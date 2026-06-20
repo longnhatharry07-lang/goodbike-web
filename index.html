@@ -68,9 +68,10 @@
   .lane{position:relative;flex:1;height:100%}
   .gridcell{position:absolute;top:0;height:100%;width:var(--dayw);border-right:1px dashed #eef2f7;cursor:pointer}
   .gridcell:hover{background:#f0f9ff}
-  .bar{position:absolute;top:7px;height:calc(var(--rowh) - 14px);border-radius:7px;color:#1f2937;font-size:11px;display:flex;align-items:center;padding:0 8px;overflow:visible;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.08);z-index:2}
-  .bar .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis}
-  .bar .ret{position:absolute;right:-2px;top:50%;transform:translate(100%,-50%);background:#0f172a;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;margin-left:6px;box-shadow:0 1px 2px rgba(0,0,0,.3);white-space:nowrap}
+  .bar{position:absolute;top:7px;height:calc(var(--rowh) - 14px);border-radius:7px;color:#1f2937;font-size:11px;display:flex;align-items:center;gap:6px;padding:0 7px;overflow:hidden;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.08);z-index:2}
+  .bar .bt{flex:0 0 auto;font-size:10px;font-weight:700;opacity:.9}
+  .bar .nm{flex:1 1 auto;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+  .bar .ret{flex:0 0 auto;font-size:10px;font-weight:700;opacity:.9}
   .bar.unpaid{background-image:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(255,255,255,.45) 6px,rgba(255,255,255,.45) 12px)}
   /* tables */
   table{border-collapse:collapse;width:100%;font-size:13px}
@@ -155,6 +156,7 @@
   .btn-call{background:#0891b2;color:#fff;width:44px;padding:0;border-radius:50%;font-size:18px;flex:0 0 auto}
   .btn-done{background:#16a34a;color:#fff}
   .btn-save{background:#0284c7;color:#fff}
+  .btn-undo{background:#fef3c7;color:#b45309}
   @media(max-width:520px){.bk-actions{flex-wrap:wrap}.bk-actions .btn-done,.bk-actions .btn-save{flex:1}}
   td.unpaidcell{color:#dc2626;font-style:italic;background:#fff5f5;background-image:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(220,38,38,.10) 5px,rgba(220,38,38,.10) 10px)}
   .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
@@ -167,7 +169,20 @@
   .tlstats .sv small{font-size:11px;font-weight:600;color:#94a3b8}
   .tlstats .sl{font-size:11px;color:#64748b;white-space:nowrap}
   .tlstats .stat.rev .sv{color:#15803d}
+  .tlstats .stat.freebtn{cursor:pointer;transition:background .12s,border-color .12s}
+  .tlstats .stat.freebtn:hover{background:#eff6ff;border-color:#bfdbfe}
   @media(max-width:560px){.tlstats .stat{flex:1 1 calc(50% - 4px)}}
+  /* danh sách xe trống */
+  .fb-list{display:flex;flex-direction:column;gap:6px}
+  .fb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid #eef2f7;border-radius:10px;background:#f8fafc}
+  .fb-row .fb-xe{font-weight:700;color:#0f172a}
+  .fb-row .fb-xe small{font-weight:600;color:#94a3b8;font-size:11px;margin-left:4px}
+  .fb-rdy{font-weight:700;color:#15803d;background:#dcfce7;border-radius:999px;padding:3px 12px;font-size:12px}
+  .fb-time{font-weight:700;color:#b45309;background:#fef3c7;border-radius:999px;padding:3px 12px;font-size:12px}
+  /* toast hoàn tác */
+  #undoToast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:none;align-items:center;gap:14px;background:#0f172a;color:#fff;border-radius:12px;padding:11px 16px;box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:80;font-size:14px}
+  #undoToast button{background:#f59e0b;color:#1f2937;font-weight:700;border-radius:8px;padding:6px 12px;font-size:13px}
+  #undoToast button:hover{background:#fbbf24}
   .muted{color:var(--muted)}
   .right{margin-left:auto}
   /* modal */
@@ -472,6 +487,7 @@
       <button class="btn-del" id="bkDelete" style="display:none" title="Xóa booking" aria-label="Xóa booking">🗑</button>
       <span class="act-spacer"></span>
       <button class="btn-call" id="bkCall" style="display:none" title="Gọi khách" aria-label="Gọi khách">📞</button>
+      <button class="btn-undo" id="bkUndo" style="display:none" title="Hoàn tác giao/thu hồi gần nhất">↩ Hoàn tác</button>
       <button class="btn-done" id="bkSchDone" style="display:none">✓ Hoàn thành</button>
       <button class="btn-save" id="bkSave">💾 Lưu</button>
     </div>
@@ -598,6 +614,7 @@
     <div id="sa_paylist" style="border:1px solid var(--line);border-radius:8px;padding:6px;max-height:200px;overflow:auto;background:#fbfdff"></div>
     <div class="actions">
       <button class="ghost" id="schActCancel">Đóng</button>
+      <button class="ghost" id="schActUndo" style="display:none;background:#fef3c7;color:#b45309;border-color:#fde68a">↩ Hoàn tác</button>
       <button class="primary" id="schActCall" style="display:none;background:#16a34a;color:#fff">📞 Gọi khách</button>
       <button class="primary" id="schActDone">✓ Hoàn thành</button>
     </div>
@@ -7509,18 +7526,18 @@ function renderTimeline(){
     for(let i=1;i<=ndays;i++){rows+=`<div class="gridcell" style="left:${(i-1)*DAYW}px" data-xe="${v.id}" data-day="${i}"></div>`;}
     // bars
     DB.bookings.filter(b=>b.xe===v.id).forEach(b=>{
-      const seg=clampSeg(b,ndays);
-      if(!seg)return;
-      const left=seg.startIdx*DAYW + DAYW/2;            // center of arrive day
-      const width=Math.max((seg.endIdx-seg.startIdx)*DAYW, 120);
+      const g=barGeom(b,ndays);            // vị trí bám theo GIỜ thực tế (nhận→trả) như ezCloud
+      if(!g)return;
       const st=computeStatus(b);
       const col=STATUS[st].color;
       const txtDark=isLight(col);
       const owe=remainOf(b)>0;
-      rows+=`<div class="bar ${owe?'unpaid':''}" data-id="${b.id}" title="${b.xe} · ${b.src} · ${STATUS[st].label} · ${fmtDMY(b.arrive)}→${fmtDMY(b.depart)}"
-            style="left:${left}px;width:${width}px;background:${col};color:${txtDark?'#1f2937':'#fff'}">
+      const dt=b.dtime||'08:00', rt=b.rtime||'12:00';
+      rows+=`<div class="bar ${owe?'unpaid':''}" data-id="${b.id}" title="${b.xe} · ${b.src} · ${STATUS[st].label} · ${fmtDMY(b.arrive)} ${dt} → ${fmtDMY(b.depart)} ${rt}"
+            style="left:${g.left}px;width:${g.width}px;background:${col};color:${txtDark?'#1f2937':'#fff'}">
+            <span class="bt">${dt}</span>
             <span class="nm">${b.guest||b.src}</span>
-            <span class="ret">⏱ ${b.rtime} ${fmtDM(b.depart)}</span></div>`;
+            <span class="ret">${rt} ${fmtDM(b.depart)}</span></div>`;
     });
     if(nowLX!=null) rows+=`<div class="nowline" style="left:${nowLX}px"></div>`;  // đường hiện tại — NẰM SAU thanh booking (z-index thấp hơn)
     rows+='</div></div>';
@@ -7542,9 +7559,40 @@ function renderTlStats(){
   const tot=VEHICLES.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
   el.innerHTML=`
     <div class="stat"><span class="sv">${thue}<small>/${tot}</small></span><span class="sl">🛵 Đang thuê</span></div>
-    <div class="stat"><span class="sv">${trong}</span><span class="sl">🅿️ Đang trống</span></div>
+    <div class="stat freebtn" id="statFree" title="Bấm để xem chi tiết xe trống & giờ có thể thuê"><span class="sv">${trong}</span><span class="sl">🅿️ Đang trống ›</span></div>
     <div class="stat"><span class="sv">${pct}%</span><span class="sl">📊 Công suất</span></div>
     <div class="stat rev"><span class="sv">${fmtVND(rev)}đ</span><span class="sl">💰 Doanh thu ${fmtDM(T)}</span></div>`;
+  const fb=document.getElementById('statFree'); if(fb) fb.onclick=openFreeBikes;
+}
+/* ====== Chi tiết XE TRỐNG hôm nay (bấm vào ô "Đang trống") ====== */
+// Tình trạng 1 xe hôm nay: 'busy' (đang thuê qua hôm nay), 'ready' (trống cả ngày / đã trả), 'time' (sẽ trống từ giờ trả)
+function bikeAvailability(xe,T){
+  const active=DB.bookings.filter(b=>b.xe===xe && b.status!=='datra' && b.arrive<=T && b.depart>=T);
+  if(active.length===0) return {state:'ready'};                       // không có booking đang thuê / đã trả → sẵn sàng
+  if(active.some(b=>b.depart>T)) return {state:'busy'};               // còn thuê qua hôm nay → bận
+  const t=active.map(b=>b.rtime||'12:00').sort().slice(-1)[0];        // đều trả trong hôm nay → trống từ giờ trả muộn nhất
+  return {state:'time',time:t};
+}
+function showModal(title,body){
+  let ov=document.getElementById('genModal');
+  if(!ov){ov=document.createElement('div');ov.id='genModal';ov.className='overlay';
+    ov.innerHTML='<div class="modal"><button class="modal-x" id="genModalX" title="Đóng">✕</button><h3 id="genModalT"></h3><div id="genModalB"></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
+    document.getElementById('genModalX').onclick=()=>ov.classList.remove('open');}
+  document.getElementById('genModalT').innerHTML=title;
+  document.getElementById('genModalB').innerHTML=body;
+  ov.classList.add('open');
+}
+function openFreeBikes(){
+  const T=todayStr();
+  const rows=VEHICLES.map(v=>({v,a:bikeAvailability(v.id,T)})).filter(x=>x.a.state!=='busy');
+  rows.sort((a,b)=>(a.a.state==='ready'?0:1)-(b.a.state==='ready'?0:1) || ((a.a.time||'')<(b.a.time||'')?-1:1));
+  const list=rows.length
+    ? rows.map(x=>`<div class="fb-row"><span class="fb-xe">${x.v.id}<small>${x.v.typ}</small></span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`).join('')
+    : '<div class="muted" style="padding:10px">Hôm nay không có xe trống.</div>';
+  showModal(`🅿️ Xe có thể cho thuê — ${fmtDM(T)}`,
+    `<div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = trống cả ngày hoặc đã trả. “Trống từ HH:MM” = giờ khách đang thuê sẽ trả xe.</div>`);
 }
 function scrollTimelineToToday(){
   const t=todayStr();
@@ -7562,6 +7610,23 @@ function clampSeg(b,ndays){
   let endIdx=+e.split('-')[2]-1;
   if(endIdx<=startIdx)endIdx=startIdx+1; // ensure visible width incl. return day
   return {startIdx,endIdx};
+}
+// Phần giờ trong ngày (0..1): "07:00" -> 7/24. Mỗi ô ngày = 24h, 0h ở mép trái (khớp đường "hiện tại").
+function hm2frac(t){const m=/^(\d{1,2}):(\d{2})/.exec(t||'');if(!m)return 0;return (Math.min(+m[1],23)*60+Math.min(+m[2],59))/1440;}
+// Vị trí thanh booking bám theo GIỜ thực tế: trái = ngày nhận + giờ nhận, phải = ngày trả + giờ trả.
+function barGeom(b,ndays){
+  const mStart=curMonth+'-01', mEnd=`${curMonth}-${String(ndays).padStart(2,'0')}`;
+  if(b.depart<mStart||b.arrive>mEnd)return null;
+  let left;
+  if(b.arrive<mStart){left=0;}                                                     // tràn từ tháng trước → bắt đầu ở mép trái
+  else{const si=+b.arrive.split('-')[2]-1; left=si*DAYW + hm2frac(b.dtime||'08:00')*DAYW;}
+  let right;
+  if(b.depart>mEnd){right=ndays*DAYW;}                                             // tràn sang tháng sau → kéo hết lane
+  else{const ei=+b.depart.split('-')[2]-1; right=ei*DAYW + hm2frac(b.rtime||'12:00')*DAYW;}
+  let width=right-left;
+  const MINW=16;                                                                   // tối thiểu để còn bấm được (chuyến cực ngắn)
+  if(width<MINW)width=MINW;
+  return {left,width};
 }
 function isLight(hex){const c=hex.replace('#','');const r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);return (0.299*r+0.587*g+0.114*b)>150;}
 
@@ -7961,6 +8026,9 @@ function openSchAct(id,kind){
   if(ph){callBtn.style.display='';callBtn.textContent='📞 Gọi khách — '+ph;callBtn.onclick=()=>{window.location.href='tel:'+ph;};}
   else{callBtn.style.display='none';callBtn.onclick=null;}
   document.getElementById('schActDone').textContent=kind==='Giao'?'✓ Hoàn thành & Giao xe':'✓ Hoàn thành & Thu hồi';
+  const ub=document.getElementById('schActUndo');
+  if(b.undoState){ ub.style.display=''; ub.textContent='↩ Hoàn tác '+(b._undoKind==='Giao'?'giao xe':'thu hồi'); ub.onclick=()=>doUndoFor(id); }
+  else { ub.style.display='none'; ub.onclick=null; }
   document.getElementById('schActOverlay').classList.add('open');
 }
 function renderSaPayments(){
@@ -7989,14 +8057,54 @@ document.getElementById('sa_addpay').onclick=()=>{
   renderSaPayments();saRecalc();
 };
 document.getElementById('schActCancel').onclick=()=>document.getElementById('schActOverlay').classList.remove('open');
+/* ====== HOÀN TÁC tình trạng (lỡ bấm giao/thu hồi) ====== */
+// Ảnh chụp các trường bị đổi khi giao/thu hồi — lưu vào b.undoState (TRƯỚC khi đổi)
+function snapshotBk(b){return {status:b.status,dtime:b.dtime,rtime:b.rtime,arrive:b.arrive,depart:b.depart,prices:JSON.parse(JSON.stringify(b.prices||{})),payments:JSON.parse(JSON.stringify(b.payments||[])),prepaid:b.prepaid,pay:b.pay};}
+let _undoTimer=null;
+function showUndoToast(id,kind,xe){
+  let t=document.getElementById('undoToast');
+  if(!t){t=document.createElement('div');t.id='undoToast';document.body.appendChild(t);}
+  t.innerHTML=`<span>Đã ${kind==='Giao'?'giao xe':'thu hồi xe'} <b>${xe}</b></span><button id="undoBtn">↩ Hoàn tác</button>`;
+  t.style.display='flex';
+  document.getElementById('undoBtn').onclick=()=>doUndoFor(id);
+  clearTimeout(_undoTimer);_undoTimer=setTimeout(()=>{const x=document.getElementById('undoToast');if(x)x.style.display='none';},15000); // toast tự ẩn 15s, nút trong chi tiết vẫn còn
+}
+function doUndoFor(id){
+  const b=DB.bookings.find(x=>x.id===id); if(!b)return;
+  if(b.undoState){                                   // có ảnh chụp (vừa giao/thu hồi) → khôi phục đầy đủ cả giờ/ngày/giá
+    const s=b.undoState;
+    b.status=s.status;b.dtime=s.dtime;b.rtime=s.rtime;b.arrive=s.arrive;b.depart=s.depart;
+    b.prices=JSON.parse(JSON.stringify(s.prices));b.payments=JSON.parse(JSON.stringify(s.payments));b.prepaid=s.prepaid;b.pay=s.pay;
+    delete b.undoState; delete b._undoKind;
+  } else {                                            // không có ảnh chụp → lùi đúng 1 bước trạng thái
+    if(b.status==='datra') b.status='danhan';         // đã trả → đang thuê
+    else if(b.status==='danhan') b.status='sapnhan';  // đã nhận → sắp nhận
+  }
+  const t=document.getElementById('undoToast');if(t)t.style.display='none';
+  document.getElementById('schActOverlay').classList.remove('open');
+  document.getElementById('bkOverlay').classList.remove('open');
+  renderAll();
+}
 document.getElementById('schActDone').onclick=()=>{
   const b=DB.bookings.find(x=>x.id===schActId);if(!b)return;
+  const _snap=snapshotBk(b);                 // chụp trạng thái TRƯỚC khi đổi để còn Hoàn tác
   b.payments=saPayments.filter(p=>(+p.amount||0)!==0);
   b.prepaid=b.payments.reduce((a,p)=>a+(+p.amount||0),0);
   const ms=[...new Set(b.payments.map(p=>p.method))];
   b.pay=ms.sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a])[0]||'';
+  // Ghi giờ THỰC TẾ lúc giao/thu hồi → sơ đồ cập nhật ngay
+  const _now=nowHHMM(), _td=todayStr();
+  if(schActKind==='Giao'){ b.dtime=_now; }
+  else {
+    b.rtime=_now;
+    // Trả SỚM hơn ngày hẹn → rút ngắn ngày trả về hôm nay để giải phóng xe bán tiếp;
+    // cắt giá các ngày sau hôm nay nên doanh thu chỉ tính số ngày thực tế đã thuê.
+    if(b.depart>_td){ b.depart=_td; if(b.prices) Object.keys(b.prices).forEach(ds=>{ if(ds>_td) delete b.prices[ds]; }); }
+  }
   b.status=schActKind==='Giao'?'danhan':'datra';
+  b.undoState=_snap; b._undoKind=schActKind;                    // lưu để Hoàn tác từ chi tiết
   document.getElementById('schActOverlay').classList.remove('open');renderAll();
+  showUndoToast(b.id,schActKind,b.xe);                          // toast hoàn tác nhanh
 };
 document.getElementById('schDate').onchange=e=>{schDate=e.target.value;renderSchedule();};
 document.getElementById('schPrev').onclick=()=>{schDate=addDays(schDate,-1);renderSchedule();};
@@ -8055,6 +8163,14 @@ function openBooking(id,prefill,schedKind){
   const sd=document.getElementById('bkSchDone');
   if(schedKind){sd.style.display='';sd.textContent=schedKind==='Giao'?'✓ Hoàn thành & Giao xe':'✓ Hoàn thành & Thu hồi';}
   else sd.style.display='none';
+  // Nút Hoàn tác trạng thái — LUÔN hiện khi xe đã nhận/đã trả (lùi 1 bước, kiểu undo check-in/out ezCloud)
+  const ub=document.getElementById('bkUndo');
+  const _bb=id?DB.bookings.find(x=>x.id===id):null;
+  if(_bb && (_bb.status==='danhan'||_bb.status==='datra')){
+    ub.style.display='';
+    ub.textContent = _bb.status==='datra' ? '↩ Hoàn tác trả xe' : '↩ Hoàn tác nhận xe';
+    ub.onclick=()=>doUndoFor(id);
+  } else { ub.style.display='none'; ub.onclick=null; }
   updateBkCall();
   bkOv.classList.add('open');
 }
@@ -8154,12 +8270,21 @@ document.getElementById('bk_addpay').onclick=()=>{
 };
 document.querySelectorAll('.mtab').forEach(t=>t.onclick=()=>activateMtab(t.dataset.t));
 document.getElementById('bkSchDone').onclick=()=>{ // từ Lịch giao trả: set check-in/out + GIỜ THỰC TẾ rồi lưu
+  const _b=editingBk?DB.bookings.find(x=>x.id===editingBk):null;
+  const _snap=_b?snapshotBk(_b):null;            // chụp trạng thái TRƯỚC để Hoàn tác
+  const _kind=bkSchKind;
   if(bkSchKind){
     f('status', bkSchKind==='Giao'?'danhan':'datra');
     const now=nowHHMM();
     if(bkSchKind==='Giao') f('dtime', now); else f('rtime', now);  // ghi giờ tại thời điểm giao/thu hồi, không dùng giờ đặt trước
   }
   document.getElementById('bkSave').click();
+  if(_b&&_snap&&_kind){
+    // Thu hồi mà trả SỚM hơn ngày hẹn → rút ngắn ngày trả về hôm nay + cắt giá ngày sau (giải phóng xe, doanh thu theo ngày thực)
+    if(_kind!=='Giao' && _b.depart>todayStr()){ _b.depart=todayStr(); if(_b.prices) Object.keys(_b.prices).forEach(ds=>{ if(ds>todayStr()) delete _b.prices[ds]; }); }
+    _b.undoState=_snap; _b._undoKind=_kind; showUndoToast(_b.id,_kind,_b.xe);
+    renderAll();
+  }
 };
 document.getElementById('bkCall').onclick=()=>{const ph=bkPhoneNow()||(f('phone')||'').replace(/[^\d+]/g,'');if(ph)window.location.href='tel:'+ph;else alert('Booking này chưa có số điện thoại.');};
 document.getElementById('addBk').onclick=()=>openBooking(null);   // mặc định ngày = hôm nay
