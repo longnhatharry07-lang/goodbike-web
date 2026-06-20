@@ -72,6 +72,7 @@
   .bar .bt{flex:0 0 auto;font-size:10px;font-weight:700;opacity:.9}
   .bar .nm{flex:1 1 auto;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis}
   .bar .ret{flex:0 0 auto;font-size:10px;font-weight:700;opacity:.9}
+  .bar .swapmark{flex:0 0 auto;font-size:15px;font-weight:900;line-height:1;padding:0 2px;text-shadow:0 1px 1px rgba(0,0,0,.25)}
   .bar.unpaid{background-image:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(255,255,255,.45) 6px,rgba(255,255,255,.45) 12px)}
   /* tables */
   table{border-collapse:collapse;width:100%;font-size:13px}
@@ -157,6 +158,15 @@
   .btn-done{background:#16a34a;color:#fff}
   .btn-save{background:#0284c7;color:#fff}
   .btn-undo{background:#fef3c7;color:#b45309}
+  .btn-swap{background:#e0e7ff;color:#4338ca}
+  .swap-opts{display:flex;flex-direction:column;gap:6px}
+  .swap-opts label{display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:8px 10px;cursor:pointer}
+  .swap-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 10px}
+  .swap-col{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfdff}
+  .swap-col-h{font-weight:800;margin-bottom:8px;color:#0f172a}
+  .swap-col .sdp-wrap{max-height:160px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px;margin-top:4px;background:#fff}
+  .swap-tot{margin-top:8px;font-size:14px;text-align:right}
+  @media(max-width:640px){.swap-cols{grid-template-columns:1fr}}
   @media(max-width:520px){.bk-actions{flex-wrap:wrap}.bk-actions .btn-done,.bk-actions .btn-save{flex:1}}
   td.unpaidcell{color:#dc2626;font-style:italic;background:#fff5f5;background-image:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(220,38,38,.10) 5px,rgba(220,38,38,.10) 10px)}
   .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
@@ -179,6 +189,9 @@
   .fb-row .fb-xe small{font-weight:600;color:#94a3b8;font-size:11px;margin-left:4px}
   .fb-rdy{font-weight:700;color:#15803d;background:#dcfce7;border-radius:999px;padding:3px 12px;font-size:12px}
   .fb-time{font-weight:700;color:#b45309;background:#fef3c7;border-radius:999px;padding:3px 12px;font-size:12px}
+  .fb-tags{display:inline-flex;align-items:center;gap:6px}
+  .fb-b18{font-weight:700;color:#7c3aed;background:#ede9fe;border-radius:999px;padding:3px 10px;font-size:11px}
+  .fb-row.fb-early{border-color:#ddd6fe;background:#faf5ff}
   /* toast hoàn tác */
   #undoToast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:none;align-items:center;gap:14px;background:#0f172a;color:#fff;border-radius:12px;padding:11px 16px;box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:80;font-size:14px}
   #undoToast button{background:#f59e0b;color:#1f2937;font-weight:700;border-radius:8px;padding:6px 12px;font-size:13px}
@@ -488,6 +501,7 @@
       <span class="act-spacer"></span>
       <button class="btn-call" id="bkCall" style="display:none" title="Gọi khách" aria-label="Gọi khách">📞</button>
       <button class="btn-undo" id="bkUndo" style="display:none" title="Hoàn tác giao/thu hồi gần nhất">↩ Hoàn tác</button>
+      <button class="btn-swap" id="bkSwap" style="display:none" title="Đổi sang xe khác">🔁 Đổi xe</button>
       <button class="btn-done" id="bkSchDone" style="display:none">✓ Hoàn thành</button>
       <button class="btn-save" id="bkSave">💾 Lưu</button>
     </div>
@@ -617,6 +631,33 @@
       <button class="ghost" id="schActUndo" style="display:none;background:#fef3c7;color:#b45309;border-color:#fde68a">↩ Hoàn tác</button>
       <button class="primary" id="schActCall" style="display:none;background:#16a34a;color:#fff">📞 Gọi khách</button>
       <button class="primary" id="schActDone">✓ Hoàn thành</button>
+    </div>
+  </div>
+</div>
+
+<!-- Swap (đổi xe) modal -->
+<div class="overlay" id="swapOverlay">
+  <div class="modal" style="width:min(900px,100%)">
+    <button class="modal-x" data-close="swapOverlay" title="Đóng">✕</button>
+    <h3>🔁 Đổi xe — <span id="swapGuest"></span></h3>
+    <div id="swapInfo" class="muted" style="margin-bottom:10px"></div>
+    <div class="grid2">
+      <div class="field"><label>Xe mới</label><select id="swapNewXe"></select></div>
+      <div class="field"><label>Thời điểm đổi (giờ hiện tại)</label><input type="text" id="swapWhen" readonly></div>
+    </div>
+    <div class="field"><label>Phương án doanh thu</label>
+      <div class="swap-opts">
+        <label><input type="radio" name="swapOpt" value="1" checked> <b>PA1</b> — Tách doanh thu theo thời gian (xe cũ giữ phần đã chạy, xe mới phần còn lại)</label>
+        <label><input type="radio" name="swapOpt" value="2"> <b>PA2</b> — Dồn toàn bộ doanh thu sang xe mới (xe cũ ghi nhận, doanh thu 0)</label>
+      </div>
+    </div>
+    <div class="swap-cols">
+      <div class="swap-col" id="swapColOld"></div>
+      <div class="swap-col" id="swapColNew"></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="swapCancel">Hủy</button>
+      <button class="primary" id="swapSave">💾 Hoàn tất đổi xe</button>
     </div>
   </div>
 </div>
@@ -7533,11 +7574,14 @@ function renderTimeline(){
       const txtDark=isLight(col);
       const owe=remainOf(b)>0;
       const dt=b.dtime||'08:00', rt=b.rtime||'12:00';
-      rows+=`<div class="bar ${owe?'unpaid':''}" data-id="${b.id}" title="${b.xe} · ${b.src} · ${STATUS[st].label} · ${fmtDMY(b.arrive)} ${dt} → ${fmtDMY(b.depart)} ${rt}"
+      const swOut = b._swapNewId ? `<span class="swapmark" title="Đã đổi sang xe ${b._swapToXe||'khác'}">⇶</span>` : '';
+      const swIn  = b._swapFromXe ? `<span class="swapmark in" title="Đổi từ xe ${b._swapFromXe}">⇶</span>` : '';
+      const swT   = b._swapNewId ? ` · ⇶ đã đổi sang ${b._swapToXe||''}` : (b._swapFromXe ? ` · ⇶ đổi từ ${b._swapFromXe}` : '');
+      rows+=`<div class="bar ${owe?'unpaid':''}" data-id="${b.id}" title="${b.xe} · ${b.src} · ${STATUS[st].label} · ${fmtDMY(b.arrive)} ${dt} → ${fmtDMY(b.depart)} ${rt}${swT}"
             style="left:${g.left}px;width:${g.width}px;background:${col};color:${txtDark?'#1f2937':'#fff'}">
-            <span class="bt">${dt}</span>
+            ${swIn}<span class="bt">${dt}</span>
             <span class="nm">${b.guest||b.src}</span>
-            <span class="ret">${rt} ${fmtDM(b.depart)}</span></div>`;
+            <span class="ret">${rt} ${fmtDM(b.depart)}</span>${swOut}</div>`;
     });
     if(nowLX!=null) rows+=`<div class="nowline" style="left:${nowLX}px"></div>`;  // đường hiện tại — NẰM SAU thanh booking (z-index thấp hơn)
     rows+='</div></div>';
@@ -7557,12 +7601,21 @@ function renderTlStats(){
     if(nightsOf(b).includes(T)) rev+=priceOn(b,T);                                                   // doanh thu hôm nay theo DAY_PRICE
   });
   const tot=VEHICLES.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
+  const before18=retBefore18Set(T).size;   // số xe trả/sẽ trả trước 18h hôm nay → trống để bán buổi tối
   el.innerHTML=`
     <div class="stat"><span class="sv">${thue}<small>/${tot}</small></span><span class="sl">🛵 Đang thuê</span></div>
     <div class="stat freebtn" id="statFree" title="Bấm để xem chi tiết xe trống & giờ có thể thuê"><span class="sv">${trong}</span><span class="sl">🅿️ Đang trống ›</span></div>
+    <div class="stat freebtn" id="statBefore18" title="Xe trả/sẽ trả trước 18h hôm nay — bấm xem chi tiết"><span class="sv">${before18}</span><span class="sl">🕕 Trả trước 18h ›</span></div>
     <div class="stat"><span class="sv">${pct}%</span><span class="sl">📊 Công suất</span></div>
     <div class="stat rev"><span class="sv">${fmtVND(rev)}đ</span><span class="sl">💰 Doanh thu ${fmtDM(T)}</span></div>`;
   const fb=document.getElementById('statFree'); if(fb) fb.onclick=openFreeBikes;
+  const b18=document.getElementById('statBefore18'); if(b18) b18.onclick=openFreeBikes;
+}
+// Tập xe có chuyến TRẢ trong hôm nay với giờ trả < 18:00 (đã trả hoặc còn đang thuê sẽ trả) → trống trước buổi tối
+function retBefore18Set(T){
+  const s=new Set();
+  DB.bookings.forEach(b=>{ if((b.status==='danhan'||b.status==='datra') && b.depart===T && (b.rtime||'12:00')<'18:00') s.add(b.xe); });
+  return s;
 }
 /* ====== Chi tiết XE TRỐNG hôm nay (bấm vào ô "Đang trống") ====== */
 // Tình trạng 1 xe hôm nay: 'busy' (đang thuê qua hôm nay), 'ready' (trống cả ngày / đã trả), 'time' (sẽ trống từ giờ trả)
@@ -7588,11 +7641,12 @@ function openFreeBikes(){
   const T=todayStr();
   const rows=VEHICLES.map(v=>({v,a:bikeAvailability(v.id,T)})).filter(x=>x.a.state!=='busy');
   rows.sort((a,b)=>(a.a.state==='ready'?0:1)-(b.a.state==='ready'?0:1) || ((a.a.time||'')<(b.a.time||'')?-1:1));
+  const cnt18=retBefore18Set(T).size;
   const list=rows.length
     ? rows.map(x=>`<div class="fb-row"><span class="fb-xe">${x.v.id}<small>${x.v.typ}</small></span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`).join('')
     : '<div class="muted" style="padding:10px">Hôm nay không có xe trống.</div>';
   showModal(`🅿️ Xe có thể cho thuê — ${fmtDM(T)}`,
-    `<div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = trống cả ngày hoặc đã trả. “Trống từ HH:MM” = giờ khách đang thuê sẽ trả xe.</div>`);
+    `<div class="muted" style="font-size:12px;padding:0 2px 8px">Trống/sẽ trống: <b>${rows.length}</b> xe · Trả trước 18h: <b>${cnt18}</b> xe</div><div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = trống cả ngày hoặc đã trả. “Trống từ HH:MM” = giờ khách đang thuê sẽ trả xe.</div>`);
 }
 function scrollTimelineToToday(){
   const t=todayStr();
@@ -8064,14 +8118,16 @@ let _undoTimer=null;
 function showUndoToast(id,kind,xe){
   let t=document.getElementById('undoToast');
   if(!t){t=document.createElement('div');t.id='undoToast';document.body.appendChild(t);}
-  t.innerHTML=`<span>Đã ${kind==='Giao'?'giao xe':'thu hồi xe'} <b>${xe}</b></span><button id="undoBtn">↩ Hoàn tác</button>`;
+  const verb = kind==='Giao'?'giao xe':kind==='Đổi'?'đổi xe':'thu hồi xe';
+  t.innerHTML=`<span>Đã ${verb} <b>${xe}</b></span><button id="undoBtn">↩ Hoàn tác</button>`;
   t.style.display='flex';
   document.getElementById('undoBtn').onclick=()=>doUndoFor(id);
   clearTimeout(_undoTimer);_undoTimer=setTimeout(()=>{const x=document.getElementById('undoToast');if(x)x.style.display='none';},15000); // toast tự ẩn 15s, nút trong chi tiết vẫn còn
 }
 function doUndoFor(id){
   const b=DB.bookings.find(x=>x.id===id); if(!b)return;
-  if(b.undoState){                                   // có ảnh chụp (vừa giao/thu hồi) → khôi phục đầy đủ cả giờ/ngày/giá
+  if(b._swapNewId){ DB.bookings=DB.bookings.filter(x=>x.id!==b._swapNewId); delete b._swapNewId; delete b._swapToXe; } // hoàn tác đổi xe: xóa booking xe mới + bỏ dấu ⇶
+  if(b.undoState){                                   // có ảnh chụp (vừa giao/thu hồi/đổi xe) → khôi phục đầy đủ cả giờ/ngày/giá
     const s=b.undoState;
     b.status=s.status;b.dtime=s.dtime;b.rtime=s.rtime;b.arrive=s.arrive;b.depart=s.depart;
     b.prices=JSON.parse(JSON.stringify(s.prices));b.payments=JSON.parse(JSON.stringify(s.payments));b.prepaid=s.prepaid;b.pay=s.pay;
@@ -8168,9 +8224,13 @@ function openBooking(id,prefill,schedKind){
   const _bb=id?DB.bookings.find(x=>x.id===id):null;
   if(_bb && (_bb.status==='danhan'||_bb.status==='datra')){
     ub.style.display='';
-    ub.textContent = _bb.status==='datra' ? '↩ Hoàn tác trả xe' : '↩ Hoàn tác nhận xe';
+    ub.textContent = _bb._swapNewId ? '↩ Hoàn tác đổi xe' : (_bb.status==='datra' ? '↩ Hoàn tác trả xe' : '↩ Hoàn tác nhận xe');
     ub.onclick=()=>doUndoFor(id);
   } else { ub.style.display='none'; ub.onclick=null; }
+  // Nút Đổi xe — hiện khi xe đang được thuê (đã nhận)
+  const sw=document.getElementById('bkSwap');
+  if(_bb && _bb.status==='danhan'){ sw.style.display=''; sw.onclick=()=>openSwap(id); }
+  else { sw.style.display='none'; sw.onclick=null; }
   updateBkCall();
   bkOv.classList.add('open');
 }
@@ -8307,6 +8367,89 @@ document.getElementById('bkDelete').onclick=()=>{
   if(!confirm('Xóa booking này?'))return;
   DB.bookings=DB.bookings.filter(x=>x.id!==editingBk);
   bkOv.classList.remove('open');renderAll();
+};
+
+/* ============ ĐỔI XE (swap) ============ */
+let swapOldId=null, swapOld=null, swapNew=null;
+const swapOv=document.getElementById('swapOverlay');
+function swapOptVal(){const r=document.querySelector('input[name="swapOpt"]:checked');return r?r.value:'1';}
+function swapTot(o){return Object.values(o.prices||{}).reduce((a,p)=>a+(+p||0),0);}
+function buildSwapDefaults(b,opt,newXe){
+  const T=todayStr(), now=nowHHMM();
+  const oldb={xe:b.xe,arrive:b.arrive,dtime:b.dtime||'08:00',depart:T,rtime:now,prices:{}};
+  const neo ={xe:newXe,arrive:T,dtime:now,depart:b.depart,rtime:b.rtime||'12:00',prices:{}};
+  const allP=b.prices||{};
+  if(opt==='2'){ neo.prices=JSON.parse(JSON.stringify(allP)); }                 // PA2: dồn toàn bộ doanh thu sang xe mới, xe cũ = 0
+  else { Object.keys(allP).forEach(ds=>{ if(ds<=T) oldb.prices[ds]=allP[ds]; else neo.prices[ds]=allP[ds]; }); } // PA1: ngày đổi tính cho xe cũ
+  return {old:oldb,neo};
+}
+function swapDayRows(o){
+  const days=Array.from(new Set([...dayListIncl(o.arrive,o.depart),...Object.keys(o.prices||{})])).sort();
+  return days.map(ds=>`<div class="dayprice"><span>${fmtDMY(ds)}</span><input type="number" class="sdp" data-d="${ds}" value="${o.prices&&o.prices[ds]!=null?o.prices[ds]:0}" step="10000" style="width:130px"></div>`).join('');
+}
+function renderSwapCol(side){
+  const o=side==='old'?swapOld:swapNew;
+  const el=document.getElementById(side==='old'?'swapColOld':'swapColNew');
+  el.innerHTML=`
+    <div class="swap-col-h">${side==='old'?('Xe cũ — '+o.xe+' · đã trả'):('Xe mới — '+o.xe+' · đang thuê')}</div>
+    <div class="grid2">
+      <div class="field"><label>Nhận</label><div class="trip-fields"><input type="date" class="sf" data-side="${side}" data-k="arrive" value="${o.arrive}"><input type="time" class="sf" data-side="${side}" data-k="dtime" value="${o.dtime}"></div></div>
+      <div class="field"><label>Trả</label><div class="trip-fields"><input type="date" class="sf" data-side="${side}" data-k="depart" value="${o.depart}"><input type="time" class="sf" data-side="${side}" data-k="rtime" value="${o.rtime}"></div></div>
+    </div>
+    <label style="font-size:12px;color:var(--muted);font-weight:600">Giá từng ngày</label>
+    <div class="sdp-wrap">${swapDayRows(o)}</div>
+    <div class="swap-tot">Doanh thu: <b id="swapTot-${side}">${fmtVND(swapTot(o))} đ</b></div>`;
+  el.querySelectorAll('.sf').forEach(inp=>inp.onchange=()=>{o[inp.dataset.k]=inp.value;renderSwapCol(side);});
+  el.querySelectorAll('.sdp').forEach(inp=>inp.oninput=()=>{const v=+inp.value||0;if(v>0)o.prices[inp.dataset.d]=v;else delete o.prices[inp.dataset.d];document.getElementById('swapTot-'+side).textContent=fmtVND(swapTot(o))+' đ';});
+}
+function openSwap(id){
+  const b=DB.bookings.find(x=>x.id===id); if(!b)return;
+  swapOldId=id;
+  document.getElementById('swapGuest').textContent=(b.guest||b.src||'')+' · '+b.xe;
+  document.getElementById('swapWhen').value=fmtDMY(todayStr())+' '+nowHHMM();
+  const T=todayStr();
+  const free=VEHICLES.filter(v=>v.id!==b.xe && !xeBusy(v.id,T,b.depart,null,nowHHMM(),b.rtime||'12:00'));
+  const list=free.length?free:VEHICLES.filter(v=>v.id!==b.xe);
+  document.getElementById('swapNewXe').innerHTML=list.map(v=>`<option value="${v.id}">${v.id} (${v.typ})</option>`).join('');
+  document.getElementById('swapInfo').innerHTML=`Khách đang thuê <b>${b.xe}</b> (${fmtDMY(b.arrive)} ${b.dtime||''} → ${fmtDMY(b.depart)} ${b.rtime||''}). Chọn xe mới + phương án, chỉnh 2 bên rồi bấm Hoàn tất.`;
+  document.querySelectorAll('input[name="swapOpt"]').forEach(r=>r.checked=(r.value==='1'));
+  const built=buildSwapDefaults(b,'1',document.getElementById('swapNewXe').value); swapOld=built.old; swapNew=built.neo;
+  renderSwapCol('old'); renderSwapCol('new');
+  bkOv.classList.remove('open'); swapOv.classList.add('open');
+}
+document.getElementById('swapNewXe').onchange=e=>{ if(swapNew){swapNew.xe=e.target.value;renderSwapCol('new');} };
+document.querySelectorAll('input[name="swapOpt"]').forEach(r=>r.onchange=()=>{
+  const b=DB.bookings.find(x=>x.id===swapOldId); if(!b)return;
+  const built=buildSwapDefaults(b,swapOptVal(),document.getElementById('swapNewXe').value);
+  swapOld=built.old; swapNew=built.neo; renderSwapCol('old'); renderSwapCol('new');
+});
+document.getElementById('swapCancel').onclick=()=>swapOv.classList.remove('open');
+document.getElementById('swapSave').onclick=()=>{
+  const b=DB.bookings.find(x=>x.id===swapOldId); if(!b){swapOv.classList.remove('open');return;}
+  const newXe=document.getElementById('swapNewXe').value;
+  if(!newXe||newXe===b.xe){alert('Hãy chọn một xe khác để đổi.');return;}
+  if(swapNew.depart<swapNew.arrive||swapOld.depart<swapOld.arrive){alert('Ngày trả phải ≥ ngày nhận ở cả hai booking.');return;}
+  if(xeBusy(newXe,swapNew.arrive,swapNew.depart,null,swapNew.dtime,swapNew.rtime)){alert('Xe mới '+newXe+' bị trùng giờ với booking khác. Chọn xe khác hoặc chỉnh giờ.');return;}
+  b.undoState=snapshotBk(b);                              // ảnh chụp để Hoàn tác đổi xe
+  const opt=swapOptVal();
+  const allPay=(b.payments||[]).map(p=>({...p}));
+  const oldPay = opt==='2'?[]:allPay;                     // PA2 chuyển tiền sang xe mới; PA1 giữ ở xe cũ
+  const newPay = opt==='2'?allPay:[];
+  // booking CŨ → đã trả tại thời điểm đổi
+  b.arrive=swapOld.arrive; b.dtime=swapOld.dtime; b.depart=swapOld.depart; b.rtime=swapOld.rtime;
+  b.prices=JSON.parse(JSON.stringify(swapOld.prices)); b.price=Object.values(swapOld.prices)[0]||0;
+  b.status='datra'; b.payments=oldPay; b.prepaid=oldPay.reduce((a,p)=>a+(+p.amount||0),0);
+  b.pay=[...new Set(oldPay.map(p=>p.method))].sort((x,y)=>PAY_PRIO[y]-PAY_PRIO[x])[0]||'';
+  // booking MỚI → xe mới đang thuê
+  const newB={id:uid(),xe:newXe,src:b.src,arrive:swapNew.arrive,dtime:swapNew.dtime,depart:swapNew.depart,rtime:swapNew.rtime,
+    status:'danhan',prices:JSON.parse(JSON.stringify(swapNew.prices)),price:Object.values(swapNew.prices)[0]||0,
+    payments:newPay,prepaid:newPay.reduce((a,p)=>a+(+p.amount||0),0),
+    pay:[...new Set(newPay.map(p=>p.method))].sort((x,y)=>PAY_PRIO[y]-PAY_PRIO[x])[0]||'',
+    guest:b.guest,daddr:b.daddr||'',raddr:b.raddr||'',_swapFromXe:b.xe};
+  DB.bookings.push(newB);
+  b._swapNewId=newB.id; b._swapToXe=newXe;               // liên kết + đánh dấu 3 mũi tên ⇶ để hoàn tác/hiển thị
+  swapOv.classList.remove('open'); renderAll();
+  showUndoToast(b.id,'Đổi',b.xe+'→'+newXe);
 };
 
 /* ============ EXPENSE MODAL ============ */
