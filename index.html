@@ -8912,7 +8912,7 @@ function moveQtyHTML(m){ return isAddMove(m)?`<span style="color:#16a34a;font-we
 function invItemName(id){const it=DB.inventoryList.find(x=>x.id===id);return it?it.name:'(đã xoá)';}
 function invFilled(c){return c && c.qty!=='' && c.qty!=null;}
 
-function invRoundState(ym,r){ const m=DB.inventoryChecks[ym]||{}; return m[r]||{items:{},done:false,doneAt:null}; }
+function invRoundState(ym,r){ const m=DB.inventoryChecks[ym]||{}; const s=m[r]||{items:{},done:false,doneAt:null}; if(!s.items)s.items={}; return s; }
 function ensureInv(ym,r){ if(!DB.inventoryChecks[ym])DB.inventoryChecks[ym]={}; const cur=DB.inventoryChecks[ym][r]; if(!cur){DB.inventoryChecks[ym][r]={items:{},done:false,doneAt:null};} else if(!cur.items){cur.items={};} return DB.inventoryChecks[ym][r]; }
 
 // ===== KIỂM KÊ ĐỊNH KÌ (công khai) — chỉ các đợt tích =====
