@@ -106,7 +106,125 @@
   .inv-item{display:flex;align-items:center;gap:8px;padding:7px 6px;border-bottom:1px dashed #eef2f7}
   .inv-item:last-child{border-bottom:none}
   .inv-item .nm{flex:1}
+  .inv-item .qty{font-size:12.5px;color:#475569;font-weight:600;white-space:nowrap}
   .inv-item .del{background:#fee2e2;color:#dc2626;padding:3px 8px;font-weight:700;border-radius:6px}
+  .inv-group{margin-bottom:12px}
+  .inv-group-h{font-weight:800;font-size:13px;color:#1f2937;padding:4px 2px;border-bottom:2px solid #eef2f7;margin-bottom:2px}
+  .inv-rtable{width:100%}
+  .inv-rtable th{font-size:12px}
+  .inv-rtable td{padding:6px 8px}
+  .inv-rtable input{padding:5px 6px;font-size:13px}
+  tr.inv-diff td{background:#fff7ed}
+  tr.inv-diff td:first-child{box-shadow:inset 3px 0 0 #f59e0b}
+  /* Nút lưu chuyên nghiệp (danh mục / biến động) */
+  .btn-pro{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 14px;border-radius:9px;font-weight:700;font-size:13px;letter-spacing:.2px;color:#fff;border:none;cursor:pointer;white-space:nowrap;transition:transform .13s ease,box-shadow .13s ease,filter .13s ease}
+  .btn-pro .ic{flex:none;display:block}
+  .btn-pro:hover{transform:translateY(-1px);filter:saturate(1.06) brightness(1.03)}
+  .btn-pro:active{transform:translateY(0)}
+  .btn-pro:focus-visible{outline:none}
+  .btn-add{background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);box-shadow:0 2px 6px rgba(2,132,199,.28),inset 0 1px 0 rgba(255,255,255,.22)}
+  .btn-add:hover{box-shadow:0 6px 16px rgba(2,132,199,.34),inset 0 1px 0 rgba(255,255,255,.28)}
+  .btn-add:active{box-shadow:0 1px 3px rgba(2,132,199,.35)}
+  .btn-add:focus-visible{box-shadow:0 0 0 3px rgba(14,165,233,.4),0 2px 6px rgba(2,132,199,.28)}
+  .btn-move{background:linear-gradient(135deg,#fb923c 0%,#ea580c 100%);box-shadow:0 2px 6px rgba(234,88,12,.28),inset 0 1px 0 rgba(255,255,255,.22)}
+  .btn-move:hover{box-shadow:0 6px 16px rgba(234,88,12,.34),inset 0 1px 0 rgba(255,255,255,.28)}
+  .btn-move:active{box-shadow:0 1px 3px rgba(234,88,12,.35)}
+  .btn-move:focus-visible{box-shadow:0 0 0 3px rgba(251,146,60,.45),0 2px 6px rgba(234,88,12,.28)}
+  /* Dropdown tài sản tuỳ biến (Biến động) */
+  .csel{position:relative}
+  .csel-btn{display:flex;align-items:center;gap:8px;width:100%;height:38px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:inherit;cursor:pointer;text-align:left}
+  .csel-btn:hover{border-color:#cbd5e1}
+  .csel.open .csel-btn{border-color:var(--brand);box-shadow:0 0 0 3px rgba(2,132,199,.12)}
+  .csel-val{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap}
+  .csel-caret{flex:none;color:#94a3b8;transition:transform .15s}
+  .csel.open .csel-caret{transform:rotate(180deg)}
+  .csel-panel{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:60;background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:0 12px 30px rgba(15,23,42,.16);padding:5px;max-height:288px;overflow:auto;display:none}
+  .csel.open .csel-panel{display:block}
+  .csel-opt{display:flex;align-items:center;gap:7px;padding:8px 9px;border-radius:7px;cursor:pointer;line-height:1.2}
+  .csel-opt:hover{background:#f1f5f9}
+  .csel-opt.sel{background:#e0f2fe}
+  .csel .nm{font-weight:700;font-size:13.5px;color:#0f172a;overflow:hidden;text-overflow:ellipsis}
+  .csel .ty{font-weight:600;font-size:12px;color:#dc2626;white-space:nowrap}
+  .csel .qt{margin-left:auto;font-size:11.5px;color:#64748b;font-weight:600;white-space:nowrap}
+  .csel .qt b{color:#0f172a;font-weight:800}
+  .csel .sep{color:#d1d5db;font-weight:400}
+  .csel-empty{padding:10px;color:#94a3b8;font-size:13px}
+  /* Bảo dưỡng — 2 bảng kiểu sheet */
+  .maint-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:900px){.maint-2col{grid-template-columns:1fr}}
+  .mtbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+  .mtbl th,.mtbl td{border:1px solid #cbd5e1;padding:6px 8px;text-align:center;vertical-align:middle}
+  .mtbl th.l,.mtbl td.l{text-align:left}
+  .mtbl .mtitle{font-size:14.5px;font-weight:800;letter-spacing:.4px;background:#f8fafc;color:#0f172a;padding:10px}
+  .mtbl tr.mhead th{background:#eef2f7;font-weight:800;color:#0f172a;white-space:nowrap}
+  .mtbl td.mx{font-weight:800;font-size:14px;background:#fcfdff}
+  .mtbl tr.m-empty td{height:34px}
+  .m-sup{margin-top:4px;font-size:11.5px;color:#0369a1;font-weight:600}
+  .m-edit{margin-left:6px;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;vertical-align:middle}
+  .m-sup-row{display:flex;gap:7px;align-items:center;margin-bottom:6px}
+  .m-sup-row select{flex:1;min-width:0}
+  .m-sup-row .m-sup-qty{width:74px}
+  .m-sup-row .m-sup-del{background:#fee2e2;color:#dc2626;font-weight:700;padding:6px 9px;border-radius:7px}
+  .m-sup-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px 14px;margin:2px 0 12px}
+  .m-sup-head{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+  .m-sup-ttl{font-weight:800;font-size:13.5px;color:#0369a1}
+  .m-sup-sub{font-size:11.5px;color:#64748b}
+  .m-sup-add{margin-top:4px;font-size:13px;background:#eef2ff;color:#4f46e5;font-weight:700;border:1px dashed #c7d2fe;border-radius:8px;padding:7px 12px}
+  .m-sup-add:disabled{opacity:.5;cursor:not-allowed}
+  .kpi.clickable{cursor:pointer;transition:background .12s,outline .12s}
+  .kpi.clickable:hover{outline:2px solid var(--brand);background:#e0f2fe}
+  .cons-sum{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+  .cons-chip{display:flex;align-items:center;gap:6px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:999px;padding:5px 12px;font-size:13px;color:#0369a1}
+  .cons-chip b{color:#0f172a}
+  tr.inv-diff-sub td{background:#fff7ed;padding:7px 8px;border-top:none}
+  .ids-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .ids-lbl{font-size:12px;color:#b45309;font-weight:700;white-space:nowrap}
+  tr.inv-diff-sub select,tr.inv-diff-sub input{padding:5px 7px;font-size:12.5px;border:1px solid #fed7aa;border-radius:7px;max-width:100%;box-sizing:border-box}
+  tr.inv-diff-sub select{flex:0 1 150px}
+  tr.inv-diff-sub input{flex:1 1 130px;min-width:110px}
+  .inv-banner{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:9px 11px;margin:2px 0 10px}
+  .ivb-head{font-size:12.5px;color:#9a3412;font-weight:700;margin-bottom:6px}
+  .ivb-list{display:flex;flex-direction:column;gap:4px}
+  .ivb-row{display:flex;align-items:center;gap:8px;font-size:12px}
+  .ivb-it{font-weight:700;color:#0f172a;min-width:90px}
+  .ivb-ty{font-weight:600;color:#b45309;min-width:72px}
+  .ivb-q{color:#dc2626;font-weight:700}
+  .ivb-rs{color:#64748b;flex:1}
+  input.autocap{font-weight:700}
+  /* Phân tích tài chính */
+  .pa-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:780px){.pa-cards{grid-template-columns:1fr}}
+  .pa-banner{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;transition:background .12s,border-color .12s,box-shadow .12s}
+  .pa-banner:hover{background:#f0f9ff;border-color:var(--brand);box-shadow:0 4px 12px rgba(2,132,199,.12)}
+  .pa-bn-l{flex:1;min-width:0}
+  .pa-bn-title{font-weight:800;font-size:14px;color:#0f172a}
+  .pa-bn-sub{font-size:11.5px}
+  .pa-bn-r{text-align:right}
+  .pa-bn-rev{font-weight:800;font-size:17px;color:#0f172a}
+  .pa-bn-chev{font-size:22px;color:#94a3b8;font-weight:700}
+  .pa-rev{font-size:22px;font-weight:800;color:#0f172a;margin-top:8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .pa-rows{margin-top:4px;padding-top:4px}
+  .pa-legend{display:flex;gap:16px;font-size:12px;color:#64748b;margin-bottom:8px}
+  .pa-legend .lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .pa-legend .lg.rev{background:#0ea5e9}
+  .pa-legend .lg.cost{background:#f87171}
+  .pa-grp{gap:3px;justify-content:center}
+  .pa-bar.rev{background:#0ea5e9}
+  .pa-bar.cost{background:#f87171}
+  .pa-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px}
+  .pa-lbl{color:#64748b;flex:1}
+  .pa-val{font-weight:700;color:#0f172a}
+  .pa-up{color:#16a34a;font-weight:700;font-size:12px;white-space:nowrap}
+  .pa-down{color:#dc2626;font-weight:700;font-size:12px;white-space:nowrap}
+  .pa-flat{color:#94a3b8;font-weight:600;font-size:12px;white-space:nowrap}
+  .pa-chart-h{font-weight:800;font-size:14px;margin-bottom:12px}
+  .pa-bars{display:flex;align-items:flex-end;gap:6px;height:170px}
+  .pa-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+  .pa-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+  .pa-bar{width:80%;max-width:34px;background:#bae6fd;border-radius:5px 5px 0 0;min-height:2px;transition:height .2s}
+  .pa-bar.cur{background:#0ea5e9}
+  .pa-bar-lbl{font-size:10px;color:#64748b;margin-top:4px}
+  .pa-concl{margin:0;padding-left:18px;font-size:13.5px;line-height:1.9}
   .inv-check{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px dashed #eef2f7;cursor:pointer}
   .inv-check:last-child{border-bottom:none}
   .inv-check input{width:18px;height:18px;cursor:pointer}
@@ -284,6 +402,8 @@
   <button class="tab active" data-t="timeline">Sơ đồ xe</button>
   <button class="tab" data-t="schedule">Lịch giao trả</button>
   <button class="tab" data-t="thuchi">Thu tiền</button>
+  <button class="tab" data-t="kiemke">Kiểm kê định kì</button>
+  <button class="tab" data-t="maint">Bảo dưỡng xe</button>
   <button class="tab admin-toggle" id="accToggle">🔒 Kế toán</button>
   <span class="tab-group" id="accGroupLabel" style="display:none">📊 Kế toán</span>
   <button class="tab admin acc" data-t="revenue" style="display:none">Tổng doanh thu</button>
@@ -291,10 +411,8 @@
   <button class="tab admin acc" data-t="profit" style="display:none">Lãi hàng tháng</button>
   <button class="tab admin acc" data-t="funds" style="display:none">Dòng tiền</button>
   <button class="tab admin acc" data-t="assets" style="display:none">Tài sản</button>
-  <button class="tab admin-toggle" id="opToggle">🔒 Vận hành</button>
-  <span class="tab-group" id="opGroupLabel" style="display:none">🔧 Vận hành</span>
-  <button class="tab admin op" data-t="inventory" style="display:none">Kiểm kê tài sản</button>
-  <button class="tab admin op" data-t="maint" style="display:none">Bảo dưỡng xe</button>
+  <button class="tab admin acc" data-t="taisan2" style="display:none">Danh mục &amp; biến động</button>
+  <button class="tab admin acc" data-t="phantich" style="display:none">Phân tích tài chính</button>
 </div>
 
 <main>
@@ -464,26 +582,72 @@
     </div>
   </section>
 
-  <!-- INVENTORY (Vận hành) -->
-  <section class="view" id="view-inventory" style="display:none">
+  <!-- KIỂM KÊ ĐỊNH KÌ (công khai) -->
+  <section class="view" id="view-kiemke" style="display:none">
     <div class="card">
       <div class="row">
-        <h2 style="margin:0">Kiểm kê tài sản — <span id="invMonthLabel"></span></h2>
-        <span class="muted">2 đợt/tháng (ngày 10 & ngày 25), mỗi đợt kiểm toàn bộ danh mục. Tích từng món rồi bấm “Xác nhận kiểm kê xong”.</span>
+        <h2 style="margin:0">Kiểm kê định kì — <span id="invMonthLabel"></span></h2>
+        <span class="muted">2 đợt/tháng (ngày 10 & ngày 25). Mỗi món báo cáo số lượng thực đếm + tình trạng.</span>
       </div>
       <div class="kpis" id="invKpis" style="margin-top:12px"></div>
-    </div>
-    <div class="card">
-      <div class="row">
-        <h3 style="margin:0">Danh mục tài sản cần kiểm kê (bản cứng)</h3>
-        <div class="right row"><input type="text" id="invNewItem" placeholder="VD: Xe A1 / Mũ bảo hiểm / Áo mưa..." style="min-width:240px"><button class="primary" id="invAddBtn">+ Thêm món</button></div>
-      </div>
-      <div id="invList" style="margin-top:10px"></div>
     </div>
     <div class="inv-rounds">
       <div class="card"><div id="invRound10"></div></div>
       <div class="card"><div id="invRound25"></div></div>
     </div>
+  </section>
+
+  <!-- DANH MỤC & BIẾN ĐỘNG TÀI SẢN (Kế toán) -->
+  <section class="view" id="view-taisan2" style="display:none">
+    <div class="card">
+      <div class="row">
+        <h2 style="margin:0">Danh mục & biến động tài sản — <span id="ts2MonthLabel"></span></h2>
+        <span class="muted">Báo cáo tồn kho tài sản và mọi biến động (thất thoát / sử dụng / hỏng hóc).</span>
+      </div>
+      <div class="kpis" id="ts2Kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3 style="margin:0">Danh mục tài sản (bản cứng)</h3><button class="ghost" id="invMergeBtn" style="background:#eef2ff;color:#4f46e5;font-weight:700;font-size:12.5px;padding:6px 11px;border-radius:8px">⛙ Gộp món trùng</button></div>
+      <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="field" style="margin:0;min-width:200px;flex:1"><label>Tên tài sản</label><input type="text" id="invNewName" class="autocap" placeholder="VD: Cà lê / Mũ bảo hiểm / Áo mưa"></div>
+        <div class="field" style="margin:0;min-width:150px"><label>Loại tài sản</label><select id="invNewType"></select></div>
+        <div class="field" style="margin:0;width:110px"><label>Số lượng</label><input type="number" id="invNewQty" min="0" value="1"></div>
+        <button class="btn-pro btn-add" id="invAddBtn"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Lưu danh mục</button>
+      </div>
+      <div id="invList" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3 style="margin:0">Biến động tài sản</h3><span class="muted">Ghi lệnh giảm số lượng — trừ ngay vào danh mục bản cứng.</span></div>
+      <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="field" style="margin:0;min-width:230px;flex:1"><label>Tài sản</label>
+          <div class="csel" id="mvItemSel">
+            <button type="button" class="csel-btn" id="mvItemBtn" aria-haspopup="listbox"><span class="csel-val" id="mvItemVal"></span><svg class="csel-caret" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="csel-panel" id="mvItemPanel" role="listbox"></div>
+          </div>
+          <input type="hidden" id="mvItem">
+        </div>
+        <div class="field" style="margin:0;min-width:140px"><label>Loại biến động</label><select id="mvType"></select></div>
+        <div class="field" style="margin:0;width:90px"><label>Số lượng</label><input type="number" id="mvQty" min="1" value="1"></div>
+        <div class="field" style="margin:0;min-width:160px;flex:1"><label>Lý do</label><input type="text" id="mvReason" class="autocap" placeholder="VD: bị mất / dùng hết / gãy"></div>
+        <div class="field" style="margin:0;width:150px"><label>Ngày</label><input type="date" id="mvDate"></div>
+        <button class="btn-pro btn-move" id="mvAddBtn"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>Lưu biến động</button>
+      </div>
+      <div class="tbl-wrap" style="margin-top:12px"><table id="mvTable"></table></div>
+    </div>
+  </section>
+
+  <!-- PHÂN TÍCH TÀI CHÍNH (Kế toán) -->
+  <section class="view" id="view-phantich" style="display:none">
+    <div class="card">
+      <div class="row"><h2 style="margin:0">Phân tích tài chính</h2><span class="muted">Theo ngày hiện tại — doanh thu, chi phí, khách, ngày thuê, công suất & tăng trưởng.</span></div>
+      <div class="kpis" id="paKpis" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 4px">So sánh theo kỳ</h3>
+      <p class="muted" style="margin:0 0 12px;font-size:12.5px">Bấm vào từng kỳ để xem biểu đồ doanh thu & chi phí chi tiết.</p>
+      <div class="pa-cards" id="paCards"></div>
+    </div>
+    <div class="card"><h3 style="margin:0 0 8px">Kết luận tăng trưởng</h3><div id="paConclusion"></div></div>
   </section>
 
   <!-- MAINTENANCE (Vận hành) -->
@@ -493,14 +657,18 @@
         <h2 style="margin:0">Bảo dưỡng xe</h2>
         <div class="right row">
           <select id="maintFilter"></select>
-          <button class="primary" id="addMaint">+ Thêm bảo dưỡng</button>
+          <button class="btn-pro btn-add" id="addMaint"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Thêm bảo dưỡng</button>
         </div>
       </div>
       <div class="kpis" id="maintKpis" style="margin-top:12px"></div>
-      <p class="muted" style="margin-top:8px">Mỗi lần bảo dưỡng ghi: ngày, xe, ODO, nội dung, tình trạng xe và đề xuất. Lọc theo xe để xem lịch sử từng xe.</p>
+      <div id="maintConsumed" style="margin-top:10px"></div>
+      <p class="muted" style="margin-top:8px">Hai bảng tháng trước & tháng này song song để đối chiếu. Tất cả xe đều liệt kê sẵn từ đầu tháng để lên lịch; nhập "Thêm bảo dưỡng" sẽ điền vào đúng hàng xe.</p>
     </div>
-    <div class="card" style="padding:0">
-      <div class="tbl-wrap"><table id="maintTable"></table></div>
+    <div class="card">
+      <div class="maint-2col">
+        <div class="tbl-wrap" style="border:none"><table class="mtbl" id="maintTablePrev"></table></div>
+        <div class="tbl-wrap" style="border:none"><table class="mtbl" id="maintTableCur"></table></div>
+      </div>
     </div>
   </section>
 </main>
@@ -716,6 +884,11 @@
     </div>
     <div class="field"><label>Nội dung bảo dưỡng</label><input type="text" id="m_noidung" placeholder="VD: Thay nhớt, vệ sinh lọc gió"></div>
     <div class="field"><label>Đề xuất</label><input type="text" id="m_dexuat" placeholder="VD: Lần tới thay lốp sau"></div>
+    <div class="m-sup-box">
+      <div class="m-sup-head"><span class="m-sup-ttl">🧴 Sử dụng đồ bảo dưỡng</span><span class="m-sup-sub">trừ thẳng kho kiểm kê</span></div>
+      <div id="m_supList"></div>
+      <button type="button" id="m_supAdd" class="m-sup-add">+ Thêm đồ dùng</button>
+    </div>
     <div class="actions">
       <button class="danger" id="maintDelete" style="margin-right:auto;display:none">Xóa</button>
       <button class="ghost" id="maintCancel">Hủy</button>
@@ -7440,8 +7613,10 @@ if(!DB.funds.khauhao)DB.funds.khauhao=[];
 if(!DB.funds.lairong)DB.funds.lairong=[];
 if(!DB.assets)DB.assets=[];
 if(!DB.vehicleInfo)DB.vehicleInfo={};   // {xeId:{typ,doi,bien,mau}}
-if(!DB.inventoryList)DB.inventoryList=[];     // [{id,name}] bản cứng tài sản cần kiểm kê
-if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{checked:{},done,doneAt},'25':{...}}}
+if(!DB.inventoryList)DB.inventoryList=[];     // [{id,name,type,qty}] bản cứng tài sản cần kiểm kê
+DB.inventoryList.forEach(it=>{ if(it.type===undefined)it.type='vattu'; if(it.qty===undefined)it.qty=1; }); // migrate dữ liệu cũ
+if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
+if(!DB.assetMoves)DB.assetMoves=[];           // [{id,date,itemId,type(thatthoat|sudung|honghoc),qty,reason}] biến động tài sản
 if(!DB.maintenance)DB.maintenance=[];         // [{id,date,xe,odo,noidung,tinhtrang,dexuat}]
 let curMonth = ymNow();           // 'YYYY-MM'
 let accUnlocked = false;           // mở khóa khu Kế toán
@@ -7633,12 +7808,11 @@ document.getElementById('prevM').onclick=()=>{shiftMonth(-1)};
 document.getElementById('nextM').onclick=()=>{shiftMonth(1)};
 document.getElementById('monthPick').onchange=e=>{curMonth=e.target.value;renderAll();};
 function shiftMonth(n){const [y,m]=curMonth.split('-').map(Number);const d=new Date(y,m-1+n,1);curMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');document.getElementById('monthPick').value=curMonth;renderAll();}
-const ACC_TABS=['revenue','chi','profit','funds','assets'];
-const OP_TABS=['inventory','maint'];
+const ACC_TABS=['revenue','chi','profit','funds','assets','taisan2','phantich'];
+const OP_TABS=[];
 const ADMIN_TABS=ACC_TABS.concat(OP_TABS);
 function switchTab(t){
   if(ACC_TABS.includes(t) && !accUnlocked){pendingTab=t;openAdmin('acc');return;}
-  if(OP_TABS.includes(t) && !opUnlocked){pendingTab=t;openAdmin('op');return;}
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   document.getElementById('view-'+t).style.display='';
@@ -7651,29 +7825,24 @@ function switchTab(t){
 }
 function updateTabLocks(){
   document.querySelectorAll('.tab.acc').forEach(t=>t.style.display=accUnlocked?'':'none');
-  document.querySelectorAll('.tab.op').forEach(t=>t.style.display=opUnlocked?'':'none');
   document.getElementById('accGroupLabel').style.display=accUnlocked?'':'none';
-  document.getElementById('opGroupLabel').style.display=opUnlocked?'':'none';
   document.getElementById('accToggle').style.display=accUnlocked?'none':'';
-  document.getElementById('opToggle').style.display=opUnlocked?'none':'';
-  const any=accUnlocked||opUnlocked;
-  document.getElementById('adminLock').style.display=any?'':'none';
-  document.getElementById('changePass').style.display=any?'':'none';
+  document.getElementById('adminLock').style.display=accUnlocked?'':'none';
+  document.getElementById('changePass').style.display=accUnlocked?'':'none';
 }
 function openAdmin(target){
-  unlockTarget=target||'acc';
-  document.getElementById('adminTitle').textContent = unlockTarget==='op'?'Khu Vận hành':'Khu Kế toán';
+  unlockTarget='acc';
+  document.getElementById('adminTitle').textContent = 'Khu Kế toán';
   document.getElementById('adminPass').value='';
   document.getElementById('adminOverlay').classList.add('open');
   setTimeout(()=>{try{document.getElementById('adminPass').focus();}catch(e){}},40);
 }
 function doAdminLogin(){
   if(document.getElementById('adminPass').value===(DB.password||'goodbike')){
-    if(unlockTarget==='op')opUnlocked=true; else accUnlocked=true;
+    accUnlocked=true;
     document.getElementById('adminOverlay').classList.remove('open');
     updateTabLocks();renderAll();
-    const def = unlockTarget==='op'?'inventory':'revenue';
-    const t=pendingTab||def;pendingTab=null;switchTab(t);
+    const t=pendingTab||'revenue';pendingTab=null;switchTab(t);
   }else alert('Sai mật khẩu');
 }
 function adminLockNow(){
@@ -7688,7 +7857,7 @@ function renderAll(){
   const label=monthLabel(curMonth);
   document.getElementById('tlMonthLabel').textContent=label;
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
-  renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderChi();renderProfit();renderFunds();renderAssets();renderInventory();renderMaint();
+  renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderChi();renderProfit();renderFunds();renderAssets();renderKiemke();renderTaisan();renderPhanTich();renderMaint();
   save();
 }
 function monthLabel(ym){const [y,m]=ym.split('-');return `Tháng ${+m}/${y}`;}
@@ -7749,15 +7918,23 @@ function renderTimeline(){
   tl.querySelectorAll('.vehclick').forEach(el=>el.onclick=()=>openVehInfo(el.dataset.veh));
   renderTlStats();
 }
-// Tóm tắt nhanh HÔM NAY: đang thuê (đặt trước + đang nhận, chưa trả), đang trống, công suất, doanh thu hôm nay
+// Xe "đang thuê" hôm nay = có doanh thu hôm nay (DAY_PRICE) & TRẢ SAU 18h (hoặc còn thuê qua hôm sau).
+// Xe trả trước 18h dù có doanh thu vẫn coi là sắp trống → tính vào "trống".
+function rentedSet(T){
+  const s=new Set();
+  DB.bookings.forEach(b=>{
+    if(!nightsOf(b).includes(T)) return;                                       // không có doanh thu hôm nay → bỏ
+    if(b.depart>T || (b.depart===T && (b.rtime||'12:00')>='18:00')) s.add(b.xe); // trả sau 18h / còn thuê tiếp
+  });
+  return s;
+}
+// Tóm tắt nhanh HÔM NAY: đang thuê (doanh thu + trả sau 18h), đang trống (sẵn sàng + trả trước 18h), công suất, doanh thu hôm nay
 function renderTlStats(){
   const el=document.getElementById('tlStats'); if(!el)return;
   const T=todayStr();
-  const rented=new Set(); let rev=0;
-  DB.bookings.forEach(b=>{
-    if(b.status!=='datra' && b.arrive<=T && (b.depart>=T || b.status==='danhan')) rented.add(b.xe); // đang thuê hôm nay (gồm đặt trước + quá hạn chưa trả)
-    if(nightsOf(b).includes(T)) rev+=priceOn(b,T);                                                   // doanh thu hôm nay theo DAY_PRICE
-  });
+  let rev=0;
+  DB.bookings.forEach(b=>{ if(nightsOf(b).includes(T)) rev+=priceOn(b,T); });   // doanh thu hôm nay theo DAY_PRICE
+  const rented=rentedSet(T);
   const tot=VEHICLES.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
   el.innerHTML=`
     <div class="stat"><span class="sv">${thue}<small>/${tot}</small></span><span class="sl">🛵 Đang thuê</span></div>
@@ -7773,13 +7950,13 @@ function retBefore18Set(T){
   return s;
 }
 /* ====== Chi tiết XE TRỐNG hôm nay (bấm vào ô "Đang trống") ====== */
-// Tình trạng 1 xe hôm nay: 'busy' (đang thuê qua hôm nay), 'ready' (trống cả ngày / đã trả), 'time' (sẽ trống từ giờ trả)
+// Tình trạng 1 xe hôm nay: 'busy' (đang thuê = doanh thu + trả sau 18h), 'ready' (không doanh thu → sẵn sàng), 'time' (có doanh thu nhưng trả trước 18h)
 function bikeAvailability(xe,T){
-  const active=DB.bookings.filter(b=>b.xe===xe && b.status!=='datra' && b.arrive<=T && b.depart>=T);
-  if(active.length===0) return {state:'ready'};                       // không có booking đang thuê / đã trả → sẵn sàng
-  if(active.some(b=>b.depart>T)) return {state:'busy'};               // còn thuê qua hôm nay → bận
-  const t=active.map(b=>b.rtime||'12:00').sort().slice(-1)[0];        // đều trả trong hôm nay → trống từ giờ trả muộn nhất
-  return {state:'time',time:t};
+  if(rentedSet(T).has(xe)) return {state:'busy'};                     // đang thuê (trả sau 18h / còn thuê tiếp) → bận
+  // còn lại là trống: nếu có chuyến trả TRƯỚC 18h hôm nay → trống từ giờ trả; ngược lại sẵn sàng cả ngày
+  const ret=DB.bookings.filter(b=>b.xe===xe && b.depart===T && nightsOf(b).includes(T) && (b.rtime||'12:00')<'18:00');
+  if(ret.length){ const t=ret.map(b=>b.rtime||'12:00').sort().slice(-1)[0]; return {state:'time',time:t}; }
+  return {state:'ready'};
 }
 function showModal(title,body){
   let ov=document.getElementById('genModal');
@@ -7862,22 +8039,32 @@ function buildMatrices(){
   const top={},bottom={}; VEHICLES.forEach(v=>{top[v.id]={};bottom[v.id]={};});
   const extra={};
   DB.bookings.forEach(b=>{
-    const paid=(b.prepaid||0)>0 || b.pay==='VNA';
-    nightsOf(b).forEach(ds=>{
+    if(top[b.xe]===undefined)return;
+    const nights=nightsOf(b);
+    // BẢNG TRÊN: doanh thu ĐẦY ĐỦ theo DAY_PRICE (cộng dồn nếu 1 xe nhiều booking/ngày)
+    nights.forEach(ds=>{
       if(ds.slice(0,7)!==curMonth)return;
       const day=+ds.split('-')[2];
-      if(top[b.xe]===undefined)return;
       const p=priceOn(b,ds);
-      // BẢNG TRÊN: cùng 1 xe có nhiều booking trong ngày → CỘNG DỒN vào ô của xe (tổng doanh thu xe hôm đó)
       if(top[b.xe][day]===undefined){top[b.xe][day]={amt:p,src:b.src};}
       else{top[b.xe][day].amt+=p;}
-      // BẢNG DƯỚI: chỉ khi đã thanh toán / VNA, màu theo hình thức
-      if(paid){
-        const c=bottom[b.xe][day];
-        if(!c){bottom[b.xe][day]={amt:p,pay:b.pay};}
-        else{c.amt+=p; if(payRank(b.pay)>payRank(c.pay))c.pay=b.pay;}
-      }
     });
+    // BẢNG DƯỚI: chỉ số tiền THỰC NHẬN. Đổ đầy từng ngày theo thứ tự (mỗi ngày tối đa = giá ngày),
+    // phần dư không đủ 1 ngày dồn vào ngày kế tiếp. VNA (công nợ) coi như thu đủ.
+    const paid = b.pay==='VNA' ? totalOf(b) : (b.prepaid||0);
+    if(paid>0){
+      let rem=paid;
+      for(const ds of nights){
+        if(rem<=0)break;
+        const p=priceOn(b,ds);
+        const give=Math.min(p,rem); rem-=give;
+        if(give<=0 || ds.slice(0,7)!==curMonth)continue;
+        const day=+ds.split('-')[2];
+        const c=bottom[b.xe][day];
+        if(!c){bottom[b.xe][day]={amt:give,pay:b.pay};}
+        else{c.amt+=give; if(payRank(b.pay)>payRank(c.pay))c.pay=b.pay;}
+      }
+    }
   });
   return {top,bottom,extra,ndays};
 }
@@ -8716,98 +8903,509 @@ document.getElementById('expDelete').onclick=()=>{
 };
 
 /* ============ VẬN HÀNH — KIỂM KÊ TÀI SẢN ============ */
-function invRoundState(ym,r){ const m=DB.inventoryChecks[ym]||{}; return m[r]||{checked:{},done:false,doneAt:null}; }
-function ensureInv(ym,r){ if(!DB.inventoryChecks[ym])DB.inventoryChecks[ym]={}; if(!DB.inventoryChecks[ym][r])DB.inventoryChecks[ym][r]={checked:{},done:false,doneAt:null}; return DB.inventoryChecks[ym][r]; }
-function renderInventory(){
-  if(!opUnlocked)return;
+const INV_TYPES=[{k:'vattu',n:'Vật tư'},{k:'thietbi',n:'Thiết bị'},{k:'phukien',n:'Phụ kiện'},{k:'baoduong',n:'Đồ bảo dưỡng'}];
+const MOVE_TYPES=[{k:'thatthoat',n:'Thất thoát'},{k:'sudung',n:'Sử dụng'},{k:'honghoc',n:'Hỏng hóc'}];
+function invTypeName(k){const t=INV_TYPES.find(x=>x.k===k);return t?t.n:k;}
+function moveTypeName(k){ if(k==='nhapthem')return 'Nhập thêm'; const t=MOVE_TYPES.find(x=>x.k===k);return t?t.n:k;}
+function isAddMove(m){return m && m.type==='nhapthem';}   // nhập thêm = tăng (+), còn lại = giảm (−)
+function moveQtyHTML(m){ return isAddMove(m)?`<span style="color:#16a34a;font-weight:700">+${m.qty}</span>`:`<span style="color:#dc2626;font-weight:700">−${m.qty}</span>`; }
+function invItemName(id){const it=DB.inventoryList.find(x=>x.id===id);return it?it.name:'(đã xoá)';}
+function invFilled(c){return c && c.qty!=='' && c.qty!=null;}
+
+function invRoundState(ym,r){ const m=DB.inventoryChecks[ym]||{}; return m[r]||{items:{},done:false,doneAt:null}; }
+function ensureInv(ym,r){ if(!DB.inventoryChecks[ym])DB.inventoryChecks[ym]={}; const cur=DB.inventoryChecks[ym][r]; if(!cur){DB.inventoryChecks[ym][r]={items:{},done:false,doneAt:null};} else if(!cur.items){cur.items={};} return DB.inventoryChecks[ym][r]; }
+
+// ===== KIỂM KÊ ĐỊNH KÌ (công khai) — chỉ các đợt tích =====
+function renderKiemke(){
+  const lbl=document.getElementById('invMonthLabel'); if(!lbl)return;
   const ym=curMonth;
-  document.getElementById('invMonthLabel').textContent=monthLabel(ym);
-  const list=DB.inventoryList;
-  document.getElementById('invList').innerHTML = list.length
-    ? list.map(it=>`<div class="inv-item"><span class="nm">${it.name}</span><button class="del" data-del="${it.id}" title="Xoá khỏi danh mục">✕</button></div>`).join('')
-    : '<div class="muted" style="padding:8px">Chưa có món nào. Thêm tài sản cần kiểm kê ở ô trên.</div>';
-  document.getElementById('invList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
-    if(!confirm('Xoá món này khỏi danh mục kiểm kê?'))return;
-    DB.inventoryList=DB.inventoryList.filter(x=>x.id!==b.dataset.del); renderAll();
-  });
+  lbl.textContent=monthLabel(ym);
   renderInvRound(ym,'10','invRound10','Đợt 1 — ngày 10');
   renderInvRound(ym,'25','invRound25','Đợt 2 — ngày 25');
+  const list=DB.inventoryList;
   const s10=invRoundState(ym,'10'), s25=invRoundState(ym,'25'), cnt=list.length;
-  const c10=list.filter(it=>s10.checked[it.id]).length, c25=list.filter(it=>s25.checked[it.id]).length;
+  const c10=list.filter(it=>invFilled(s10.items[it.id])).length, c25=list.filter(it=>invFilled(s25.items[it.id])).length;
   document.getElementById('invKpis').innerHTML=
-    kpi('Số món kiểm kê',cnt+'')
+    kpi('Số món',cnt+'')
     +kpi('Đợt 1 (ngày 10)',(s10.done?'✅ Xong':c10+'/'+cnt))
     +kpi('Đợt 2 (ngày 25)',(s25.done?'✅ Xong':c25+'/'+cnt));
 }
+// ===== DANH MỤC & BIẾN ĐỘNG (Kế toán) — báo cáo tồn kho + biến động =====
+function renderTaisan(){
+  if(!accUnlocked)return;
+  const lbl=document.getElementById('ts2MonthLabel'); if(!lbl)return;
+  const ym=curMonth;
+  lbl.textContent=monthLabel(ym);
+  // init các dropdown cố định
+  const tsel=document.getElementById('invNewType');
+  if(tsel && !tsel._init){ tsel.innerHTML=INV_TYPES.map(t=>`<option value="${t.k}">${t.n}</option>`).join(''); tsel._init=true; }
+  const mtsel=document.getElementById('mvType');
+  if(mtsel && !mtsel._init){ mtsel.innerHTML=MOVE_TYPES.map(t=>`<option value="${t.k}">${t.n}</option>`).join(''); mtsel._init=true; }
+  const mdate=document.getElementById('mvDate'); if(mdate && !mdate.value)mdate.value=todayStr();
+  renderMvItemSelect();   // dropdown tài sản tuỳ biến cho biến động
+
+  const list=DB.inventoryList;
+  let html='';
+  if(list.length){
+    const itemRow=it=>`<div class="inv-item"><span class="nm">${it.name}</span><span class="qty">SL: <b>${it.qty}</b></span><button class="del" data-del="${it.id}" title="Xoá khỏi danh mục">✕</button></div>`;
+    const known=new Set(INV_TYPES.map(t=>t.k));
+    INV_TYPES.forEach(t=>{
+      const items=list.filter(it=>it.type===t.k);
+      if(!items.length)return;
+      html+=`<div class="inv-group"><div class="inv-group-h">${t.n} <span class="muted">(${items.length} món)</span></div>${items.map(itemRow).join('')}</div>`;
+    });
+    const other=list.filter(it=>!known.has(it.type));
+    if(other.length) html+=`<div class="inv-group"><div class="inv-group-h">Khác <span class="muted">(${other.length} món)</span></div>${other.map(itemRow).join('')}</div>`;
+  } else html='<div class="muted" style="padding:8px">Chưa có món nào. Thêm tài sản ở ô trên.</div>';
+  document.getElementById('invList').innerHTML=html;
+  document.getElementById('invList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Xoá món này khỏi danh mục? Lịch sử biến động vẫn được giữ.'))return;
+    DB.inventoryList=DB.inventoryList.filter(x=>x.id!==b.dataset.del); renderAll(); save();
+  });
+  renderMoves();
+  const totQty=list.reduce((a,it)=>a+(+it.qty||0),0);
+  const mv10=movesInRound(ym,'10').length, mv25=movesInRound(ym,'25').length;
+  document.getElementById('ts2Kpis').innerHTML=
+    kpi('Số món',list.length+'')
+    +kpi('Tổng số lượng',fmtVND(totQty)+'')
+    +kpi('Biến động đợt 1',(mv10||'0')+' lệnh ›','kpi-r10 clickable')
+    +kpi('Biến động đợt 2',(mv25||'0')+' lệnh ›','kpi-r25 clickable');
+  const k10=document.querySelector('#ts2Kpis .kpi-r10'); if(k10)k10.onclick=()=>openRoundMoves(ym,'10');
+  const k25=document.querySelector('#ts2Kpis .kpi-r25'); if(k25)k25.onclick=()=>openRoundMoves(ym,'25');
+}
+// Khoảng ngày của mỗi đợt: Đợt 1 = (25 tháng trước → 10 tháng này], Đợt 2 = (10 → 25 tháng này]
+function roundWindow(ym,r){
+  if(r==='10'){ return {from:`${prevMonthYM(ym)}-25`, to:`${ym}-10`}; }
+  return {from:`${ym}-10`, to:`${ym}-25`};
+}
+function movesInRound(ym,r){
+  const w=roundWindow(ym,r);
+  return DB.assetMoves.filter(m=>m.date && m.date>w.from && m.date<=w.to).sort((a,b)=>a.date<b.date?-1:1);
+}
+
+/* ============ PHÂN TÍCH TÀI CHÍNH ============ */
+function paIso(d){return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
+function paShift(ds,n){const d=new Date(ds+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return paIso(d);}
+function paDim(y,m0){return new Date(Date.UTC(y,m0+1,0)).getUTCDate();}
+function paDDiff(a,b){return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000);}
+// Thống kê 1 khoảng ngày [from,to]
+function periodStats(from,to){
+  let rev=0, days=0; const cust=new Set();
+  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ rev+=priceOn(b,ds); n++; } }); if(n>0){ days+=n; cust.add(b.id); } });
+  let cost=0;
+  DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to){ const g=costGroup(e.type); if(g==='bien'||g==='dinh'||g==='honhop')cost+=e.amt; } });
+  const numDays=paDDiff(from,to)+1;
+  const cap=(FLEET_CAPACITY*numDays)>0?days/(FLEET_CAPACITY*numDays)*100:0;
+  return {rev,cost,profit:rev-cost,customers:cust.size,days,avg:cust.size?days/cust.size:0,cap};
+}
+function paPeriods(){
+  const T=todayStr(), d=new Date(T+'T00:00:00Z'), y=d.getUTCFullYear(), mo=d.getUTCMonth();
+  const dow=(d.getUTCDay()+6)%7;                                  // Mon=0
+  const wkFrom=paShift(T,-dow), wkTo=paShift(wkFrom,6);
+  const ym=T.slice(0,7), mFrom=ym+'-01', mTo=`${ym}-${String(paDim(y,mo)).padStart(2,'0')}`;
+  const pym=prevMonthYM(ym), py=+pym.slice(0,4), pmo=+pym.slice(5,7)-1, pmTo=`${pym}-${String(paDim(py,pmo)).padStart(2,'0')}`;
+  const q=Math.floor(mo/3), qs=q*3, qe=qs+2;
+  const qFrom=`${y}-${String(qs+1).padStart(2,'0')}-01`, qTo=`${y}-${String(qe+1).padStart(2,'0')}-${String(paDim(y,qe)).padStart(2,'0')}`;
+  let pqy=y, pqs=qs-3; if(pqs<0){pqs=9;pqy=y-1;} const pqe=pqs+2;
+  const pqFrom=`${pqy}-${String(pqs+1).padStart(2,'0')}-01`, pqTo=`${pqy}-${String(pqe+1).padStart(2,'0')}-${String(paDim(pqy,pqe)).padStart(2,'0')}`;
+  return {
+    week:{label:'Tuần này',prevLabel:'tuần trước',cur:[wkFrom,wkTo],prev:[paShift(wkFrom,-7),paShift(wkFrom,-1)]},
+    month:{label:'Tháng này',prevLabel:'tháng trước',cur:[mFrom,mTo],prev:[pym+'-01',pmTo]},
+    quarter:{label:`Quý ${q+1}/${y}`,prevLabel:'quý trước',cur:[qFrom,qTo],prev:[pqFrom,pqTo]},
+    year:{label:`Năm ${y}`,prevLabel:'năm trước',cur:[`${y}-01-01`,`${y}-12-31`],prev:[`${y-1}-01-01`,`${y-1}-12-31`]}
+  };
+}
+function paGrowth(cur,prev,invert){
+  if(prev===0&&cur===0)return '<span class="pa-flat">—</span>';
+  const same=cur===prev, up=cur>=prev, good=invert?!up:up;
+  const arrow=same?'→':(up?'▲':'▼'), cls=same?'pa-flat':(good?'pa-up':'pa-down');
+  const val=prev!==0?Math.abs((cur-prev)/Math.abs(prev)*100).toFixed(1)+'%':(cur>0?'mới':'—');
+  return `<span class="${cls}">${arrow} ${val}</span>`;
+}
+function paRow(label,disp,cur,prev,invert){
+  return `<div class="pa-row"><span class="pa-lbl">${label}</span><span class="pa-val">${disp}</span>${paGrowth(cur,prev,invert)}</div>`;
+}
+// Banner thu gọn 1 kỳ — bấm để mở chi tiết
+function paBanner(key,p){
+  const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]);
+  return `<div class="pa-banner" data-pa="${key}">
+    <div class="pa-bn-l"><div class="pa-bn-title">${p.label}</div><div class="pa-bn-sub muted">${fmtDM(p.cur[0])}–${fmtDM(p.cur[1])}</div></div>
+    <div class="pa-bn-r"><div class="pa-bn-rev">${fmtVND(c.rev)}đ</div>${paGrowth(c.rev,pr.rev)}</div>
+    <span class="pa-bn-chev">›</span></div>`;
+}
+// Chia 1 kỳ thành các cột: tuần/tháng → theo NGÀY, quý/năm → theo THÁNG
+function paBuckets(key,p){
+  const [from,to]=p.cur, out=[];
+  if(key==='week'||key==='month'){
+    let d=from; while(d<=to){ out.push({label: key==='week'?dow(d):(+d.slice(8,10)+''), from:d, to:d}); d=paShift(d,1); }
+  } else {
+    let y=+from.slice(0,4), m=+from.slice(5,7)-1; const eY=+to.slice(0,4), eM=+to.slice(5,7)-1;
+    while(y<eY||(y===eY&&m<=eM)){ out.push({label:'T'+(m+1), from:`${y}-${String(m+1).padStart(2,'0')}-01`, to:`${y}-${String(m+1).padStart(2,'0')}-${String(paDim(y,m)).padStart(2,'0')}`}); m++; if(m>11){m=0;y++;} }
+  }
+  return out;
+}
+function paDetailChart(buckets){
+  const data=buckets.map(b=>{const s=periodStats(b.from,b.to);return {label:b.label,rev:s.rev,cost:s.cost};});
+  const max=Math.max(1,...data.map(d=>Math.max(d.rev,d.cost)));
+  const cols=data.map(d=>`<div class="pa-bar-col"><div class="pa-bar-wrap pa-grp"><div class="pa-bar rev" style="height:${Math.round(d.rev/max*100)}%" title="DT: ${fmtVND(d.rev)}đ"></div><div class="pa-bar cost" style="height:${Math.round(d.cost/max*100)}%" title="CP: ${fmtVND(d.cost)}đ"></div></div><div class="pa-bar-lbl">${d.label}</div></div>`).join('');
+  return `<div class="pa-legend"><span><i class="lg rev"></i>Doanh thu</span><span><i class="lg cost"></i>Chi phí</span></div><div class="pa-bars">${cols}</div>`;
+}
+function openPeriodDetail(key){
+  const P=paPeriods(), p=P[key];
+  const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]);
+  const metrics=`<div class="pa-rows" style="margin-top:0">
+     ${paRow('Doanh thu',fmtVND(c.rev)+'đ',c.rev,pr.rev)}
+     ${paRow('Chi phí',fmtVND(c.cost)+'đ',c.cost,pr.cost,true)}
+     ${paRow('Lãi ròng',fmtVND(c.profit)+'đ',c.profit,pr.profit)}
+     ${paRow('Số khách',c.customers,c.customers,pr.customers)}
+     ${paRow('Số ngày thuê',c.days,c.days,pr.days)}
+     ${paRow('TB ngày/khách',c.avg.toFixed(1),c.avg,pr.avg)}
+     ${paRow('Công suất',c.cap.toFixed(0)+'%',c.cap,pr.cap)}
+  </div>`;
+  showModal(`📊 ${p.label} · ${fmtDM(p.cur[0])}–${fmtDM(p.cur[1])}`,
+    `<div class="muted" style="font-size:12px;margin-bottom:8px">So với ${p.prevLabel}.</div>${metrics}<div style="margin-top:14px">${paDetailChart(paBuckets(key,p))}</div>`);
+}
+function paConclusion(P){
+  const line=p=>{ const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]), d=c.rev-pr.rev;
+    const pct=pr.rev?Math.abs(d/pr.rev*100).toFixed(1)+'%':'—';
+    const word=d>0?`tăng ${pct}`:(d<0?`giảm ${pct}`:'đi ngang'), cls=d>0?'pa-up':(d<0?'pa-down':'pa-flat');
+    return `<li><b>${p.label}</b> so với ${p.prevLabel}: doanh thu <span class="${cls}">${word}</span> (${fmtVND(c.rev)}đ vs ${fmtVND(pr.rev)}đ).</li>`; };
+  return `<ul class="pa-concl">${['week','month','quarter','year'].map(k=>line(P[k])).join('')}</ul>`;
+}
+function renderPhanTich(){
+  if(!accUnlocked)return;
+  if(!document.getElementById('paKpis'))return;
+  const P=paPeriods(), m=periodStats(P.month.cur[0],P.month.cur[1]);
+  document.getElementById('paKpis').innerHTML=
+    kpi('Doanh thu tháng',fmtVND(m.rev)+'đ')
+    +kpi('Chi phí tháng',fmtVND(m.cost)+'đ')
+    +kpi('Lãi ròng tháng',fmtVND(m.profit)+'đ',m.profit>=0?'pos':'neg')
+    +kpi('Số khách',m.customers+'')
+    +kpi('Số ngày thuê',m.days+'')
+    +kpi('TB ngày/khách',m.avg.toFixed(1))
+    +kpi('Công suất',m.cap.toFixed(0)+'%');
+  const wrap=document.getElementById('paCards');
+  wrap.innerHTML=['week','month','quarter','year'].map(k=>paBanner(k,P[k])).join('');
+  wrap.querySelectorAll('[data-pa]').forEach(el=>el.onclick=()=>openPeriodDetail(el.dataset.pa));
+  document.getElementById('paConclusion').innerHTML=paConclusion(P);
+}
+function openRoundMoves(ym,r){
+  const w=roundWindow(ym,r);
+  const title=`📋 Biến động tài sản — Đợt ${r==='10'?'1 (ngày 10)':'2 (ngày 25)'} · ${fmtDMY(w.from)} → ${fmtDMY(w.to)}`;
+  const moves=movesInRound(ym,r);
+  if(!moves.length){ showModal(title,`<div class="muted" style="padding:10px">Không có biến động tài sản nào trong khoảng ${fmtDMY(w.from)} → ${fmtDMY(w.to)}.</div>`); return; }
+  const byType={}; moves.forEach(m=>byType[m.type]=(byType[m.type]||0)+m.qty);
+  const totAdd=moves.filter(isAddMove).reduce((a,m)=>a+m.qty,0);
+  const totSub=moves.filter(m=>!isAddMove(m)).reduce((a,m)=>a+m.qty,0);
+  const chip=(t)=>{const add=t==='nhapthem';return `<div class="cons-chip" style="${add?'background:#ecfdf5;border-color:#a7f3d0;color:#15803d':''}"><b>${moveTypeName(t)}</b><span>${add?'+':'−'}${byType[t]}</span></div>`;};
+  const ov=`<div class="cons-sum">`+Object.keys(byType).map(chip).join('')+`</div>`;
+  const head=`<div class="muted" style="font-size:12.5px;margin:2px 0 8px">`
+    +(totAdd?`Nhập thêm <b style="color:#16a34a">+${totAdd}</b> · `:'')
+    +`Giảm <b style="color:#dc2626">−${totSub}</b> · tổng <b>${moves.length}</b> lệnh.</div>`;
+  const rows=moves.map(m=>`<tr><td class="l">${fmtDMY(m.date)}</td><td class="l">${invItemName(m.itemId)}</td><td class="l">${moveTypeName(m.type)}</td><td>${moveQtyHTML(m)}</td><td class="l">${m.reason||''}</td></tr>`).join('');
+  const tbl=`<div class="tbl-wrap"><table><tr><th class="l">Ngày</th><th class="l">Tài sản</th><th class="l">Loại</th><th>SL</th><th class="l">Lý do</th></tr>${rows}</table></div>`;
+  showModal(title, ov+head+tbl);
+}
+
+/* ===== Biến động tài sản ===== */
+function renderMoves(){
+  const ym=curMonth;
+  const all=DB.assetMoves.filter(m=>m.date && m.date.slice(0,7)===ym).sort((a,b)=>a.date<b.date?1:-1);
+  let th=`<tr><th class="l">Ngày</th><th class="l">Tài sản</th><th class="l">Loại biến động</th><th>SL</th><th class="l">Lý do</th><th></th></tr>`;
+  let body=all.map(m=>`<tr><td class="l">${fmtDMY(m.date)}</td><td class="l"><b>${invItemName(m.itemId)}</b></td><td class="l">${moveTypeName(m.type)}</td><td>${moveQtyHTML(m)}</td><td class="l">${m.reason||''}</td><td><button class="ghost" data-mvdel="${m.id}" title="Xoá & hoàn SL">✕</button></td></tr>`).join('');
+  const tbl=document.getElementById('mvTable');
+  tbl.innerHTML=th+(all.length?body:`<tr><td colspan="6" class="muted l" style="padding:12px">Chưa có biến động nào trong ${monthLabel(ym)}.</td></tr>`);
+  tbl.querySelectorAll('[data-mvdel]').forEach(b=>b.onclick=()=>delMove(b.dataset.mvdel));
+}
+function addMove(){
+  const itemId=document.getElementById('mvItem').value;
+  const it=DB.inventoryList.find(x=>x.id===itemId);
+  if(!it){alert('Chưa chọn tài sản. Hãy thêm món vào danh mục trước.');return;}
+  const type=document.getElementById('mvType').value;
+  const qty=+document.getElementById('mvQty').value||0;
+  const reason=document.getElementById('mvReason').value.trim();
+  const date=document.getElementById('mvDate').value||todayStr();
+  if(qty<=0){alert('Số lượng phải lớn hơn 0.');return;}
+  if(qty>(+it.qty||0) && !confirm(`Số lượng biến động (${qty}) lớn hơn tồn hiện tại (${it.qty}) của "${it.name}". Vẫn ghi? Tồn sẽ về ${(+it.qty||0)-qty}.`))return;
+  DB.assetMoves.push({id:uid(),date,itemId,type,qty,reason});
+  it.qty=(+it.qty||0)-qty;                       // trừ NGAY vào bản cứng
+  document.getElementById('mvQty').value=1; document.getElementById('mvReason').value='';
+  renderAll(); save();
+}
+function delMove(id){
+  const m=DB.assetMoves.find(x=>x.id===id); if(!m)return;
+  if(!confirm('Xoá biến động này và hoàn lại số lượng vào bản cứng?'))return;
+  const it=DB.inventoryList.find(x=>x.id===m.itemId);
+  if(it){ if(isAddMove(m)) it.qty=(+it.qty||0)-m.qty; else it.qty=(+it.qty||0)+m.qty; }   // nhập thêm → trừ ngược; giảm → hoàn lại
+  DB.assetMoves=DB.assetMoves.filter(x=>x.id!==id);
+  renderAll(); save();
+}
+// Nhãn 1 món: tên (đậm) · loại (đỏ) · còn N (xám, canh phải)
+function fmtItemLabel(it){
+  return `<span class="nm">${it.name}</span><span class="sep">·</span><span class="ty">${invTypeName(it.type)}</span><span class="qt">còn <b>${it.qty}</b></span>`;
+}
+function renderMvItemSelect(){
+  const hid=document.getElementById('mvItem'), panel=document.getElementById('mvItemPanel'), valEl=document.getElementById('mvItemVal');
+  if(!hid||!panel||!valEl)return;
+  const list=DB.inventoryList;
+  let cur=hid.value; if(!list.some(it=>it.id===cur)) cur=list.length?list[0].id:'';   // giữ lựa chọn cũ, không thì món đầu
+  hid.value=cur;
+  panel.innerHTML=list.length
+    ? list.map(it=>`<div class="csel-opt ${it.id===cur?'sel':''}" data-id="${it.id}" role="option">${fmtItemLabel(it)}</div>`).join('')
+    : '<div class="csel-empty">Chưa có tài sản. Thêm món ở danh mục phía trên.</div>';
+  const selIt=list.find(it=>it.id===cur);
+  valEl.innerHTML=selIt?fmtItemLabel(selIt):'<span style="color:#94a3b8">Chọn tài sản…</span>';
+  panel.querySelectorAll('[data-id]').forEach(o=>o.onclick=()=>{
+    document.getElementById('mvItem').value=o.dataset.id;
+    document.getElementById('mvItemSel').classList.remove('open');
+    renderMvItemSelect();
+  });
+}
+(function initMvItemSel(){
+  const sel=document.getElementById('mvItemSel'), btn=document.getElementById('mvItemBtn');
+  if(!sel||!btn)return;
+  btn.onclick=e=>{ e.stopPropagation(); sel.classList.toggle('open'); };
+  document.addEventListener('click',e=>{ if(!sel.contains(e.target)) sel.classList.remove('open'); });
+})();
+// Ô .autocap: tự viết HOA chữ cái đầu khi gõ (giữ nguyên vị trí con trỏ), hiển thị đậm qua CSS
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(!el||!el.classList||!el.classList.contains('autocap'))return;
+  const v=el.value; if(!v)return;
+  const nv=v.charAt(0).toUpperCase()+v.slice(1);
+  if(nv!==v){ const p=el.selectionStart; el.value=nv; try{el.setSelectionRange(p,p);}catch(_){} }
+});
+
+/* ===== Đợt kiểm kê: SL thực đếm + ghi chú tình trạng ===== */
 function renderInvRound(ym,r,elId,title){
   const list=DB.inventoryList, st=invRoundState(ym,r);
-  const cnt=list.length, done=list.filter(it=>st.checked[it.id]).length;
+  const cnt=list.length, done=list.filter(it=>invFilled(st.items[it.id])).length;
   const badge = st.done? `<span class="round-badge ok">✅ Đã xác nhận${st.doneAt?(' · '+st.doneAt):''}</span>`
     : `<span class="round-badge wait">${done}/${cnt}${(cnt>0&&done===cnt)?' — chờ xác nhận':''}</span>`;
-  const body = list.length
-    ? list.map(it=>{const ck=!!st.checked[it.id];return `<label class="inv-check ${ck?'done':''}"><input type="checkbox" data-r="${r}" data-it="${it.id}" ${ck?'checked':''} ${st.done?'disabled':''}><span class="nm">${it.name}</span></label>`;}).join('')
-    : '<div class="muted" style="padding:8px">Chưa có món để kiểm.</div>';
+  let body;
+  if(list.length){
+    let rows=`<tr><th class="l">Tài sản</th><th>SL kỳ vọng</th><th>SL thực đếm</th><th class="l">Tình trạng (ghi chú)</th></tr>`;
+    rows+=list.map(it=>{
+      const c=st.items[it.id]||{};
+      const counted=invFilled(c)?c.qty:it.qty;                 // gợi ý = SL kỳ vọng
+      const diff=invFilled(c)?((+it.qty)-(+counted)):0;         // >0 thiếu, <0 dư
+      const dis=st.done?'disabled':'';
+      const noteVal=(c.note||'').replace(/"/g,'&quot;');
+      let tr=`<tr class="${diff!==0?'inv-diff':''}"><td class="l">${it.name} <span class="muted">· ${invTypeName(it.type)}</span></td>`
+        +`<td>${it.qty}</td>`
+        +`<td><input type="number" min="0" class="inv-qin" data-r="${r}" data-it="${it.id}" value="${counted}" ${dis} style="width:72px"></td>`
+        +`<td class="l"><input type="text" class="inv-note autocap" data-r="${r}" data-it="${it.id}" value="${noteVal}" placeholder="VD: tốt / xước nhẹ / cần thay" ${dis} style="width:100%"></td></tr>`;
+      if(diff>0){                                              // THIẾU → bắt buộc chọn loại biến động + lý do
+        const rs=(c.reason||'').replace(/"/g,'&quot;');
+        const opts=MOVE_TYPES.map(t=>`<option value="${t.k}" ${c.moveType===t.k?'selected':''}>${t.n}</option>`).join('');
+        tr+=`<tr class="inv-diff-sub"><td colspan="4" class="l"><div class="ids-wrap">`
+          +`<span class="ids-lbl">⚠ Lệch thiếu ${diff} — báo lý do:</span>`
+          +`<select class="inv-mtype" data-r="${r}" data-it="${it.id}" ${dis}><option value="">— Loại biến động —</option>${opts}</select>`
+          +`<input type="text" class="inv-mreason autocap" data-r="${r}" data-it="${it.id}" value="${rs}" placeholder="Lý do (bắt buộc)" ${dis}>`
+          +`</div></td></tr>`;
+      } else if(diff<0){
+        tr+=`<tr class="inv-diff-sub"><td colspan="4" class="l muted">▲ Dư ${-diff} — xác nhận sẽ cập nhật tăng SL bản cứng.</td></tr>`;
+      }
+      return tr;
+    }).join('');
+    body=`<div class="tbl-wrap"><table class="inv-rtable">${rows}</table></div>`;
+  } else body='<div class="muted" style="padding:8px">Chưa có món để kiểm.</div>';
+  const banner='';   // báo cáo biến động đã chuyển sang khu Kế toán (Danh mục & biến động)
   const btn = st.done
     ? `<button class="ghost" data-reopen="${r}">↩ Mở lại để sửa</button>`
     : `<button class="primary" data-confirm="${r}" ${cnt===0?'disabled':''}>✓ Xác nhận kiểm kê xong</button>`;
-  document.getElementById(elId).innerHTML=`<div class="round-h"><h3>${title}/${+ym.split('-')[1]}</h3>${badge}</div>${body}<div style="margin-top:10px;text-align:right">${btn}</div>`;
+  document.getElementById(elId).innerHTML=`<div class="round-h"><h3>${title}/${+ym.split('-')[1]}</h3>${badge}</div>${banner}${body}<div style="margin-top:10px;text-align:right">${btn}</div>`;
   const el=document.getElementById(elId);
-  el.querySelectorAll('input[type=checkbox]').forEach(c=>c.onchange=()=>toggleInv(ym,c.dataset.r,c.dataset.it,c.checked));
+  el.querySelectorAll('.inv-qin').forEach(inp=>inp.onchange=()=>setInvItem(ym,inp.dataset.r,inp.dataset.it,{qty:inp.value}));
+  el.querySelectorAll('.inv-note').forEach(inp=>inp.onchange=()=>setInvItem(ym,inp.dataset.r,inp.dataset.it,{note:inp.value}));
+  el.querySelectorAll('.inv-mtype').forEach(s=>s.onchange=()=>setInvItem(ym,s.dataset.r,s.dataset.it,{moveType:s.value}));
+  el.querySelectorAll('.inv-mreason').forEach(inp=>inp.onchange=()=>setInvItem(ym,inp.dataset.r,inp.dataset.it,{reason:inp.value}));
   const cf=el.querySelector('[data-confirm]'); if(cf)cf.onclick=()=>confirmInv(ym,r);
   const ro=el.querySelector('[data-reopen]'); if(ro)ro.onclick=()=>reopenInv(ym,r);
 }
-function toggleInv(ym,r,itId,val){ const st=ensureInv(ym,r); if(val)st.checked[itId]=true; else delete st.checked[itId]; renderInventory(); save(); }
+function setInvItem(ym,r,itId,patch){
+  const st=ensureInv(ym,r);
+  if(!st.items[itId])st.items[itId]={qty:'',note:''};
+  Object.assign(st.items[itId],patch);
+  save(); renderKiemke();
+}
 function confirmInv(ym,r){
   const list=DB.inventoryList, st=ensureInv(ym,r);
-  const done=list.filter(it=>st.checked[it.id]).length;
-  if(done<list.length && !confirm('Còn '+(list.length-done)+' món chưa tích. Vẫn xác nhận kiểm kê xong?'))return;
-  st.done=true; st.doneAt=fmtDMY(todayStr())+' '+nowHHMM(); renderAll();
+  // Bắt buộc: mọi món LỆCH THIẾU phải có loại biến động + lý do
+  const probs=[];
+  list.forEach(it=>{ const c=st.items[it.id]; if(invFilled(c)){ const diff=(+it.qty)-(+c.qty); if(diff>0 && (!c.moveType||!(c.reason||'').trim())) probs.push(it.name); } });
+  if(probs.length){ alert('Các món lệch thiếu cần CHỌN loại biến động và NHẬP lý do trước khi xác nhận:\n• '+probs.join('\n• ')); return; }
+  // Món không chỉnh sửa = coi như ĐÃ KHỚP (giữ nguyên SL kỳ vọng), không còn cảnh báo "chưa nhập".
+  // Chỉ còn 1 bước xác nhận chắc chắn cuối cùng:
+  const diffCount=list.filter(it=>{const c=st.items[it.id];return invFilled(c)&&(+c.qty)!==(+it.qty);}).length;
+  const msg = diffCount
+    ? `Hoàn tất kiểm kê Đợt ${r==='10'?'1 (ngày 10)':'2 (ngày 25)'}?\n${diffCount} món lệch sẽ ghi biến động, các món còn lại coi như khớp số lượng.`
+    : `Hoàn tất kiểm kê Đợt ${r==='10'?'1 (ngày 10)':'2 (ngày 25)'}?\nTất cả món đều khớp số lượng kỳ vọng.`;
+  if(!confirm(msg))return;
+  let mv=0;                                        // đối soát + ghi biến động khi lệch
+  list.forEach(it=>{ const c=st.items[it.id]; if(!invFilled(c))return;
+    const counted=+c.qty, diff=(+it.qty)-counted;
+    if(diff>0){                                    // thiếu → ghi 1 lệnh biến động giảm, trừ về SL thực đếm
+      DB.assetMoves.push({id:uid(),date:`${ym}-${r}`,itemId:it.id,type:c.moveType,qty:diff,reason:c.reason.trim(),invKey:ym+'|'+r});
+      it.qty=counted; mv++;
+    } else if(diff<0){ it.qty=counted; }           // dư → cập nhật tăng (không tạo biến động)
+  });
+  st.done=true; st.doneAt=fmtDMY(todayStr())+' '+nowHHMM();
+  renderAll(); save();
 }
-function reopenInv(ym,r){ const st=ensureInv(ym,r); st.done=false; st.doneAt=null; renderAll(); }
+function reopenInv(ym,r){ const st=ensureInv(ym,r); st.done=false; st.doneAt=null; renderAll(); save(); }
 document.getElementById('invAddBtn').onclick=()=>{
-  const v=document.getElementById('invNewItem').value.trim(); if(!v)return;
-  DB.inventoryList.push({id:uid(),name:v}); document.getElementById('invNewItem').value=''; renderAll();
+  const name=document.getElementById('invNewName').value.trim();
+  const type=document.getElementById('invNewType').value||'vattu';
+  const qty=+document.getElementById('invNewQty').value||0;
+  if(!name){alert('Nhập tên tài sản.');return;}
+  const exist=DB.inventoryList.find(x=>x.type===type && (x.name||'').trim().toLowerCase()===name.toLowerCase());
+  let targetId;
+  if(exist){ exist.qty=(+exist.qty||0)+qty; targetId=exist.id; alert(`Đã cộng dồn vào "${exist.name}" (cùng tên & loại). SL hiện: ${exist.qty}.`); }
+  else { targetId=uid(); DB.inventoryList.push({id:targetId,name,type,qty}); }
+  if(qty>0) DB.assetMoves.push({id:uid(),date:todayStr(),itemId:targetId,type:'nhapthem',qty,reason:'Nhập thêm tài sản'});   // ghi lệnh nhập thêm
+  document.getElementById('invNewName').value=''; document.getElementById('invNewQty').value=1;
+  renderAll(); save();
 };
-document.getElementById('invNewItem').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('invAddBtn').click();});
+document.getElementById('invNewName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('invAddBtn').click();});
+// Gộp các món trùng (cùng tên + loại): cộng dồn SL, chuyển lịch sử biến động & kiểm kê sang món giữ lại
+function mergeInventoryDupes(){
+  const seen={}, removed=[];
+  DB.inventoryList.slice().forEach(it=>{
+    const key=(it.name||'').trim().toLowerCase()+'|'+it.type;
+    if(seen[key]){ const keep=seen[key];
+      keep.qty=(+keep.qty||0)+(+it.qty||0);
+      DB.assetMoves.forEach(m=>{ if(m.itemId===it.id)m.itemId=keep.id; });
+      Object.values(DB.inventoryChecks||{}).forEach(rounds=>Object.values(rounds).forEach(rd=>{ if(rd&&rd.items&&rd.items[it.id]){ if(!rd.items[keep.id])rd.items[keep.id]=rd.items[it.id]; delete rd.items[it.id]; } }));
+      removed.push(it.id);
+    } else seen[key]=it;
+  });
+  DB.inventoryList=DB.inventoryList.filter(x=>!removed.includes(x.id));
+  return removed.length;
+}
+document.getElementById('invMergeBtn').onclick=()=>{
+  const n=mergeInventoryDupes();
+  if(n>0){ alert(`Đã gộp ${n} mục trùng tên & loại (cộng dồn số lượng, giữ lịch sử biến động).`); renderAll(); save(); }
+  else alert('Không có mục nào trùng tên & loại.');
+};
+document.getElementById('mvAddBtn').onclick=addMove;
 
 /* ============ VẬN HÀNH — BẢO DƯỠNG XE ============ */
 let maintFilterXe='';
+function prevMonthYM(ym){ const [y,m]=ym.split('-').map(Number); const d=new Date(Date.UTC(y,m-1,1)); d.setUTCMonth(d.getUTCMonth()-1); return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0'); }
+function maintMonth(ym){ return DB.maintenance.filter(m=>m.date && m.date.slice(0,7)===ym); }
+function suppliesOfMaint(mid){ return DB.assetMoves.filter(x=>x.maintId===mid); }          // đồ bảo dưỡng đã dùng cho 1 lần BD
+function consumedSupplies(ym){ const map={}; DB.assetMoves.filter(x=>x.maintId && x.date && x.date.slice(0,7)===ym).forEach(x=>{map[x.itemId]=(map[x.itemId]||0)+x.qty;}); return map; }
+
 function renderMaint(){
-  if(!opUnlocked)return;
   const fsel=document.getElementById('maintFilter');
   if(fsel && !fsel._init){ fsel.innerHTML='<option value="">Tất cả xe</option>'+VEHICLES.map(v=>`<option value="${v.id}">${v.id}</option>`).join(''); fsel._init=true; fsel.onchange=()=>{maintFilterXe=fsel.value;renderMaint();}; }
-  const all=[...DB.maintenance].sort((a,b)=>a.date<b.date?1:-1);
-  const list=maintFilterXe?all.filter(m=>m.xe===maintFilterXe):all;
-  let th=`<tr><th class="l">Ngày</th><th class="l">Xe</th><th>ODO</th><th class="l">Nội dung bảo dưỡng</th><th class="l">Tình trạng</th><th class="l">Đề xuất</th><th></th></tr>`;
-  let body=list.map(m=>`<tr><td class="l">${fmtDMY(m.date)}</td><td class="l"><b>${m.xe}</b></td><td>${m.odo?fmtVND(m.odo)+' km':''}</td><td class="l">${m.noidung||''}</td><td class="l">${m.tinhtrang||''}</td><td class="l">${m.dexuat||''}</td><td><button class="ghost" onclick="openMaint('${m.id}')">✎</button></td></tr>`).join('');
-  document.getElementById('maintTable').innerHTML=th+(list.length?body:`<tr><td colspan="7" class="muted l" style="padding:14px">Chưa có lần bảo dưỡng nào.</td></tr>`);
-  const latestByXe={}; all.forEach(m=>{ if(!latestByXe[m.xe]||m.date>latestByXe[m.xe].date)latestByXe[m.xe]=m; });
+  const cur=curMonth, prev=prevMonthYM(cur);
+  renderMaintMonthTable(prev,'maintTablePrev');
+  renderMaintMonthTable(cur,'maintTableCur');
+  const consMap=consumedSupplies(cur), consIds=Object.keys(consMap);
+  const totalCons=consIds.reduce((a,id)=>a+consMap[id],0);
   document.getElementById('maintKpis').innerHTML=
-    kpi('Tổng lần bảo dưỡng',DB.maintenance.length+'')
-    +kpi('Số xe đã có hồ sơ',Object.keys(latestByXe).length+'/'+VEHICLES.length)
-    +kpi('Lần gần nhất',all.length?fmtDMY(all[0].date):'—');
+    kpi('Lần BD '+monthLabel(cur).toLowerCase(),maintMonth(cur).length+'')
+    +kpi('Lần BD '+monthLabel(prev).toLowerCase(),maintMonth(prev).length+'')
+    +kpi('Đồ bảo dưỡng đã dùng',fmtVND(totalCons)+' ›','kpi-cons clickable');
+  const ck=document.querySelector('#maintKpis .kpi-cons'); if(ck)ck.onclick=openConsumedDetail;
+  document.getElementById('maintConsumed').innerHTML = consIds.length
+    ? `<div class="muted" style="font-size:12.5px;line-height:1.6">🧴 Đồ bảo dưỡng đã dùng trong ${monthLabel(cur)}: `+consIds.map(id=>`<b style="color:#0369a1">${invItemName(id)}</b> ×${consMap[id]}`).join(' · ')+'</div>'
+    : `<div class="muted" style="font-size:12.5px">Chưa dùng đồ bảo dưỡng nào trong ${monthLabel(cur)}.</div>`;
+}
+function openConsumedDetail(){
+  const ym=curMonth;
+  const moves=DB.assetMoves.filter(x=>x.maintId && x.date && x.date.slice(0,7)===ym).sort((a,b)=>a.date<b.date?-1:1);
+  const consMap=consumedSupplies(ym), ids=Object.keys(consMap);
+  if(!ids.length){ showModal(`🧴 Đồ bảo dưỡng đã dùng — ${monthLabel(ym)}`,`<div class="muted" style="padding:10px">Chưa dùng đồ bảo dưỡng nào trong ${monthLabel(ym)}.</div>`); return; }
+  const total=ids.reduce((a,id)=>a+consMap[id],0);
+  const sum=`<div class="cons-sum">`+ids.map(id=>`<div class="cons-chip"><b>${invItemName(id)}</b><span>×${consMap[id]}</span></div>`).join('')+`</div>`;
+  const rows=moves.map(m=>`<tr><td class="l">${fmtDMY(m.date)}</td><td class="l">${invItemName(m.itemId)}</td><td>×${m.qty}</td><td class="l">${m.reason||''}</td></tr>`).join('');
+  const tbl=`<div class="tbl-wrap" style="margin-top:12px"><table><tr><th class="l">Ngày</th><th class="l">Đồ</th><th>SL</th><th class="l">Dùng cho</th></tr>${rows}</table></div>`;
+  showModal(`🧴 Đồ bảo dưỡng đã dùng — ${monthLabel(ym)} · tổng ${total}`, sum+tbl);
+}
+function renderMaintMonthTable(ym,elId){
+  const el=document.getElementById(elId); if(!el)return;
+  const vehs=maintFilterXe?VEHICLES.filter(v=>v.id===maintFilterXe):VEHICLES;
+  const byXe={}; vehs.forEach(v=>byXe[v.id]=[]);
+  maintMonth(ym).forEach(m=>{ if(byXe[m.xe]) byXe[m.xe].push(m); });
+  Object.values(byXe).forEach(arr=>arr.sort((a,b)=>a.date<b.date?-1:1));
+  let rows='';
+  vehs.forEach(v=>{
+    const arr=byXe[v.id];
+    if(!arr.length){ rows+=`<tr class="m-empty"><td></td><td class="mx">${v.id}</td><td></td><td></td><td></td><td></td></tr>`; return; }
+    arr.forEach((m,i)=>{
+      const sup=suppliesOfMaint(m.id);
+      const supTxt=sup.length?`<div class="m-sup">🧴 ${sup.map(s=>invItemName(s.itemId)+' ×'+s.qty).join(', ')}</div>`:'';
+      rows+=`<tr>`
+        +`<td>${fmtDMY(m.date)}</td>`
+        +(i===0?`<td class="mx" rowspan="${arr.length}">${v.id}</td>`:'')
+        +`<td class="l">${m.noidung||''}${supTxt} <button class="m-edit" onclick="openMaint('${m.id}')" title="Sửa">✎</button></td>`
+        +`<td>${m.odo?fmtVND(m.odo)+' km':''}</td>`
+        +`<td class="l">${m.tinhtrang||''}</td>`
+        +`<td class="l">${m.dexuat||''}</td>`
+        +`</tr>`;
+    });
+  });
+  const head=`<tr><th class="mtitle" colspan="6">BÁO CÁO BẢO DƯỠNG — ${monthLabel(ym).toUpperCase()}</th></tr>`
+    +`<tr class="mhead"><th>Ngày</th><th>Xe</th><th class="l">Nội dung bảo dưỡng</th><th>Odo</th><th>Tình trạng xe</th><th>Đề Xuất</th></tr>`;
+  el.innerHTML=head+rows;
+}
+// Tạo / hoàn tác các lệnh "sử dụng" đồ bảo dưỡng gắn với 1 lần BD
+function revertMaintMoves(mid){
+  DB.assetMoves.filter(x=>x.maintId===mid).forEach(x=>{ const it=DB.inventoryList.find(i=>i.id===x.itemId); if(it)it.qty=(+it.qty||0)+x.qty; });
+  DB.assetMoves=DB.assetMoves.filter(x=>x.maintId!==mid);
+}
+function applyMaintSupplies(mid,supRows,date,xe,noidung){
+  supRows.forEach(s=>{
+    const it=DB.inventoryList.find(i=>i.id===s.itemId); if(!it)return;
+    DB.assetMoves.push({id:uid(),date,itemId:s.itemId,type:'sudung',qty:s.qty,reason:`Bảo dưỡng ${xe}${noidung?(' - '+noidung):''}`,maintId:mid});
+    it.qty=(+it.qty||0)-s.qty;                       // trừ NGAY vào kho đồ bảo dưỡng
+  });
 }
 let editingMaint=null;
 function mf(k,v){const el=document.getElementById('m_'+k);if(v!==undefined)el.value=v;return el.value;}
+function maintSupItemOptions(sel){ return DB.inventoryList.filter(x=>x.type==='baoduong').map(it=>`<option value="${it.id}" ${it.id===sel?'selected':''}>${it.name} (còn ${it.qty})</option>`).join(''); }
+function addMaintSupRow(itemId,qty){
+  const wrap=document.getElementById('m_supList');
+  const items=DB.inventoryList.filter(x=>x.type==='baoduong');
+  if(!items.length)return;
+  const row=document.createElement('div'); row.className='m-sup-row';
+  row.innerHTML=`<select class="m-sup-item">${maintSupItemOptions(itemId||items[0].id)}</select><input type="number" class="m-sup-qty" min="1" step="1" value="${qty||1}"><button type="button" class="m-sup-del" title="Bỏ">✕</button>`;
+  row.querySelector('.m-sup-del').onclick=()=>row.remove();
+  wrap.appendChild(row);
+}
 function openMaint(id){
   editingMaint=id;
   const del=document.getElementById('maintDelete');
   const xsel=document.getElementById('m_xe');
   if(!xsel._init){ xsel.innerHTML=VEHICLES.map(v=>`<option value="${v.id}">${v.id} (${vehTyp(v.id)})</option>`).join(''); xsel._init=true; }
+  const supWrap=document.getElementById('m_supList'); supWrap.innerHTML='';
+  const noBd=DB.inventoryList.filter(x=>x.type==='baoduong').length===0;
+  const supAdd=document.getElementById('m_supAdd'); supAdd.disabled=noBd; supAdd.style.opacity=noBd?'.5':'';
+  if(noBd) supWrap.innerHTML='<div class="muted" style="font-size:12px">Chưa có đồ bảo dưỡng trong kho. Thêm ở Kiểm kê tài sản (loại "Đồ bảo dưỡng").</div>';
   if(id){const m=DB.maintenance.find(x=>x.id===id);document.getElementById('maintTitle').textContent='Sửa bảo dưỡng — '+m.xe;
-    mf('date',m.date);mf('xe',m.xe);mf('odo',m.odo||'');mf('noidung',m.noidung||'');mf('tinhtrang',m.tinhtrang||'');mf('dexuat',m.dexuat||'');del.style.display='';}
+    mf('date',m.date);mf('xe',m.xe);mf('odo',m.odo||'');mf('noidung',m.noidung||'');mf('tinhtrang',m.tinhtrang||'');mf('dexuat',m.dexuat||'');del.style.display='';
+    if(!noBd) suppliesOfMaint(id).forEach(s=>addMaintSupRow(s.itemId,s.qty));}
   else{document.getElementById('maintTitle').textContent='Thêm bảo dưỡng';
-    mf('date',todayStr());mf('xe',maintFilterXe||VEHICLES[0].id);mf('odo','');mf('noidung','');mf('tinhtrang','');mf('dexuat','');del.style.display='none';}
+    mf('date',todayStr());mf('xe',maintFilterXe||VEHICLES[0].id);mf('odo','');mf('noidung','');mf('tinhtrang','');mf('dexuat','');del.style.display='none';
+    if(!noBd) addMaintSupRow();}        // hiện sẵn 1 dòng chọn đồ để dễ thấy
   document.getElementById('maintOverlay').classList.add('open');
 }
 document.getElementById('addMaint').onclick=()=>openMaint(null);
+document.getElementById('m_supAdd').onclick=()=>addMaintSupRow();
 document.getElementById('maintCancel').onclick=()=>document.getElementById('maintOverlay').classList.remove('open');
 document.getElementById('maintSave').onclick=()=>{
   const rec={date:mf('date'),xe:mf('xe'),odo:+mf('odo')||0,noidung:mf('noidung'),tinhtrang:mf('tinhtrang'),dexuat:mf('dexuat')};
-  if(editingMaint){Object.assign(DB.maintenance.find(x=>x.id===editingMaint),rec);}else{rec.id=uid();DB.maintenance.push(rec);}
-  document.getElementById('maintOverlay').classList.remove('open');renderAll();
+  const supRows=[...document.querySelectorAll('#m_supList .m-sup-row')].map(r=>({itemId:r.querySelector('.m-sup-item').value,qty:+r.querySelector('.m-sup-qty').value||0})).filter(s=>s.itemId&&s.qty>0);
+  let mid;
+  if(editingMaint){ mid=editingMaint; Object.assign(DB.maintenance.find(x=>x.id===editingMaint),rec); revertMaintMoves(mid); }
+  else { rec.id=uid(); mid=rec.id; DB.maintenance.push(rec); }
+  applyMaintSupplies(mid,supRows,rec.date,rec.xe,rec.noidung);
+  document.getElementById('maintOverlay').classList.remove('open');renderAll();save();
 };
-document.getElementById('maintDelete').onclick=()=>{if(!confirm('Xoá lần bảo dưỡng này?'))return;DB.maintenance=DB.maintenance.filter(x=>x.id!==editingMaint);document.getElementById('maintOverlay').classList.remove('open');renderAll();};
+document.getElementById('maintDelete').onclick=()=>{if(!confirm('Xoá lần bảo dưỡng này? (đồ bảo dưỡng đã dùng sẽ được hoàn lại kho)'))return;revertMaintMoves(editingMaint);DB.maintenance=DB.maintenance.filter(x=>x.id!==editingMaint);document.getElementById('maintOverlay').classList.remove('open');renderAll();save();};
 
 /* ============ THÔNG TIN XE (bấm tên xe ở Sơ đồ) ============ */
 function vehTyp(id){ const vi=DB.vehicleInfo&&DB.vehicleInfo[id]; const base=(VEHICLES.find(v=>v.id===id)||{}).typ||''; return (vi&&vi.typ)||base; }
@@ -8834,12 +9432,11 @@ document.getElementById('vehSave').onclick=()=>{
 
 /* ============ ADMIN LOCK (Kế toán & Vận hành — mở riêng) ============ */
 document.getElementById('accToggle').onclick=()=>{accUnlocked?switchTab('revenue'):openAdmin('acc');};
-document.getElementById('opToggle').onclick=()=>{opUnlocked?switchTab('inventory'):openAdmin('op');};
 document.getElementById('adminLogin').onclick=doAdminLogin;
 document.getElementById('adminPass').onkeydown=e=>{if(e.key==='Enter')doAdminLogin();};
 document.getElementById('adminCancel').onclick=()=>document.getElementById('adminOverlay').classList.remove('open');
 document.getElementById('adminLock').onclick=adminLockNow;
-document.getElementById('changePass').onclick=()=>{const p=prompt('Mật khẩu nội bộ mới (dùng cho cả Kế toán & Vận hành):');if(p){DB.password=p;save();alert('Đã đổi mật khẩu nội bộ.');}};
+document.getElementById('changePass').onclick=()=>{const p=prompt('Mật khẩu khu Kế toán mới:');if(p){DB.password=p;save();alert('Đã đổi mật khẩu Kế toán.');}};
 
 /* ============ SYNC SCROLL 2 bảng doanh thu ============ */
 (function(){
