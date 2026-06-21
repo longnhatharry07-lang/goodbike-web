@@ -7608,16 +7608,24 @@ const SEED_DATA = {
 /* ============ STATE ============ */
 let LOADED_FROM_LS=false;
 let DB = load();
-if(!DB.funds)DB.funds={khauhao:[],lairong:[]};
-if(!DB.funds.khauhao)DB.funds.khauhao=[];
-if(!DB.funds.lairong)DB.funds.lairong=[];
-if(!DB.assets)DB.assets=[];
-if(!DB.vehicleInfo)DB.vehicleInfo={};   // {xeId:{typ,doi,bien,mau}}
-if(!DB.inventoryList)DB.inventoryList=[];     // [{id,name,type,qty}] bản cứng tài sản cần kiểm kê
-DB.inventoryList.forEach(it=>{ if(it.type===undefined)it.type='vattu'; if(it.qty===undefined)it.qty=1; }); // migrate dữ liệu cũ
-if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
-if(!DB.assetMoves)DB.assetMoves=[];           // [{id,date,itemId,type(thatthoat|sudung|honghoc),qty,reason}] biến động tài sản
-if(!DB.maintenance)DB.maintenance=[];         // [{id,date,xe,odo,noidung,tinhtrang,dexuat}]
+// Chuẩn hoá DB: đảm bảo mọi trường tồn tại — chạy cả sau khi KÉO dữ liệu từ cloud (Supabase)
+// vì document cloud cũ có thể thiếu các trường mới → tránh lỗi undefined khi render.
+function normalizeDB(){
+  if(!DB || typeof DB!=='object') DB={};
+  if(!DB.bookings)DB.bookings=[];
+  if(!DB.expenses)DB.expenses=[];
+  if(!DB.funds)DB.funds={khauhao:[],lairong:[]};
+  if(!DB.funds.khauhao)DB.funds.khauhao=[];
+  if(!DB.funds.lairong)DB.funds.lairong=[];
+  if(!DB.assets)DB.assets=[];
+  if(!DB.vehicleInfo)DB.vehicleInfo={};   // {xeId:{typ,doi,bien,mau}}
+  if(!DB.inventoryList)DB.inventoryList=[];     // [{id,name,type,qty}] bản cứng tài sản kiểm kê
+  DB.inventoryList.forEach(it=>{ if(it.type===undefined)it.type='vattu'; if(it.qty===undefined)it.qty=1; });
+  if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
+  if(!DB.assetMoves)DB.assetMoves=[];           // biến động tài sản
+  if(!DB.maintenance)DB.maintenance=[];         // bảo dưỡng xe
+}
+normalizeDB();
 let curMonth = ymNow();           // 'YYYY-MM'
 let accUnlocked = false;           // mở khóa khu Kế toán
 let opUnlocked = false;            // mở khóa khu Vận hành (độc lập với Kế toán)
@@ -7854,6 +7862,7 @@ function adminLockNow(){
 
 /* ============ RENDER ALL ============ */
 function renderAll(){
+  normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
   const label=monthLabel(curMonth);
   document.getElementById('tlMonthLabel').textContent=label;
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
