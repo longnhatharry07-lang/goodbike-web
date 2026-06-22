@@ -240,10 +240,30 @@
   .pa-down{color:#dc2626;font-weight:700;font-size:12px;white-space:nowrap}
   .pa-flat{color:#94a3b8;font-weight:600;font-size:12px;white-space:nowrap}
   .pa-cc-sum{font-size:12.5px;color:#475569;margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;line-height:1.55}
+  .pa-wk-nav{display:inline-flex;align-items:center;gap:8px;font-size:12.5px}
+  .pa-wk-nav button{width:26px;height:26px;border:1px solid var(--line);border-radius:7px;background:#fff;cursor:pointer;color:#475569;font-size:15px;line-height:1}
+  .pa-wk-nav button:disabled{opacity:.4;cursor:default}
+  .pa-wk-nav button:hover:not(:disabled){background:#f1f5f9}
+  .pa-cc.wkbrowser{border-color:#cfe0fb;background:#f7faff}
   .inv-add-btn{width:23px;height:23px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#b0b7c3;font-size:14px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:all .14s}
   .inv-add-btn:hover{border-color:#7aa7f0;color:#3b82f6;background:#f3f8ff}
   .inv-add-btn.added{color:#86c79b;border-color:#d6efdd;background:#f6fdf8}
   .inv-add-btn.added:hover{border-color:#86c79b;color:#16a34a}
+  .srcrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #eef2f7}
+  .srcrow .sw{width:14px;height:14px;border-radius:4px;flex:none}
+  .srcrow .nm{flex:1;font-size:13px;color:#0f172a}
+  .srcrow input[type=color]{width:42px;height:28px;padding:2px;border:1px solid var(--line);border-radius:6px}
+  .srcrow .del{border:none;background:none;color:#dc2626;cursor:pointer;font-size:14px}
+  .srcgrp{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px}
+  .srcgrp-h{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;color:#0f172a;margin-bottom:5px}
+  .srcgrp .sw{width:13px;height:13px;border-radius:4px;flex:none}
+  .srcgrp .newco{font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:7px}
+  .dayprice.pay2{flex-wrap:wrap;align-items:flex-end}
+  .dayprice .dp2{display:flex;flex-direction:column;gap:2px}
+  .dayprice .dp2 label{font-size:10px;color:#64748b;font-weight:600}
+  .dayprice .dp2 .dpc{border-color:#f1c7c7;background:#fff8f8}
+  .pmethod-fixed{display:inline-flex;align-items:center;padding:6px 8px;font-size:12.5px;font-weight:700;color:#b45309;background:#fff4e6;border:1px solid #fcd9a8;border-radius:7px}
+  #f_dayPrices.payable .dayprice{background:#fafbfc}
   .inv-check{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px dashed #eef2f7;cursor:pointer}
   .inv-check:last-child{border-bottom:none}
   .inv-check input{width:18px;height:18px;cursor:pointer}
@@ -399,6 +419,8 @@
   .lock .ico{font-size:40px}
   @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <header>
@@ -478,7 +500,8 @@
       <div class="kpis" id="revKpis"></div>
     </div>
     <div class="card">
-      <h2 style="margin:0 0 6px">Bảng trên — Doanh thu booking (tô màu theo nguồn khách)</h2>
+      <div class="row"><h2 style="margin:0 0 6px">Bảng trên — Doanh thu booking (tô màu theo nguồn khách)</h2>
+        <button class="ghost" id="revSrcMgr" style="font-size:12.5px" title="Thêm nguồn & chọn màu">🎨 Nguồn &amp; màu</button></div>
       <div class="legend" id="revLegendTop"></div>
     </div>
     <div class="card" style="padding:0">
@@ -506,10 +529,27 @@
         </div>
       </div>
       <div class="kpis" id="tcKpis" style="margin-top:12px"></div>
-      <div class="legend muted" style="margin-top:8px">Phân loại cột: Vexere &gt; Công nợ VNA &gt; Chuyển khoản &gt; Tiền mặt. Booking chưa thanh toán không lên bảng này.</div>
+      <div class="legend muted" style="margin-top:8px">3 cột: Chuyển khoản · Tiền mặt · Công nợ phải thu (ô phải thu kèm tên công ty). Tổng thực thu = tiền mặt + chuyển khoản.</div>
     </div>
     <div class="card" style="padding:0">
       <div class="tbl-wrap"><table id="tcTable"></table></div>
+    </div>
+    <div class="card" id="debtReconCard">
+      <div class="row">
+        <h2 style="margin:0">📑 Đối soát công nợ</h2>
+        <div class="right row">
+          <select id="drGroup"><option value="receivable">Phải thu</option><option value="payable">Phải trả</option></select>
+          <select id="drCompany"></select>
+          <span class="muted">Từ</span><input type="date" id="drFrom">
+          <span class="muted">đến</span><input type="date" id="drTo">
+          <button class="ghost" id="drExport">⬇ Xuất PDF</button>
+        </div>
+      </div>
+      <div id="drCapture" style="background:#fff;padding:8px 2px">
+        <div id="drTitle" style="font-weight:800;font-size:15px;margin:2px 0 4px"></div>
+        <div id="drSummary" class="muted" style="margin-bottom:8px;font-size:12.5px"></div>
+        <div class="tbl-wrap" style="border:none"><table id="drTable"></table></div>
+      </div>
     </div>
   </section>
 
@@ -745,6 +785,13 @@
         <div class="field"><label>Nguồn khách</label>
           <select id="f_src"></select></div>
       </div>
+      <div id="f_debtBox" class="field" style="display:none;margin:0 0 10px">
+        <label id="f_debtLabel">Công ty công nợ</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="f_debtCo" style="flex:1"></select>
+          <button type="button" id="f_debtAdd" class="ghost" title="Thêm công ty" style="font-size:18px;font-weight:700;padding:4px 12px">＋</button>
+        </div>
+      </div>
 
       <!-- 3) CHỌN XE (theo thời gian đã nhập) -->
       <div class="form-step"><span class="step-no">3</span> Chọn xe</div>
@@ -885,6 +932,21 @@
       <button class="ghost" id="assetCancel">Hủy</button>
       <button class="primary" id="assetSave">Lưu</button>
     </div>
+  </div>
+</div>
+
+<!-- Quản lý nguồn khách & màu -->
+<div class="overlay" id="srcMgrOverlay">
+  <div class="modal" style="width:min(480px,100%)">
+    <button class="modal-x" data-close="srcMgrOverlay" title="Đóng">✕</button>
+    <h3>Nguồn khách &amp; màu</h3>
+    <div class="muted" style="margin:-4px 0 10px">Thêm nguồn mới và chọn màu hiển thị trên Bảng tổng doanh thu.</div>
+    <div id="srcMgrList" style="margin-bottom:12px"></div>
+    <div class="grid2">
+      <div class="field"><label>Tên nguồn mới</label><input type="text" id="srcNewName" placeholder="VD: Booking.com"></div>
+      <div class="field"><label>Màu</label><input type="color" id="srcNewColor" value="#34A853" style="height:40px;padding:2px;width:100%"></div>
+    </div>
+    <div class="actions"><button class="ghost" id="srcMgrClose">Đóng</button><button class="primary" id="srcAddBtn">Thêm nguồn</button></div>
   </div>
 </div>
 
@@ -1034,9 +1096,10 @@ const VEHICLES = [
 const FLEET_CAPACITY = 14; // mẫu số tính công suất (khớp sheet GOODBIKE)
 const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
-  'VNA':'#FF6D01','Vexere':'#9900FF','iRest PHT':'#F6B26B','iRest Thái Thịnh':'#4285F4',
-  'Meta':'#A4C2F4','Walk in':'#FFE599','Zalo':'#FFE599','Atlantis':'#CC4125'
+  'iRest PHT':'#F6B26B','iRest Thái Thịnh':'#4285F4',
+  'Meta':'#A4C2F4','Walk in':'#FFE599','Zalo':'#FFE599'
 };
+// VNA, Atlantis, Vexere nay là CÔNG TY thuộc nguồn công nợ (xem DB.debtCompanies), không còn là nguồn riêng.
 // Tình trạng xe — màu kiểu ezCloud
 const STATUS = {
   sapnhan:{label:'Sắp nhận',color:'#42A5F5'},
@@ -7679,6 +7742,10 @@ function normalizeDB(){
   if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
   if(!DB.assetMoves)DB.assetMoves=[];           // biến động tài sản
   if(!DB.maintenance)DB.maintenance=[];         // bảo dưỡng xe
+  if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
+  if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
+  if(!DB.debtCompanies.receivable)DB.debtCompanies.receivable=[];
+  if(!DB.debtCompanies.payable)DB.debtCompanies.payable=[];
 }
 normalizeDB();
 let curMonth = ymNow();           // 'YYYY-MM'
@@ -7837,9 +7904,23 @@ function nightsOf(b){
 }
 function fmtVND(n){return (Math.round(n)||0).toLocaleString('en-US');}
 function moneyVN(n){return n?Number(n).toLocaleString('en-US')+'đ':'';}
-function priceOn(b,ds){return (b.prices&&b.prices[ds]!=null)?b.prices[ds]:(b.price||0);}
-function totalOf(b){return nightsOf(b).reduce((a,ds)=>a+priceOn(b,ds),0);}
-function remainOf(b){return Math.max(totalOf(b)-(b.prepaid||0),0);}
+function priceOn(b,ds){return (b.prices&&b.prices[ds]!=null)?b.prices[ds]:(b.price||0);}   // GIÁ KHÁCH TRẢ/ngày (ô Doanh thu, gồm hoa hồng)
+function totalOf(b){return nightsOf(b).reduce((a,ds)=>a+priceOn(b,ds),0);}   // tổng giá khách trả (gồm hoa hồng)
+function remainOf(b){return Math.max(grossTotalOf(b)-(b.prepaid||0),0);}
+/* ===== Công nợ & hoa hồng ===== */
+const DEBT_RECV='Công nợ phải thu', DEBT_PAY='Công nợ phải trả';
+const DEBT_COLORS={receivable:'#FF6D01', payable:'#CC4125'};      // phải thu = cam (VNA), phải trả = đỏ (Atlantis)
+function debtGroupOf(src){
+  if(!src)return null;
+  if((DB.debtCompanies&&DB.debtCompanies.receivable||[]).includes(src))return 'receivable';
+  if((DB.debtCompanies&&DB.debtCompanies.payable||[]).includes(src))return 'payable';
+  return null;
+}
+function commissionOn(b,ds){return (b&&b.debt==='payable'&&b.commissions&&b.commissions[ds]!=null)?b.commissions[ds]:0;}
+function commissionTotal(b){return (b&&b.debt==='payable')?nightsOf(b).reduce((a,ds)=>a+commissionOn(b,ds),0):0;}
+function netOn(b,ds){return priceOn(b,ds)-commissionOn(b,ds);}   // DOANH THU THẬT/ngày = giá khách trả − hoa hồng
+function grossTotalOf(b){return totalOf(b);}   // số tiền KHÁCH trả = tổng giá (hoa hồng đã nằm trong giá)
+function vehTyp(xe){ return (DB.vehicleInfo&&DB.vehicleInfo[xe]&&DB.vehicleInfo[xe].typ) || ((typeof VEHICLES!=='undefined'&&VEHICLES.find(v=>v.id===xe)||{}).typ) || xe; }
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function departDT(b){return new Date(b.depart+'T'+(b.rtime||'12:00')+':00');}
 function arriveDT(b){return new Date(b.arrive+'T'+(b.dtime||'08:00')+':00');}
@@ -7921,7 +8002,7 @@ function renderAll(){
   const label=monthLabel(curMonth);
   document.getElementById('tlMonthLabel').textContent=label;
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
-  renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderChi();renderProfit();renderFunds();renderAssets();renderKiemke();renderTaisan();renderPhanTich();renderMaint();
+  renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderKiemke();renderTaisan();renderPhanTich();renderMaint();
   save();
 }
 function monthLabel(ym){const [y,m]=ym.split('-');return `Tháng ${+m}/${y}`;}
@@ -8082,22 +8163,23 @@ function isLight(hex){const c=hex.replace('#','');const r=parseInt(c.substr(0,2)
 /* ============ REVENUE TABLES ============ */
 // Màu nguồn khách (bảng trên)
 function sourceColor(src){
+  if(DB.customSources && DB.customSources[src])return DB.customSources[src];   // nguồn tự thêm (giữ màu user chọn)
+  const g=debtGroupOf(src); if(g)return DEBT_COLORS[g];                          // công ty công nợ → màu nhóm
   const s=(src||'').toUpperCase();
-  if(/VNA/.test(s))return '#FF6D01';
-  if(/VEXERE/.test(s))return '#9900FF';
-  if(/IREST.*PHT|62PHT|PHT/.test(s))return '#F6B26B';
-  if(/IREST.*(TH|ATELIER)|THÁI|THAI/.test(s))return '#4285F4';
-  if(/META/.test(s))return '#A4C2F4';
-  if(/ATLANTIS|ALANTIS/.test(s))return '#CC4125';
-  return '#FFE599'; // Walk in / ZALO / GG MAP / null
+  if(/WALK|ZALO/.test(s))return '#FFE599';   // Walk in / Zalo
+  if(/META/.test(s))return '#A4C2F4';        // Meta
+  return '';                                  // các nguồn còn lại: KHÔNG tô màu
 }
 // Màu hình thức thanh toán (bảng dưới): VNA cam > CK/Vexere magenta > TM trắng
 function payColor(pay){
-  if(pay==='VNA')return '#FF6D01';
+  if(pay==='RECV'||pay==='VNA')return '#FF6D01';   // công nợ phải thu / VNA = cam (giống bảng trên)
   if(pay==='CK'||pay==='Vexere')return '#ff00ff';
   return ''; // tiền mặt / không xác định = trắng
 }
-function payRank(pay){return pay==='VNA'?3:(pay==='CK'||pay==='Vexere')?2:1;}
+function payRank(pay){return (pay==='RECV'||pay==='VNA')?3:(pay==='CK'||pay==='Vexere')?2:1;}
+// Khoá màu bảng DƯỚI: phải thu → 'RECV' (cam, giống bảng trên); còn lại theo hình thức thanh toán thực
+function bottomKey(b){ return (b.debt==='receivable'||(!b.debt&&debtGroupOf(b.src)==='receivable'))?'RECV':b.pay; }
+function isRecvBk(b){ return b.debt==='receivable'||(!b.debt&&debtGroupOf(b.src)==='receivable'); }
 function buildMatrices(){
   const ndays=daysInMonth(curMonth);
   const top={},bottom={}; VEHICLES.forEach(v=>{top[v.id]={};bottom[v.id]={};});
@@ -8109,24 +8191,25 @@ function buildMatrices(){
     nights.forEach(ds=>{
       if(ds.slice(0,7)!==curMonth)return;
       const day=+ds.split('-')[2];
-      const p=priceOn(b,ds);
+      const p=netOn(b,ds);   // doanh thu THẬT (đã trừ hoa hồng với nguồn phải trả)
       if(top[b.xe][day]===undefined){top[b.xe][day]={amt:p,src:b.src};}
       else{top[b.xe][day].amt+=p;}
     });
     // BẢNG DƯỚI: chỉ số tiền THỰC NHẬN. Đổ đầy từng ngày theo thứ tự (mỗi ngày tối đa = giá ngày),
     // phần dư không đủ 1 ngày dồn vào ngày kế tiếp. VNA (công nợ) coi như thu đủ.
-    const paid = b.pay==='VNA' ? totalOf(b) : (b.prepaid||0);
+    const paid = (b.pay==='VNA'||isRecvBk(b)) ? totalOf(b) : (b.prepaid||0);   // phải thu (công nợ) coi như đã ghi đủ
+    const bkey = bottomKey(b);
     if(paid>0){
       let rem=paid;
       for(const ds of nights){
         if(rem<=0)break;
-        const p=priceOn(b,ds);
+        const p=netOn(b,ds);   // doanh thu THẬT (đã trừ hoa hồng) — bảng dưới hiển thị net
         const give=Math.min(p,rem); rem-=give;
         if(give<=0 || ds.slice(0,7)!==curMonth)continue;
         const day=+ds.split('-')[2];
         const c=bottom[b.xe][day];
-        if(!c){bottom[b.xe][day]={amt:give,pay:b.pay};}
-        else{c.amt+=give; if(payRank(b.pay)>payRank(c.pay))c.pay=b.pay;}
+        if(!c){bottom[b.xe][day]={amt:give,pay:bkey};}
+        else{c.amt+=give; if(payRank(bkey)>payRank(c.pay))c.pay=bkey;}
       }
     }
   });
@@ -8151,7 +8234,8 @@ function renderRevenue(){
   VEHICLES.forEach(v=>{
     let rowTot=0;let tds='';
     for(let i=1;i<=ndays;i++){const c=top[v.id][i];const val=c?c.amt:0;rowTot+=val;colTot[i]=(colTot[i]||0)+val;
-      tds+=`<td ${c?cellStyle(sourceColor(c.src)):''}>${val?fmtVND(val)+'đ':''}</td>`;}
+      const tiny = (c&&debtGroupOf(c.src)) ? `<small style="display:block;font-size:8px;line-height:1.05;opacity:.9;font-weight:600">${c.src}</small>` : '';
+      tds+=`<td ${c?cellStyle(sourceColor(c.src)):''}>${val?fmtVND(val)+'đ':''}${tiny}</td>`;}
     grand+=rowTot;
     body+=`<tr><td class="l"><b>${v.id}</b> <span class="muted">${v.typ}</span></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
@@ -8186,12 +8270,14 @@ function renderRevenue(){
   body2+=`<tr class="total"><td class="l" style="color:#dc2626">Chưa thanh toán</td>${owtds}<td style="color:#dc2626">${fmtVND(grandOwed)}đ</td></tr>`;
   document.getElementById('revTableBot').innerHTML=revHeader(ndays)+body2;
   /* ---------- Legends ---------- */
-  const srcs=[['VNA','#FF6D01'],['Vexere','#9900FF'],['iRest PHT','#F6B26B'],['iRest Thái Thịnh','#4285F4'],['Meta','#A4C2F4'],['Walk in / Zalo','#FFE599'],['Atlantis','#CC4125']];
-  document.getElementById('revLegendTop').innerHTML=srcs.map(([n,c])=>`<span><i class="sw" style="background:${c}"></i>${n}</span>`).join('');
+  const srcs=[['Walk in / Zalo','#FFE599'],['Meta','#A4C2F4'],['Công nợ phải thu','#FF6D01'],['Công nợ phải trả','#CC4125']]
+    .concat(Object.entries(DB.customSources||{}));
+  document.getElementById('revLegendTop').innerHTML=srcs.map(([n,c])=>`<span><i class="sw" style="background:${c}"></i>${n}</span>`).join('')
+    +`<span><i class="sw" style="background:#fff;border:1px solid var(--line)"></i>Nguồn khác (không tô màu)</span>`;
   document.getElementById('revLegendBot').innerHTML=
     `<span><i class="sw" style="background:#ff00ff"></i>Chuyển khoản</span>`+
-    `<span><i class="sw" style="background:#FF6D01"></i>Công nợ VNA</span>`+
-    `<span><i class="sw" style="background:#fff"></i>Tiền mặt</span>`;
+    `<span><i class="sw" style="background:#FF6D01"></i>Công nợ phải thu</span>`+
+    `<span><i class="sw" style="background:#fff;border:1px solid var(--line)"></i>Tiền mặt</span>`;
   /* ---------- KPIs ---------- */
   const activeBikes=VEHICLES.filter(v=>Object.keys(top[v.id]).length).length;
   const rentedDays=VEHICLES.reduce((a,v)=>a+Object.keys(top[v.id]).length,0);
@@ -8226,35 +8312,40 @@ function tcRange(){ // khoảng ngày đang lọc; mặc định = HÔM NAY (ch�
     if(from>to){const t=from;from=to;to=t;}
     return {from,to};
 }
-function tcCol(method,src){return (method==='Vexere'||/vexere/i.test(src))?'Vexere':(method==='VNA'||/vna/i.test(src))?'VNA':method==='CK'?'CK':method==='TM'?'TM':'CK';}
+function tcCol(b,method){ return isRecvBk(b)?'RECV':(method==='TM'?'TM':'CK'); }   // 3 cột: phải thu / tiền mặt / chuyển khoản
 function renderThuChi(){
   const {from,to}=tcRange();
-  // MỖI LỆNH thanh toán = 1 dòng (ngày/giờ, số tiền, hình thức) — giống ezCloud
+  // MỖI LỆNH thanh toán = 1 dòng. Booking công nợ PHẢI THU → ghi khoản phải thu (doanh thu net) theo ngày nhận.
   const lines=[];
   DB.bookings.forEach(b=>{
+    if(isRecvBk(b)){
+      const amt=totalOf(b);
+      if(amt>0 && b.arrive>=from && b.arrive<=to) lines.push({b,p:{date:b.arrive,time:'',amount:amt,method:'RECV'}});
+      return;
+    }
     const pls=(b.payments&&b.payments.length)?b.payments
       :((b.prepaid||0)>0?[{date:b.arrive,time:'',amount:b.prepaid,method:b.pay||'TM'}]:[]);
     pls.forEach(p=>{if(p.date>=from&&p.date<=to&&(+p.amount||0)>0)lines.push({b,p});});
   });
   lines.sort((a,b)=>((a.p.date+(a.p.time||''))<(b.p.date+(b.p.time||'')))?-1:1);
-  let th=`<tr><th class="l">Ngày giờ</th><th>Chuyển khoản</th><th>Tiền mặt</th><th>Vexere</th><th>Công nợ VNA</th><th class="l">Nội dung</th></tr>`;
-  const sum={CK:0,TM:0,Vexere:0,VNA:0};
+  let th=`<tr><th class="l">Ngày giờ</th><th>Chuyển khoản</th><th>Tiền mặt</th><th>Công nợ phải thu</th><th class="l">Nội dung</th></tr>`;
+  const sum={CK:0,TM:0,RECV:0};
   let body=lines.map(({b,p})=>{
-    const col=tcCol(p.method,b.src);sum[col]+=(+p.amount||0);
-    const cell=c=>col===c?fmtVND(p.amount):'';
+    const col=tcCol(b,p.method);sum[col]+=(+p.amount||0);
+    const tiny=`<small style="display:block;font-size:9px;line-height:1.05;opacity:.85;font-weight:600">${b.src}</small>`;
+    const cell=c=>col===c?(fmtVND(p.amount)+(c==='RECV'?tiny:'')):'';
     const content=`${b.xe} (${fmtDM(b.arrive)} - ${fmtDM(b.depart)}) - ${b.src}`;
-    return `<tr><td class="l">${fmtDMY(p.date)}${p.time?(' '+p.time):''}</td><td>${cell('CK')}</td><td>${cell('TM')}</td><td>${cell('Vexere')}</td><td>${cell('VNA')}</td><td class="l">${content}</td></tr>`;
+    return `<tr><td class="l">${fmtDMY(p.date)}${p.time?(' '+p.time):''}</td><td>${cell('CK')}</td><td>${cell('TM')}</td><td ${col==='RECV'?cellStyle('#FF6D01'):''}>${cell('RECV')}</td><td class="l">${content}</td></tr>`;
   }).join('');
-  const totalThu=sum.CK+sum.TM+sum.Vexere+sum.VNA;
-  body+=`<tr class="total"><td class="l">Tổng (${lines.length} lệnh)</td><td>${fmtVND(sum.CK)}</td><td>${fmtVND(sum.TM)}</td><td>${fmtVND(sum.Vexere)}</td><td>${fmtVND(sum.VNA)}</td><td class="l">${fmtVND(totalThu)}đ</td></tr>`;
-  document.getElementById('tcTable').innerHTML=th+(body||'<tr><td colspan="6" class="l muted" style="padding:14px">Chưa có lệnh thanh toán trong khoảng ngày này.</td></tr>');
+  const totalThu=sum.CK+sum.TM+sum.RECV;
+  body+=`<tr class="total"><td class="l">Tổng (${lines.length} lệnh)</td><td>${fmtVND(sum.CK)}</td><td>${fmtVND(sum.TM)}</td><td>${fmtVND(sum.RECV)}</td><td class="l">${fmtVND(totalThu)}đ</td></tr>`;
+  document.getElementById('tcTable').innerHTML=th+(body||'<tr><td colspan="5" class="l muted" style="padding:14px">Chưa có lệnh thanh toán trong khoảng ngày này.</td></tr>');
   document.getElementById('tcKpis').innerHTML=`
     ${kpi('Chuyển khoản',fmtVND(sum.CK)+'đ')}
     ${kpi('Tiền mặt',fmtVND(sum.TM)+'đ')}
-    ${kpi('Vexere',fmtVND(sum.Vexere)+'đ')}
-    ${kpi('Công nợ VNA',fmtVND(sum.VNA)+'đ')}
-    ${kpi('Tổng thực thu',fmtVND(totalThu)+'đ')}`;
-  window._thuTotal=totalThu;
+    ${kpi('Công nợ phải thu',fmtVND(sum.RECV)+'đ')}
+    ${kpi('Tổng',fmtVND(totalThu)+'đ')}`;
+  window._thuTotal=sum.CK+sum.TM;   // thực thu = tiền mặt + chuyển khoản (công nợ phải thu chưa về)
 }
 
 /* ============ CHI (locked) ============ */
@@ -8302,8 +8393,20 @@ function costGroup(type){return type==='bienphi'?'bien':type==='honhop'?'honhop'
 const GROUP_LABEL={bien:'biến phí',dinh:'định phí',honhop:'chi phí hỗn hợp'};
 function revBySource(month){
   const m={};
-  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)!==month)return;m[b.src||'Khác']=(m[b.src||'Khác']||0)+priceOn(b,ds);}));
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)!==month)return;m[b.src||'Khác']=(m[b.src||'Khác']||0)+netOn(b,ds);}));
   return m;
+}
+// Gom nhóm doanh thu: nguồn thường (gộp Walk in/Zalo, Meta) + 2 nhóm công nợ kèm chi tiết công ty
+function revByGroup(month){
+  const recvCo={}, payCo={}, simple={};
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{
+    if(ds.slice(0,7)!==month)return;
+    const v=netOn(b,ds), s=b.src||'Khác', g=debtGroupOf(s);
+    if(g==='receivable')recvCo[s]=(recvCo[s]||0)+v;
+    else if(g==='payable')payCo[s]=(payCo[s]||0)+v;
+    else { const lbl=/walk|zalo/i.test(s)?'Walk in / Zalo':(/meta/i.test(s)?'Meta':s); simple[lbl]=(simple[lbl]||0)+v; }
+  }));
+  return {recvCo,payCo,simple};
 }
 function renderProfit(){
   const rev=window._revGrand||0;     // tổng doanh thu (booking)
@@ -8323,12 +8426,26 @@ function renderProfit(){
     ${kpi('Biên lợi nhuận',bienLN.toFixed(1)+'%',lai>=0?'pos':'neg')}`;
   document.getElementById('profitNote').textContent =
     'Lãi ròng = Doanh thu − Biến phí − Định phí − Chi phí hỗn hợp (khấu hao nằm trong định phí). Đầu tư là chi vốn nên không trừ vào lãi.'+(g.dautu>0?` Đầu tư tháng này: ${fmtVND(g.dautu)}đ.`:'')+` Thực thu: ${fmtVND(thu)}đ.`;
-  /* ---- Doanh thu theo nguồn ---- */
-  const srcRows=Object.entries(revBySource(curMonth)).sort((a,b)=>b[1]-a[1]);
+  /* ---- Doanh thu theo nguồn (gom nhóm: Walk in/Zalo · Meta · Công nợ phải trả ▸ công ty · Công nợ phải thu ▸ công ty) ---- */
+  const grp=revByGroup(curMonth);
   let sth=`<tr><th class="l">Nguồn khách</th><th>Doanh thu</th><th>% doanh thu</th></tr>`;
-  let sbody=srcRows.map(([s,v])=>`<tr><td class="l"><i class="sw" style="background:${sourceColor(s)};margin-right:6px"></i>${s}</td><td>${fmtVND(v)}đ</td><td class="pct">${rev>0?(v/rev*100).toFixed(1):0}%</td></tr>`).join('');
+  const sRow=(label,v,color,indent,bold)=>`<tr><td class="l" style="${indent?'padding-left:28px;':''}${bold?'font-weight:700;':''}">${color?`<i class="sw" style="background:${color};margin-right:6px"></i>`:'<span style="display:inline-block;width:11px;margin-right:6px"></span>'}${label}</td><td${bold?' style="font-weight:700"':''}>${fmtVND(v)}đ</td><td class="pct">${rev>0?(v/rev*100).toFixed(1):0}%</td></tr>`;
+  let sbody='';
+  // nguồn thường: Walk in/Zalo & Meta trước, còn lại theo doanh thu giảm dần
+  const sk=Object.keys(grp.simple), firstK=['Walk in / Zalo','Meta'].filter(k=>grp.simple[k]!=null);
+  firstK.concat(sk.filter(k=>!firstK.includes(k)).sort((a,b)=>grp.simple[b]-grp.simple[a]))
+    .forEach(k=>sbody+=sRow(k,grp.simple[k],sourceColor(k.replace(' / Zalo','')),false,false));
+  // Công nợ phải trả + công ty
+  const paySum=Object.values(grp.payCo).reduce((a,v)=>a+v,0);
+  if(Object.keys(grp.payCo).length){ sbody+=sRow('Công nợ phải trả',paySum,DEBT_COLORS.payable,false,true);
+    Object.entries(grp.payCo).sort((a,b)=>b[1]-a[1]).forEach(([co,v])=>sbody+=sRow(co,v,'',true,false)); }
+  // Công nợ phải thu + công ty
+  const recvSum=Object.values(grp.recvCo).reduce((a,v)=>a+v,0);
+  if(Object.keys(grp.recvCo).length){ sbody+=sRow('Công nợ phải thu',recvSum,DEBT_COLORS.receivable,false,true);
+    Object.entries(grp.recvCo).sort((a,b)=>b[1]-a[1]).forEach(([co,v])=>sbody+=sRow(co,v,'',true,false)); }
+  const hasData=sk.length||Object.keys(grp.payCo).length||Object.keys(grp.recvCo).length;
   sbody+=`<tr class="total"><td class="l">Tổng</td><td>${fmtVND(rev)}đ</td><td>100%</td></tr>`;
-  document.getElementById('srcTable').innerHTML=sth+(srcRows.length?sbody:'<tr><td colspan="3" class="muted l" style="padding:14px">Chưa có doanh thu trong tháng.</td></tr>');
+  document.getElementById('srcTable').innerHTML=sth+(hasData?sbody:'<tr><td colspan="3" class="muted l" style="padding:14px">Chưa có doanh thu trong tháng.</td></tr>');
   /* ---- Cơ cấu chi phí ---- */
   let cth=`<tr><th class="l">Hạng mục</th><th>Số tiền</th><th>% trong nhóm</th><th>% doanh thu</th></tr>`;
   let cbody='';
@@ -8541,7 +8658,7 @@ function phoneOf(g){const m=(g||'').match(/\+?\d[\d\s]{7,}\d/);return m?m[0].rep
 function splitGuest(g){const ph=phoneOf(g||'');let nm=(g||'');if(ph)nm=nm.replace(ph,'').replace(/[-–\s]+$/,'').replace(/^[-–\s]+/,'').trim();return {name:nm,phone:ph};}
 function joinGuest(name,phone){name=(name||'').trim();phone=(phone||'').trim();return name+(phone?(name?' - ':'')+phone:'');}
 let schActId=null,schActKind=null,saPayments=[];
-const PAY_PRIO={VNA:4,Vexere:3,CK:2,TM:1};
+const PAY_PRIO={CONGNO:5,VNA:4,Vexere:3,CK:2,TM:1};
 function nowHHMM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 function openSchAct(id,kind){
   const b=DB.bookings.find(x=>x.id===id);if(!b)return;
@@ -8564,7 +8681,7 @@ function renderSaPayments(){
   el.innerHTML = saPayments.length ? (saPayments.map((p,i)=>`<div class="payline">
     <span class="pdate">${p.date?fmtDMY(p.date):todayStr()}${p.time?(' · '+p.time):''}</span>
     <input type="number" data-i="${i}" data-k="amount" step="10000" value="${p.amount||0}" placeholder="Số tiền">
-    <select data-i="${i}" data-k="method">${['TM','CK','VNA','Vexere'].map(m=>`<option value="${m}" ${p.method===m?'selected':''}>${PAY_LABEL[m]}</option>`).join('')}</select>
+    <select data-i="${i}" data-k="method">${['TM','CK'].map(m=>`<option value="${m}" ${p.method===m?'selected':''}>${PAY_LABEL[m]}</option>`).join('')}</select>
     <button class="del" data-i="${i}" title="Xóa lệnh">✕</button></div>`).join('')
     + '<div class="muted" style="font-size:11px;padding:5px 2px 0">(Ngày giờ được hệ thống tự ghi nhận lúc thêm lệnh)</div>')
     : '<div class="muted" style="padding:6px">Chưa có lệnh thanh toán. Bấm "+ Thêm lệnh" để ghi nhận.</div>';
@@ -8572,14 +8689,14 @@ function renderSaPayments(){
   el.querySelectorAll('.del').forEach(btn=>btn.onclick=()=>{saPayments.splice(+btn.dataset.i,1);renderSaPayments();saRecalc();});
 }
 function saRecalc(){
-  const b=DB.bookings.find(x=>x.id===schActId);const tot=b?totalOf(b):0;
+  const b=DB.bookings.find(x=>x.id===schActId);const tot=b?grossTotalOf(b):0;
   const paid=saPayments.reduce((a,p)=>a+(+p.amount||0),0);
   document.getElementById('sa_total').value=fmtVND(tot)+'đ';
   document.getElementById('sa_paid').value=fmtVND(paid)+'đ';
   document.getElementById('sa_remain').value=fmtVND(Math.max(tot-paid,0))+'đ';
 }
 document.getElementById('sa_addpay').onclick=()=>{
-  const b=DB.bookings.find(x=>x.id===schActId);const tot=b?totalOf(b):0;
+  const b=DB.bookings.find(x=>x.id===schActId);const tot=b?grossTotalOf(b):0;
   const paid=saPayments.reduce((a,p)=>a+(+p.amount||0),0);
   saPayments.push({date:todayStr(),time:nowHHMM(),amount:Math.max(tot-paid,0),method:'TM',desc:''});
   renderSaPayments();saRecalc();
@@ -8657,10 +8774,178 @@ document.getElementById('tcThisMonth').onclick=()=>{
 /* ============ BOOKING MODAL ============ */
 let editingBk=null;
 const bkOv=document.getElementById('bkOverlay');
+function srcOptions(){
+  const base=Object.keys(SOURCES).concat(Object.keys(DB.customSources||{}));
+  return base.map(s=>`<option value="${s}">${s}</option>`).join('')
+    +`<option value="${DEBT_RECV}">${DEBT_RECV}</option>`
+    +`<option value="${DEBT_PAY}">${DEBT_PAY}</option>`
+    +`<option value="__add__">➕ Thêm nguồn mới…</option>`;
+}
 (function initSelects(){
   document.getElementById('f_xe').innerHTML=VEHICLES.map(v=>`<option value="${v.id}">${v.id} (${v.typ})</option>`).join('');
-  document.getElementById('f_src').innerHTML=Object.keys(SOURCES).map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('f_src').innerHTML=srcOptions();
 })();
+let _lastSrc='Walk in';
+function isFormPayable(){const s=document.getElementById('f_src');return s&&s.value===DEBT_PAY;}
+function isFormRecv(){const s=document.getElementById('f_src');return s&&s.value===DEBT_RECV;}
+// Hình thức công nợ phải thu = 'CONGNO'; còn lại chỉ Tiền mặt / Chuyển khoản
+function normMethod(m){ if(isFormRecv())return 'CONGNO'; return (m==='TM'||m==='CK')?m:'CK'; }   // Vexere/VNA cũ → Chuyển khoản
+function payLabelFull(m){ if(m==='CONGNO'){const co=(document.getElementById('f_debtCo')||{}).value||'';return 'Công nợ'+(co?(' '+co):' phải thu');} return PAY_LABEL[m]||m; }
+function onSrcChange(){
+  const sel=document.getElementById('f_src'), v=sel.value;
+  if(v==='__add__'){ sel.value=_lastSrc; openSrcMgr(); return; }
+  _lastSrc=v;
+  const box=document.getElementById('f_debtBox');
+  if(v===DEBT_RECV||v===DEBT_PAY){
+    const grp=v===DEBT_RECV?'receivable':'payable';
+    document.getElementById('f_debtLabel').textContent=v===DEBT_RECV?'Công ty (công nợ phải thu)':'Công ty (công nợ phải trả)';
+    const cos=(DB.debtCompanies[grp]||[]);
+    document.getElementById('f_debtCo').innerHTML=cos.map(c=>`<option>${c}</option>`).join('')+`<option value="__addco__">➕ Thêm công ty mới…</option>`;
+    box.style.display='';
+  } else box.style.display='none';
+  renderDayPrices(readDayPrices(),readDayComm());
+  if(document.getElementById('bk_paylist'))renderBkPayments();   // cập nhật hình thức (công nợ / TM-CK)
+  recalcPay();
+}
+/* ===== Quản lý nguồn & màu ===== */
+function renderSrcMgr(){
+  const built=Object.keys(SOURCES), customs=Object.entries(DB.customSources||{});
+  const pill=s=>{const c=sourceColor(s);return c?`<span class="pill" style="background:${c};color:${isLight(c)?'#1f2937':'#fff'}">${s}</span>`:`<span class="pill" style="background:#f1f5f9;color:#475569;border:1px solid var(--line)">${s} · không màu</span>`;};
+  let h='<div style="font-size:12px;color:#64748b;margin-bottom:5px">Nguồn có sẵn</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">'
+    +built.map(pill).join('')+'</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-bottom:3px">Nguồn tự thêm</div>';
+  h+= customs.length? customs.map(([s,c])=>`<div class="srcrow"><span class="sw" style="background:${c}"></span><span class="nm">${s}</span><input type="color" data-c="${s}" value="${c}"><button class="del" data-del="${s}" title="Xoá">✕</button></div>`).join('')
+     : '<div class="muted" style="font-size:12.5px;padding:4px 0">Chưa có nguồn tự thêm.</div>';
+  // ===== Công ty công nợ =====
+  const grpBlock=(key,label)=>{
+    const cos=DB.debtCompanies[key]||[], c=DEBT_COLORS[key];
+    return `<div class="srcgrp"><div class="srcgrp-h"><span class="sw" style="background:${c}"></span>${label}</div>`
+      +(cos.length?cos.map(co=>`<div class="srcrow"><span class="nm">${co}</span><button class="del" data-delco="${key}|${co}" title="Xoá công ty">✕</button></div>`).join(''):'<div class="muted" style="font-size:12px;padding:3px 0">Chưa có công ty.</div>')
+      +`<div style="display:flex;gap:6px;margin-top:7px"><input type="text" class="newco" data-grp="${key}" placeholder="Tên công ty mới" style="flex:1"><button class="ghost addco" data-grp="${key}" style="font-weight:700">＋ Thêm</button></div></div>`;
+  };
+  h+='<div style="font-size:12px;color:#64748b;margin:14px 0 5px">Công ty công nợ</div>'+grpBlock('receivable','Công nợ phải thu')+grpBlock('payable','Công nợ phải trả');
+  document.getElementById('srcMgrList').innerHTML=h;
+  document.querySelectorAll('#srcMgrList [data-c]').forEach(inp=>inp.onchange=()=>{DB.customSources[inp.dataset.c]=inp.value;renderAll();save();renderSrcMgr();});
+  document.querySelectorAll('#srcMgrList [data-del]').forEach(b=>b.onclick=()=>{if(!confirm('Xoá nguồn "'+b.dataset.del+'"? Booking cũ vẫn giữ tên nguồn.'))return;delete DB.customSources[b.dataset.del];renderAll();save();renderSrcMgr();});
+  document.querySelectorAll('#srcMgrList .addco').forEach(b=>b.onclick=()=>{
+    const grp=b.dataset.grp, inp=document.querySelector(`#srcMgrList .newco[data-grp="${grp}"]`), nm=(inp.value||'').trim();
+    if(!nm){alert('Nhập tên công ty.');return;}
+    if(!DB.debtCompanies[grp].includes(nm))DB.debtCompanies[grp].push(nm);
+    renderAll();save();renderSrcMgr();
+    const fs=document.getElementById('f_src'); if(fs && (fs.value===DEBT_RECV||fs.value===DEBT_PAY))onSrcChange();
+  });
+  document.querySelectorAll('#srcMgrList [data-delco]').forEach(b=>b.onclick=()=>{
+    const [grp,co]=b.dataset.delco.split('|');
+    if(!confirm('Xoá công ty "'+co+'"? Booking cũ vẫn giữ tên công ty.'))return;
+    DB.debtCompanies[grp]=DB.debtCompanies[grp].filter(x=>x!==co);
+    renderAll();save();renderSrcMgr();
+  });
+}
+function openSrcMgr(){ renderSrcMgr(); document.getElementById('srcMgrOverlay').classList.add('open'); }
+document.getElementById('srcAddBtn').onclick=()=>{
+  const n=document.getElementById('srcNewName').value.trim(), c=document.getElementById('srcNewColor').value;
+  if(!n){alert('Nhập tên nguồn.');return;}
+  if(SOURCES[n]||DB.customSources[n]){alert('Nguồn này đã tồn tại.');return;}
+  if(n===DEBT_RECV||n===DEBT_PAY){alert('Tên này dành cho nguồn công nợ.');return;}
+  DB.customSources[n]=c; document.getElementById('srcNewName').value='';
+  renderAll(); save(); renderSrcMgr();
+  const fs=document.getElementById('f_src'); if(fs && fs.closest('.overlay').classList.contains('open')){ fs.innerHTML=srcOptions(); fs.value=n; onSrcChange(); }
+};
+document.getElementById('srcMgrClose').onclick=()=>document.getElementById('srcMgrOverlay').classList.remove('open');
+{const rb=document.getElementById('revSrcMgr'); if(rb)rb.onclick=openSrcMgr;}
+/* ===== Đối soát công nợ ===== */
+function fillDrCompany(){
+  const grp=document.getElementById('drGroup').value, sel=document.getElementById('drCompany'), cur=sel.value;
+  const cos=DB.debtCompanies[grp]||[];
+  sel.innerHTML='<option value="__all__">— Tất cả công ty —</option>'+cos.map(c=>`<option>${c}</option>`).join('');
+  if([...sel.options].some(o=>o.value===cur))sel.value=cur; else sel.value='__all__';
+}
+function debtReconInit(){
+  const f=document.getElementById('drFrom'), t=document.getElementById('drTo');
+  if(f&&!f.value){ f.value=curMonth+'-01'; t.value=`${curMonth}-${String(daysInMonth(curMonth)).padStart(2,'0')}`; }
+}
+function debtReconData(){
+  const grp=document.getElementById('drGroup').value, co=document.getElementById('drCompany').value;
+  const from=document.getElementById('drFrom').value, to=document.getElementById('drTo').value;
+  const rows=DB.bookings.filter(b=>(b.debt===grp || (!b.debt && debtGroupOf(b.src)===grp)) && (co==='__all__'||b.src===co) && b.arrive>=from && b.arrive<=to)
+    .sort((a,b)=>((a.created||a.arrive)<(b.created||b.arrive))?-1:1);
+  return {grp,co,from,to,rows};
+}
+function renderDebtRecon(){
+  if(!document.getElementById('drTable'))return;
+  debtReconInit(); fillDrCompany();
+  const {grp,co,rows}=debtReconData(), payable=grp==='payable';
+  document.getElementById('drTitle').textContent=`Đối soát công nợ ${payable?'phải trả':'phải thu'} — ${co==='__all__'?'Tất cả công ty':co}`;
+  let th=`<tr><th class="l">Ngày đặt</th><th class="l">Loại xe</th><th class="l">Giao</th><th class="l">Trả</th><th>Số ngày</th>`
+    +(payable?`<th>Giá nhà xe thu</th>`:'')
+    +`<th>${payable?'Phải trả (hoa hồng)':'Phải thu'}</th></tr>`;
+  let tDays=0,tDebt=0,tGross=0;
+  let body=rows.map(b=>{
+    const nd=nightsOf(b).length, debtAmt=payable?commissionTotal(b):totalOf(b), gross=grossTotalOf(b);
+    tDays+=nd; tDebt+=debtAmt; tGross+=gross;
+    return `<tr><td class="l">${fmtDMY(b.created||b.arrive)}</td><td class="l">${vehTyp(b.xe)}</td><td class="l">${fmtDMY(b.arrive)}</td><td class="l">${fmtDMY(b.depart)}</td><td>${nd}</td>`
+      +(payable?`<td>${fmtVND(gross)}đ</td>`:'')
+      +`<td>${fmtVND(debtAmt)}đ</td></tr>`;
+  }).join('');
+  const cols=payable?7:6;
+  body+=`<tr class="total"><td class="l">Tổng (${rows.length})</td><td></td><td></td><td></td><td>${tDays}</td>`+(payable?`<td>${fmtVND(tGross)}đ</td>`:'')+`<td>${fmtVND(tDebt)}đ</td></tr>`;
+  document.getElementById('drTable').innerHTML=th+(rows.length?body:`<tr><td colspan="${cols}" class="muted l" style="padding:12px">Không có booking công nợ ${payable?'phải trả':'phải thu'} trong khoảng này.</td></tr>`);
+  document.getElementById('drSummary').innerHTML=`${fmtDMY(document.getElementById('drFrom').value)} → ${fmtDMY(document.getElementById('drTo').value)} · ${rows.length} booking · Tổng ${payable?'hoa hồng phải trả':'phải thu'}: <b>${fmtVND(tDebt)}đ</b>${payable?` · Tổng nhà xe thu (gồm hoa hồng): <b>${fmtVND(tGross)}đ</b>`:''}`;
+}
+['drGroup','drCompany','drFrom','drTo'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',renderDebtRecon);});
+{const ex=document.getElementById('drExport'); if(ex)ex.onclick=exportDebtPdf;}
+function loadScriptOnce(src){return new Promise((res,rej)=>{if([...document.scripts].some(s=>s.src===src))return res();const s=document.createElement('script');s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('load_fail'));document.head.appendChild(s);});}
+async function ensurePdfLibs(){
+  if(typeof html2canvas==='undefined')await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  if(!window.jspdf)await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+}
+function debtPrintFallback(){   // dự phòng khi không tải được thư viện: mở cửa sổ in → Lưu thành PDF
+  const node=document.getElementById('drCapture'); if(!node)return;
+  const win=window.open('','_blank','width=1000,height=700');
+  if(!win){alert('Trình duyệt đang chặn cửa sổ. Hãy cho phép pop-up rồi bấm Xuất PDF lại.');return;}
+  win.document.write(`<html><head><title>Đối soát công nợ</title><meta charset="utf-8"><style>body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#0f172a}table{border-collapse:collapse;width:100%;margin-top:8px}th,td{border:1px solid #cbd5e1;padding:6px 9px;font-size:13px;text-align:center}th{background:#f1f5f9}td.l,th.l{text-align:left}tr.total{font-weight:700;background:#f8fafc}h1{font-size:17px;margin:0 0 4px}</style></head><body>${node.innerHTML}</body></html>`);
+  win.document.close(); win.focus(); setTimeout(()=>{try{win.print();}catch(e){}},350);
+}
+async function exportDebtPdf(){
+  const btn=document.getElementById('drExport'), old=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Đang tạo PDF…';}
+  try{
+    await ensurePdfLibs();
+    if(typeof html2canvas==='undefined'||!window.jspdf)throw new Error('libs');
+    const {grp,co}=debtReconData();
+    const node=document.getElementById('drCapture');
+    const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
+    const {jsPDF}=window.jspdf, pdf=new jsPDF('l','mm','a4');
+    const pw=pdf.internal.pageSize.getWidth()-16, pageH=pdf.internal.pageSize.getHeight()-16;
+    const fullH=canvas.height*pw/canvas.width;
+    if(fullH<=pageH){ pdf.addImage(canvas.toDataURL('image/png'),'PNG',8,8,pw,fullH); }
+    else {
+      const sliceCanvasH=Math.floor(canvas.width*pageH/pw); let pos=0,pg=0;
+      while(pos<canvas.height){
+        const sh=Math.min(sliceCanvasH,canvas.height-pos);
+        const c2=document.createElement('canvas');c2.width=canvas.width;c2.height=sh;
+        c2.getContext('2d').drawImage(canvas,0,pos,canvas.width,sh,0,0,canvas.width,sh);
+        if(pg>0)pdf.addPage();
+        pdf.addImage(c2.toDataURL('image/png'),'PNG',8,8,pw,sh*pw/canvas.width);
+        pos+=sh;pg++;
+      }
+    }
+    pdf.save(`doi-soat-${grp}-${(co==='__all__'?'tatca':co).replace(/\s+/g,'_')}-${document.getElementById('drFrom').value}.pdf`);
+  }catch(e){
+    debtPrintFallback();   // lỗi mạng/CDN → dùng cửa sổ in để Lưu PDF
+  }finally{ if(btn){btn.disabled=false;btn.textContent=old;} }
+}
+function addDebtCompanyPrompt(){
+  const v=document.getElementById('f_src').value, grp=v===DEBT_RECV?'receivable':(v===DEBT_PAY?'payable':null); if(!grp)return;
+  const name=prompt('Tên công ty '+(grp==='receivable'?'(công nợ phải thu)':'(công nợ phải trả)')+':');
+  const nm=(name||'').trim();
+  if(nm && !DB.debtCompanies[grp].includes(nm))DB.debtCompanies[grp].push(nm);
+  save(); onSrcChange();                                   // dựng lại dropdown (gồm công ty mới)
+  if(nm)document.getElementById('f_debtCo').value=nm;      // chọn công ty vừa thêm
+}
+document.getElementById('f_debtAdd').onclick=addDebtCompanyPrompt;
+document.getElementById('f_debtCo').addEventListener('change',function(){ if(this.value==='__addco__')addDebtCompanyPrompt(); });
+document.getElementById('f_src').addEventListener('change',onSrcChange);
 let bkPayments=[];
 let bkSchKind=null;
 function activateMtab(id){
@@ -8671,13 +8956,18 @@ function openBooking(id,prefill,schedKind){
   editingBk=id; bkSchKind=schedKind||null;
   const del=document.getElementById('bkDelete');
   let selXe;
+  document.getElementById('f_src').innerHTML=srcOptions();   // gồm cả nguồn tự thêm + công nợ
   if(id){
     const b=DB.bookings.find(x=>x.id===id);
     document.getElementById('bkTitle').textContent='Chi tiết booking — '+b.xe;
-    f('arrive',b.arrive);f('depart',b.depart);f('dtime',b.dtime||'08:00');f('rtime',b.rtime);f('src',b.src);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
+    const grp = b.debt || debtGroupOf(b.src);     // booking cũ chưa có cờ debt → suy ra từ tên công ty
+    const srcDisplay = grp==='receivable'?DEBT_RECV:(grp==='payable'?DEBT_PAY:b.src);
+    f('arrive',b.arrive);f('depart',b.depart);f('dtime',b.dtime||'08:00');f('rtime',b.rtime);f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
-    renderDayPrices(b.prices||null);
+    onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
+    if(grp){ document.getElementById('f_debtCo').value=b.src; }
+    renderDayPrices(b.prices||null, b.commissions||null);
     del.style.display='';
   }else{
     document.getElementById('bkTitle').textContent='Thêm booking';
@@ -8686,6 +8976,7 @@ function openBooking(id,prefill,schedKind){
     f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('status','sapnhan');f('guest','');f('phone','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
+    onSrcChange();
     renderDayPrices(null);
     del.style.display='none';
   }
@@ -8754,33 +9045,48 @@ function bkPhoneNow(){ return phoneOf(joinGuest(f('guest'),f('phone'))) || ''; }
 function updateBkCall(){ document.getElementById('bkCall').style.display = bkPhoneNow() ? '' : 'none'; }
 function f(k,v){const el=document.getElementById('f_'+k);if(v!==undefined)el.value=v;return el.value;}
 function dayListIncl(a,d){const out=[];let cur=a,g=0;while(cur<=d&&g<400){out.push(cur);cur=addDays(cur,1);g++;}return out.length?out:[a];}
-function renderDayPrices(prices){ // 1 ô / NGÀY thuê GỒM cả ngày trả: 18-19 => 18,19 ; 18-20 => 18,19,20
+function renderDayPrices(prices, commissions){ // 1 ô / NGÀY thuê GỒM cả ngày trả: 18-19 => 18,19 ; 18-20 => 18,19,20
   const base=165000;
   // mỗi ngày từ nhận → trả (kèm cả ngày trả); gộp thêm ngày có giá ngoài khoảng (nếu có)
   const incl=dayListIncl(f('arrive'),f('depart'));
-  const days=[...new Set(incl.concat(prices?Object.keys(prices):[]))].sort();
-  document.getElementById('f_dayPrices').innerHTML=days.map(ds=>{
+  const days=[...new Set(incl.concat(prices?Object.keys(prices):[]).concat(commissions?Object.keys(commissions):[]))].sort();
+  const pay=isFormPayable();
+  const wrap=document.getElementById('f_dayPrices'); wrap.classList.toggle('payable',pay);
+  wrap.innerHTML=days.map(ds=>{
     const val= prices ? (prices[ds]!=null?prices[ds]:(editingBk?0:base)) : base;
+    if(pay){
+      const com= commissions ? (commissions[ds]!=null?commissions[ds]:0) : 0;
+      return `<div class="dayprice pay2"><span class="dlabel">${fmtDMY(ds)}<small>${dow(ds)}</small></span>`
+        +`<span class="dp2"><label>Doanh thu</label><input type="number" class="dp" data-d="${ds}" min="0" step="5000" value="${val}"></span>`
+        +`<span class="dp2"><label>Hoa hồng</label><input type="number" class="dpc" data-d="${ds}" min="0" step="5000" value="${com}"></span></div>`;
+    }
     return `<div class="dayprice"><span class="dlabel">${fmtDMY(ds)}<small>${dow(ds)}</small></span><input type="number" class="dp" data-d="${ds}" min="0" step="5000" value="${val}"></div>`;
   }).join('');
-  document.getElementById('f_dayPrices').querySelectorAll('.dp').forEach(i=>i.addEventListener('input',recalcPay));
+  wrap.querySelectorAll('.dp,.dpc').forEach(i=>i.addEventListener('input',recalcPay));
 }
 function readDayPrices(){const o={};document.querySelectorAll('#f_dayPrices .dp').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
+function readDayComm(){const o={};document.querySelectorAll('#f_dayPrices .dpc').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
+function formTotal(){return [...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);}   // khách trả = giá (ô Doanh thu); hoa hồng đã nằm trong giá
 function renderBkPayments(){
   const el=document.getElementById('bk_paylist');
   if(!bkPayments.length){
     el.innerHTML='<div class="muted" style="padding:6px">Chưa có lệnh thanh toán. Bấm <b>➕ Thêm lệnh</b> rồi nhập số tiền + hình thức — vd khách trả trước 100k thì thêm 1 lệnh 100k.</div>';
     return;
   }
+  bkPayments.forEach(p=>{p.method=normMethod(p.method);});   // chuẩn hoá: phải thu→CONGNO; Vexere/VNA cũ→CK
+  const recv=isFormRecv();
   el.innerHTML = bkPayments.map((p,i)=>{
     if(p._locked){ // đã thanh toán → 1 dòng chữ nghiêng hơi mờ, gọn gàng + banner chỉnh sửa
       const when=(p.date?fmtDMY(p.date):todayStr())+(p.time?(' '+p.time):'');
-      return `<div class="payrow-locked"><span class="ptxt"><b>${moneyVN(p.amount)}</b> · ${PAY_LABEL[p.method]||p.method} · ${when}</span><button class="pedit" data-edit="${i}" title="Bấm để chỉnh sửa lệnh">✏️ Chỉnh sửa</button></div>`;
+      return `<div class="payrow-locked"><span class="ptxt"><b>${moneyVN(p.amount)}</b> · ${payLabelFull(p.method)} · ${when}</span><button class="pedit" data-edit="${i}" title="Bấm để chỉnh sửa lệnh">✏️ Chỉnh sửa</button></div>`;
     }
+    const methodCtrl = recv
+      ? `<span class="pmethod-fixed">${payLabelFull('CONGNO')}</span><input type="hidden" class="pmethod" data-i="${i}" value="CONGNO">`
+      : `<select class="pmethod" data-i="${i}">${['TM','CK'].map(m=>`<option value="${m}" ${p.method===m?'selected':''}>${PAY_LABEL[m]}</option>`).join('')}</select>`;
     return `<div class="payline">
     <span class="pdate">${p.date?fmtDMY(p.date):todayStr()}${p.time?('<br>'+p.time):''}</span>
     <input type="text" inputmode="numeric" class="pamt" data-i="${i}" value="${moneyVN(p.amount)}" placeholder="Nhập tiền">
-    <select class="pmethod" data-i="${i}">${['TM','CK','VNA','Vexere'].map(m=>`<option value="${m}" ${p.method===m?'selected':''}>${PAY_LABEL[m]}</option>`).join('')}</select>
+    ${methodCtrl}
     <span class="pbtns"><button class="pconfirm" data-pay="${i}" title="Thanh toán &amp; khoá lệnh">✓ Thanh toán</button><button class="del" data-i="${i}" title="Xóa lệnh">✕</button></span></div>`;
   }).join('')
     + '<div class="muted" style="font-size:11px;padding:5px 2px 0">(Ngày giờ tự ghi nhận. Bấm ✓ Thanh toán để khoá lệnh; bấm ✏️ Chỉnh sửa để mở lại.)</div>';
@@ -8794,34 +9100,34 @@ function renderBkPayments(){
   el.querySelectorAll('.pedit').forEach(b=>b.onclick=()=>{bkPayments[+b.dataset.edit]._locked=false;renderBkPayments();recalcPay();});
   el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{bkPayments.splice(+b.dataset.i,1);renderBkPayments();recalcPay();});
 }
-function recalcPay(){ // tổng từ giá ngày; đã thu = tổng các lệnh; còn lại = chênh
-  const total=[...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);
+function recalcPay(){ // tổng từ giá ngày (gồm hoa hồng nếu phải trả); đã thu = tổng các lệnh; còn lại = chênh
+  const total=formTotal();
   const paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
   document.getElementById('f_total').textContent=fmtVND(total)+'đ';
   document.getElementById('f_paid').textContent=fmtVND(paid)+'đ';
   document.getElementById('f_remain').textContent=fmtVND(Math.max(total-paid,0))+'đ';
 }
 ['f_arrive','f_depart'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
-  const cur=readDayPrices();                            // giá đang hiển thị
+  const cur=readDayPrices(), curC=readDayComm();        // giá + hoa hồng đang hiển thị
   const incl=dayListIncl(f('arrive'),f('depart'));      // CHỈ các ngày trong khoảng nhận→trả mới
-  const kept={}; incl.forEach(d=>{ if(cur[d]!=null) kept[d]=cur[d]; }); // giữ giá ngày còn trong khoảng, BỎ ngày ngoài khoảng
-  renderDayPrices(kept); recalcPay();
+  const kept={},keptC={}; incl.forEach(d=>{ if(cur[d]!=null) kept[d]=cur[d]; if(curC[d]!=null) keptC[d]=curC[d]; }); // giữ giá ngày còn trong khoảng, BỎ ngày ngoài khoảng
+  renderDayPrices(kept,keptC); recalcPay();
   renderXeOptions(f('xe'));   // đổi ngày → lọc lại xe còn trống
 }));
 // đổi GIỜ giao/thu hồi → lọc lại xe trống (xe vừa trả sẽ trống cho booking nhận sau giờ trả)
 ['f_dtime','f_rtime'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>renderXeOptions(f('xe')));});
 ['f_guest','f_phone'].forEach(id=>document.getElementById(id).addEventListener('input',updateBkCall));
 document.getElementById('bk_addpay').onclick=()=>{
-  const total=[...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);
+  const total=formTotal();
   const paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
-  bkPayments.push({date:todayStr(),time:nowHHMM(),amount:Math.max(total-paid,0),method:'TM',desc:''});
+  bkPayments.push({date:todayStr(),time:nowHHMM(),amount:Math.max(total-paid,0),method:isFormRecv()?'CONGNO':'TM',desc:''});
   renderBkPayments();recalcPay();
 };
 document.querySelectorAll('.mtab').forEach(t=>t.onclick=()=>activateMtab(t.dataset.t));
 document.getElementById('bkSchDone').onclick=()=>{ // từ Lịch giao trả: set check-in/out + GIỜ THỰC TẾ rồi lưu
   // BẮT BUỘC thanh toán đủ mới được THU HỒI xe (giao xe thì không cần)
   if(bkSchKind && bkSchKind!=='Giao'){
-    const _tot=[...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);
+    const _tot=formTotal();
     const _paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
     if(_paid < _tot){ activateMtab('bkSec2'); alert('Chưa thu đủ tiền — còn lại '+fmtVND(_tot-_paid)+'đ.\nPhải thanh toán hết mới được hoàn thành THU HỒI xe.'); return; }
   }
@@ -8851,11 +9157,19 @@ document.getElementById('bkSave').onclick=()=>{
     if(xeBusy(f('xe'),f('arrive'),f('depart'),editingBk,f('dtime'),f('rtime'))){alert('Xe '+f('xe')+' đã có booking trùng giờ thuê này. Hãy chọn xe khác hoặc đổi ngày/giờ.');activateMtab('bkSec1');return;}
   }
   const _pr=readDayPrices();
+  // Nguồn: nếu là công nợ → src = tên công ty, debt = nhóm
+  const srcVal=f('src'); let srcStore=srcVal, debt=undefined, _co={};
+  if(srcVal===DEBT_RECV||srcVal===DEBT_PAY){
+    debt=srcVal===DEBT_RECV?'receivable':'payable';
+    srcStore=(document.getElementById('f_debtCo').value||'').trim();
+    if(!srcStore||srcStore==='__addco__'){alert('Hãy chọn hoặc thêm công ty cho nguồn công nợ.');activateMtab('bkSec1');return;}
+    if(debt==='payable')_co=readDayComm();
+  }
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
-  const rec={xe:f('xe'),src:f('src'),arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
-  if(editingBk){Object.assign(DB.bookings.find(x=>x.id===editingBk),rec);}
-  else{rec.id=uid();DB.bookings.push(rec);}
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
+  if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;Object.assign(ex,rec);}
+  else{rec.id=uid();rec.created=todayStr();DB.bookings.push(rec);}
   bkOv.classList.remove('open');renderAll();
 };
 document.getElementById('bkDelete').onclick=()=>{
@@ -9086,7 +9400,7 @@ function paDDiff(a,b){return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a
 // Thống kê 1 khoảng ngày [from,to]
 function periodStats(from,to){
   let rev=0, days=0; const cust=new Set();
-  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ rev+=priceOn(b,ds); n++; } }); if(n>0){ days+=n; cust.add(b.id); } });
+  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ rev+=netOn(b,ds); n++; } }); if(n>0){ days+=n; cust.add(b.id); } });
   let cost=0;
   DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to){ const g=costGroup(e.type); if(g==='bien'||g==='dinh'||g==='honhop')cost+=e.amt; } });
   const numDays=paDDiff(from,to)+1;
@@ -9193,7 +9507,7 @@ let paChartGeom=null;
 function paRenderChart(){
   const buckets=paRangeBuckets(paState.from,paState.to);
   const sel=paState.metrics.map(paMeta);
-  const W=1000,H=500,padL=46,padR=46,padT=24,padB=38, plotW=W-padL-padR, plotH=H-padT-padB, n=buckets.length;
+  const W=1000,H=340,padL=44,padR=44,padT=20,padB=32, plotW=W-padL-padR, plotH=H-padT-padB, n=buckets.length;
   const stats=buckets.map(b=>periodStats(b.from,b.to));
   const xs=n===1?[padL+plotW/2]:buckets.map((b,i)=>padL+i*plotW/(n-1));
   const lines=sel.map(m=>{
@@ -9203,13 +9517,13 @@ function paRenderChart(){
   });
   let grid=''; for(let g=0;g<=4;g++){const yy=padT+plotH*g/4;grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#eef1f5" stroke-width="1"/>`;}
   const step=Math.max(1,Math.ceil(n/13)); let xlab='';
-  buckets.forEach((b,i)=>{ if(i%step===0||i===n-1){ xlab+=`<text x="${xs[i].toFixed(1)}" y="${H-12}" text-anchor="middle" font-size="13" fill="#94a3b8">${b.label}</text>`; }});
+  buckets.forEach((b,i)=>{ if(i%step===0||i===n-1){ xlab+=`<text x="${xs[i].toFixed(1)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#94a3b8">${b.label}</text>`; }});
   let paths='';
   lines.forEach(L=>{
-    if(n===1){ paths+=`<circle cx="${xs[0].toFixed(1)}" cy="${L.ys[0].toFixed(1)}" r="6" fill="${L.m.color}"/>`; return; }
+    if(n===1){ paths+=`<circle cx="${xs[0].toFixed(1)}" cy="${L.ys[0].toFixed(1)}" r="5" fill="${L.m.color}"/>`; return; }
     const dd=L.ys.map((y,i)=>(i?'L':'M')+xs[i].toFixed(1)+' '+y.toFixed(1)).join(' ');
-    paths+=`<path d="${dd}" fill="none" stroke="${L.m.color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    paths+=L.ys.map((y,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${y.toFixed(1)}" r="3.6" fill="#fff" stroke="${L.m.color}" stroke-width="2.4"/>`).join('');
+    paths+=`<path d="${dd}" fill="none" stroke="${L.m.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    paths+=L.ys.map((y,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#fff" stroke="${L.m.color}" stroke-width="2"/>`).join('');
   });
   const guide=`<line id="paGuideLine" x1="0" y1="${padT}" x2="0" y2="${padT+plotH}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4" style="display:none"/>`;
   const hit=`<rect id="paHit" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent"/>`;
@@ -9280,9 +9594,34 @@ function paConclCard(kind){
     <div class="pa-cc-sum">${sum}</div>
   </div>`;
 }
+let paWkOffset=0;   // 0 = tuần đã kết thúc gần nhất, âm = lùi về quá khứ
+function paWeekAt(off){
+  const base=paLatestCompleted('week'), mon=paShift(base.range[0],off*7), sun=paShift(mon,6);
+  return {range:[mon,sun], prev:[paShift(mon,-7),paShift(mon,-1)], label:`${fmtDM(mon)}–${fmtDM(sun)}`};
+}
+function paWeekBrowser(){
+  const w=paWeekAt(paWkOffset);
+  const c=periodStats(w.range[0],w.range[1]), pr=periodStats(w.prev[0],w.prev[1]);
+  const line=(lbl,m,inv)=>`<div class="pa-cc-line"><span class="l">${lbl}</span><span class="v">${paFmt(m,c[m.k])}</span>${paGrowth(c[m.k],pr[m.k],inv)}</div>`;
+  return `<div class="pa-cc wkbrowser" style="grid-column:1/-1">
+    <div class="pa-cc-h"><b>📅 Xem tuần trong quá khứ</b>
+      <span class="pa-wk-nav"><button id="paWkPrev" title="Tuần cũ hơn">‹</button><b id="paWkLbl">Tuần ${w.label}${paWkOffset===0?' · mới nhất':''}</b><button id="paWkNext" title="Tuần mới hơn" ${paWkOffset>=0?'disabled':''}>›</button></span>
+    </div>
+    ${line('Doanh thu',paMeta('rev'))}
+    ${line('Chi phí',paMeta('cost'),true)}
+    ${line('Lãi ròng',paMeta('profit'))}
+    ${line('Số khách',paMeta('customers'))}
+    ${line('Số ngày thuê',paMeta('days'))}
+    ${line('Công suất',paMeta('cap'))}
+    <div class="pa-cc-sum">So với tuần liền trước (${fmtDM(w.prev[0])}–${fmtDM(w.prev[1])}).</div>
+  </div>`;
+}
 function paRenderConcl(){
   const el=document.getElementById('paConcl'); if(!el)return;
-  el.innerHTML=['week','month','quarter','year'].map(paConclCard).join('');
+  el.innerHTML=paWeekBrowser()+['week','month','quarter','year'].map(paConclCard).join('');
+  const pv=document.getElementById('paWkPrev'), nx=document.getElementById('paWkNext');
+  if(pv)pv.onclick=()=>{paWkOffset--;paRenderConcl();};
+  if(nx)nx.onclick=()=>{if(paWkOffset<0){paWkOffset++;paRenderConcl();}};
 }
 function openRoundMoves(ym,r){
   const w=roundWindow(ym,r);
