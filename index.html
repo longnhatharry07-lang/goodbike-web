@@ -192,39 +192,58 @@
   .ivb-rs{color:#64748b;flex:1}
   input.autocap{font-weight:700}
   /* Phân tích tài chính */
-  .pa-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:780px){.pa-cards{grid-template-columns:1fr}}
-  .pa-banner{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;transition:background .12s,border-color .12s,box-shadow .12s}
-  .pa-banner:hover{background:#f0f9ff;border-color:var(--brand);box-shadow:0 4px 12px rgba(2,132,199,.12)}
-  .pa-bn-l{flex:1;min-width:0}
-  .pa-bn-title{font-weight:800;font-size:14px;color:#0f172a}
-  .pa-bn-sub{font-size:11.5px}
-  .pa-bn-r{text-align:right}
-  .pa-bn-rev{font-weight:800;font-size:17px;color:#0f172a}
-  .pa-bn-chev{font-size:22px;color:#94a3b8;font-weight:700}
-  .pa-rev{font-size:22px;font-weight:800;color:#0f172a;margin-top:8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .pa-rows{margin-top:4px;padding-top:4px}
-  .pa-legend{display:flex;gap:16px;font-size:12px;color:#64748b;margin-bottom:8px}
-  .pa-legend .lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-  .pa-legend .lg.rev{background:#0ea5e9}
-  .pa-legend .lg.cost{background:#f87171}
-  .pa-grp{gap:3px;justify-content:center}
-  .pa-bar.rev{background:#0ea5e9}
-  .pa-bar.cost{background:#f87171}
-  .pa-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px}
-  .pa-lbl{color:#64748b;flex:1}
-  .pa-val{font-weight:700;color:#0f172a}
+  /* ===== Phân tích tài chính (kiểu Google Ads) ===== */
+  .pa-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .pa-ctrls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pa-sel{padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-weight:600;background:#fff;cursor:pointer}
+  .pa-daterange{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:5px 10px}
+  .pa-daterange input{border:none;font-size:13px;font-weight:600;color:#0f172a;background:transparent;outline:none}
+  .pa-daterange span{color:#94a3b8}
+  .pa-nav{display:flex;gap:4px}
+  .pa-nav button{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:18px;cursor:pointer;color:#475569;line-height:1}
+  .pa-nav button:hover{background:#f1f5f9}
+  .pa-rangelbl{font-size:12.5px;margin:8px 0 14px}
+  .pa-metric-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:8px}
+  .pa-mcard{position:relative;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;background:#fff;transition:box-shadow .14s,background .14s;overflow:hidden}
+  .pa-mcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--mc)}
+  .pa-mcard:hover{box-shadow:0 3px 10px rgba(0,0,0,.08)}
+  .pa-mcard .mc-name{font-size:11px;font-weight:700;color:#5f6368;display:flex;align-items:center;gap:5px;padding-right:18px}
+  .pa-mcard .mc-dot{width:7px;height:7px;border-radius:50%;background:var(--mc);display:inline-block;flex:none}
+  .pa-mcard .mc-val{font-size:17px;font-weight:800;color:#202124;margin-top:2px;line-height:1.1}
+  .pa-mcard .mc-delta{font-size:10px;font-weight:700;margin-top:1px;color:#5f6368}
+  .pa-mcard.active{color:#fff;border-color:transparent;background:var(--mc)}
+  .pa-mcard.active::before{display:none}
+  .pa-mcard.active .mc-name,.pa-mcard.active .mc-val{color:#fff}
+  .pa-mcard.active .mc-dot{background:#fff}
+  .pa-mcard.active .mc-delta{color:rgba(255,255,255,.92)}
+  .pa-mcard .mc-check{position:absolute;top:7px;right:7px;width:14px;height:14px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:transparent}
+  .pa-mcard.active .mc-check{background:#fff;border-color:#fff;color:var(--mc)}
+  .pa-mcard.disabled{opacity:.55;cursor:not-allowed}
+  .pa-hint{font-size:12px;margin:12px 0 6px}
+  .pa-chart-box{position:relative;margin-top:6px}
+  .pa-chart-box svg{width:100%;height:auto;display:block;overflow:visible}
+  .pa-tip{position:absolute;pointer-events:none;background:#202124;color:#fff;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.55;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:5;white-space:nowrap;transform:translate(-50%,-115%)}
+  .pa-tip .tt-d{font-weight:700;margin-bottom:3px}
+  .pa-tip .tt-row{display:flex;align-items:center;gap:6px}
+  .pa-tip .tt-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .pa-concl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:780px){.pa-concl-grid{grid-template-columns:1fr}}
+  .pa-cc{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .pa-cc-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .pa-cc-h b{font-size:14px;color:#0f172a}
+  .pa-cc-badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#ecfdf5;color:#15803d}
+  .pa-cc-badge.wait{background:#fef3c7;color:#b45309}
+  .pa-cc-line{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px}
+  .pa-cc-line .l{color:#64748b;flex:1}
+  .pa-cc-line .v{font-weight:700;color:#0f172a}
   .pa-up{color:#16a34a;font-weight:700;font-size:12px;white-space:nowrap}
   .pa-down{color:#dc2626;font-weight:700;font-size:12px;white-space:nowrap}
   .pa-flat{color:#94a3b8;font-weight:600;font-size:12px;white-space:nowrap}
-  .pa-chart-h{font-weight:800;font-size:14px;margin-bottom:12px}
-  .pa-bars{display:flex;align-items:flex-end;gap:6px;height:170px}
-  .pa-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
-  .pa-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
-  .pa-bar{width:80%;max-width:34px;background:#bae6fd;border-radius:5px 5px 0 0;min-height:2px;transition:height .2s}
-  .pa-bar.cur{background:#0ea5e9}
-  .pa-bar-lbl{font-size:10px;color:#64748b;margin-top:4px}
-  .pa-concl{margin:0;padding-left:18px;font-size:13.5px;line-height:1.9}
+  .pa-cc-sum{font-size:12.5px;color:#475569;margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;line-height:1.55}
+  .inv-add-btn{width:23px;height:23px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#b0b7c3;font-size:14px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:all .14s}
+  .inv-add-btn:hover{border-color:#7aa7f0;color:#3b82f6;background:#f3f8ff}
+  .inv-add-btn.added{color:#86c79b;border-color:#d6efdd;background:#f6fdf8}
+  .inv-add-btn.added:hover{border-color:#86c79b;color:#16a34a}
   .inv-check{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px dashed #eef2f7;cursor:pointer}
   .inv-check:last-child{border-bottom:none}
   .inv-check input{width:18px;height:18px;cursor:pointer}
@@ -639,15 +658,33 @@
   <!-- PHÂN TÍCH TÀI CHÍNH (Kế toán) -->
   <section class="view" id="view-phantich" style="display:none">
     <div class="card">
-      <div class="row"><h2 style="margin:0">Phân tích tài chính</h2><span class="muted">Theo ngày hiện tại — doanh thu, chi phí, khách, ngày thuê, công suất & tăng trưởng.</span></div>
-      <div class="kpis" id="paKpis" style="margin-top:12px"></div>
+      <div class="pa-top">
+        <h2 style="margin:0">Phân tích tài chính</h2>
+        <div class="pa-ctrls">
+          <select id="paPreset" class="pa-sel">
+            <option value="today">Hôm nay</option>
+            <option value="7d">7 ngày qua</option>
+            <option value="thisweek">Tuần này</option>
+            <option value="30d">30 ngày qua</option>
+            <option value="thismonth" selected>Tháng này</option>
+            <option value="lastmonth">Tháng trước</option>
+            <option value="thisquarter">Quý này</option>
+            <option value="thisyear">Năm nay</option>
+            <option value="custom">Tùy chọn…</option>
+          </select>
+          <div class="pa-daterange"><input type="date" id="paFrom"><span>→</span><input type="date" id="paTo"></div>
+          <div class="pa-nav"><button id="paPrev" title="Kỳ trước">‹</button><button id="paNext" title="Kỳ sau">›</button></div>
+        </div>
+      </div>
+      <div class="pa-rangelbl muted" id="paRangeLbl"></div>
+      <div class="pa-metric-cards" id="paCards"></div>
+      <div class="pa-hint muted" id="paHint">Chọn tối đa <b>3 chỉ số</b> để hiển thị trên biểu đồ.</div>
+      <div class="pa-chart-box"><div id="paChart"></div><div class="pa-tip" id="paTip" style="display:none"></div></div>
     </div>
     <div class="card">
-      <h3 style="margin:0 0 4px">So sánh theo kỳ</h3>
-      <p class="muted" style="margin:0 0 12px;font-size:12.5px">Bấm vào từng kỳ để xem biểu đồ doanh thu & chi phí chi tiết.</p>
-      <div class="pa-cards" id="paCards"></div>
+      <div class="row"><h3 style="margin:0">Kết luận tăng trưởng</h3><span class="muted">Tự tổng kết khi kết thúc tuần (CN), tháng, quý, năm. Kỳ chưa kết thúc thì xem kỳ liền trước.</span></div>
+      <div class="pa-concl-grid" id="paConcl" style="margin-top:12px"></div>
     </div>
-    <div class="card"><h3 style="margin:0 0 8px">Kết luận tăng trưởng</h3><div id="paConclusion"></div></div>
   </section>
 
   <!-- MAINTENANCE (Vận hành) -->
@@ -847,6 +884,24 @@
       <button class="danger" id="assetDelete" style="margin-right:auto;display:none">Xóa</button>
       <button class="ghost" id="assetCancel">Hủy</button>
       <button class="primary" id="assetSave">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Thêm tài sản vào danh mục kiểm kê -->
+<div class="overlay" id="invFromAssetOverlay">
+  <div class="modal" style="width:min(440px,100%)">
+    <button class="modal-x" data-close="invFromAssetOverlay" title="Đóng">✕</button>
+    <h3>Thêm vào danh mục kiểm kê</h3>
+    <div class="muted" style="margin:-4px 0 12px">Đưa tài sản này vào mục <b>Danh mục &amp; biến động</b> để theo dõi kiểm kê định kì.</div>
+    <div class="grid2">
+      <div class="field"><label>Tên tài sản</label><input type="text" id="ifa_name"></div>
+      <div class="field"><label>Số lượng</label><input type="number" id="ifa_qty" min="0" step="1" value="1"></div>
+      <div class="field"><label>Phân loại kiểm kê</label><select id="ifa_type"></select></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="ifaCancel">Hủy</button>
+      <button class="primary" id="ifaSave">Thêm vào kiểm kê</button>
     </div>
   </div>
 </div>
@@ -8388,12 +8443,16 @@ document.getElementById('napLaiRong').onclick=()=>{const amt=monthNet(curMonth);
 /* ============ ASSETS (tài sản) ============ */
 function renderAssets(){
   const list=DB.assets;
-  let th=`<tr><th class="l">Vật tư</th><th>SL</th><th>Giá nhập</th><th class="l">Ngày nhập</th><th>Hạn KT (th)</th><th class="l">Hạn thanh khoản</th><th>Giá thanh khoản</th><th>Khấu hao/tháng</th><th></th></tr>`;
+  let th=`<tr><th style="width:36px"></th><th class="l">Vật tư</th><th>SL</th><th>Giá nhập</th><th class="l">Ngày nhập</th><th>Hạn KT (th)</th><th class="l">Hạn thanh khoản</th><th>Giá thanh khoản</th><th>Khấu hao/tháng</th><th></th></tr>`;
   let totVal=0,totDep=0;
   let body=list.map(a=>{const dep=assetDep(a);totVal+=a.price||0;totDep+=dep;
-    return `<tr><td class="l">${a.name}</td><td>${a.qty||1}</td><td>${fmtVND(a.price)}đ</td><td class="l">${fmtDMY(a.date)}</td><td>${a.months}</td><td class="l">${fmtDMY(addMonths(a.date,a.months))}</td><td>${a.salvage?fmtVND(a.salvage)+'đ':'—'}</td><td>${fmtVND(dep)}đ</td><td><button class="ghost" onclick="openAsset('${a.id}')">✎</button></td></tr>`;}).join('');
-  body+=`<tr class="total"><td class="l">Tổng (${list.length})</td><td></td><td>${fmtVND(totVal)}đ</td><td></td><td></td><td></td><td></td><td>${fmtVND(totDep)}đ</td><td></td></tr>`;
-  document.getElementById('assetTable').innerHTML=th+(list.length?body:'<tr><td colspan="9" class="muted l" style="padding:14px">Chưa có tài sản.</td></tr>');
+    const inInv=DB.inventoryList.some(x=>(x.name||'').trim().toLowerCase()===(a.name||'').trim().toLowerCase());
+    const invBtn=inInv
+      ? `<button class="inv-add-btn added" title="Đã có trong danh mục kiểm kê — bấm để thêm nữa" onclick="openInvFromAsset('${a.id}')">✓</button>`
+      : `<button class="inv-add-btn" title="Thêm vào danh mục kiểm kê" onclick="openInvFromAsset('${a.id}')">＋</button>`;
+    return `<tr><td>${invBtn}</td><td class="l">${a.name}</td><td>${a.qty||1}</td><td>${fmtVND(a.price)}đ</td><td class="l">${fmtDMY(a.date)}</td><td>${a.months}</td><td class="l">${fmtDMY(addMonths(a.date,a.months))}</td><td>${a.salvage?fmtVND(a.salvage)+'đ':'—'}</td><td>${fmtVND(dep)}đ</td><td><button class="ghost" onclick="openAsset('${a.id}')">✎</button></td></tr>`;}).join('');
+  body+=`<tr class="total"><td></td><td class="l">Tổng (${list.length})</td><td></td><td>${fmtVND(totVal)}đ</td><td></td><td></td><td></td><td></td><td>${fmtVND(totDep)}đ</td><td></td></tr>`;
+  document.getElementById('assetTable').innerHTML=th+(list.length?body:'<tr><td colspan="10" class="muted l" style="padding:14px">Chưa có tài sản.</td></tr>');
   document.getElementById('assetKpis').innerHTML=`${kpi('Tổng tài sản',fmtVND(totVal)+'đ')}${kpi('Tổng khấu hao/tháng',fmtVND(totDep)+'đ')}${kpi('Số đầu tài sản',list.length+'')}`;
 }
 let editingAsset=null;
@@ -8418,6 +8477,33 @@ document.getElementById('assetSave').onclick=()=>{
   document.getElementById('assetOverlay').classList.remove('open');renderAll();
 };
 document.getElementById('assetDelete').onclick=()=>{if(!confirm('Xóa tài sản này?'))return;DB.assets=DB.assets.filter(x=>x.id!==editingAsset);document.getElementById('assetOverlay').classList.remove('open');renderAll();};
+
+/* ====== Thêm tài sản (Tài sản) vào DANH MỤC KIỂM KÊ ====== */
+let _invFromAsset=null;
+function openInvFromAsset(id){
+  const a=DB.assets.find(x=>x.id===id);if(!a)return;
+  _invFromAsset=id;
+  const tsel=document.getElementById('ifa_type');
+  tsel.innerHTML=INV_TYPES.map(t=>`<option value="${t.k}">${t.n}</option>`).join('');
+  document.getElementById('ifa_name').value=a.name||'';
+  document.getElementById('ifa_qty').value=a.qty||1;
+  document.getElementById('invFromAssetOverlay').classList.add('open');
+}
+document.getElementById('ifaCancel').onclick=()=>document.getElementById('invFromAssetOverlay').classList.remove('open');
+document.getElementById('ifaSave').onclick=()=>{
+  const name=document.getElementById('ifa_name').value.trim();
+  const type=document.getElementById('ifa_type').value||'vattu';
+  const qty=+document.getElementById('ifa_qty').value||0;
+  if(!name){alert('Nhập tên tài sản.');return;}
+  const exist=DB.inventoryList.find(x=>x.type===type && (x.name||'').trim().toLowerCase()===name.toLowerCase());
+  let targetId;
+  if(exist){ exist.qty=(+exist.qty||0)+qty; targetId=exist.id; }
+  else { targetId=uid(); DB.inventoryList.push({id:targetId,name,type,qty}); }
+  if(qty>0) DB.assetMoves.push({id:uid(),date:todayStr(),itemId:targetId,type:'nhapthem',qty,reason:'Thêm từ mục Tài sản'});
+  document.getElementById('invFromAssetOverlay').classList.remove('open');
+  alert(`Đã thêm "${name}" vào danh mục kiểm kê (${invTypeName(type)}). Số lượng hiện: ${exist?exist.qty:qty}.`);
+  renderAll(); save();
+};
 
 /* ============ SCHEDULE (giao/trả theo giờ) ============ */
 let schDate = todayStr();
@@ -9007,23 +9093,27 @@ function periodStats(from,to){
   const cap=(FLEET_CAPACITY*numDays)>0?days/(FLEET_CAPACITY*numDays)*100:0;
   return {rev,cost,profit:rev-cost,customers:cust.size,days,avg:cust.size?days/cust.size:0,cap};
 }
-function paPeriods(){
-  const T=todayStr(), d=new Date(T+'T00:00:00Z'), y=d.getUTCFullYear(), mo=d.getUTCMonth();
-  const dow=(d.getUTCDay()+6)%7;                                  // Mon=0
-  const wkFrom=paShift(T,-dow), wkTo=paShift(wkFrom,6);
-  const ym=T.slice(0,7), mFrom=ym+'-01', mTo=`${ym}-${String(paDim(y,mo)).padStart(2,'0')}`;
-  const pym=prevMonthYM(ym), py=+pym.slice(0,4), pmo=+pym.slice(5,7)-1, pmTo=`${pym}-${String(paDim(py,pmo)).padStart(2,'0')}`;
-  const q=Math.floor(mo/3), qs=q*3, qe=qs+2;
-  const qFrom=`${y}-${String(qs+1).padStart(2,'0')}-01`, qTo=`${y}-${String(qe+1).padStart(2,'0')}-${String(paDim(y,qe)).padStart(2,'0')}`;
-  let pqy=y, pqs=qs-3; if(pqs<0){pqs=9;pqy=y-1;} const pqe=pqs+2;
-  const pqFrom=`${pqy}-${String(pqs+1).padStart(2,'0')}-01`, pqTo=`${pqy}-${String(pqe+1).padStart(2,'0')}-${String(paDim(pqy,pqe)).padStart(2,'0')}`;
-  return {
-    week:{label:'Tuần này',prevLabel:'tuần trước',cur:[wkFrom,wkTo],prev:[paShift(wkFrom,-7),paShift(wkFrom,-1)]},
-    month:{label:'Tháng này',prevLabel:'tháng trước',cur:[mFrom,mTo],prev:[pym+'-01',pmTo]},
-    quarter:{label:`Quý ${q+1}/${y}`,prevLabel:'quý trước',cur:[qFrom,qTo],prev:[pqFrom,pqTo]},
-    year:{label:`Năm ${y}`,prevLabel:'năm trước',cur:[`${y}-01-01`,`${y}-12-31`],prev:[`${y-1}-01-01`,`${y-1}-12-31`]}
-  };
-}
+/* ===== Cấu hình chỉ số ===== */
+const PA_METRICS=[
+  {k:'rev',      n:'Doanh thu',     color:'#1a73e8', kind:'money'},
+  {k:'cost',     n:'Chi phí',       color:'#d93025', kind:'money', invert:true},
+  {k:'customers',n:'Số khách hàng', color:'#188038', kind:'int'},
+  {k:'days',     n:'Số ngày thuê',  color:'#9334e6', kind:'int'},
+  {k:'profit',   n:'Lãi ròng',      color:'#e8710a', kind:'money'},
+  {k:'cap',      n:'Công suất',     color:'#12a4af', kind:'pct'}
+];
+function paMeta(k){return PA_METRICS.find(m=>m.k===k);}
+let paState=null;
+function paInit(){ if(paState)return; const t=todayStr(); paState={preset:'thismonth',from:t.slice(0,7)+'-01',to:t,metrics:['rev','cost','profit']}; }
+function paCompact(v){ v=Math.round(v); const a=Math.abs(v), s=v<0?'-':'';
+  if(a>=1e9)return s+(a/1e9).toFixed(a>=1e10?0:1).replace('.',',')+' T';
+  if(a>=1e6)return s+(a/1e6).toFixed(a>=1e7?0:1).replace('.',',')+' Tr';
+  if(a>=1e3)return s+Math.round(a/1e3)+' N';
+  return v+''; }
+function paFmt(m,v,full){
+  if(m.kind==='money')return (full?fmtVND(Math.round(v)):paCompact(v))+' đ';
+  if(m.kind==='pct')return (Math.round(v*10)/10)+'%';
+  return fmtVND(Math.round(v)); }
 function paGrowth(cur,prev,invert){
   if(prev===0&&cur===0)return '<span class="pa-flat">—</span>';
   const same=cur===prev, up=cur>=prev, good=invert?!up:up;
@@ -9031,72 +9121,168 @@ function paGrowth(cur,prev,invert){
   const val=prev!==0?Math.abs((cur-prev)/Math.abs(prev)*100).toFixed(1)+'%':(cur>0?'mới':'—');
   return `<span class="${cls}">${arrow} ${val}</span>`;
 }
-function paRow(label,disp,cur,prev,invert){
-  return `<div class="pa-row"><span class="pa-lbl">${label}</span><span class="pa-val">${disp}</span>${paGrowth(cur,prev,invert)}</div>`;
+function paResolvePreset(p){
+  const T=todayStr(), d=new Date(T+'T00:00:00Z'), y=d.getUTCFullYear(), mo=d.getUTCMonth(), ym=T.slice(0,7);
+  if(p==='today')return [T,T];
+  if(p==='7d')return [paShift(T,-6),T];
+  if(p==='30d')return [paShift(T,-29),T];
+  if(p==='thisweek'){const dw=(d.getUTCDay()+6)%7;const f=paShift(T,-dw);return [f,paShift(f,6)];}
+  if(p==='thismonth')return [ym+'-01',`${ym}-${String(paDim(y,mo)).padStart(2,'0')}`];
+  if(p==='lastmonth'){const pym=prevMonthYM(ym),py=+pym.slice(0,4),pm=+pym.slice(5,7)-1;return [pym+'-01',`${pym}-${String(paDim(py,pm)).padStart(2,'0')}`];}
+  if(p==='thisquarter'){const q=Math.floor(mo/3),qs=q*3,qe=qs+2;return [`${y}-${String(qs+1).padStart(2,'0')}-01`,`${y}-${String(qe+1).padStart(2,'0')}-${String(paDim(y,qe)).padStart(2,'0')}`];}
+  if(p==='thisyear')return [`${y}-01-01`,`${y}-12-31`];
+  return null;
 }
-// Banner thu gọn 1 kỳ — bấm để mở chi tiết
-function paBanner(key,p){
-  const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]);
-  return `<div class="pa-banner" data-pa="${key}">
-    <div class="pa-bn-l"><div class="pa-bn-title">${p.label}</div><div class="pa-bn-sub muted">${fmtDM(p.cur[0])}–${fmtDM(p.cur[1])}</div></div>
-    <div class="pa-bn-r"><div class="pa-bn-rev">${fmtVND(c.rev)}đ</div>${paGrowth(c.rev,pr.rev)}</div>
-    <span class="pa-bn-chev">›</span></div>`;
-}
-// Chia 1 kỳ thành các cột: tuần/tháng → theo NGÀY, quý/năm → theo THÁNG
-function paBuckets(key,p){
-  const [from,to]=p.cur, out=[];
-  if(key==='week'||key==='month'){
-    let d=from; while(d<=to){ out.push({label: key==='week'?dow(d):(+d.slice(8,10)+''), from:d, to:d}); d=paShift(d,1); }
-  } else {
-    let y=+from.slice(0,4), m=+from.slice(5,7)-1; const eY=+to.slice(0,4), eM=+to.slice(5,7)-1;
-    while(y<eY||(y===eY&&m<=eM)){ out.push({label:'T'+(m+1), from:`${y}-${String(m+1).padStart(2,'0')}-01`, to:`${y}-${String(m+1).padStart(2,'0')}-${String(paDim(y,m)).padStart(2,'0')}`}); m++; if(m>11){m=0;y++;} }
-  }
+function paRangeBuckets(from,to){
+  const days=paDDiff(from,to)+1, out=[];
+  if(days<=1){ out.push({label:fmtDM(from),from,to}); return out; }
+  if(days<=62){ let dd=from; while(dd<=to){ out.push({label:dd.slice(8,10)+'/'+dd.slice(5,7),from:dd,to:dd}); dd=paShift(dd,1);} return out; }
+  let y=+from.slice(0,4),m=+from.slice(5,7)-1; const eY=+to.slice(0,4),eM=+to.slice(5,7)-1;
+  while(y<eY||(y===eY&&m<=eM)){ const mf=`${y}-${String(m+1).padStart(2,'0')}-01`, mt=`${y}-${String(m+1).padStart(2,'0')}-${String(paDim(y,m)).padStart(2,'0')}`;
+    out.push({label:'T'+(m+1)+'/'+String(y).slice(2),from:mf<from?from:mf,to:mt>to?to:mt}); m++; if(m>11){m=0;y++;} }
   return out;
 }
-function paDetailChart(buckets){
-  const data=buckets.map(b=>{const s=periodStats(b.from,b.to);return {label:b.label,rev:s.rev,cost:s.cost};});
-  const max=Math.max(1,...data.map(d=>Math.max(d.rev,d.cost)));
-  const cols=data.map(d=>`<div class="pa-bar-col"><div class="pa-bar-wrap pa-grp"><div class="pa-bar rev" style="height:${Math.round(d.rev/max*100)}%" title="DT: ${fmtVND(d.rev)}đ"></div><div class="pa-bar cost" style="height:${Math.round(d.cost/max*100)}%" title="CP: ${fmtVND(d.cost)}đ"></div></div><div class="pa-bar-lbl">${d.label}</div></div>`).join('');
-  return `<div class="pa-legend"><span><i class="lg rev"></i>Doanh thu</span><span><i class="lg cost"></i>Chi phí</span></div><div class="pa-bars">${cols}</div>`;
+function paShiftRange(dir){
+  const days=paDDiff(paState.from,paState.to)+1;
+  paState.from=paShift(paState.from,dir*days); paState.to=paShift(paState.to,dir*days);
+  paState.preset='custom'; renderPhanTich();
 }
-function openPeriodDetail(key){
-  const P=paPeriods(), p=P[key];
-  const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]);
-  const metrics=`<div class="pa-rows" style="margin-top:0">
-     ${paRow('Doanh thu',fmtVND(c.rev)+'đ',c.rev,pr.rev)}
-     ${paRow('Chi phí',fmtVND(c.cost)+'đ',c.cost,pr.cost,true)}
-     ${paRow('Lãi ròng',fmtVND(c.profit)+'đ',c.profit,pr.profit)}
-     ${paRow('Số khách',c.customers,c.customers,pr.customers)}
-     ${paRow('Số ngày thuê',c.days,c.days,pr.days)}
-     ${paRow('TB ngày/khách',c.avg.toFixed(1),c.avg,pr.avg)}
-     ${paRow('Công suất',c.cap.toFixed(0)+'%',c.cap,pr.cap)}
-  </div>`;
-  showModal(`📊 ${p.label} · ${fmtDM(p.cur[0])}–${fmtDM(p.cur[1])}`,
-    `<div class="muted" style="font-size:12px;margin-bottom:8px">So với ${p.prevLabel}.</div>${metrics}<div style="margin-top:14px">${paDetailChart(paBuckets(key,p))}</div>`);
-}
-function paConclusion(P){
-  const line=p=>{ const c=periodStats(p.cur[0],p.cur[1]), pr=periodStats(p.prev[0],p.prev[1]), d=c.rev-pr.rev;
-    const pct=pr.rev?Math.abs(d/pr.rev*100).toFixed(1)+'%':'—';
-    const word=d>0?`tăng ${pct}`:(d<0?`giảm ${pct}`:'đi ngang'), cls=d>0?'pa-up':(d<0?'pa-down':'pa-flat');
-    return `<li><b>${p.label}</b> so với ${p.prevLabel}: doanh thu <span class="${cls}">${word}</span> (${fmtVND(c.rev)}đ vs ${fmtVND(pr.rev)}đ).</li>`; };
-  return `<ul class="pa-concl">${['week','month','quarter','year'].map(k=>line(P[k])).join('')}</ul>`;
-}
+function flashHint(){ const h=document.getElementById('paHint'); if(!h)return;
+  h.style.color='#d93025'; h.textContent='Tối đa 3 chỉ số — hãy bỏ bớt 1 chỉ số trước khi chọn thêm.';
+  setTimeout(()=>{h.style.color='';h.innerHTML='Chọn tối đa <b>3 chỉ số</b> để hiển thị trên biểu đồ.';},1900); }
 function renderPhanTich(){
   if(!accUnlocked)return;
-  if(!document.getElementById('paKpis'))return;
-  const P=paPeriods(), m=periodStats(P.month.cur[0],P.month.cur[1]);
-  document.getElementById('paKpis').innerHTML=
-    kpi('Doanh thu tháng',fmtVND(m.rev)+'đ')
-    +kpi('Chi phí tháng',fmtVND(m.cost)+'đ')
-    +kpi('Lãi ròng tháng',fmtVND(m.profit)+'đ',m.profit>=0?'pos':'neg')
-    +kpi('Số khách',m.customers+'')
-    +kpi('Số ngày thuê',m.days+'')
-    +kpi('TB ngày/khách',m.avg.toFixed(1))
-    +kpi('Công suất',m.cap.toFixed(0)+'%');
-  const wrap=document.getElementById('paCards');
-  wrap.innerHTML=['week','month','quarter','year'].map(k=>paBanner(k,P[k])).join('');
-  wrap.querySelectorAll('[data-pa]').forEach(el=>el.onclick=()=>openPeriodDetail(el.dataset.pa));
-  document.getElementById('paConclusion').innerHTML=paConclusion(P);
+  if(!document.getElementById('paCards'))return;
+  paInit();
+  const pre=document.getElementById('paPreset'), fi=document.getElementById('paFrom'), ti=document.getElementById('paTo');
+  if(paState.preset!=='custom'){ const r=paResolvePreset(paState.preset); if(r){paState.from=r[0];paState.to=r[1];} }
+  pre.value=paState.preset; fi.value=paState.from; ti.value=paState.to;
+  if(!pre._wired){ pre._wired=true;
+    pre.onchange=()=>{ paState.preset=pre.value; if(pre.value!=='custom'){const r=paResolvePreset(pre.value);if(r){paState.from=r[0];paState.to=r[1];}} renderPhanTich(); };
+    const onDate=()=>{ paState.preset='custom'; paState.from=fi.value||paState.from; paState.to=ti.value||paState.to; if(paState.from>paState.to){const t=paState.from;paState.from=paState.to;paState.to=t;} renderPhanTich(); };
+    fi.onchange=onDate; ti.onchange=onDate;
+    document.getElementById('paPrev').onclick=()=>paShiftRange(-1);
+    document.getElementById('paNext').onclick=()=>paShiftRange(1);
+  }
+  const days=paDDiff(paState.from,paState.to)+1;
+  document.getElementById('paRangeLbl').innerHTML=`${fmtDMY(paState.from)} → ${fmtDMY(paState.to)} · ${days} ngày`;
+  paRenderCards(); paRenderChart(); paRenderConcl();
+}
+function paRenderCards(){
+  const cur=periodStats(paState.from,paState.to);
+  const days=paDDiff(paState.from,paState.to)+1;
+  const prev=periodStats(paShift(paState.from,-days),paShift(paState.from,-1));
+  const sel=paState.metrics, full=sel.length>=3;
+  document.getElementById('paCards').innerHTML=PA_METRICS.map(m=>{
+    const on=sel.includes(m.k), dis=!on&&full;
+    return `<div class="pa-mcard${on?' active':''}${dis?' disabled':''}" data-mk="${m.k}" style="--mc:${m.color}">
+      <div class="mc-check">✓</div>
+      <div class="mc-name"><span class="mc-dot"></span>${m.n}</div>
+      <div class="mc-val">${paFmt(m,cur[m.k])}</div>
+      <div class="mc-delta">${paGrowth(cur[m.k],prev[m.k],m.invert)} <span style="opacity:.75">vs kỳ trước</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('paCards').querySelectorAll('[data-mk]').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.mk, i=paState.metrics.indexOf(k);
+    if(i>=0){ if(paState.metrics.length>1)paState.metrics.splice(i,1); }
+    else { if(paState.metrics.length>=3){ flashHint(); return; } paState.metrics.push(k); }
+    renderPhanTich();
+  });
+}
+let paChartGeom=null;
+function paRenderChart(){
+  const buckets=paRangeBuckets(paState.from,paState.to);
+  const sel=paState.metrics.map(paMeta);
+  const W=1000,H=500,padL=46,padR=46,padT=24,padB=38, plotW=W-padL-padR, plotH=H-padT-padB, n=buckets.length;
+  const stats=buckets.map(b=>periodStats(b.from,b.to));
+  const xs=n===1?[padL+plotW/2]:buckets.map((b,i)=>padL+i*plotW/(n-1));
+  const lines=sel.map(m=>{
+    const vals=stats.map(s=>s[m.k]); let mn=Math.min(...vals), mx=Math.max(...vals);
+    if(m.kind==='pct')mn=Math.min(mn,0); if(mx===mn)mx=mn+1;
+    return {m,vals,ys:vals.map(v=>padT+plotH-(v-mn)/(mx-mn)*plotH)};
+  });
+  let grid=''; for(let g=0;g<=4;g++){const yy=padT+plotH*g/4;grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#eef1f5" stroke-width="1"/>`;}
+  const step=Math.max(1,Math.ceil(n/13)); let xlab='';
+  buckets.forEach((b,i)=>{ if(i%step===0||i===n-1){ xlab+=`<text x="${xs[i].toFixed(1)}" y="${H-12}" text-anchor="middle" font-size="13" fill="#94a3b8">${b.label}</text>`; }});
+  let paths='';
+  lines.forEach(L=>{
+    if(n===1){ paths+=`<circle cx="${xs[0].toFixed(1)}" cy="${L.ys[0].toFixed(1)}" r="6" fill="${L.m.color}"/>`; return; }
+    const dd=L.ys.map((y,i)=>(i?'L':'M')+xs[i].toFixed(1)+' '+y.toFixed(1)).join(' ');
+    paths+=`<path d="${dd}" fill="none" stroke="${L.m.color}" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    paths+=L.ys.map((y,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${y.toFixed(1)}" r="3.6" fill="#fff" stroke="${L.m.color}" stroke-width="2.4"/>`).join('');
+  });
+  const guide=`<line id="paGuideLine" x1="0" y1="${padT}" x2="0" y2="${padT+plotH}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4" style="display:none"/>`;
+  const hit=`<rect id="paHit" x="${padL}" y="${padT}" width="${plotW}" height="${plotH}" fill="transparent"/>`;
+  const empty=(sel.length===0)?`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#94a3b8" font-size="14">Chọn ít nhất 1 chỉ số để xem biểu đồ.</text>`:'';
+  document.getElementById('paChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}">${grid}${guide}${paths}${xlab}${hit}${empty}</svg>`;
+  paChartGeom={W,H,padT,plotH,xs,buckets,stats,lines};
+  paWireHover();
+}
+function paWireHover(){
+  const svg=document.querySelector('#paChart svg'); if(!svg)return;
+  const tip=document.getElementById('paTip'), guide=svg.querySelector('#paGuideLine'), hit=svg.querySelector('#paHit'), box=document.querySelector('.pa-chart-box');
+  if(!hit)return; const g=paChartGeom;
+  function move(e){
+    const rect=svg.getBoundingClientRect(); if(!rect.width)return;
+    const svgX=(e.clientX-rect.left)/rect.width*g.W;
+    let idx=0,best=1e9; g.xs.forEach((x,i)=>{const dd=Math.abs(x-svgX);if(dd<best){best=dd;idx=i;}});
+    const xSvg=g.xs[idx]; guide.setAttribute('x1',xSvg); guide.setAttribute('x2',xSvg); guide.style.display='';
+    const b=g.buckets[idx], s=g.stats[idx];
+    let html=`<div class="tt-d">${b.label}</div>`;
+    g.lines.forEach(L=>{ html+=`<div class="tt-row"><span class="tt-dot" style="background:${L.m.color}"></span>${L.m.n}: <b>${paFmt(L.m,s[L.m.k],true)}</b></div>`; });
+    tip.innerHTML=html; tip.style.display='';
+    const boxRect=box.getBoundingClientRect();
+    tip.style.left=((xSvg/g.W)*rect.width+(rect.left-boxRect.left))+'px';
+    tip.style.top=((g.padT/g.H)*rect.height+(rect.top-boxRect.top)+8)+'px';
+  }
+  hit.onmousemove=move; hit.onmouseenter=move;
+  hit.onmouseleave=()=>{tip.style.display='none';guide.style.display='none';};
+}
+/* ===== Kết luận tăng trưởng — chỉ kết luận khi kỳ ĐÃ kết thúc ===== */
+function paLatestCompleted(kind){
+  const T=todayStr(), d=new Date(T+'T00:00:00Z'), y=d.getUTCFullYear(), mo=d.getUTCMonth(), dd=d.getUTCDate();
+  if(kind==='week'){
+    const dw=(d.getUTCDay()+6)%7, mon=paShift(T,-dw), sun=paShift(mon,6), done=T>=sun;
+    const cMon=done?mon:paShift(mon,-7), cSun=done?sun:paShift(mon,-1);
+    return {name:'Tuần', range:[cMon,cSun], prev:[paShift(cMon,-7),paShift(cMon,-1)], done, label:`${fmtDM(cMon)}–${fmtDM(cSun)}`, prevName:'tuần trước', endLabel:'Chủ nhật'};
+  }
+  if(kind==='month'){
+    const done=dd===paDim(y,mo);
+    const baseYM=done?T.slice(0,7):prevMonthYM(T.slice(0,7)), by=+baseYM.slice(0,4), bm=+baseYM.slice(5,7)-1;
+    const pYM=prevMonthYM(baseYM), py=+pYM.slice(0,4), pm=+pYM.slice(5,7)-1;
+    return {name:'Tháng', range:[baseYM+'-01',`${baseYM}-${String(paDim(by,bm)).padStart(2,'0')}`], prev:[pYM+'-01',`${pYM}-${String(paDim(py,pm)).padStart(2,'0')}`], done, label:monthLabel(baseYM), prevName:'tháng trước', endLabel:'ngày cuối tháng'};
+  }
+  if(kind==='quarter'){
+    const q=Math.floor(mo/3), qe=q*3+2, done=(mo===qe&&dd===paDim(y,qe));
+    let cy=y,cq=q; if(!done){cq=q-1; if(cq<0){cq=3;cy=y-1;}}
+    const cqs=cq*3, cqe=cqs+2;
+    let py=cy,pq=cq-1; if(pq<0){pq=3;py=cy-1;} const pqs=pq*3,pqe=pqs+2;
+    return {name:'Quý', range:[`${cy}-${String(cqs+1).padStart(2,'0')}-01`,`${cy}-${String(cqe+1).padStart(2,'0')}-${String(paDim(cy,cqe)).padStart(2,'0')}`], prev:[`${py}-${String(pqs+1).padStart(2,'0')}-01`,`${py}-${String(pqe+1).padStart(2,'0')}-${String(paDim(py,pqe)).padStart(2,'0')}`], done, label:`Quý ${cq+1}/${cy}`, prevName:'quý trước', endLabel:'ngày cuối quý'};
+  }
+  const done=(mo===11&&dd===31), cy=done?y:y-1;
+  return {name:'Năm', range:[`${cy}-01-01`,`${cy}-12-31`], prev:[`${cy-1}-01-01`,`${cy-1}-12-31`], done, label:`Năm ${cy}`, prevName:'năm trước', endLabel:'ngày cuối năm'};
+}
+function paConclCard(kind){
+  const p=paLatestCompleted(kind);
+  const c=periodStats(p.range[0],p.range[1]), pr=periodStats(p.prev[0],p.prev[1]);
+  const badge=p.done?`<span class="pa-cc-badge">đã kết thúc</span>`:`<span class="pa-cc-badge wait">kỳ này chưa xong → xem ${p.name.toLowerCase()} trước</span>`;
+  const line=(lbl,m,inv)=>`<div class="pa-cc-line"><span class="l">${lbl}</span><span class="v">${paFmt(m,c[m.k])}</span>${paGrowth(c[m.k],pr[m.k],inv)}</div>`;
+  const dRev=c.rev-pr.rev, pct=pr.rev?Math.abs(dRev/pr.rev*100).toFixed(1)+'%':'—';
+  const word=dRev>0?`tăng ${pct}`:(dRev<0?`giảm ${pct}`:'đi ngang');
+  const sum=`Doanh thu <b>${word}</b> so với ${p.prevName} (${fmtVND(c.rev)}đ vs ${fmtVND(pr.rev)}đ). Lãi ròng ${c.profit>=0?'dương':'âm'} ${fmtVND(Math.abs(c.profit))}đ.`;
+  return `<div class="pa-cc">
+    <div class="pa-cc-h"><b>${p.name}: ${p.label}</b>${badge}</div>
+    ${line('Doanh thu',paMeta('rev'))}
+    ${line('Chi phí',paMeta('cost'),true)}
+    ${line('Lãi ròng',paMeta('profit'))}
+    ${line('Số khách',paMeta('customers'))}
+    ${line('Công suất',paMeta('cap'))}
+    <div class="pa-cc-sum">${sum}</div>
+  </div>`;
+}
+function paRenderConcl(){
+  const el=document.getElementById('paConcl'); if(!el)return;
+  el.innerHTML=['week','month','quarter','year'].map(paConclCard).join('');
 }
 function openRoundMoves(ym,r){
   const w=roundWindow(ym,r);
