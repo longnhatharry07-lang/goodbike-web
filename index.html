@@ -1096,7 +1096,7 @@ const VEHICLES = [
 const FLEET_CAPACITY = 14; // mẫu số tính công suất (khớp sheet GOODBIKE)
 const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
-  'iRest PHT':'#F6B26B','iRest Thái Thịnh':'#4285F4',
+  'iRest':'#43A047',
   'Meta':'#A4C2F4','Walk in':'#FFE599','Zalo':'#FFE599'
 };
 // VNA, Atlantis, Vexere nay là CÔNG TY thuộc nguồn công nợ (xem DB.debtCompanies), không còn là nguồn riêng.
@@ -7746,6 +7746,11 @@ function normalizeDB(){
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
   if(!DB.debtCompanies.receivable)DB.debtCompanies.receivable=[];
   if(!DB.debtCompanies.payable)DB.debtCompanies.payable=[];
+  if(!DB._migSrc1){   // 1 lần: HaYe Apartment → công nợ phải trả; gộp iRest ATELIER/PHT/62PHT → "iRest"
+    if(!DB.debtCompanies.payable.includes('HaYe Apartment'))DB.debtCompanies.payable.push('HaYe Apartment');
+    (DB.bookings||[]).forEach(b=>{ if(/i\s*rest/i.test(b.src||''))b.src='iRest'; });
+    DB._migSrc1=true;
+  }
 }
 normalizeDB();
 let curMonth = ymNow();           // 'YYYY-MM'
@@ -8168,6 +8173,7 @@ function sourceColor(src){
   const s=(src||'').toUpperCase();
   if(/WALK|ZALO/.test(s))return '#FFE599';   // Walk in / Zalo
   if(/META/.test(s))return '#A4C2F4';        // Meta
+  if(/I\s*REST/.test(s))return '#43A047';    // iRest (gộp các biến thể) — xanh lá
   return '';                                  // các nguồn còn lại: KHÔNG tô màu
 }
 // Màu hình thức thanh toán (bảng dưới): VNA cam > CK/Vexere magenta > TM trắng
@@ -8270,7 +8276,7 @@ function renderRevenue(){
   body2+=`<tr class="total"><td class="l" style="color:#dc2626">Chưa thanh toán</td>${owtds}<td style="color:#dc2626">${fmtVND(grandOwed)}đ</td></tr>`;
   document.getElementById('revTableBot').innerHTML=revHeader(ndays)+body2;
   /* ---------- Legends ---------- */
-  const srcs=[['Walk in / Zalo','#FFE599'],['Meta','#A4C2F4'],['Công nợ phải thu','#FF6D01'],['Công nợ phải trả','#CC4125']]
+  const srcs=[['Walk in / Zalo','#FFE599'],['Meta','#A4C2F4'],['iRest','#43A047'],['Công nợ phải thu','#FF6D01'],['Công nợ phải trả','#CC4125']]
     .concat(Object.entries(DB.customSources||{}));
   document.getElementById('revLegendTop').innerHTML=srcs.map(([n,c])=>`<span><i class="sw" style="background:${c}"></i>${n}</span>`).join('')
     +`<span><i class="sw" style="background:#fff;border:1px solid var(--line)"></i>Nguồn khác (không tô màu)</span>`;
@@ -8404,7 +8410,7 @@ function revByGroup(month){
     const v=netOn(b,ds), s=b.src||'Khác', g=debtGroupOf(s);
     if(g==='receivable')recvCo[s]=(recvCo[s]||0)+v;
     else if(g==='payable')payCo[s]=(payCo[s]||0)+v;
-    else { const lbl=/walk|zalo/i.test(s)?'Walk in / Zalo':(/meta/i.test(s)?'Meta':s); simple[lbl]=(simple[lbl]||0)+v; }
+    else { const lbl=/walk|zalo/i.test(s)?'Walk in / Zalo':(/meta/i.test(s)?'Meta':(/i\s*rest/i.test(s)?'iRest':s)); simple[lbl]=(simple[lbl]||0)+v; }
   }));
   return {recvCo,payCo,simple};
 }
