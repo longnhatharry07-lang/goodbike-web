@@ -1090,10 +1090,10 @@ const VEHICLES = [
   {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'OVER1',typ:'Xe số',over:true},
   {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},
   {id:'B1',typ:'NVX/Lead'},{id:'B2',typ:'NVX/Lead'},
-  {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},
+  {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},
   {id:'E1',typ:'Xe điện'},{id:'E2',typ:'Xe điện'},{id:'E3',typ:'Xe điện'}
 ];
-const FLEET_CAPACITY = 14; // mẫu số tính công suất (khớp sheet GOODBIKE)
+const FLEET_CAPACITY = 15; // mẫu số tính công suất (khớp sheet GOODBIKE) — +1 sau khi thêm xe G4
 const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
   'iRest':'#43A047',
@@ -8100,13 +8100,16 @@ function retBefore18Set(T){
   return s;
 }
 /* ====== Chi tiết XE TRỐNG hôm nay (bấm vào ô "Đang trống") ====== */
-// Tình trạng 1 xe hôm nay: 'busy' (đang thuê = doanh thu + trả sau 18h), 'ready' (không doanh thu → sẵn sàng), 'time' (có doanh thu nhưng trả trước 18h)
+// Tình trạng 1 xe hôm nay: 'busy' (đang thuê cả ngày / trả sau 18h còn doanh thu → bận),
+// 'time'  (xe CÒN ở chỗ khách & sẽ trả trong hôm nay → trống TỪ giờ trả),
+// 'ready' (xe ĐÃ TRẢ xong, hoặc không có khách nào trong ngày → sẵn sàng ngay).
 function bikeAvailability(xe,T){
   if(rentedSet(T).has(xe)) return {state:'busy'};                     // đang thuê (trả sau 18h / còn thuê tiếp) → bận
-  // còn lại là trống: nếu có chuyến trả TRƯỚC 18h hôm nay → trống từ giờ trả; ngược lại sẵn sàng cả ngày
-  const ret=DB.bookings.filter(b=>b.xe===xe && b.depart===T && nightsOf(b).includes(T) && (b.rtime||'12:00')<'18:00');
+  // Chỉ xe CÒN ĐANG cầm (đã nhận / quá hạn) và sẽ trả trong hôm nay mới ghi "Trống từ giờ trả".
+  // Xe ĐÃ TRẢ (datra) coi như có sẵn ngay → rơi xuống 'ready' = Sẵn sàng.
+  const ret=DB.bookings.filter(b=>b.xe===xe && b.depart===T && (b.status==='danhan'||b.status==='quahan'));
   if(ret.length){ const t=ret.map(b=>b.rtime||'12:00').sort().slice(-1)[0]; return {state:'time',time:t}; }
-  return {state:'ready'};
+  return {state:'ready'};                                             // đã trả xong / không có khách → sẵn sàng ngay
 }
 function showModal(title,body){
   let ov=document.getElementById('genModal');
@@ -8127,7 +8130,7 @@ function openFreeBikes(){
     ? rows.map(x=>`<div class="fb-row"><span class="fb-xe">${x.v.id}<small>${x.v.typ}</small></span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`).join('')
     : '<div class="muted" style="padding:10px">Hôm nay không có xe trống.</div>';
   showModal(`🅿️ Xe có thể cho thuê — ${fmtDM(T)}`,
-    `<div class="muted" style="font-size:12px;padding:0 2px 8px">Trống/sẽ trống: <b>${rows.length}</b> xe</div><div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = trống cả ngày hoặc đã trả. “Trống từ HH:MM” = giờ khách đang thuê sẽ trả xe.</div>`);
+    `<div class="muted" style="font-size:12px;padding:0 2px 8px">Trống/sẽ trống: <b>${rows.length}</b> xe</div><div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = xe có sẵn ngay (đã trả xong hoặc không có khách). “Trống từ HH:MM” = xe còn ở chỗ khách, sẽ trống sau giờ trả.</div>`);
 }
 function scrollTimelineToToday(){
   const t=todayStr();
@@ -8232,6 +8235,8 @@ function revHeader(ndays){
   return th;
 }
 function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="background:${bg};color:${dark?'#1f2937':'#fff'}"`;}
+// Mẫu số tính công suất theo NGÀY: 16 từ hôm nay trở đi, 14 cho các ngày trước hôm nay.
+function capacityOn(ds){ return ds >= todayStr() ? 16 : 14; }
 function renderRevenue(){
   const {top,bottom,extra,ndays}=buildMatrices();
   const chiByDay={};DB.expenses.filter(e=>e.date.slice(0,7)===curMonth&&e.type==='honhop').forEach(e=>{const dd=+e.date.split('-')[2];chiByDay[dd]=(chiByDay[dd]||0)+e.amt;});
@@ -8252,7 +8257,8 @@ function renderRevenue(){
   body+=`<tr class="total"><td class="l">Tổng Doanh Thu</td>${ttds}<td>${fmtVND(grand)}đ</td></tr>`;
   let ctds='';
   for(let i=1;i<=ndays;i++){let cnt=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);
-    const pct=cnt/FLEET_CAPACITY*100;ctds+=`<td>${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
+    const cap=capacityOn(`${curMonth}-${String(i).padStart(2,'0')}`);
+    const pct=cap?cnt/cap*100:0;ctds+=`<td>${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
   body+=`<tr class="total"><td class="l">Công suất</td>${ctds}<td></td></tr>`;
   document.getElementById('revTableTop').innerHTML=revHeader(ndays)+body;
   /* ---------- BẢNG DƯỚI (đã thanh toán) ---------- */
@@ -8287,7 +8293,11 @@ function renderRevenue(){
   /* ---------- KPIs ---------- */
   const activeBikes=VEHICLES.filter(v=>Object.keys(top[v.id]).length).length;
   const rentedDays=VEHICLES.reduce((a,v)=>a+Object.keys(top[v.id]).length,0);
-  const occ=(rentedDays/(FLEET_CAPACITY*ndays)*100);
+  // Công suất TB CHỈ tính đến HÔM NAY (bỏ qua các ngày tương lai chưa diễn ra). Mẫu số theo ngày: 16 từ hôm nay, 14 trước đó.
+  let capDays=0,rentedDaysTD=0;
+  for(let i=1;i<=ndays;i++){const ds=`${curMonth}-${String(i).padStart(2,'0')}`; if(ds>todayStr())continue;
+    capDays+=capacityOn(ds); rentedDaysTD+=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);}
+  const occ=(capDays?rentedDaysTD/capDays*100:0);
   document.getElementById('revKpis').innerHTML=`
     ${kpi('Tổng doanh thu',fmtVND(grand)+'đ')}
     ${kpi('Đã thu',fmtVND(grand2)+'đ')}
