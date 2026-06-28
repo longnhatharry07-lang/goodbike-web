@@ -280,6 +280,25 @@
   tr.schrow.overdue:hover td{background:#ffe4e4}
   tr.schrow.done td{background:#f4f4f5;opacity:.4}
   tr.schrow.done:hover td{background:#ececef;opacity:.6}
+  /* ===== Lịch giao trả — giao diện rõ ràng hơn (chỉ thẩm mỹ) ===== */
+  #view-schedule #schTable{font-size:13.5px}
+  #view-schedule #schTable th{background:#f8fafc;color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:11px 14px;border-bottom:2px solid #e2e8f0}
+  #view-schedule #schTable td{padding:12px 14px;vertical-align:middle;border-color:#eef2f7}
+  #view-schedule #schTable td:first-child{text-align:center;width:150px;border-left:4px solid transparent;padding:10px 12px}
+  .schtime{display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.1}
+  .schtime .t-plan{font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:21px;font-weight:800;color:#0284c7;letter-spacing:.5px}
+  .schtime .t-plan-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#94a3b8;margin-top:-2px}
+  .schtime .t-act{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-top:2px;white-space:nowrap}
+  .schtime .t-act.done{background:#dcfce7;color:#15803d}
+  .schtime .t-act.wait{background:#f1f5f9;color:#94a3b8;font-weight:600}
+  #view-schedule tr.schrow.giao td:first-child{border-left-color:#22c55e;background:#f6fef9}
+  #view-schedule tr.schrow.tra td:first-child{border-left-color:#ef4444;background:#fff7f7}
+  #view-schedule tr.schrow.overdue td:first-child{border-left-color:#f59e0b;background:#fffaf0}
+  #view-schedule tr.schrow.done td:first-child{border-left-color:#cbd5e1}
+  #view-schedule #schTable td:nth-child(3) b{font-size:14.5px;font-weight:800}
+  #view-schedule #schTable .pill{font-size:12px;padding:4px 11px;border-radius:999px}
+  #view-schedule #schTable td:last-child{color:#475569;white-space:normal;line-height:1.35}
+  #view-schedule #schKpis .kpi{border:1px solid #eef2f7;box-shadow:0 1px 2px rgba(15,23,42,.04)}
   .callbtn{padding:5px 10px;background:#dcfce7;color:#15803d;font-weight:600}
   .payline{display:grid;grid-template-columns:0.8fr 1.4fr 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #eef2f7}
   .payline .pdate{font-size:10.5px;color:var(--muted);font-weight:600;line-height:1.25}
@@ -7751,6 +7770,8 @@ function normalizeDB(){
     (DB.bookings||[]).forEach(b=>{ if(/i\s*rest/i.test(b.src||''))b.src='iRest'; });
     DB._migSrc1=true;
   }
+  // Tách GIỜ DỰ KIẾN (lúc tạo đặt xe) khỏi giờ thực tế. dplan/rplan = dự kiến; dtime/rtime = thực tế (cập nhật khi giao/thu hồi).
+  (DB.bookings||[]).forEach(b=>{ if(b.dplan==null)b.dplan=b.dtime||''; if(b.rplan==null)b.rplan=b.rtime||''; });
 }
 normalizeDB();
 let curMonth = ymNow();           // 'YYYY-MM'
@@ -7943,6 +7964,12 @@ function schedState(e){
   if(e.overdue || (schDate<=today && now>departDT(b))) return {label:'Quá hạn trả',color:'#EF5350'};
   return {label:'Chưa thu hồi',color:'#FB8C00'};
 }
+// GIỜ DỰ KIẾN (lúc tạo đặt xe) — không bị ghi đè khi giao/thu hồi
+function planDtime(b){return b.dplan||b.dtime||'';}
+function planRtime(b){return b.rplan||b.rtime||'';}
+// GIỜ THỰC TẾ (ghi nhận lúc bấm hoàn thành giao/thu hồi) — chỉ có khi đã giao/thu hồi
+function actDtime(b){return (b.status==='danhan'||b.status==='datra')?(b.dtime||''):'';}
+function actRtime(b){return (b.status==='datra')?(b.rtime||''):'';}
 function computeStatus(b){
   let s=b.status;
   if(!s){const t=todayStr();s=t<b.arrive?'sapnhan':(t>=b.depart?'datra':'danhan');}
@@ -8645,11 +8672,11 @@ function renderSchedule(){
   if(picker.value!==schDate)picker.value=schDate;
   const events=[];
   DB.bookings.forEach(b=>{
-    if(b.arrive===schDate)events.push({kind:'Giao',time:b.dtime||'08:00',xe:b.xe,src:b.src,guest:b.guest,addr:b.daddr,pay:b.pay,b});
-    if(b.depart===schDate)events.push({kind:'Trả',time:b.rtime||'12:00',xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b});
+    if(b.arrive===schDate)events.push({kind:'Giao',time:planDtime(b)||'08:00',act:actDtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.daddr,pay:b.pay,b});
+    if(b.depart===schDate)events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b});
     // QUÁ HẠN: chỉ hiện khi đang xem ngày HÔM NAY (hoặc trước đó) — xe đã đến hạn trả nhưng chưa thu hồi.
     // Xem lịch NGÀY TƯƠNG LAI thì KHÔNG hiện quá hạn, chỉ hiện giao/trả dự kiến của ngày đó.
-    else if(schDate<=todayStr() && b.depart<schDate && b.status==='danhan')events.push({kind:'Trả',time:b.rtime||'12:00',xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b,overdue:true});
+    else if(schDate<=todayStr() && b.depart<schDate && b.status==='danhan')events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b,overdue:true});
   });
   events.sort((a,b)=>{if(!!a.overdue!==!!b.overdue)return a.overdue?-1:1;return (a.time||'').localeCompare(b.time||'');});
   const nGiao=events.filter(e=>e.kind==='Giao').length, nTra=events.filter(e=>e.kind==='Trả'&&!e.overdue).length, nOver=events.filter(e=>e.overdue).length;
@@ -8658,14 +8685,16 @@ function renderSchedule(){
     ${kpi('🟢 Giao xe',nGiao+' chuyến')}
     ${kpi('🔴 Trả xe',nTra+' chuyến')}
     ${kpi('⚠️ Quá hạn chưa trả',nOver+' xe',nOver>0?'neg':'')}`;
-  let th=`<tr><th>Giờ</th><th class="l">Việc</th><th class="l">Xe / Tình trạng</th><th class="l">Địa chỉ</th></tr>`;
+  let th=`<tr><th>Giờ (dự kiến · thực tế)</th><th class="l">Việc</th><th class="l">Xe / Tình trạng</th><th class="l">Địa chỉ</th></tr>`;
   let body=events.map(e=>{
     const ss=schedState(e);
     const tag=ss.done?`<span class="pill" style="background:#e5e7eb;color:#9ca3af">⚪ ${e.kind==='Giao'?'Giao':'Trả'}</span>`
       :e.overdue?`<span class="pill" style="background:#fee2e2;color:#b91c1c">⚠️ Trả QUÁ HẠN (${fmtDM(e.b.depart)})</span>`
       :e.kind==='Giao'?'<span class="pill" style="background:#dcfce7;color:#15803d">🟢 Giao</span>':'<span class="pill" style="background:#fee2e2;color:#b91c1c">🔴 Trả</span>';
     const stp=`<span class="pill" style="background:${ss.color};color:${isLight(ss.color)?'#1f2937':'#fff'}">${ss.label}</span>`;
-    return `<tr class="schrow${e.overdue?' overdue':''}${ss.done?' done':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td><b>${e.time||''}</b></td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}</td><td class="l">${e.addr||'<span class="muted">—</span>'}</td></tr>`;
+    const actTxt=e.act?`<span class="t-act done">${e.act}</span>`:'';
+    const timeCell=`<div class="schtime"><span class="t-plan">${e.time||'--:--'}</span>${actTxt}</div>`;
+    return `<tr class="schrow ${e.kind==='Giao'?'giao':'tra'}${e.overdue?' overdue':''}${ss.done?' done':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td>${timeCell}</td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}</td><td class="l">${e.addr||'<span class="muted">—</span>'}</td></tr>`;
   }).join('');
   document.getElementById('schTable').innerHTML=th+(events.length?body:'<tr><td colspan="4" class="l muted" style="padding:14px">Không có lịch giao/trả trong ngày này.</td></tr>');
   document.querySelectorAll('#schTable .schrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id,null,r.dataset.kind));
@@ -8892,19 +8921,24 @@ function renderDebtRecon(){
   debtReconInit(); fillDrCompany();
   const {grp,co,rows}=debtReconData(), payable=grp==='payable';
   document.getElementById('drTitle').textContent=`Đối soát công nợ ${payable?'phải trả':'phải thu'} — ${co==='__all__'?'Tất cả công ty':co}`;
-  let th=`<tr><th class="l">Ngày đặt</th><th class="l">Loại xe</th><th class="l">Giao</th><th class="l">Trả</th><th>Số ngày</th>`
+  let th=`<tr><th class="l">Ngày đặt</th><th class="l">Loại xe</th><th class="l">Tên khách</th><th class="l">Giao</th><th class="l">Trả</th><th class="l">Địa điểm giao/trả</th><th>Số ngày</th>`
     +(payable?`<th>Giá nhà xe thu</th>`:'')
     +`<th>${payable?'Phải trả (hoa hồng)':'Phải thu'}</th></tr>`;
   let tDays=0,tDebt=0,tGross=0;
   let body=rows.map(b=>{
     const nd=nightsOf(b).length, debtAmt=payable?commissionTotal(b):totalOf(b), gross=grossTotalOf(b);
     tDays+=nd; tDebt+=debtAmt; tGross+=gross;
-    return `<tr><td class="l">${fmtDMY(b.created||b.arrive)}</td><td class="l">${vehTyp(b.xe)}</td><td class="l">${fmtDMY(b.arrive)}</td><td class="l">${fmtDMY(b.depart)}</td><td>${nd}</td>`
+    const guest=(b.guest||'').trim()||'—';
+    const da=(b.daddr||'').trim(), ra=(b.raddr||'').trim();
+    const loc=(da||ra)?[da||'—',ra||'—'].join(' → '):'—';
+    const giao=fmtDMY(b.arrive)+(planDtime(b)?(' '+planDtime(b)):'');
+    const tra=fmtDMY(b.depart)+(planRtime(b)?(' '+planRtime(b)):'');
+    return `<tr><td class="l">${fmtDMY(b.created||b.arrive)}</td><td class="l">${vehTyp(b.xe)}</td><td class="l">${guest}</td><td class="l">${giao}</td><td class="l">${tra}</td><td class="l">${loc}</td><td>${nd}</td>`
       +(payable?`<td>${fmtVND(gross)}đ</td>`:'')
       +`<td>${fmtVND(debtAmt)}đ</td></tr>`;
   }).join('');
-  const cols=payable?7:6;
-  body+=`<tr class="total"><td class="l">Tổng (${rows.length})</td><td></td><td></td><td></td><td>${tDays}</td>`+(payable?`<td>${fmtVND(tGross)}đ</td>`:'')+`<td>${fmtVND(tDebt)}đ</td></tr>`;
+  const cols=payable?9:8;
+  body+=`<tr class="total"><td class="l">Tổng (${rows.length})</td><td></td><td></td><td></td><td></td><td></td><td>${tDays}</td>`+(payable?`<td>${fmtVND(tGross)}đ</td>`:'')+`<td>${fmtVND(tDebt)}đ</td></tr>`;
   document.getElementById('drTable').innerHTML=th+(rows.length?body:`<tr><td colspan="${cols}" class="muted l" style="padding:12px">Không có booking công nợ ${payable?'phải trả':'phải thu'} trong khoảng này.</td></tr>`);
   document.getElementById('drSummary').innerHTML=`${fmtDMY(document.getElementById('drFrom').value)} → ${fmtDMY(document.getElementById('drTo').value)} · ${rows.length} booking · Tổng ${payable?'hoa hồng phải trả':'phải thu'}: <b>${fmtVND(tDebt)}đ</b>${payable?` · Tổng nhà xe thu (gồm hoa hồng): <b>${fmtVND(tGross)}đ</b>`:''}`;
 }
@@ -8978,7 +9012,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Chi tiết booking — '+b.xe;
     const grp = b.debt || debtGroupOf(b.src);     // booking cũ chưa có cờ debt → suy ra từ tên công ty
     const srcDisplay = grp==='receivable'?DEBT_RECV:(grp==='payable'?DEBT_PAY:b.src);
-    f('arrive',b.arrive);f('depart',b.depart);f('dtime',b.dtime||'08:00');f('rtime',b.rtime);f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
+    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
@@ -9183,8 +9217,12 @@ document.getElementById('bkSave').onclick=()=>{
   }
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
-  if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;Object.assign(ex,rec);}
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
+  if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
+    // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
+    if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
+    if(ex.status==='datra')rec.rtime=ex.rtime;
+    Object.assign(ex,rec);}
   else{rec.id=uid();rec.created=todayStr();DB.bookings.push(rec);}
   bkOv.classList.remove('open');renderAll();
 };
@@ -9266,7 +9304,7 @@ document.getElementById('swapSave').onclick=()=>{
   b.status='datra'; b.payments=oldPay; b.prepaid=oldPay.reduce((a,p)=>a+(+p.amount||0),0);
   b.pay=[...new Set(oldPay.map(p=>p.method))].sort((x,y)=>PAY_PRIO[y]-PAY_PRIO[x])[0]||'';
   // booking MỚI → xe mới đang thuê
-  const newB={id:uid(),xe:newXe,src:b.src,arrive:swapNew.arrive,dtime:swapNew.dtime,depart:swapNew.depart,rtime:swapNew.rtime,
+  const newB={id:uid(),xe:newXe,src:b.src,arrive:swapNew.arrive,dtime:swapNew.dtime,depart:swapNew.depart,rtime:swapNew.rtime,dplan:swapNew.dtime,rplan:swapNew.rtime,
     status:'danhan',prices:JSON.parse(JSON.stringify(swapNew.prices)),price:Object.values(swapNew.prices)[0]||0,
     payments:newPay,prepaid:newPay.reduce((a,p)=>a+(+p.amount||0),0),
     pay:[...new Set(newPay.map(p=>p.method))].sort((x,y)=>PAY_PRIO[y]-PAY_PRIO[x])[0]||'',
