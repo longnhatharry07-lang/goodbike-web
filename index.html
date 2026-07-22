@@ -56,10 +56,14 @@
   .tl{position:relative;min-width:max-content}
   .nowline{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #ef4444;z-index:1;pointer-events:none}
   .todaytag{background:#ef4444;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px;margin-left:5px;vertical-align:middle}
-  .tl-head{display:flex;position:sticky;top:0;z-index:5;background:#f8fafc;border-bottom:1px solid var(--line)}
+  .tl-monthrow{display:flex;position:sticky;top:0;z-index:6;background:#e2e8f0;height:26px}
+  .tl-monthrow .corner{width:120px;min-width:120px;position:sticky;left:0;z-index:7;background:#e2e8f0}
+  .tl-monthrow .mlabel{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#334155;border-right:2px solid #94a3b8;letter-spacing:.3px}
+  .tl-head{display:flex;position:sticky;top:26px;z-index:5;background:#f8fafc;border-bottom:1px solid var(--line)}
   .tl-head .corner{width:120px;min-width:120px;position:sticky;left:0;z-index:6;background:#f1f5f9;border-right:1px solid var(--line);font-size:12px;font-weight:700;display:flex;align-items:center;padding:0 10px}
   .day{width:var(--dayw);min-width:var(--dayw);text-align:center;font-size:11px;padding:6px 2px;border-right:1px solid var(--line);color:var(--muted)}
   .day.today{background:#e0f2fe;color:var(--brand-d);font-weight:700}
+  .day.msep{border-left:2px solid #94a3b8}
   .day .dow{display:block;font-size:10px}
   .tl-row{display:flex;height:var(--rowh);border-bottom:1px solid var(--line);position:relative}
   .tl-row:nth-child(even){background:#fcfdff}
@@ -74,6 +78,7 @@
   .veh .typ{font-size:10px;color:var(--muted);font-weight:500}
   .lane{position:relative;flex:1;height:100%}
   .gridcell{position:absolute;top:0;height:100%;width:var(--dayw);border-right:1px dashed #eef2f7;cursor:pointer}
+  .gridcell.msep{border-left:2px solid #cbd5e1}
   .gridcell:hover{background:#f0f9ff}
   .bar{position:absolute;top:7px;height:calc(var(--rowh) - 14px);border-radius:7px;color:#1f2937;font-size:11px;display:flex;align-items:center;gap:6px;padding:0 7px;overflow:hidden;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.08);z-index:2}
   .bar .bt{flex:0 0 auto;font-size:10px;font-weight:700;opacity:.9}
@@ -300,7 +305,7 @@
   #view-schedule #schTable td:last-child{color:#475569;white-space:normal;line-height:1.35}
   #view-schedule #schKpis .kpi{border:1px solid #eef2f7;box-shadow:0 1px 2px rgba(15,23,42,.04)}
   .callbtn{padding:5px 10px;background:#dcfce7;color:#15803d;font-weight:600}
-  .payline{display:grid;grid-template-columns:0.8fr 1.4fr 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #eef2f7}
+  .payline{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.4fr) minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #eef2f7}
   .payline .pdate{font-size:10.5px;color:var(--muted);font-weight:600;line-height:1.25}
   .payline .pamt{font-size:16px;font-weight:800;color:#15803d;text-align:right}
   .payline .pamt::placeholder{font-size:13px;font-weight:500;color:#9ca3af}
@@ -310,11 +315,11 @@
   .payline .pbtns{display:flex;gap:5px;align-items:center}
   .payline .pconfirm{background:#dcfce7;color:#15803d;font-weight:800;padding:4px 9px;font-size:12px;white-space:nowrap}
   .payline .pconfirm:hover{background:#bbf7d0}
-  .payrow-locked{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px dashed #eef2f7}
+  .payrow-locked{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 2px;border-bottom:1px dashed #eef2f7;flex-wrap:wrap}
   .payrow-locked:last-child{border-bottom:none}
-  .payrow-locked .ptxt{font-style:italic;color:#94a3b8;font-size:12.5px;line-height:1.3}
+  .payrow-locked .ptxt{font-style:italic;color:#94a3b8;font-size:12.5px;line-height:1.3;flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
   .payrow-locked .ptxt b{color:#64748b;font-weight:700;font-style:normal}
-  .pedit{background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:4px 9px;border-radius:7px;white-space:nowrap}
+  .pedit{background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:4px 9px;border-radius:7px;white-space:nowrap;flex:0 0 auto}
   .pedit:hover{background:#e0e7ff}
   .sec-h{font-weight:800;font-size:14px;color:var(--brand-d);background:#e0f2fe;padding:7px 12px;border-radius:8px;margin:14px 0 10px}
   .sec-body{display:none}
@@ -325,16 +330,17 @@
   /* Khối thanh toán đẹp hơn */
   .pay-block{border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
   .pay-block-h{background:linear-gradient(90deg,#f8fafc,#eff6ff);font-weight:800;font-size:13px;color:#0f172a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-  .dayprice-wrap{max-height:210px;overflow:auto;padding:2px 14px}
-  .dayprice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #eef2f7}
+  .dayprice-wrap{max-height:210px;overflow-y:auto;overflow-x:hidden;padding:2px 14px}
+  .dayprice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #eef2f7;flex-wrap:wrap}
   .dayprice:last-child{border-bottom:none}
-  .dayprice .dlabel{font-size:13.5px;font-weight:700;color:#1f2937}
+  .dayprice .dlabel{font-size:13.5px;font-weight:700;color:#1f2937;flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
   .dayprice .dlabel small{color:var(--muted);font-weight:600;margin-left:6px;font-size:11px}
-  .dayprice input{width:155px;text-align:right;font-weight:700;color:#0369a1;font-family:'SF Mono',ui-monospace,'Roboto Mono',Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:15px;letter-spacing:.2px}
-  .pay-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-  .paystat{border-radius:12px;padding:12px 10px;text-align:center;border:1px solid transparent}
-  .paystat .lbl{display:block;font-size:11.5px;font-weight:600;opacity:.9;margin-bottom:3px}
-  .paystat b{font-size:18px}
+  .dayprice input{width:clamp(88px,30vw,155px);flex:0 0 auto;text-align:right;font-weight:700;color:#0369a1;font-family:'SF Mono',ui-monospace,'Roboto Mono',Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:15px;letter-spacing:.2px}
+  .pay-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+  .paystat{border-radius:12px;padding:12px 8px;text-align:center;border:1px solid transparent;min-width:0}
+  .paystat .lbl{display:block;font-size:11.5px;font-weight:600;opacity:.9;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .paystat b{font-size:18px;word-break:break-word}
+  @media(max-width:420px){.paystat b{font-size:14.5px}.paystat{padding:9px 5px}}
   .paystat.s-blue{background:#e0f2fe;color:#0369a1;border-color:#bae6fd}
   .paystat.s-green{background:#dcfce7;color:#15803d;border-color:#bbf7d0}
   .paystat.s-red{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
@@ -342,7 +348,7 @@
   .addpay-btn:hover{filter:brightness(1.05)}
   .paylist-wrap{padding:8px 14px;max-height:190px;overflow:auto}
   /* Chi tiết khách hàng */
-  .cust-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+  .cust-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
   .trip-row{display:flex;align-items:stretch;gap:10px;margin-bottom:14px}
   .trip-box{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:#f8fafc;transition:border-color .15s,box-shadow .15s}
   .trip-box:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px rgba(2,132,199,.12);background:#fff}
@@ -351,7 +357,7 @@
   .trip-fields input{flex:1;min-width:0;height:42px;padding:8px 12px;border-radius:10px;font-weight:600}
   .trip-fields input[type=date]{flex:1.4}
   .trip-arrow{align-self:center;font-size:22px;color:var(--brand);font-weight:800}
-  .addr-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+  .addr-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:2px}
   /* tiêu đề từng bước trong form thêm booking */
   .form-step{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;color:#0f172a;margin:14px 0 9px}
   .form-step:first-child{margin-top:2px}
@@ -365,11 +371,11 @@
   .addr-box input{background:#fff;width:100%}
   @media(max-width:560px){.cust-row3{grid-template-columns:1fr}.trip-row{flex-direction:column}.trip-arrow{transform:rotate(90deg)}.addr-row{grid-template-columns:1fr}}
   /* Thanh nút chi tiết booking */
-  .bk-actions{display:flex;gap:10px;align-items:center;flex-wrap:nowrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-  .bk-actions .act-spacer{flex:1}
+  .bk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .bk-actions .act-spacer{display:none}
   .bk-actions button{height:44px;padding:0 18px;border-radius:12px;font-weight:700;font-size:14px;border:none;cursor:pointer;transition:filter .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
   .bk-actions button:hover{filter:brightness(1.06)}
-  .btn-del{background:#fef2f2;color:#dc2626;width:38px;height:38px;padding:0;border-radius:10px;font-size:16px;flex:0 0 auto}
+  .btn-del{background:#fef2f2;color:#dc2626;width:38px;height:38px;padding:0;border-radius:10px;font-size:16px;flex:0 0 auto;margin-right:auto}
   .btn-del:hover{background:#fee2e2;filter:none}
   .btn-call{background:#0891b2;color:#fff;width:44px;padding:0;border-radius:50%;font-size:18px;flex:0 0 auto}
   .btn-done{background:#16a34a;color:#fff}
@@ -378,13 +384,22 @@
   .btn-swap{background:#e0e7ff;color:#4338ca}
   .swap-opts{display:flex;flex-direction:column;gap:6px}
   .swap-opts label{display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:8px 10px;cursor:pointer}
-  .swap-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 10px}
+  .swap-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 10px}
   .swap-col{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfdff}
   .swap-col-h{font-weight:800;margin-bottom:8px;color:#0f172a}
   .swap-col .sdp-wrap{max-height:160px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 8px;margin-top:4px;background:#fff}
   .swap-tot{margin-top:8px;font-size:14px;text-align:right}
   @media(max-width:640px){.swap-cols{grid-template-columns:1fr}}
   @media(max-width:520px){.bk-actions{flex-wrap:wrap}.bk-actions .btn-done,.bk-actions .btn-save{flex:1}}
+  /* Điều khoản thuê xe */
+  .terms-box{margin-top:16px;padding:12px 14px;border:1px solid #fcd34d;background:#fffbeb;border-radius:12px}
+  .terms-h{font-weight:800;font-size:13px;color:#b45309;margin-bottom:8px}
+  .terms-list{margin:0 0 8px;padding-left:20px;font-size:12.5px;color:#78350f;line-height:1.5}
+  .terms-list li{margin-bottom:4px}
+  .terms-note{font-size:12px;color:#075985;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:7px 10px;margin-bottom:10px;line-height:1.4}
+  .terms-agree{display:flex;align-items:flex-start;gap:8px;font-size:13px;font-weight:700;color:#1f2937;cursor:pointer}
+  .terms-agree input{width:18px;height:18px;margin-top:1px;cursor:pointer;flex:0 0 auto}
+  .cart-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;margin-left:4px}
   td.unpaidcell{color:#dc2626;font-style:italic;background:#fff5f5;background-image:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(220,38,38,.10) 5px,rgba(220,38,38,.10) 10px)}
   .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
   .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-top:10px}
@@ -418,22 +433,18 @@
   /* modal */
   .overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
   .overlay.open{display:flex}
-  .modal{position:relative;background:#fff;border-radius:16px;padding:20px;width:min(560px,100%);max-height:90vh;overflow:auto}
+  .modal{position:relative;background:#fff;border-radius:16px;padding:20px;width:min(560px,100%);max-height:90vh;overflow-y:auto;overflow-x:hidden}
+  @media(max-width:480px){.modal{padding:14px}}
   .modal h3{margin:0 0 14px;padding-right:34px}
   .modal-x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;padding:0;font-size:16px;line-height:1;background:#f1f5f9;color:#475569}
   .modal-x:hover{background:#fee2e2;color:#dc2626}
   .chip-clear{display:inline-flex;align-items:center;gap:6px;background:#e0f2fe;color:#0284c7;border-radius:999px;padding:4px 6px 4px 12px;font-size:13px;font-weight:600;margin-left:10px}
   .chip-clear button{padding:0;width:20px;height:20px;border-radius:50%;background:#0284c7;color:#fff;font-size:12px;line-height:1}
   .chip-clear button:hover{background:#dc2626}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
   .field label{font-size:12px;color:var(--muted);font-weight:600}
   .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-  #f_dayPrices{max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin-top:4px;background:#fbfdff}
-  .dayprice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed #eef2f7}
-  .dayprice:last-child{border-bottom:none}
-  .dayprice span{font-size:13px;color:var(--muted)}
-  .dayprice input{width:150px}
   .lock{text-align:center;padding:40px 20px}
   .lock .ico{font-size:40px}
   @media(max-width:640px){.grid2{grid-template-columns:1fr}}
@@ -453,6 +464,7 @@
     <input type="month" id="monthPick">
     <button class="ghost" id="nextM">▶</button>
     <button class="primary" id="addBk">+ Thêm booking</button>
+    <button class="ghost" id="cartBtn">🛒 Giỏ hàng<span class="cart-badge" id="cartCount" style="display:none">0</span></button>
     <button class="ghost" id="adminLock" style="display:none">🔓 Khoá nội bộ</button>
     <button class="ghost" id="changePass" style="display:none">Đổi MK</button>
   </div>
@@ -482,7 +494,13 @@
       <div class="row">
         <h2 style="margin:0">Sơ đồ xe — <span id="tlMonthLabel"></span></h2>
         <span class="muted">Bấm vào ô trống để thêm booking, bấm vào thanh để sửa.</span>
-        <button class="primary" id="tlToday" style="margin-left:auto">📅 Hôm nay</button>
+        <div class="row" style="margin-left:auto;gap:8px">
+          <input type="date" id="tlRangeFrom" title="Từ ngày">
+          <span class="muted">→</span>
+          <input type="date" id="tlRangeTo" title="Đến ngày">
+          <button class="ghost" id="tlRangeGo">🔎 Xem</button>
+          <button class="primary" id="tlToday">📅 Hôm nay</button>
+        </div>
       </div>
       <div class="legend" id="legend"></div>
       <div class="tlstats" id="tlStats"></div>
@@ -868,6 +886,58 @@
   </div>
 </div>
 
+<!-- Cart modal (giỏ hàng — gộp nhiều xe cho 1 khách) -->
+<div class="overlay" id="cartOverlay">
+  <div class="modal" style="width:min(660px,100%)">
+    <button class="modal-x" data-close="cartOverlay" title="Đóng">✕</button>
+    <h3>🛒 Giỏ hàng — đặt nhiều xe cho 1 khách</h3>
+
+    <div class="form-step"><span class="step-no">1</span> Thông tin khách</div>
+    <div class="cust-row3">
+      <div class="field"><label>Tên khách</label>
+        <input type="text" id="cart_guest" placeholder="VD: Anh Nam" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+      <div class="field"><label>Số điện thoại</label>
+        <input type="text" inputmode="tel" id="cart_phone" placeholder="VD: 0901 234 567" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+      <div class="field"><label>Nguồn khách</label>
+        <select id="cart_src"></select></div>
+    </div>
+
+    <div class="form-step"><span class="step-no">2</span> Thêm xe vào giỏ</div>
+    <div class="trip-row">
+      <div class="trip-box">
+        <div class="trip-h" style="color:#15803d">🟢 Nhận xe</div>
+        <div class="trip-fields"><input type="date" id="cart_arrive"><input type="time" id="cart_dtime" value="08:00"></div>
+      </div>
+      <div class="trip-arrow">→</div>
+      <div class="trip-box">
+        <div class="trip-h" style="color:#b91c1c">🔴 Trả xe</div>
+        <div class="trip-fields"><input type="date" id="cart_depart"><input type="time" id="cart_rtime" value="12:00"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Xe còn trống</label>
+        <select id="cart_xe"></select></div>
+      <div class="field"><label>Giá / ngày</label>
+        <input type="number" id="cart_price" min="0" step="5000" value="165000"></div>
+    </div>
+    <div class="xe-note" id="cartXeNote"></div>
+    <div class="actions" style="margin:2px 0 14px">
+      <button class="ghost" id="cart_addline" type="button">➕ Thêm vào giỏ</button>
+    </div>
+
+    <div class="pay-block">
+      <div class="pay-block-h">🧺 Danh sách trong giỏ <span id="cartTotal" class="muted" style="font-weight:600;font-size:12.5px"></span></div>
+      <div id="cartList" class="paylist-wrap" style="max-height:260px"></div>
+    </div>
+
+
+    <div class="bk-actions">
+      <span class="act-spacer"></span>
+      <button class="btn-save" id="cartConfirm">✓ Xác nhận đặt xe &amp; Lưu</button>
+    </div>
+  </div>
+</div>
+
 <!-- Expense modal -->
 <div class="overlay" id="expOverlay">
   <div class="modal">
@@ -1106,10 +1176,10 @@
 /* ============ CONFIG ============ */
 const VEHICLES = [
   {id:'A1',typ:'Vision'},{id:'A2',typ:'Vision'},{id:'A3',typ:'Vision'},
-  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'OVER1',typ:'Xe số',over:true},
+  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'OVER1',typ:'Xe số',over:true},
   {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},
-  {id:'B1',typ:'NVX/Lead'},{id:'B2',typ:'NVX/Lead'},
-  {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},
+  {id:'B1',typ:'NVX/Lead'},
+  {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},{id:'G5',typ:'Xe số'},
   {id:'E1',typ:'Xe điện'},{id:'E2',typ:'Xe điện'},{id:'E3',typ:'Xe điện'}
 ];
 const FLEET_CAPACITY = 15; // mẫu số tính công suất (khớp sheet GOODBIKE) — +1 sau khi thêm xe G4
@@ -8032,7 +8102,6 @@ function adminLockNow(){
 function renderAll(){
   normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
   const label=monthLabel(curMonth);
-  document.getElementById('tlMonthLabel').textContent=label;
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
   renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderKiemke();renderTaisan();renderPhanTich();renderMaint();
   save();
@@ -8052,25 +8121,48 @@ function bookingsInMonth(){
   const start=curMonth+'-01', end=curMonth+'-'+String(daysInMonth(curMonth)).padStart(2,'0');
   return DB.bookings.filter(b=> b.arrive<=end && b.depart>=start || (b.arrive===b.depart && b.arrive>=start && b.arrive<=end));
 }
+// Sơ đồ hiển thị 3 tháng NỐI TIẾP NHAU (tháng trước — tháng hiện tại — tháng sau) trên cùng 1 dải cuộn ngang,
+// để các booking nối tháng (VD: nhận 30/6, trả 3/7) hiện thành 1 thanh liền mạch, không bị cắt ở mép tháng.
+function tlWindow(){
+  const months=[prevMonthYM(curMonth),curMonth,nextMonthYM(curMonth)];
+  let idx=0; const map={}; const monthMeta=[];
+  months.forEach(ym=>{
+    const nd=daysInMonth(ym);
+    monthMeta.push({ym,startIdx:idx,days:nd});
+    for(let d=1;d<=nd;d++){ map[`${ym}-${String(d).padStart(2,'0')}`]=idx; idx++; }
+  });
+  const last=months[2], lastNd=daysInMonth(last);
+  return {months,monthMeta,map,total:idx,start:months[0]+'-01',end:`${last}-${String(lastNd).padStart(2,'0')}`};
+}
 function renderTimeline(){
-  const ndays=daysInMonth(curMonth);
+  const win=tlWindow();
   const tl=document.getElementById('timeline');
-  // header
+  document.getElementById('tlMonthLabel').textContent=`${monthLabel(win.months[0])} → ${monthLabel(win.months[2])}`;
+  // hàng nhãn tháng (dải màu, phân cách rõ giữa các tháng)
+  let mrow='<div class="tl-monthrow"><div class="corner"></div>';
+  win.monthMeta.forEach(m=>{ mrow+=`<div class="mlabel" style="width:${m.days*DAYW}px;min-width:${m.days*DAYW}px">${monthLabel(m.ym)}</div>`; });
+  mrow+='</div>';
+  // header ngày
   let head='<div class="tl-head"><div class="corner">Xe \\ Ngày</div>';
-  for(let i=1;i<=ndays;i++){const ds=`${curMonth}-${String(i).padStart(2,'0')}`;const isT=ds===todayStr();
-    head+=`<div class="day ${isT?'today':''}"><span class="dow">${dow(ds)}</span>${i}${isT?'<span class="todaytag">HÔM NAY</span>':''}</div>`;}
+  win.monthMeta.forEach(m=>{
+    for(let i=1;i<=m.days;i++){const ds=`${m.ym}-${String(i).padStart(2,'0')}`;const isT=ds===todayStr();const msep=i===1&&m.startIdx>0;
+      head+=`<div class="day ${isT?'today':''}${msep?' msep':''}"><span class="dow">${dow(ds)}</span>${i}${isT?'<span class="todaytag">HÔM NAY</span>':''}</div>`;}
+  });
   head+='</div>';
-  // vị trí đường "hiện tại" trong lane (lane bắt đầu từ 0, không có cột tên xe)
+  // vị trí đường "hiện tại" trong lane (chỉ vẽ nếu hôm nay nằm trong dải 3 tháng đang hiển thị)
   const _t=todayStr();
-  const nowLX = (_t.slice(0,7)===curMonth) ? ((+_t.split('-')[2]-1)*DAYW + ((new Date().getHours()*60+new Date().getMinutes())/1440)*DAYW) : null;
+  const nowLX = (win.map[_t]!=null) ? (win.map[_t]*DAYW + ((new Date().getHours()*60+new Date().getMinutes())/1440)*DAYW) : null;
   // rows
   let rows='';
   VEHICLES.forEach(v=>{
     rows+=`<div class="tl-row" data-xe="${v.id}"><div class="veh vehclick" data-veh="${v.id}" title="Bấm để xem/sửa thông tin xe ${v.id}">${v.id}<span class="typ">${vehTyp(v.id)}</span><span class="vehinfo-ic">ⓘ</span></div><div class="lane">`;
-    for(let i=1;i<=ndays;i++){rows+=`<div class="gridcell" style="left:${(i-1)*DAYW}px" data-xe="${v.id}" data-day="${i}"></div>`;}
+    win.monthMeta.forEach(m=>{
+      for(let i=1;i<=m.days;i++){const idx=m.startIdx+i-1;const ds=`${m.ym}-${String(i).padStart(2,'0')}`;const msep=i===1&&m.startIdx>0;
+        rows+=`<div class="gridcell${msep?' msep':''}" style="left:${idx*DAYW}px" data-xe="${v.id}" data-ds="${ds}"></div>`;}
+    });
     // bars
     DB.bookings.filter(b=>b.xe===v.id).forEach(b=>{
-      const g=barGeom(b,ndays);            // vị trí bám theo GIỜ thực tế (nhận→trả) như ezCloud
+      const g=barGeom(b,win);              // vị trí bám theo GIỜ thực tế (nhận→trả) như ezCloud, liên tục qua nhiều tháng
       if(!g)return;
       const st=computeStatus(b);
       const col=STATUS[st].color;
@@ -8089,8 +8181,8 @@ function renderTimeline(){
     if(nowLX!=null) rows+=`<div class="nowline" style="left:${nowLX}px"></div>`;  // đường hiện tại — NẰM SAU thanh booking (z-index thấp hơn)
     rows+='</div></div>';
   });
-  tl.innerHTML=head+rows;
-  tl.querySelectorAll('.gridcell').forEach(c=>c.onclick=()=>openBooking(null,{xe:c.dataset.xe,day:+c.dataset.day}));
+  tl.innerHTML=mrow+head+rows;
+  tl.querySelectorAll('.gridcell').forEach(c=>c.onclick=()=>openBooking(null,{xe:c.dataset.xe,ds:c.dataset.ds}));
   tl.querySelectorAll('.bar').forEach(bar=>bar.onclick=ev=>{ev.stopPropagation();openBooking(bar.dataset.id);});
   tl.querySelectorAll('.vehclick').forEach(el=>el.onclick=()=>openVehInfo(el.dataset.veh));
   renderTlStats();
@@ -8159,37 +8251,41 @@ function openFreeBikes(){
   showModal(`🅿️ Xe có thể cho thuê — ${fmtDM(T)}`,
     `<div class="muted" style="font-size:12px;padding:0 2px 8px">Trống/sẽ trống: <b>${rows.length}</b> xe</div><div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = xe có sẵn ngay (đã trả xong hoặc không có khách). “Trống từ HH:MM” = xe còn ở chỗ khách, sẽ trống sau giờ trả.</div>`);
 }
+function nextMonthYM(ym){ const [y,m]=ym.split('-').map(Number); const d=new Date(Date.UTC(y,m-1,1)); d.setUTCMonth(d.getUTCMonth()+1); return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0'); }
 function scrollTimelineToToday(){
   const t=todayStr();
   if(t.slice(0,7)!==curMonth){ curMonth=t.slice(0,7); const mp=document.getElementById('monthPick'); if(mp)mp.value=curMonth; renderAll(); }
   const wrap=document.querySelector('.tl-wrap');
-  const todayIdx=+t.split('-')[2]-1;
-  if(wrap) wrap.scrollLeft=Math.max(0,(todayIdx-1)*DAYW);  // chừa 1 ngày trước, rồi hôm nay + các ngày tiếp
+  const win=tlWindow();
+  const idx=win.map[t];
+  if(wrap && idx!=null) wrap.scrollLeft=Math.max(0,(idx-1)*DAYW);  // chừa 1 ngày trước, rồi hôm nay + các ngày tiếp
 }
-function clampSeg(b,ndays){
-  const mStart=curMonth+'-01', mEnd=`${curMonth}-${String(ndays).padStart(2,'0')}`;
-  let s=b.arrive<mStart?mStart:b.arrive;
-  let e=b.depart>mEnd?mEnd:b.depart;
-  if(e<mStart||s>mEnd)return null;
-  const startIdx=+s.split('-')[2]-1;
-  let endIdx=+e.split('-')[2]-1;
-  if(endIdx<=startIdx)endIdx=startIdx+1; // ensure visible width incl. return day
-  return {startIdx,endIdx};
+// Cuộn sơ đồ tới khoảng ngày người dùng chọn (Từ - Đến). Nếu khác tháng đang xem → chuyển tháng rồi cuộn.
+function scrollTimelineToRange(from,to){
+  if(!from) return;
+  if(!to) to=from;
+  if(from>to){const tmp=from;from=to;to=tmp;}
+  const fm=from.slice(0,7);
+  if(fm!==curMonth){ curMonth=fm; const mp=document.getElementById('monthPick'); if(mp)mp.value=curMonth; renderAll(); }
+  const wrap=document.querySelector('.tl-wrap');
+  const win=tlWindow();
+  const idx=win.map[from];
+  if(wrap && idx!=null) wrap.scrollLeft=Math.max(0,(idx-1)*DAYW);
 }
 // Phần giờ trong ngày (0..1): "07:00" -> 7/24. Mỗi ô ngày = 24h, 0h ở mép trái (khớp đường "hiện tại").
 function hm2frac(t){const m=/^(\d{1,2}):(\d{2})/.exec(t||'');if(!m)return 0;return (Math.min(+m[1],23)*60+Math.min(+m[2],59))/1440;}
 // Vị trí thanh booking bám theo GIỜ thực tế: trái = ngày nhận + giờ nhận, phải = ngày trả + giờ trả.
-function barGeom(b,ndays){
-  const mStart=curMonth+'-01', mEnd=`${curMonth}-${String(ndays).padStart(2,'0')}`;
-  if(b.depart<mStart||b.arrive>mEnd)return null;
+// Toạ độ liên tục trên cả dải nhiều tháng (win) → booking nối tháng vẫn ra 1 thanh liền, không bị cắt ở mép tháng.
+function barGeom(b,win){
+  if(b.depart<win.start||b.arrive>win.end)return null;
   let left;
-  if(b.arrive<mStart){left=0;}                                                     // tràn từ tháng trước → bắt đầu ở mép trái
-  else{const si=+b.arrive.split('-')[2]-1; left=si*DAYW + hm2frac(b.dtime||'08:00')*DAYW;}
+  if(b.arrive<win.start){left=0;}                                                   // tràn từ trước dải hiển thị → bắt đầu ở mép trái
+  else{const idx=win.map[b.arrive]; left=idx*DAYW + hm2frac(b.dtime||'08:00')*DAYW;}
   let right;
-  if(b.depart>mEnd){right=ndays*DAYW;}                                             // tràn sang tháng sau → kéo hết lane
-  else{const ei=+b.depart.split('-')[2]-1; right=ei*DAYW + hm2frac(b.rtime||'12:00')*DAYW;}
+  if(b.depart>win.end){right=win.total*DAYW;}                                        // tràn sau dải hiển thị → kéo hết lane
+  else{const idx=win.map[b.depart]; right=idx*DAYW + hm2frac(b.rtime||'12:00')*DAYW;}
   let width=right-left;
-  const MINW=16;                                                                   // tối thiểu để còn bấm được (chuyến cực ngắn)
+  const MINW=16;                                                                     // tối thiểu để còn bấm được (chuyến cực ngắn)
   if(width<MINW)width=MINW;
   return {left,width};
 }
@@ -8262,8 +8358,8 @@ function revHeader(ndays){
   return th;
 }
 function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="background:${bg};color:${dark?'#1f2937':'#fff'}"`;}
-// Mẫu số tính công suất theo NGÀY: 16 từ hôm nay trở đi, 14 cho các ngày trước hôm nay.
-function capacityOn(ds){ return ds >= todayStr() ? 16 : 14; }
+// Mẫu số tính công suất theo THÁNG: 16 đến hết tháng này, 18 từ tháng sau trở đi.
+function capacityOn(ds){ return ds.slice(0,7) > todayStr().slice(0,7) ? 18 : 16; }
 function renderRevenue(){
   const {top,bottom,extra,ndays}=buildMatrices();
   const chiByDay={};DB.expenses.filter(e=>e.date.slice(0,7)===curMonth&&e.type==='honhop').forEach(e=>{const dd=+e.date.split('-')[2];chiByDay[dd]=(chiByDay[dd]||0)+e.amt;});
@@ -8320,7 +8416,7 @@ function renderRevenue(){
   /* ---------- KPIs ---------- */
   const activeBikes=VEHICLES.filter(v=>Object.keys(top[v.id]).length).length;
   const rentedDays=VEHICLES.reduce((a,v)=>a+Object.keys(top[v.id]).length,0);
-  // Công suất TB CHỈ tính đến HÔM NAY (bỏ qua các ngày tương lai chưa diễn ra). Mẫu số theo ngày: 16 từ hôm nay, 14 trước đó.
+  // Công suất TB CHỈ tính đến HÔM NAY (bỏ qua các ngày tương lai chưa diễn ra). Mẫu số theo tháng: 16 đến hết tháng này, 18 từ tháng sau.
   let capDays=0,rentedDaysTD=0;
   for(let i=1;i<=ndays;i++){const ds=`${curMonth}-${String(i).padStart(2,'0')}`; if(ds>todayStr())continue;
     capDays+=capacityOn(ds); rentedDaysTD+=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);}
@@ -9021,8 +9117,8 @@ function openBooking(id,prefill,schedKind){
     del.style.display='';
   }else{
     document.getElementById('bkTitle').textContent='Thêm booking';
-    // mặc định: nếu bấm từ ô sơ đồ xe (prefill.day) → ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
-    const ds = (prefill&&prefill.day) ? `${curMonth}-${String(prefill.day).padStart(2,'0')}` : todayStr();
+    // mặc định: nếu bấm từ ô sơ đồ xe (prefill.ds) → đúng ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
+    const ds = (prefill&&prefill.ds) ? prefill.ds : todayStr();
     f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('status','sapnhan');f('guest','');f('phone','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
@@ -9230,6 +9326,113 @@ document.getElementById('bkDelete').onclick=()=>{
   if(!confirm('Xóa booking này?'))return;
   DB.bookings=DB.bookings.filter(x=>x.id!==editingBk);
   bkOv.classList.remove('open');renderAll();
+};
+
+/* ============ GIỎ HÀNG (gộp nhiều xe cho 1 khách, xác nhận 1 lần) ============ */
+let cart=[];   // {xe,arrive,dtime,depart,rtime,price}
+const cartOv=document.getElementById('cartOverlay');
+function cv(k,v){const el=document.getElementById('cart_'+k);if(v!==undefined)el.value=v;return el.value.trim?el.value.trim():el.value;}
+function cartSrcOptions(){
+  const base=Object.keys(SOURCES).concat(Object.keys(DB.customSources||{}));
+  return base.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+function openCart(){
+  cart=[];
+  document.getElementById('cart_src').innerHTML=cartSrcOptions();
+  cv('guest',''); cv('phone',''); cv('price',165000);
+  const t=todayStr();
+  cv('arrive',t); cv('depart',addDays(t,1)); cv('dtime','08:00'); cv('rtime','12:00');
+  renderCartXeOptions(); renderCartList();
+  cartOv.classList.add('open');
+}
+document.getElementById('cartBtn').onclick=openCart;
+function renderCartXeOptions(){
+  const sel=document.getElementById('cart_xe'); if(!sel)return;
+  const a=cv('arrive'), d=cv('depart'), dt=cv('dtime'), rt=cv('rtime');
+  const valid=a&&d&&d>=a;
+  const already=new Set(cart.map(c=>c.xe));
+  let opts='',avail=0;
+  VEHICLES.forEach(v=>{
+    if(already.has(v.id))return;                                  // đã có trong giỏ → không cho thêm trùng
+    const busy=valid?xeBusy(v.id,a,d,null,dt,rt):false;
+    if(busy)return;
+    avail++; opts+=`<option value="${v.id}">${v.id} (${v.typ})</option>`;
+  });
+  sel.innerHTML=opts||'<option value="">— Không còn xe trống —</option>';
+  const note=document.getElementById('cartXeNote');
+  if(!valid){note.className='xe-note warn';note.textContent='Hãy nhập ngày/giờ nhận & trả để xem xe còn trống.';}
+  else if(avail===0){note.className='xe-note warn';note.textContent='⚠️ Không còn xe trống cho khoảng thời gian này (hoặc các xe trống đã có trong giỏ).';}
+  else{note.className='xe-note';note.textContent='✅ Còn '+avail+' xe có thể thêm vào giỏ cho '+fmtDMY(a)+' → '+fmtDMY(d)+'.';}
+}
+['cart_arrive','cart_depart','cart_dtime','cart_rtime'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.addEventListener('change',renderCartXeOptions);
+});
+document.getElementById('cart_addline').onclick=()=>{
+  const xe=cv('xe'); if(!xe){alert('Không có xe trống để thêm vào giỏ.');return;}
+  const arrive=cv('arrive'), depart=cv('depart');
+  if(!arrive||!depart||depart<arrive){alert('Kiểm tra lại ngày nhận/trả.');return;}
+  const price=+cv('price')||0;
+  cart.push({xe,arrive,dtime:cv('dtime')||'08:00',depart,rtime:cv('rtime')||'12:00',price});
+  renderCartList(); renderCartXeOptions();
+};
+function cartLineTotal(c){return dayListIncl(c.arrive,c.depart).length*c.price;}
+function renderCartList(){
+  const el=document.getElementById('cartList');
+  if(!cart.length){
+    el.innerHTML='<div class="muted" style="padding:10px">Giỏ hàng đang trống — thêm xe ở mục 2 phía trên.</div>';
+  }else{
+    el.innerHTML=cart.map((c,i)=>`<div class="payrow-locked"><span class="ptxt"><b>${c.xe}</b> · ${vehTyp(c.xe)} · ${fmtDMY(c.arrive)} ${c.dtime} → ${fmtDMY(c.depart)} ${c.rtime} · ${moneyVN(c.price)}/ngày → <b>${moneyVN(cartLineTotal(c))}</b></span><button class="pedit" data-i="${i}" title="Bỏ khỏi giỏ">🗑 Bỏ</button></div>`).join('');
+    el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{cart.splice(+b.dataset.i,1);renderCartList();renderCartXeOptions();});
+  }
+  const total=cart.reduce((a,c)=>a+cartLineTotal(c),0);
+  document.getElementById('cartTotal').textContent=cart.length?`— ${cart.length} xe · Tổng ${moneyVN(total)}`:'';
+  const cc=document.getElementById('cartCount');
+  cc.style.display=cart.length?'':'none'; cc.textContent=cart.length;
+}
+// Chuẩn hoá SĐT VN sang dạng quốc tế 84xxxxxxxxx cho link Zalo (0901234567 → 84901234567)
+function phoneIntlVN(p){ const d=(p||'').replace(/\D/g,''); if(!d)return ''; return d.startsWith('0')?'84'+d.slice(1):d; }
+function buildCartConfirmText(guest,phone,lines){
+  const total=lines.reduce((a,c)=>a+cartLineTotal(c),0);
+  const rows=lines.map(c=>`- ${c.xe} (${vehTyp(c.xe)}): ${fmtDMY(c.arrive)} ${c.dtime} → ${fmtDMY(c.depart)} ${c.rtime} — ${moneyVN(cartLineTotal(c))}`).join('\n');
+  return `XÁC NHẬN ĐẶT XE — GOODBIKE\n`
+    +`Khách: ${guest}${phone?' - '+phone:''}\n\n`
+    +`${rows}\n\n`
+    +`Tổng cộng: ${moneyVN(total)}\n\n`
+    +`Điều khoản: xe dùng trong nội thành (bán kính <35km từ 192 Kim Mã); có sự cố báo ngay nhà xe; giữ liên lạc, quá 3 tiếng không liên lạc được coi là chiếm đoạt tài sản.\n`
+    +`Lưu ý: vui lòng gọi trước cho nhà xe để chốt giờ giao xe cụ thể.`;
+}
+// Gửi xác nhận cho khách: thử gọi Zalo ZNS tự động qua Edge Function (nếu đã cấu hình);
+// nếu chưa cấu hình/OA chưa duyệt → tự copy nội dung vào clipboard + mở sẵn khung chat Zalo để nhân viên dán & gửi.
+async function offerSendConfirm(guest,phone,text,lines){
+  const intl=phoneIntlVN(phone);
+  const total=(lines||[]).reduce((a,c)=>a+cartLineTotal(c),0);
+  try{
+    if(sb){
+      const {data,error}=await sb.functions.invoke('send-zns',{body:{phone:intl,guest,text,lines,total}});
+      if(!error && data && data.ok){ alert('Đã tự động gửi xác nhận qua Zalo ZNS cho '+guest+'.'); return; }
+    }
+    throw new Error('ZNS chưa sẵn sàng');
+  }catch(e){
+    try{ await navigator.clipboard.writeText(text); }catch(_e){}
+    if(intl && confirm('Chưa cấu hình gửi Zalo tự động (ZNS) nên đã COPY sẵn nội dung xác nhận vào clipboard.\nBấm OK để mở khung chat Zalo với khách — chỉ cần DÁN (Ctrl/Cmd+V) và bấm gửi.')){
+      window.open('https://zalo.me/'+intl,'_blank');
+    }
+  }
+}
+document.getElementById('cartConfirm').onclick=async()=>{
+  if(!cart.length){alert('Giỏ hàng đang trống.');return;}
+  const guest=cv('guest'), phone=cv('phone'), src=cv('src')||'Walk in';
+  if(!guest){alert('Nhập tên khách.');return;}
+  for(const c of cart){ if(xeBusy(c.xe,c.arrive,c.depart,null,c.dtime,c.rtime)){alert('Xe '+c.xe+' vừa bị trùng lịch với booking khác, hãy kiểm tra lại giỏ hàng.');return;} }
+  const guestField=joinGuest(guest,phone);
+  cart.forEach(c=>{
+    const prices={}; dayListIncl(c.arrive,c.depart).forEach(ds=>prices[ds]=c.price);
+    DB.bookings.push({id:uid(),created:todayStr(),xe:c.xe,src,arrive:c.arrive,depart:c.depart,dtime:c.dtime,rtime:c.rtime,dplan:c.dtime,rplan:c.rtime,daddr:'',raddr:'',status:'sapnhan',price:c.price,prices,payments:[],prepaid:0,pay:'',guest:guestField,note:'Đặt qua giỏ hàng'});
+  });
+  const text=buildCartConfirmText(guest,phone,cart);
+  const lines=cart; cart=[];
+  cartOv.classList.remove('open'); renderAll();
+  offerSendConfirm(guest,phone,text,lines);
 };
 
 /* ============ ĐỔI XE (swap) ============ */
@@ -10041,6 +10244,12 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 
 /* ============ GO ============ */
 document.getElementById('tlToday').onclick=scrollTimelineToToday;
+document.getElementById('tlRangeGo').onclick=()=>{
+  const f=document.getElementById('tlRangeFrom').value;
+  const t=document.getElementById('tlRangeTo').value;
+  if(!f){ alert('Chọn ít nhất ngày bắt đầu.'); return; }
+  scrollTimelineToRange(f,t);
+};
 updateTabLocks();
 reconcileExpenseFunds();   // bù dòng quỹ cho khoản chi khấu hao/đầu tư đã nhập trước đó
 renderAll();
