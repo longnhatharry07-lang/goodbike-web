@@ -402,6 +402,25 @@
   .addr-box{background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:9px 12px}
   .addr-box label{display:block;font-weight:800;color:#b45309;font-size:12px;margin-bottom:4px}
   .addr-box input{background:#fff;width:100%}
+  .pill.kmpill{background:#e0e7ff;color:#3730a3;font-weight:700;margin-left:4px}
+  /* --- Chọn ô kiểu bảng tính ở Bảng tổng doanh thu --- */
+  td.selcell{cursor:cell;-webkit-user-select:none;user-select:none}
+  td.selcell.sel{outline:2px solid #1a73e8;outline-offset:-2px;background-image:linear-gradient(rgba(26,115,232,.18),rgba(26,115,232,.18))}
+  td.selcell.sel.anchor{outline-width:3px}
+  .sel-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;
+    background:#0f172a;color:#fff;border-radius:14px;padding:10px 14px;display:flex;gap:14px;align-items:center;
+    font-size:13px;box-shadow:0 10px 28px rgba(15,23,42,.35);flex-wrap:wrap;max-width:calc(100vw - 20px)}
+  .sel-bar .sb-item{display:flex;flex-direction:column;line-height:1.25;min-width:56px}
+  .sel-bar .sb-l{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+  .sel-bar .sb-v{font-weight:800;font-size:14.5px;white-space:nowrap}
+  .sel-bar .sb-head{font-weight:800;font-size:12.5px;opacity:.9;padding-right:4px;border-right:1px solid rgba(255,255,255,.2);white-space:nowrap}
+  .sel-bar .sb-hint{font-size:10.5px;opacity:.55;max-width:190px;line-height:1.35}
+  .sel-bar .sb-x{background:rgba(255,255,255,.14);border:none;color:#fff;border-radius:9px;padding:6px 10px;cursor:pointer;font-weight:800;font-size:13px}
+  .sel-bar .sb-x:hover{background:rgba(255,255,255,.26)}
+  @media(max-width:640px){.sel-bar{gap:10px;padding:9px 11px;font-size:12px}.sel-bar .sb-v{font-size:13px}.sel-bar .sb-hint{display:none}}
+  .guest-hint{margin:-4px 0 10px;padding:7px 11px;border-radius:9px;font-size:12.5px;font-weight:600;line-height:1.5}
+  .guest-hint.known{background:#ecfdf5;border:1px solid #a7f3d0;color:#15803d}
+  .guest-hint.dup{background:#fef3c7;border:1px solid #fcd34d;color:#b45309}
   .addr-inline{display:flex;gap:8px;align-items:center}
   .addr-inline input.addr-main{flex:1 1 auto;min-width:0}
   .addr-inline .km-wrap{flex:0 0 108px;display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px}
@@ -590,6 +609,8 @@
     <div class="card" style="padding:0">
       <div class="tbl-wrap" id="wrapBot"><table id="revTableBot"></table></div>
     </div>
+    <div class="muted" style="font-size:12px;margin-top:-4px">💡 Ở các dòng tổng (Tổng doanh thu, Công suất, Chi, Đã thu, Chưa thanh toán): bấm và <b>kéo ngang</b> để chọn nhiều ngày — hệ thống tự tính tổng và trung bình. Trên điện thoại: chạm ô đầu rồi chạm ô cuối.</div>
+    <div id="revSelBar" class="sel-bar" style="display:none"></div>
   </section>
 
   <!-- THU CHI -->
@@ -806,9 +827,10 @@
       <div class="pa-metric-cards" id="paCustKpis" style="margin-top:12px"></div>
       <div class="row" style="margin-top:16px">
         <h3 style="margin:0;font-size:14px">Danh bạ khách hàng <span class="muted" style="font-weight:400">(toàn bộ từ trước tới nay)</span></h3>
-        <div class="right row" style="gap:10px">
+        <div class="right row" style="gap:10px" id="paCustTools">
           <label class="muted" style="display:flex;align-items:center;gap:5px;font-size:12.5px;cursor:pointer"><input type="checkbox" id="paCustOnlyPhone"> Chỉ khách có SĐT</label>
           <input type="search" id="paCustSearch" placeholder="Tìm tên hoặc SĐT…" style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:190px">
+          <button class="ghost" id="paCustToggle">👁 Hiện danh sách</button>
         </div>
       </div>
       <div class="muted" id="paCustNote" style="font-size:11.5px;margin-top:6px"></div>
@@ -883,12 +905,15 @@
       <div class="form-step"><span class="step-no">2</span> Thông tin khách</div>
       <div class="cust-row3">
         <div class="field"><label>Tên khách</label>
-          <input type="text" id="f_guest" placeholder="VD: Anh Nam" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+          <input type="text" id="f_guest" list="guestList" placeholder="VD: Anh Nam" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
         <div class="field"><label>Số điện thoại</label>
-          <input type="text" inputmode="tel" id="f_phone" placeholder="VD: 0901 234 567" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+          <input type="text" inputmode="tel" id="f_phone" list="phoneList" placeholder="VD: 0901 234 567" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
         <div class="field"><label>Nguồn khách</label>
           <select id="f_src"></select></div>
       </div>
+      <datalist id="guestList"></datalist>
+      <datalist id="phoneList"></datalist>
+      <div id="f_guestHint" class="guest-hint" style="display:none"></div>
       <div id="f_debtBox" class="field" style="display:none;margin:0 0 10px">
         <label id="f_debtLabel">Công ty công nợ</label>
         <div style="display:flex;gap:8px;align-items:center">
@@ -8450,14 +8475,14 @@ function renderRevenue(){
     body+=`<tr><td class="l"><b>${v.id}</b> <span class="muted">${v.typ}</span></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
   let chiTds='';let chiTot=0;
-  for(let i=1;i<=ndays;i++){const val=chiByDay[i]||0;chiTot+=val;chiTds+=`<td style="color:#dc2626">${val?'-'+fmtVND(val)+'đ':''}</td>`;}
+  for(let i=1;i<=ndays;i++){const val=chiByDay[i]||0;chiTot+=val;chiTds+=`<td class="selcell" data-r="chi" data-i="${i}" data-v="${val}" style="color:#dc2626">${val?'-'+fmtVND(val)+'đ':''}</td>`;}
   body+=`<tr><td class="l">Chi</td>${chiTds}<td style="color:#dc2626">${chiTot?'-'+fmtVND(chiTot):''}</td></tr>`;
-  let ttds='';for(let i=1;i<=ndays;i++)ttds+=`<td>${colTot[i]?fmtVND(colTot[i])+'đ':'0 đ'}</td>`;
+  let ttds='';for(let i=1;i<=ndays;i++)ttds+=`<td class="selcell" data-r="rev" data-i="${i}" data-v="${colTot[i]||0}">${colTot[i]?fmtVND(colTot[i])+'đ':'0 đ'}</td>`;
   body+=`<tr class="total"><td class="l">Tổng Doanh Thu</td>${ttds}<td>${fmtVND(grand)}đ</td></tr>`;
   let ctds='';
   for(let i=1;i<=ndays;i++){let cnt=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);
     const cap=capacityOn(`${curMonth}-${String(i).padStart(2,'0')}`);
-    const pct=cap?cnt/cap*100:0;ctds+=`<td>${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
+    const pct=cap?cnt/cap*100:0;ctds+=`<td class="selcell" data-r="cap" data-i="${i}" data-v="${pct}">${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
   body+=`<tr class="total"><td class="l">Công suất</td>${ctds}<td></td></tr>`;
   document.getElementById('revTableTop').innerHTML=revHeader(ndays)+body;
   /* ---------- BẢNG DƯỚI (đã thanh toán) ---------- */
@@ -8475,9 +8500,9 @@ function renderRevenue(){
     grand2+=rowTot;
     body2+=`<tr><td class="l"><b>${v.id}</b></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
-  let ttds2='';for(let i=1;i<=ndays;i++)ttds2+=`<td>${colTot2[i]?fmtVND(colTot2[i])+'đ':'0 đ'}</td>`;
+  let ttds2='';for(let i=1;i<=ndays;i++)ttds2+=`<td class="selcell" data-r="thu" data-i="${i}" data-v="${colTot2[i]||0}">${colTot2[i]?fmtVND(colTot2[i])+'đ':'0 đ'}</td>`;
   body2+=`<tr class="total"><td class="l">Đã thu</td>${ttds2}<td>${fmtVND(grand2)}đ</td></tr>`;
-  let owtds='';for(let i=1;i<=ndays;i++){const o=owedCol[i]||0;grandOwed+=o;owtds+=`<td style="color:#dc2626">${o?fmtVND(o)+'đ':''}</td>`;}
+  let owtds='';for(let i=1;i<=ndays;i++){const o=owedCol[i]||0;grandOwed+=o;owtds+=`<td class="selcell" data-r="no" data-i="${i}" data-v="${o}" style="color:#dc2626">${o?fmtVND(o)+'đ':''}</td>`;}
   body2+=`<tr class="total"><td class="l" style="color:#dc2626">Chưa thanh toán</td>${owtds}<td style="color:#dc2626">${fmtVND(grandOwed)}đ</td></tr>`;
   document.getElementById('revTableBot').innerHTML=revHeader(ndays)+body2;
   /* ---------- Legends ---------- */
@@ -8502,9 +8527,82 @@ function renderRevenue(){
     ${kpi('Đã thu',fmtVND(grand2)+'đ')}
     ${kpi('Chưa thanh toán',fmtVND(grandOwed)+'đ',grandOwed>0?'neg':'')}
     ${kpi('Công suất TB',occ.toFixed(0)+'%')}`;
+  revWireSel(); revSelPaint();   // giữ vùng đang chọn sau khi vẽ lại bảng
   window._revGrand=grand;
 }
 function kpi(l,v,cls=''){return `<div class="kpi ${cls}"><div class="lbl">${l}</div><div class="val">${v}</div></div>`;}
+
+/* ============ CHỌN Ô KIỂU BẢNG TÍNH (Bảng tổng doanh thu) ============
+   Kéo ngang trên một dòng tổng để xem nhanh tổng / trung bình của khoảng ngày đó —
+   giống thanh trạng thái của Google Sheets. Chỉ cho chọn trong CÙNG một dòng vì
+   cộng doanh thu với % công suất thì con số vô nghĩa. */
+const REV_ROW_META={
+  rev:{label:'Tổng doanh thu', kind:'money'},
+  cap:{label:'Công suất',      kind:'pct'},
+  chi:{label:'Chi',            kind:'money'},
+  thu:{label:'Đã thu',         kind:'money'},
+  no :{label:'Chưa thanh toán',kind:'money'}
+};
+let revSel={r:null,a:null,b:null,drag:false};
+function revSelClear(){ revSel={r:null,a:null,b:null,drag:false}; revSelPaint(); }
+function revSelCells(){
+  if(!revSel.r||revSel.a==null)return [];
+  const lo=Math.min(revSel.a,revSel.b), hi=Math.max(revSel.a,revSel.b);
+  return [...document.querySelectorAll(`#view-revenue td.selcell[data-r="${revSel.r}"]`)]
+    .filter(td=>{const i=+td.dataset.i; return i>=lo&&i<=hi;});
+}
+function revSelPaint(){
+  document.querySelectorAll('#view-revenue td.selcell.sel').forEach(td=>td.classList.remove('sel','anchor'));
+  const bar=document.getElementById('revSelBar'); if(!bar)return;
+  const cells=revSelCells();
+  if(!cells.length){ bar.style.display='none'; bar.innerHTML=''; return; }
+  cells.forEach(td=>{ td.classList.add('sel'); if(+td.dataset.i===revSel.a)td.classList.add('anchor'); });
+  const meta=REV_ROW_META[revSel.r]||{label:revSel.r,kind:'money'};
+  const vals=cells.map(td=>+td.dataset.v||0);
+  const n=vals.length, sum=vals.reduce((a,v)=>a+v,0), avg=sum/n;
+  const mx=Math.max(...vals), mn=Math.min(...vals);
+  const lo=Math.min(revSel.a,revSel.b), hi=Math.max(revSel.a,revSel.b);
+  const dayLbl=i=>`${i}/${+curMonth.split('-')[1]}`;
+  const money=v=>fmtVND(Math.round(v))+'đ';
+  const pct=v=>(Math.round(v*10)/10).toString().replace('.',',')+'%';
+  const fmt=meta.kind==='pct'?pct:money;
+  const item=(l,v)=>`<span class="sb-item"><span class="sb-l">${l}</span><span class="sb-v">${v}</span></span>`;
+  bar.innerHTML=`<span class="sb-head">${meta.label}<br>${lo===hi?dayLbl(lo):`${dayLbl(lo)} → ${dayLbl(hi)}`}</span>`
+    + item('Số ngày', n)
+    + (meta.kind==='pct'?'':item('Tổng', fmt(sum)))
+    + item('Trung bình', fmt(avg))
+    + item('Cao nhất', fmt(mx))
+    + item('Thấp nhất', fmt(mn))
+    + `<span class="sb-hint">${n===1?'Chạm/Shift+bấm ô khác cùng dòng để chọn khoảng.':'Kéo hoặc chạm để đổi khoảng.'}</span>`
+    + `<button class="sb-x" id="revSelX" title="Bỏ chọn (Esc)">✕</button>`;
+  bar.style.display='flex';
+  const x=document.getElementById('revSelX'); if(x)x.onclick=revSelClear;
+}
+function revWireSel(){
+  const root=document.getElementById('view-revenue'); if(!root||root._selWired)return; root._selWired=true;
+  const cellOf=t=>(t&&t.closest)?t.closest('td.selcell'):null;
+  const anchorAt=td=>{ revSel={r:td.dataset.r,a:+td.dataset.i,b:+td.dataset.i,drag:true}; revSelPaint(); };
+  const extendTo=td=>{ if(td.dataset.r!==revSel.r)return; revSel.b=+td.dataset.i; revSelPaint(); };
+  /* --- chuột: bấm giữ rồi kéo --- */
+  root.addEventListener('mousedown',e=>{
+    const td=cellOf(e.target);
+    if(!td){ revSelClear(); return; }
+    e.preventDefault();
+    if(e.shiftKey&&revSel.r===td.dataset.r){ extendTo(td); revSel.drag=true; }
+    else anchorAt(td);
+  });
+  root.addEventListener('mouseover',e=>{ if(!revSel.drag)return; const td=cellOf(e.target); if(td)extendTo(td); });
+  document.addEventListener('mouseup',()=>{ revSel.drag=false; });
+  /* --- cảm ứng: chạm ô đầu → chạm ô cuối (kéo ngang bị vướng cuộn bảng nên dùng 2 lần chạm) --- */
+  root.addEventListener('touchend',e=>{
+    const t=e.changedTouches&&e.changedTouches[0]; if(!t)return;
+    const td=cellOf(document.elementFromPoint(t.clientX,t.clientY)); if(!td)return;
+    if(revSel.r===td.dataset.r&&revSel.a===revSel.b&&+td.dataset.i!==revSel.a) extendTo(td);   // lần chạm thứ 2 → mở rộng
+    else anchorAt(td);
+    revSel.drag=false;
+  },{passive:true});
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&revSel.r)revSelClear(); });
+}
 
 /* ============ THU CHI TABLE ============ */
 function payColumn(b){ // exclusive classification
@@ -8845,11 +8943,11 @@ function renderSchedule(){
   if(picker.value!==schDate)picker.value=schDate;
   const events=[];
   DB.bookings.forEach(b=>{
-    if(b.arrive===schDate)events.push({kind:'Giao',time:planDtime(b)||'08:00',act:actDtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.daddr,pay:b.pay,b});
-    if(b.depart===schDate)events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b});
+    if(b.arrive===schDate)events.push({kind:'Giao',time:planDtime(b)||'08:00',act:actDtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.daddr,km:+b.dkm||0,pay:b.pay,b});
+    if(b.depart===schDate)events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,km:+b.rkm||0,pay:b.pay,b});
     // QUÁ HẠN: chỉ hiện khi đang xem ngày HÔM NAY (hoặc trước đó) — xe đã đến hạn trả nhưng chưa thu hồi.
     // Xem lịch NGÀY TƯƠNG LAI thì KHÔNG hiện quá hạn, chỉ hiện giao/trả dự kiến của ngày đó.
-    else if(schDate<=todayStr() && b.depart<schDate && b.status==='danhan')events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,pay:b.pay,b,overdue:true});
+    else if(schDate<=todayStr() && b.depart<schDate && b.status==='danhan')events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,km:+b.rkm||0,pay:b.pay,b,overdue:true});
   });
   events.sort((a,b)=>{if(!!a.overdue!==!!b.overdue)return a.overdue?-1:1;return (a.time||'').localeCompare(b.time||'');});
   const nGiao=events.filter(e=>e.kind==='Giao').length, nTra=events.filter(e=>e.kind==='Trả'&&!e.overdue).length, nOver=events.filter(e=>e.overdue).length;
@@ -8857,7 +8955,8 @@ function renderSchedule(){
     ${kpi('Ngày',fmtDMY(schDate)+' ('+dow(schDate)+')')}
     ${kpi('🟢 Giao xe',nGiao+' chuyến')}
     ${kpi('🔴 Trả xe',nTra+' chuyến')}
-    ${kpi('⚠️ Quá hạn chưa trả',nOver+' xe',nOver>0?'neg':'')}`;
+    ${kpi('⚠️ Quá hạn chưa trả',nOver+' xe',nOver>0?'neg':'')}
+    ${kpi('🛣️ Tổng km phải chạy',(Math.round(events.reduce((a,e)=>a+(e.km||0),0)*10)/10).toString().replace('.',',')+' km')}`;
   let th=`<tr><th>Giờ (dự kiến · thực tế)</th><th class="l">Việc</th><th class="l">Xe / Tình trạng</th><th class="l">Địa chỉ</th></tr>`;
   let body=events.map(e=>{
     const ss=schedState(e);
@@ -8867,7 +8966,7 @@ function renderSchedule(){
     const stp=`<span class="pill" style="background:${ss.color};color:${isLight(ss.color)?'#1f2937':'#fff'}">${ss.label}</span>`;
     const actTxt=e.act?`<span class="t-act done">${e.act}</span>`:'';
     const timeCell=`<div class="schtime"><span class="t-plan">${e.time||'--:--'}</span>${actTxt}</div>`;
-    return `<tr class="schrow ${e.kind==='Giao'?'giao':'tra'}${e.overdue?' overdue':''}${ss.done?' done':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td>${timeCell}</td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}</td><td class="l">${e.addr||'<span class="muted">—</span>'}</td></tr>`;
+    return `<tr class="schrow ${e.kind==='Giao'?'giao':'tra'}${e.overdue?' overdue':''}${ss.done?' done':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td>${timeCell}</td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}</td><td class="l">${e.addr||'<span class="muted">—</span>'}${e.km?` <span class="pill kmpill">🛣️ ${(Math.round(e.km*10)/10).toString().replace('.',',')} km</span>`:''}</td></tr>`;
   }).join('');
   document.getElementById('schTable').innerHTML=th+(events.length?body:'<tr><td colspan="4" class="l muted" style="padding:14px">Không có lịch giao/trả trong ngày này.</td></tr>');
   document.querySelectorAll('#schTable .schrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id,null,r.dataset.kind));
@@ -8883,7 +8982,9 @@ function openSchAct(id,kind){
   schActId=id;schActKind=kind;const ph=phoneOf(b.guest);
   saPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   document.getElementById('schActTitle').textContent=(kind==='Giao'?'🟢 Giao xe ':'🔴 Thu hồi xe ')+b.xe;
-  document.getElementById('schActInfo').innerHTML=`Khách: <b>${b.guest||'—'}</b><br>Nguồn: ${b.src} · ${fmtDMY(b.arrive)} → ${fmtDMY(b.depart)} · ${kind==='Giao'?('giao lúc '+(b.dtime||'')):('trả lúc '+(b.rtime||''))}`;
+  {const _ad=kind==='Giao'?(b.daddr||''):(b.raddr||''), _km=kind==='Giao'?(+b.dkm||0):(+b.rkm||0);
+   document.getElementById('schActInfo').innerHTML=`Khách: <b>${b.guest||'—'}</b><br>Nguồn: ${b.src} · ${fmtDMY(b.arrive)} → ${fmtDMY(b.depart)} · ${kind==='Giao'?('giao lúc '+(b.dtime||'')):('trả lúc '+(b.rtime||''))}`
+     +`<br>📍 ${_ad||'—'}${_km?` · <b>🛣️ ${(Math.round(_km*10)/10).toString().replace('.',',')} km</b>`:''}`;}
   renderSaPayments();saRecalc();
   const callBtn=document.getElementById('schActCall');
   if(ph){callBtn.style.display='';callBtn.textContent='📞 Gọi khách — '+ph;callBtn.onclick=()=>{window.location.href='tel:'+ph;};}
@@ -9180,6 +9281,48 @@ function activateMtab(id){
   document.querySelectorAll('.mtab').forEach(x=>x.classList.toggle('active',x.dataset.t===id));
   ['bkSec1','bkSec2'].forEach(s=>document.getElementById(s).classList.toggle('open',s===id));
 }
+/* ===== Gợi nhớ khách quen (tên + SĐT) để tránh nhập trùng ===== */
+function refreshGuestList(){
+  const gl=document.getElementById('guestList'), pl=document.getElementById('phoneList');
+  if(!gl||!pl)return;
+  const esc=t=>String(t||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const dir=paCustDirectory();
+  gl.innerHTML=dir.filter(c=>c.name&&c.name!=='—')
+    .map(c=>`<option value="${esc(c.name)}">${esc(c.phone||'chưa có SĐT')} · ${c.count} lần</option>`).join('');
+  pl.innerHTML=dir.filter(c=>c.phone)
+    .map(c=>`<option value="${esc(c.phone)}">${esc(c.name)} · ${c.count} lần</option>`).join('');
+}
+function findCustByPhone(ph){ ph=(ph||'').replace(/\s/g,''); if(ph.length<6)return null;
+  return paCustDirectory().find(c=>c.phone&&c.phone.replace(/\s/g,'')===ph)||null; }
+function findCustByName(nm){ nm=(nm||'').trim().toLowerCase(); if(!nm)return null;
+  return paCustDirectory().find(c=>(c.name||'').trim().toLowerCase()===nm)||null; }
+function showGuestHint(c,matchedBy){
+  const el=document.getElementById('f_guestHint'); if(!el)return;
+  if(!c){ el.style.display='none'; el.innerHTML=''; return; }
+  const same = matchedBy==='phone';
+  el.className='guest-hint '+(same?'known':'dup');
+  el.style.display='';
+  el.innerHTML=`${same?'🔁':'⚠️'} <b>${c.name||'—'}</b>${c.phone?` · ${c.phone}`:''} — đã thuê <b>${c.count} lần</b>`
+    +`${c.last?`, gần nhất ${fmtDMY(c.last)}`:''}${c.srcs&&c.srcs.size?` · nguồn: ${[...c.srcs].join(', ')}`:''}.`
+    +(same?' Đây là khách quen, thông tin đã được điền tự động.':' Trùng tên nhưng SĐT khác hoặc chưa có — kiểm tra lại để tránh tạo khách trùng.');
+}
+function wireGuestInputs(){
+  const g=document.getElementById('f_guest'), ph=document.getElementById('f_phone');
+  if(!g||!ph||g._gWired)return; g._gWired=true;
+  const byPhone=()=>{ const c=findCustByPhone(ph.value);
+    if(c){ if(c.name&&c.name!=='—'&&!g.value.trim())g.value=c.name; showGuestHint(c,'phone'); }
+    else showGuestHint(null); };
+  const byName=()=>{ if(findCustByPhone(ph.value))return;      // đã khớp SĐT thì ưu tiên SĐT
+    const c=findCustByName(g.value);
+    if(!c){ showGuestHint(null); return; }
+    const typed=(ph.value||'').replace(/\s/g,'');
+    if(c.phone&&!typed){ ph.value=c.phone; showGuestHint(c,'phone'); }   // cùng người → điền SĐT, báo xanh
+    else showGuestHint(c,'name');                                       // trùng tên nhưng SĐT khác/chưa có → cảnh báo
+  };
+  ph.addEventListener('change',byPhone); ph.addEventListener('input',byPhone); ph.addEventListener('blur',byPhone);
+  g.addEventListener('change',byName);   g.addEventListener('blur',byName);
+}
+
 /* ===== Thư viện địa điểm giao/trả (tự nhớ tên + số km) ===== */
 function placeKey(n){return (n||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function placeKmOf(n){const p=(DB.places||{})[placeKey(n)];return (p&&p.km)?p.km:null;}
@@ -9236,6 +9379,7 @@ function openBooking(id,prefill,schedKind){
     del.style.display='none';
   }
   refreshPlaceList(); wirePlaceInputs();   // gợi ý địa điểm đã lưu + tự điền km
+  refreshGuestList(); wireGuestInputs(); showGuestHint(null);   // gợi nhớ khách quen theo tên/SĐT
   renderXeOptions(selXe);   // dựng dropdown chỉ gồm xe còn trống theo khoảng ngày
   renderStatusBadge();      // badge trạng thái (không sửa tay; tự đổi khi giao/trả)
   renderBkPayments();recalcPay();
@@ -10078,6 +10222,7 @@ function paCustDirectory(){
   return Object.values(map).sort((a,b)=>(b.phone?1:0)-(a.phone?1:0)||b.count-a.count||b.spend-a.spend);
 }
 let paCustQ='', paCustOnlyPhone=false;
+let paCustShow=(localStorage.getItem('gb_paCustShow')||'0')==='1';   // mặc định ẩn — dữ liệu khách chỉ hiện khi bấm
 function paRenderCust(){
   const box=document.getElementById('paCustKpis'); if(!box)return;
   const st=paCustStats(paState.from,paState.to);
@@ -10092,10 +10237,25 @@ function paRenderCust(){
   if(sc&&!sc._wired){ sc._wired=true; sc.oninput=()=>{paCustQ=sc.value.trim().toLowerCase(); paRenderCustTable();}; }
   const op=document.getElementById('paCustOnlyPhone');
   if(op&&!op._wired){ op._wired=true; op.onchange=()=>{paCustOnlyPhone=op.checked; paRenderCustTable();}; }
+  const tg=document.getElementById('paCustToggle');
+  if(tg&&!tg._wired){ tg._wired=true; tg.onclick=()=>{ paCustShow=!paCustShow;
+    try{localStorage.setItem('gb_paCustShow',paCustShow?'1':'0');}catch(e){} paRenderCustTable(); }; }
   paRenderCustTable();
 }
 function paRenderCustTable(){
   const t=document.getElementById('paCustTable'); if(!t)return;
+  const wrap=t.closest('.tbl-wrap'), tg=document.getElementById('paCustToggle'), nt=document.getElementById('paCustNote');
+  const sc=document.getElementById('paCustSearch'), op=document.getElementById('paCustOnlyPhone');
+  const total=paCustDirectory().length;
+  if(tg)tg.textContent=paCustShow?'🙈 Ẩn danh sách':`👁 Hiện danh sách (${total} khách)`;
+  if(sc)sc.style.display=paCustShow?'':'none';
+  if(op&&op.parentElement)op.parentElement.style.display=paCustShow?'':'none';
+  if(!paCustShow){
+    if(wrap)wrap.style.display='none';
+    if(nt)nt.innerHTML='Danh sách khách hàng đang được <b>ẩn</b> để bảo mật thông tin. Bấm "Hiện danh sách" khi cần tra cứu.';
+    t.innerHTML=''; return;
+  }
+  if(wrap)wrap.style.display='';
   let list=paCustDirectory();
   if(paCustOnlyPhone)list=list.filter(c=>!!c.phone);
   if(paCustQ)list=list.filter(c=>(c.name||'').toLowerCase().includes(paCustQ)||(c.phone||'').includes(paCustQ));
@@ -10108,7 +10268,6 @@ function paRenderCustTable(){
     <td class="l">${[...c.srcs].join(', ')||'—'}</td>
     <td class="l">${c.last?fmtDMY(c.last):'—'}</td></tr>`).join('');
   t.innerHTML=th+(list.length?body:`<tr><td colspan="8" class="muted l" style="padding:14px">${paCustQ?'Không tìm thấy khách phù hợp.':'Chưa có khách hàng nào.'}</td></tr>`);
-  const nt=document.getElementById('paCustNote');
   if(nt){ const noPh=paCustDirectory().filter(c=>!c.phone).length;
     nt.innerHTML=`Gộp trùng theo <b>số điện thoại</b>; khách chưa có SĐT được gộp tạm theo tên nên có thể chưa chính xác${noPh?` (${noPh} khách chưa có SĐT)`:''}.`; }
 }
