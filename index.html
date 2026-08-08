@@ -45,6 +45,16 @@
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
   .grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:880px){.grid-2col{grid-template-columns:1fr}}
+  /* --- Bố cục 2 quỹ dòng tiền (xếp dọc, full chiều ngang) --- */
+  .fund-stack{display:grid;grid-template-columns:1fr;gap:16px}
+  .fund-head{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;padding:12px 16px}
+  .fund-head .fund-title{margin:0;flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fund-head .fund-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .fund-head .fund-bal{margin-left:auto;flex:0 0 auto;padding:8px 14px;white-space:nowrap;text-align:right}
+  .fund-head .fund-bal .val{font-size:20px;margin-top:2px}
+  #view-funds .tbl-wrap{max-height:none}
+  #view-funds .tbl-wrap table{width:100%}
+  @media(max-width:700px){.fund-head .fund-bal{margin-left:0;width:100%;text-align:left}}
   tr.subtot td{font-weight:800;background:#fff7cc}
   tr.netprofit td{font-weight:800;background:#dcfce7;color:#15803d;font-size:14px}
   td.pct{color:#b91c1c;font-style:italic}
@@ -254,6 +264,25 @@
   .pa-wk-nav button:disabled{opacity:.4;cursor:default}
   .pa-wk-nav button:hover:not(:disabled){background:#f1f5f9}
   .pa-cc.wkbrowser{border-color:#cfe0fb;background:#f7faff}
+  /* --- Bảng đối chiếu 2 kỳ + phân tích khách hàng / vận hành --- */
+  .pa-cc.expandable{cursor:pointer}
+  .pa-cc-toggle{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:9px;padding-top:8px;border-top:1px dashed #e2e8f0;font-size:12.5px;font-weight:700;color:#1a73e8}
+  .pa-det{grid-column:1/-1;border:1px solid #cfe0fb;border-radius:12px;background:#f7faff;padding:12px 14px;margin-top:-4px}
+  .pa-det h4{margin:0 0 8px;font-size:13.5px}
+  .pa-det table{border-collapse:collapse;width:100%;background:#fff;border-radius:8px;overflow:hidden}
+  .pa-det th,.pa-det td{border-bottom:1px solid #e2e8f0;padding:6px 9px;font-size:12.5px;text-align:right}
+  .pa-det th{background:#eef4ff;font-weight:800}
+  .pa-det th.l,.pa-det td.l{text-align:left}
+  .pa-det tr.grp td{background:#f8fafc;font-weight:800}
+  .pa-det tr.tot td{background:#eef2f7;font-weight:800}
+  .pa-det tr.net td{background:#ecfdf5;font-weight:800;color:#15803d}
+  .pa-det .up{color:#188038;font-weight:700} .pa-det .down{color:#d93025;font-weight:700} .pa-det .flat{color:#94a3b8}
+  .pa-hourbar{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:2px 0}
+  .pa-hourbar .hl{width:62px;color:#64748b;flex:0 0 62px}
+  .pa-hourbar .hb{height:14px;border-radius:4px;background:#1a73e8;min-width:2px}
+  .pa-hourbar .hb.ret{background:#e8710a}
+  .pa-hourbar .hv{font-weight:700}
+  .pa-peak{display:inline-block;padding:3px 10px;border-radius:999px;background:#fef3c7;color:#b45309;font-weight:800;font-size:12px;margin:2px 6px 2px 0}
   .inv-add-btn{width:23px;height:23px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#b0b7c3;font-size:14px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:all .14s}
   .inv-add-btn:hover{border-color:#7aa7f0;color:#3b82f6;background:#f3f8ff}
   .inv-add-btn.added{color:#86c79b;border-color:#d6efdd;background:#f6fdf8}
@@ -373,6 +402,12 @@
   .addr-box{background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:9px 12px}
   .addr-box label{display:block;font-weight:800;color:#b45309;font-size:12px;margin-bottom:4px}
   .addr-box input{background:#fff;width:100%}
+  .addr-inline{display:flex;gap:8px;align-items:center}
+  .addr-inline input.addr-main{flex:1 1 auto;min-width:0}
+  .addr-inline .km-wrap{flex:0 0 108px;display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px}
+  .addr-inline .km-wrap input{border:none;padding:6px 0;text-align:right;width:100%}
+  .addr-inline .km-wrap input:focus{outline:none}
+  .addr-inline .km-wrap span{font-size:12px;font-weight:700;color:#b45309}
   @media(max-width:640px){.cust-row3{grid-template-columns:1fr}.trip-row{flex-direction:column}.trip-arrow{transform:rotate(90deg)}.addr-row{grid-template-columns:1fr}}
   /* Thanh nút chi tiết booking */
   .bk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
@@ -583,6 +618,7 @@
           <select id="drCompany"></select>
           <span class="muted">Từ</span><input type="date" id="drFrom">
           <span class="muted">đến</span><input type="date" id="drTo">
+          <button class="ghost" id="drToggleGross" style="display:none">🙈 Ẩn tiền thu về</button>
           <button class="ghost" id="drExport">⬇ Xuất PDF</button>
         </div>
       </div>
@@ -641,26 +677,26 @@
       <h2 style="margin:0 0 6px">Tổng kiểm dòng tiền — 2 quỹ</h2>
       <p class="muted" style="margin:0">Quỹ khấu hao: nạp từ khấu hao hàng tháng (theo bảng Tài sản), chi cho sửa chữa – bảo dưỡng. Quỹ lãi ròng: nạp từ lãi ròng hàng tháng, dùng để đầu tư (nhập xe, thiết bị…).</p>
     </div>
-    <div class="grid-2col">
+    <div class="fund-stack">
       <div class="card" style="padding:0">
-        <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <h2 style="margin:0">🛠️ Quỹ khấu hao luỹ kế</h2>
-          <span class="right kpi" style="padding:8px 12px"><span class="lbl">Tổng quỹ</span><b id="fundKhBal" class="val" style="font-size:18px"></b></span>
-        </div>
-        <div style="padding:0 12px 10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="primary" id="addFundKh">+ Giao dịch</button>
-          <button class="ghost" id="napKhauHao">+ Nạp khấu hao tháng</button>
+        <div class="fund-head">
+          <h2 class="fund-title">🛠️ Quỹ khấu hao luỹ kế</h2>
+          <div class="fund-actions">
+            <button class="primary" id="addFundKh">+ Giao dịch</button>
+            <button class="ghost" id="napKhauHao">+ Nạp khấu hao tháng</button>
+          </div>
+          <span class="kpi fund-bal"><span class="lbl">Tổng quỹ</span><b id="fundKhBal" class="val"></b></span>
         </div>
         <div class="tbl-wrap" style="border:none"><table id="fundKhTable"></table></div>
       </div>
       <div class="card" style="padding:0">
-        <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <h2 style="margin:0">💰 Quỹ lãi ròng (vốn đầu tư)</h2>
-          <span class="right kpi" style="padding:8px 12px"><span class="lbl">Tổng quỹ</span><b id="fundLrBal" class="val" style="font-size:18px"></b></span>
-        </div>
-        <div style="padding:0 12px 10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="primary" id="addFundLr">+ Giao dịch</button>
-          <button class="ghost" id="napLaiRong">+ Nạp lãi ròng tháng</button>
+        <div class="fund-head">
+          <h2 class="fund-title">💰 Quỹ lãi ròng (vốn đầu tư)</h2>
+          <div class="fund-actions">
+            <button class="primary" id="addFundLr">+ Giao dịch</button>
+            <button class="ghost" id="napLaiRong">+ Nạp lãi ròng tháng</button>
+          </div>
+          <span class="kpi fund-bal"><span class="lbl">Tổng quỹ</span><b id="fundLrBal" class="val"></b></span>
         </div>
         <div class="tbl-wrap" style="border:none"><table id="fundLrTable"></table></div>
       </div>
@@ -749,8 +785,6 @@
             <option value="30d">30 ngày qua</option>
             <option value="thismonth" selected>Tháng này</option>
             <option value="lastmonth">Tháng trước</option>
-            <option value="thisquarter">Quý này</option>
-            <option value="thisyear">Năm nay</option>
             <option value="custom">Tùy chọn…</option>
           </select>
           <div class="pa-daterange"><input type="date" id="paFrom"><span>→</span><input type="date" id="paTo"></div>
@@ -763,8 +797,37 @@
       <div class="pa-chart-box"><div id="paChart"></div><div class="pa-tip" id="paTip" style="display:none"></div></div>
     </div>
     <div class="card">
-      <div class="row"><h3 style="margin:0">Kết luận tăng trưởng</h3><span class="muted">Tự tổng kết khi kết thúc tuần (CN), tháng, quý, năm. Kỳ chưa kết thúc thì xem kỳ liền trước.</span></div>
+      <div class="row"><h3 style="margin:0">Kết luận tăng trưởng</h3><span class="muted">Tự tổng kết khi kết thúc tuần (CN) và tháng. Bấm vào thẻ để bung bảng đối chiếu chi tiết 2 kỳ.</span></div>
       <div class="pa-concl-grid" id="paConcl" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3 style="margin:0">👥 Phân tích khách hàng</h3>
+        <span class="muted">Mỗi booking = 1 khách thuê · số người tiếp cận ước tính 2 người/booking</span></div>
+      <div class="pa-metric-cards" id="paCustKpis" style="margin-top:12px"></div>
+      <div class="row" style="margin-top:16px">
+        <h3 style="margin:0;font-size:14px">Danh bạ khách hàng <span class="muted" style="font-weight:400">(toàn bộ từ trước tới nay)</span></h3>
+        <div class="right row" style="gap:10px">
+          <label class="muted" style="display:flex;align-items:center;gap:5px;font-size:12.5px;cursor:pointer"><input type="checkbox" id="paCustOnlyPhone"> Chỉ khách có SĐT</label>
+          <input type="search" id="paCustSearch" placeholder="Tìm tên hoặc SĐT…" style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:190px">
+        </div>
+      </div>
+      <div class="muted" id="paCustNote" style="font-size:11.5px;margin-top:6px"></div>
+      <div class="tbl-wrap" style="margin-top:6px"><table id="paCustTable"></table></div>
+    </div>
+    <div class="card">
+      <div class="row"><h3 style="margin:0">🛵 Phân tích vận hành</h3>
+        <span class="muted">Lượt giao/nhận xe trong khoảng ngày đang chọn ở đầu trang</span></div>
+      <div class="pa-metric-cards" id="paOpsKpis" style="margin-top:12px"></div>
+      <div class="grid-2col" style="margin-top:16px">
+        <div>
+          <h3 style="margin:0 0 8px;font-size:14px">Lượt giao / nhận theo ngày</h3>
+          <div class="tbl-wrap"><table id="paOpsDayTable"></table></div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px;font-size:14px">Khung giờ cao điểm</h3>
+          <div id="paOpsHours"></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -849,10 +912,18 @@
       <div class="form-step"><span class="step-no">4</span> Địa chỉ giao &amp; trả</div>
       <div class="addr-row">
         <div class="addr-box"><label>📍 Địa chỉ giao xe</label>
-          <input type="text" id="f_daddr" placeholder="VD: Sân bay Nội Bài / 123 Mã Mây" autocomplete="off" data-lpignore="true" data-form-type="other"></div>
+          <div class="addr-inline">
+            <input type="text" class="addr-main" id="f_daddr" list="placeList" placeholder="VD: Sân bay Nội Bài / 123 Mã Mây" autocomplete="off" data-lpignore="true" data-form-type="other">
+            <span class="km-wrap"><input type="number" id="f_dkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
+          </div></div>
         <div class="addr-box"><label>🏁 Địa chỉ trả xe</label>
-          <input type="text" id="f_raddr" placeholder="VD: Cửa hàng / Khách sạn ..." autocomplete="off" data-lpignore="true" data-form-type="other"></div>
+          <div class="addr-inline">
+            <input type="text" class="addr-main" id="f_raddr" list="placeList" placeholder="VD: Cửa hàng / Khách sạn ..." autocomplete="off" data-lpignore="true" data-form-type="other">
+            <span class="km-wrap"><input type="number" id="f_rkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
+          </div></div>
       </div>
+      <datalist id="placeList"></datalist>
+      <div class="muted" style="font-size:12px;margin-top:6px">💡 Nhập địa chỉ kèm số km một lần, hệ thống sẽ tự nhớ và gợi ý km cho những lần sau.</div>
 
       <!-- 5) GHI CHÚ -->
       <div class="form-step"><span class="step-no">5</span> Ghi chú</div>
@@ -7835,6 +7906,7 @@ function normalizeDB(){
   if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
   if(!DB.assetMoves)DB.assetMoves=[];           // biến động tài sản
   if(!DB.maintenance)DB.maintenance=[];         // bảo dưỡng xe
+  if(!DB.places)DB.places={};                   // {key:{name,km,n}} — thư viện địa điểm giao/trả đã lưu
   if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
   if(!DB.debtCompanies.receivable)DB.debtCompanies.receivable=[];
@@ -8531,8 +8603,8 @@ document.getElementById('chiKpis').addEventListener('click',e=>{
 
 /* ============ PROFIT ============ */
 function isCapital(type){return !!(EXP_TYPES[type]&&EXP_TYPES[type].capital);}
-// Nhóm chi phí: biến phí / định phí (gồm khấu hao) / hỗn hợp / đầu tư (chi vốn)
-function costGroup(type){return type==='bienphi'?'bien':type==='honhop'?'honhop':type==='dautu'?'dautu':'dinh';}
+// Nhóm chi phí: biến phí / định phí / hỗn hợp | khấu hao & đầu tư = 2 quỹ chi, KHÔNG trừ vào lãi tháng
+function costGroup(type){return type==='bienphi'?'bien':type==='honhop'?'honhop':type==='dautu'?'dautu':type==='khauhao'?'khauhao':'dinh';}
 const GROUP_LABEL={bien:'biến phí',dinh:'định phí',honhop:'chi phí hỗn hợp'};
 function revBySource(month){
   const m={};
@@ -8555,9 +8627,9 @@ function renderProfit(){
   const rev=window._revGrand||0;     // tổng doanh thu (booking)
   const thu=window._thuTotal||0;     // thực thu
   const exps=expInMonth();
-  const g={bien:0,dinh:0,honhop:0,dautu:0};
+  const g={bien:0,dinh:0,honhop:0,dautu:0,khauhao:0};
   exps.forEach(e=>g[costGroup(e.type)]+=e.amt);
-  const lai=rev-g.bien-g.dinh-g.honhop;        // lãi ròng (đầu tư không trừ)
+  const lai=rev-g.bien-g.dinh-g.honhop;        // lãi ròng — khấu hao & đầu tư do 2 quỹ chi, không trừ
   const bienLN=(rev>0?lai/rev*100:0);
   /* ---- KPIs ---- */
   document.getElementById('profitKpis').innerHTML=`
@@ -8568,7 +8640,7 @@ function renderProfit(){
     ${kpi('LÃI RÒNG',fmtVND(lai)+'đ',lai>=0?'pos':'neg')}
     ${kpi('Biên lợi nhuận',bienLN.toFixed(1)+'%',lai>=0?'pos':'neg')}`;
   document.getElementById('profitNote').textContent =
-    'Lãi ròng = Doanh thu − Biến phí − Định phí − Chi phí hỗn hợp (khấu hao nằm trong định phí). Đầu tư là chi vốn nên không trừ vào lãi.'+(g.dautu>0?` Đầu tư tháng này: ${fmtVND(g.dautu)}đ.`:'')+` Thực thu: ${fmtVND(thu)}đ.`;
+    'Lãi ròng = Doanh thu − Biến phí − Định phí − Chi phí hỗn hợp. Khấu hao do Quỹ khấu hao chi, Đầu tư do Quỹ lãi ròng chi — cả hai KHÔNG trừ vào lãi tháng.'+(g.khauhao>0?` Khấu hao tháng này: ${fmtVND(g.khauhao)}đ (Quỹ khấu hao chi).`:'')+(g.dautu>0?` Đầu tư tháng này: ${fmtVND(g.dautu)}đ (Quỹ lãi ròng chi).`:'')+` Thực thu: ${fmtVND(thu)}đ.`;
   /* ---- Doanh thu theo nguồn (gom nhóm: Walk in/Zalo · Meta · Công nợ phải trả ▸ công ty · Công nợ phải thu ▸ công ty) ---- */
   const grp=revByGroup(curMonth);
   let sth=`<tr><th class="l">Nguồn khách</th><th>Doanh thu</th><th>% doanh thu</th></tr>`;
@@ -8602,12 +8674,13 @@ function renderProfit(){
   });
   cbody+=`<tr class="total"><td class="l">Tổng doanh thu</td><td>${fmtVND(rev)}đ</td><td></td><td>100%</td></tr>`;
   cbody+=`<tr class="netprofit"><td class="l">LÃI RÒNG</td><td>${fmtVND(lai)}đ</td><td></td><td>${bienLN.toFixed(1)}%</td></tr>`;
-  if(g.dautu>0)cbody+=`<tr><td class="l muted">Đầu tư (không trừ vào lãi)</td><td class="muted">${fmtVND(g.dautu)}đ</td><td></td><td></td></tr>`;
+  if(g.khauhao>0)cbody+=`<tr><td class="l muted">Khấu hao — Quỹ khấu hao chi (không trừ vào lãi)</td><td class="muted">${fmtVND(g.khauhao)}đ</td><td></td><td></td></tr>`;
+  if(g.dautu>0)cbody+=`<tr><td class="l muted">Đầu tư — Quỹ lãi ròng chi (không trừ vào lãi)</td><td class="muted">${fmtVND(g.dautu)}đ</td><td></td><td></td></tr>`;
   document.getElementById('costTable').innerHTML=cth+cbody;
   /* ---- Doanh thu & lãi theo từng tháng ---- */
   const months={};
-  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{const ym=ds.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0}).rev+=priceOn(b,ds);}));
-  DB.expenses.forEach(e=>{const ym=e.date.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0})[costGroup(e.type)]+=e.amt;});
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{const ym=ds.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0,khauhao:0}).rev+=priceOn(b,ds);}));
+  DB.expenses.forEach(e=>{const ym=e.date.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0,khauhao:0})[costGroup(e.type)]+=e.amt;});
   const yms=Object.keys(months).sort();
   let th=`<tr><th class="l">Tháng</th><th>Doanh thu</th><th>Biến phí</th><th>Định phí</th><th>Chi hỗn hợp</th><th>Lãi ròng</th><th>Biên LN</th></tr>`;
   let body=yms.map(ym=>{const r=months[ym];const l=r.rev-r.bien-r.dinh-r.honhop;const bm=r.rev>0?l/r.rev*100:0;
@@ -8617,7 +8690,7 @@ function renderProfit(){
 function monthNet(month){
   let rev=0;DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)===month)rev+=priceOn(b,ds);}));
   const g={bien:0,dinh:0,honhop:0};
-  DB.expenses.filter(e=>e.date.slice(0,7)===month).forEach(e=>{const grp=costGroup(e.type);if(grp!=='dautu')g[grp]+=e.amt;});
+  DB.expenses.filter(e=>e.date.slice(0,7)===month).forEach(e=>{const grp=costGroup(e.type);if(grp==='bien'||grp==='dinh'||grp==='honhop')g[grp]+=e.amt;});
   return rev-g.bien-g.dinh-g.honhop;
 }
 
@@ -8999,6 +9072,7 @@ document.getElementById('srcAddBtn').onclick=()=>{
 document.getElementById('srcMgrClose').onclick=()=>document.getElementById('srcMgrOverlay').classList.remove('open');
 {const rb=document.getElementById('revSrcMgr'); if(rb)rb.onclick=openSrcMgr;}
 /* ===== Đối soát công nợ ===== */
+let drShowGross = (localStorage.getItem('gb_drShowGross')||'1')==='1';   // hiện/ẩn cột tiền nhà xe thu về
 function fillDrCompany(){
   const grp=document.getElementById('drGroup').value, sel=document.getElementById('drCompany'), cur=sel.value;
   const cos=DB.debtCompanies[grp]||[];
@@ -9020,9 +9094,10 @@ function renderDebtRecon(){
   if(!document.getElementById('drTable'))return;
   debtReconInit(); fillDrCompany();
   const {grp,co,rows}=debtReconData(), payable=grp==='payable';
+  const showG = payable && drShowGross;   // chỉ hiện cột thu về khi bật
   document.getElementById('drTitle').textContent=`Đối soát công nợ ${payable?'phải trả':'phải thu'} — ${co==='__all__'?'Tất cả công ty':co}`;
   let th=`<tr><th class="l">Ngày đặt</th><th class="l">Loại xe</th><th class="l">Tên khách</th><th class="l">Giao</th><th class="l">Trả</th><th class="l">Địa điểm giao/trả</th><th>Số ngày</th>`
-    +(payable?`<th>Giá nhà xe thu</th>`:'')
+    +(showG?`<th>Giá nhà xe thu</th>`:'')
     +`<th>${payable?'Phải trả (hoa hồng)':'Phải thu'}</th></tr>`;
   let tDays=0,tDebt=0,tGross=0;
   let body=rows.map(b=>{
@@ -9034,16 +9109,19 @@ function renderDebtRecon(){
     const giao=fmtDMY(b.arrive)+(planDtime(b)?(' '+planDtime(b)):'');
     const tra=fmtDMY(b.depart)+(planRtime(b)?(' '+planRtime(b)):'');
     return `<tr><td class="l">${fmtDMY(b.created||b.arrive)}</td><td class="l">${vehTyp(b.xe)}</td><td class="l">${guest}</td><td class="l">${giao}</td><td class="l">${tra}</td><td class="l">${loc}</td><td>${nd}</td>`
-      +(payable?`<td>${fmtVND(gross)}đ</td>`:'')
+      +(showG?`<td>${fmtVND(gross)}đ</td>`:'')
       +`<td>${fmtVND(debtAmt)}đ</td></tr>`;
   }).join('');
-  const cols=payable?9:8;
-  body+=`<tr class="total"><td class="l">Tổng (${rows.length})</td><td></td><td></td><td></td><td></td><td></td><td>${tDays}</td>`+(payable?`<td>${fmtVND(tGross)}đ</td>`:'')+`<td>${fmtVND(tDebt)}đ</td></tr>`;
+  const cols=showG?9:8;
+  body+=`<tr class="total"><td class="l">Tổng (${rows.length})</td><td></td><td></td><td></td><td></td><td></td><td>${tDays}</td>`+(showG?`<td>${fmtVND(tGross)}đ</td>`:'')+`<td>${fmtVND(tDebt)}đ</td></tr>`;
   document.getElementById('drTable').innerHTML=th+(rows.length?body:`<tr><td colspan="${cols}" class="muted l" style="padding:12px">Không có booking công nợ ${payable?'phải trả':'phải thu'} trong khoảng này.</td></tr>`);
-  document.getElementById('drSummary').innerHTML=`${fmtDMY(document.getElementById('drFrom').value)} → ${fmtDMY(document.getElementById('drTo').value)} · ${rows.length} booking · Tổng ${payable?'hoa hồng phải trả':'phải thu'}: <b>${fmtVND(tDebt)}đ</b>${payable?` · Tổng nhà xe thu (gồm hoa hồng): <b>${fmtVND(tGross)}đ</b>`:''}`;
+  document.getElementById('drSummary').innerHTML=`${fmtDMY(document.getElementById('drFrom').value)} → ${fmtDMY(document.getElementById('drTo').value)} · ${rows.length} booking · Tổng ${payable?'hoa hồng phải trả':'phải thu'}: <b>${fmtVND(tDebt)}đ</b>${showG?` · Tổng nhà xe thu (gồm hoa hồng): <b>${fmtVND(tGross)}đ</b>`:''}`;
+  const tg=document.getElementById('drToggleGross');
+  if(tg){ tg.style.display = payable?'':'none'; tg.textContent = drShowGross?'🙈 Ẩn tiền thu về':'👁 Hiện tiền thu về'; }
 }
 ['drGroup','drCompany','drFrom','drTo'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',renderDebtRecon);});
 {const ex=document.getElementById('drExport'); if(ex)ex.onclick=exportDebtPdf;}
+{const tg=document.getElementById('drToggleGross'); if(tg)tg.onclick=()=>{ drShowGross=!drShowGross; try{localStorage.setItem('gb_drShowGross',drShowGross?'1':'0');}catch(e){} renderDebtRecon(); };}
 function loadScriptOnce(src){return new Promise((res,rej)=>{if([...document.scripts].some(s=>s.src===src))return res();const s=document.createElement('script');s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('load_fail'));document.head.appendChild(s);});}
 async function ensurePdfLibs(){
   if(typeof html2canvas==='undefined')await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
@@ -9102,6 +9180,33 @@ function activateMtab(id){
   document.querySelectorAll('.mtab').forEach(x=>x.classList.toggle('active',x.dataset.t===id));
   ['bkSec1','bkSec2'].forEach(s=>document.getElementById(s).classList.toggle('open',s===id));
 }
+/* ===== Thư viện địa điểm giao/trả (tự nhớ tên + số km) ===== */
+function placeKey(n){return (n||'').trim().toLowerCase().replace(/\s+/g,' ');}
+function placeKmOf(n){const p=(DB.places||{})[placeKey(n)];return (p&&p.km)?p.km:null;}
+function rememberPlace(name,km){
+  name=(name||'').trim(); if(!name)return;
+  if(!DB.places)DB.places={};
+  const k=placeKey(name), cur=DB.places[k]||{name,km:0,n:0};
+  cur.name=name; cur.n=(cur.n||0)+1;
+  const v=parseFloat(km); if(!isNaN(v)&&v>0)cur.km=v;
+  DB.places[k]=cur;
+}
+function refreshPlaceList(){
+  const dl=document.getElementById('placeList'); if(!dl)return;
+  const esc=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  dl.innerHTML=Object.values(DB.places||{}).sort((a,b)=>(b.n||0)-(a.n||0))
+    .map(p=>`<option value="${esc(p.name)}">${p.km?p.km+' km':''}</option>`).join('');
+}
+function wirePlaceInputs(){
+  [['daddr','dkm'],['raddr','rkm']].forEach(([ai,ki])=>{
+    const a=document.getElementById('f_'+ai), k=document.getElementById('f_'+ki);
+    if(!a||!k||a._plWired)return; a._plWired=true;
+    const fill=force=>{ const km=placeKmOf(a.value); if(km!=null&&(force||!k.value))k.value=km; };
+    a.addEventListener('change',()=>fill(true));
+    a.addEventListener('input',()=>fill(false));
+    a.addEventListener('blur',()=>fill(false));
+  });
+}
 function openBooking(id,prefill,schedKind){
   editingBk=id; bkSchKind=schedKind||null;
   const del=document.getElementById('bkDelete');
@@ -9112,7 +9217,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Chi tiết booking — '+b.xe;
     const grp = b.debt || debtGroupOf(b.src);     // booking cũ chưa có cờ debt → suy ra từ tên công ty
     const srcDisplay = grp==='receivable'?DEBT_RECV:(grp==='payable'?DEBT_PAY:b.src);
-    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
+    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
@@ -9123,13 +9228,14 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Thêm booking';
     // mặc định: nếu bấm từ ô sơ đồ xe (prefill.ds) → đúng ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
     const ds = (prefill&&prefill.ds) ? prefill.ds : todayStr();
-    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('status','sapnhan');f('guest','');f('phone','');f('bknote','');
+    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     onSrcChange();
     renderDayPrices(null);
     del.style.display='none';
   }
+  refreshPlaceList(); wirePlaceInputs();   // gợi ý địa điểm đã lưu + tự điền km
   renderXeOptions(selXe);   // dựng dropdown chỉ gồm xe còn trống theo khoảng ngày
   renderStatusBadge();      // badge trạng thái (không sửa tay; tự đổi khi giao/trả)
   renderBkPayments();recalcPay();
@@ -9317,7 +9423,8 @@ document.getElementById('bkSave').onclick=()=>{
   }
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
+  rememberPlace(f('daddr'),f('dkm')); rememberPlace(f('raddr'),f('rkm'));   // tự nhớ địa điểm + km cho lần sau
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
   if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
     // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
@@ -9704,8 +9811,6 @@ function paResolvePreset(p){
   if(p==='thisweek'){const dw=(d.getUTCDay()+6)%7;const f=paShift(T,-dw);return [f,paShift(f,6)];}
   if(p==='thismonth')return [ym+'-01',`${ym}-${String(paDim(y,mo)).padStart(2,'0')}`];
   if(p==='lastmonth'){const pym=prevMonthYM(ym),py=+pym.slice(0,4),pm=+pym.slice(5,7)-1;return [pym+'-01',`${pym}-${String(paDim(py,pm)).padStart(2,'0')}`];}
-  if(p==='thisquarter'){const q=Math.floor(mo/3),qs=q*3,qe=qs+2;return [`${y}-${String(qs+1).padStart(2,'0')}-01`,`${y}-${String(qe+1).padStart(2,'0')}-${String(paDim(y,qe)).padStart(2,'0')}`];}
-  if(p==='thisyear')return [`${y}-01-01`,`${y}-12-31`];
   return null;
 }
 function paRangeBuckets(from,to){
@@ -9741,7 +9846,7 @@ function renderPhanTich(){
   }
   const days=paDDiff(paState.from,paState.to)+1;
   document.getElementById('paRangeLbl').innerHTML=`${fmtDMY(paState.from)} → ${fmtDMY(paState.to)} · ${days} ngày`;
-  paRenderCards(); paRenderChart(); paRenderConcl();
+  paRenderCards(); paRenderChart(); paRenderConcl(); paRenderCust(); paRenderOps();
 }
 function paRenderCards(){
   const cur=periodStats(paState.from,paState.to);
@@ -9845,7 +9950,8 @@ function paConclCard(kind){
   const dRev=c.rev-pr.rev, pct=pr.rev?Math.abs(dRev/pr.rev*100).toFixed(1)+'%':'—';
   const word=dRev>0?`tăng ${pct}`:(dRev<0?`giảm ${pct}`:'đi ngang');
   const sum=`Doanh thu <b>${word}</b> so với ${p.prevName} (${fmtVND(c.rev)}đ vs ${fmtVND(pr.rev)}đ). Lãi ròng ${c.profit>=0?'dương':'âm'} ${fmtVND(Math.abs(c.profit))}đ.`;
-  return `<div class="pa-cc">
+  const open=!!paConclOpen[kind];
+  return `<div class="pa-cc expandable" data-cck="${kind}">
     <div class="pa-cc-h"><b>${p.name}: ${p.label}</b>${badge}</div>
     ${line('Doanh thu',paMeta('rev'))}
     ${line('Chi phí',paMeta('cost'),true)}
@@ -9853,9 +9959,11 @@ function paConclCard(kind){
     ${line('Số khách',paMeta('customers'))}
     ${line('Công suất',paMeta('cap'))}
     <div class="pa-cc-sum">${sum}</div>
+    <div class="pa-cc-toggle">${open?'▾ Thu gọn đối chiếu':'▸ Xem chi tiết doanh thu & chi phí 2 kỳ'}</div>
   </div>`;
 }
 let paWkOffset=0;   // 0 = tuần đã kết thúc gần nhất, âm = lùi về quá khứ
+let paConclOpen={};  // {week:true, month:true, wk:true} — thẻ nào đang bung bảng đối chiếu
 function paWeekAt(off){
   const base=paLatestCompleted('week'), mon=paShift(base.range[0],off*7), sun=paShift(mon,6);
   return {range:[mon,sun], prev:[paShift(mon,-7),paShift(mon,-1)], label:`${fmtDM(mon)}–${fmtDM(sun)}`};
@@ -9864,7 +9972,8 @@ function paWeekBrowser(){
   const w=paWeekAt(paWkOffset);
   const c=periodStats(w.range[0],w.range[1]), pr=periodStats(w.prev[0],w.prev[1]);
   const line=(lbl,m,inv)=>`<div class="pa-cc-line"><span class="l">${lbl}</span><span class="v">${paFmt(m,c[m.k])}</span>${paGrowth(c[m.k],pr[m.k],inv)}</div>`;
-  return `<div class="pa-cc wkbrowser" style="grid-column:1/-1">
+  const open=!!paConclOpen.wk;
+  return `<div class="pa-cc wkbrowser expandable" data-cck="wk" style="grid-column:1/-1">
     <div class="pa-cc-h"><b>📅 Xem tuần trong quá khứ</b>
       <span class="pa-wk-nav"><button id="paWkPrev" title="Tuần cũ hơn">‹</button><b id="paWkLbl">Tuần ${w.label}${paWkOffset===0?' · mới nhất':''}</b><button id="paWkNext" title="Tuần mới hơn" ${paWkOffset>=0?'disabled':''}>›</button></span>
     </div>
@@ -9875,14 +9984,199 @@ function paWeekBrowser(){
     ${line('Số ngày thuê',paMeta('days'))}
     ${line('Công suất',paMeta('cap'))}
     <div class="pa-cc-sum">So với tuần liền trước (${fmtDM(w.prev[0])}–${fmtDM(w.prev[1])}).</div>
+    <div class="pa-cc-toggle">${open?'▾ Thu gọn đối chiếu':'▸ Xem chi tiết doanh thu & chi phí 2 kỳ'}</div>
   </div>`;
+}
+
+/* ===== Bảng đối chiếu chi tiết 2 kỳ (doanh thu theo nguồn + chi phí theo hạng mục) ===== */
+function paRevBySrc(from,to){
+  const m={};
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ const k=b.src||'Khác'; m[k]=(m[k]||0)+netOn(b,ds); } }));
+  return m;
+}
+function paCostByCat(from,to){
+  const m={bien:{},dinh:{},honhop:{}};
+  DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to){ const g=costGroup(e.type); if(m[g]){ const k=e.cat||'Khác'; m[g][k]=(m[g][k]||0)+e.amt; } } });
+  return m;
+}
+function paDeltaCell(cur,prev,invert){
+  const d=Math.round(cur-prev);
+  if(d===0)return '<span class="flat">—</span>';
+  const good=invert?d<0:d>0;
+  const pct=prev?(Math.abs(d/prev*100).toFixed(0)+'%'):'mới';
+  return `<span class="${good?'up':'down'}">${d>0?'+':'−'}${fmtVND(Math.abs(d))}đ · ${pct}</span>`;
+}
+function paDetailHTML(cur,prev,curLbl,prevLbl){
+  const money=v=>fmtVND(Math.round(v||0))+'đ';
+  const rowsOf=(a,b)=>{const ks=[...new Set([...Object.keys(a),...Object.keys(b)])];
+    return ks.map(k=>[k,a[k]||0,b[k]||0]).sort((x,y)=>y[1]-x[1]||y[2]-x[2]);};
+  const r=(lbl,c,p,cls,inv,indent)=>`<tr class="${cls||''}"><td class="l"${indent?' style="padding-left:22px"':''}>${lbl}</td><td>${money(c)}</td><td>${money(p)}</td><td>${paDeltaCell(c,p,inv)}</td></tr>`;
+  const rc=paRevBySrc(cur[0],cur[1]), rp=paRevBySrc(prev[0],prev[1]);
+  const cc=paCostByCat(cur[0],cur[1]), cp=paCostByCat(prev[0],prev[1]);
+  let h=`<div class="pa-det"><h4>Đối chiếu chi tiết: <b>${curLbl}</b> vs <b>${prevLbl}</b></h4>
+    <table><tr><th class="l">Hạng mục</th><th>${curLbl}</th><th>${prevLbl}</th><th>Chênh lệch</th></tr>`;
+  h+=`<tr class="grp"><td class="l" colspan="4">DOANH THU theo nguồn khách</td></tr>`;
+  const rr=rowsOf(rc,rp);
+  if(!rr.length)h+=`<tr><td class="l" colspan="4" style="color:#94a3b8">Không có doanh thu ở cả 2 kỳ.</td></tr>`;
+  let tRc=0,tRp=0; rr.forEach(([k,a,b])=>{tRc+=a;tRp+=b;h+=r(k,a,b,'',false,true);});
+  h+=r('Tổng doanh thu',tRc,tRp,'tot');
+  h+=`<tr class="grp"><td class="l" colspan="4">CHI PHÍ theo hạng mục</td></tr>`;
+  let tCc=0,tCp=0;
+  ['bien','dinh','honhop'].forEach(g=>{
+    const rows=rowsOf(cc[g],cp[g]); if(!rows.length)return;
+    let sa=0,sb=0; rows.forEach(([k,a,b])=>{sa+=a;sb+=b;});
+    tCc+=sa; tCp+=sb;
+    h+=`<tr class="grp"><td class="l" style="padding-left:14px;font-size:12px">${GROUP_LABEL[g].toUpperCase()}</td><td>${money(sa)}</td><td>${money(sb)}</td><td>${paDeltaCell(sa,sb,true)}</td></tr>`;
+    rows.forEach(([k,a,b])=>h+=r(k,a,b,'',true,true));
+  });
+  if(tCc===0&&tCp===0)h+=`<tr><td class="l" colspan="4" style="color:#94a3b8">Không có chi phí ở cả 2 kỳ.</td></tr>`;
+  h+=r('Tổng chi phí',tCc,tCp,'tot',true);
+  h+=r('LÃI RÒNG',tRc-tCc,tRp-tCp,'net');
+  h+=`</table><div class="muted" style="font-size:11.5px;margin-top:7px">Khấu hao và Đầu tư không nằm trong chi phí vì do 2 quỹ riêng chi ra.</div></div>`;
+  return h;
 }
 function paRenderConcl(){
   const el=document.getElementById('paConcl'); if(!el)return;
-  el.innerHTML=paWeekBrowser()+['week','month','quarter','year'].map(paConclCard).join('');
+  const w=paWeekAt(paWkOffset);
+  let html=paWeekBrowser();
+  if(paConclOpen.wk)html+=paDetailHTML(w.range,w.prev,`Tuần ${w.label}`,`Tuần ${fmtDM(w.prev[0])}–${fmtDM(w.prev[1])}`);
+  ['week','month'].forEach(k=>{
+    const p=paLatestCompleted(k);
+    html+=paConclCard(k);
+    if(paConclOpen[k])html+=paDetailHTML(p.range,p.prev,p.label,p.name+' trước');
+  });
+  el.innerHTML=html;
   const pv=document.getElementById('paWkPrev'), nx=document.getElementById('paWkNext');
-  if(pv)pv.onclick=()=>{paWkOffset--;paRenderConcl();};
-  if(nx)nx.onclick=()=>{if(paWkOffset<0){paWkOffset++;paRenderConcl();}};
+  if(pv)pv.onclick=e=>{e.stopPropagation();paWkOffset--;paRenderConcl();};
+  if(nx)nx.onclick=e=>{e.stopPropagation();if(paWkOffset<0){paWkOffset++;paRenderConcl();}};
+  el.querySelectorAll('[data-cck]').forEach(card=>card.onclick=e=>{
+    if(e.target.closest('button'))return;
+    const k=card.dataset.cck; paConclOpen[k]=!paConclOpen[k]; paRenderConcl();
+  });
+}
+
+/* ============ PHÂN TÍCH KHÁCH HÀNG ============ */
+function paCustStats(from,to){
+  let bks=0, days=0, rev=0;
+  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){n++; rev+=netOn(b,ds);} }); if(n>0){bks++; days+=n;} });
+  return {bookings:bks, days, avgDays:bks?days/bks:0, reach:bks*2, rev, avgRev:bks?rev/bks:0};
+}
+function paCustDirectory(){
+  const map={};
+  DB.bookings.forEach(b=>{
+    const sg=splitGuest(b.guest||'');
+    const nm=(sg.name||'').trim(), ph=(sg.phone||'').trim();
+    if(!nm&&!ph)return;
+    const key=ph||('n:'+nm.toLowerCase());
+    const r=map[key]||(map[key]={name:nm||'—', phone:ph, count:0, days:0, spend:0, last:'', srcs:new Set()});
+    if(nm&&(r.name==='—'||!r.name))r.name=nm;
+    if(ph&&!r.phone)r.phone=ph;
+    r.count++; r.days+=nightsOf(b).length; r.spend+=totalOf(b);
+    if((b.arrive||'')>r.last)r.last=b.arrive||'';
+    if(b.src)r.srcs.add(b.src);
+  });
+  return Object.values(map).sort((a,b)=>(b.phone?1:0)-(a.phone?1:0)||b.count-a.count||b.spend-a.spend);
+}
+let paCustQ='', paCustOnlyPhone=false;
+function paRenderCust(){
+  const box=document.getElementById('paCustKpis'); if(!box)return;
+  const st=paCustStats(paState.from,paState.to);
+  const card=(l,v,sub)=>`<div class="kpi"><div class="lbl">${l}</div><div class="val" style="font-size:19px">${v}</div>${sub?`<div class="lbl" style="margin-top:2px">${sub}</div>`:''}</div>`;
+  box.innerHTML=
+     card('Khách thuê (booking)', fmtVND(st.bookings), 'mỗi booking = 1 khách')
+    +card('TB ngày thuê / khách', (Math.round(st.avgDays*10)/10).toString().replace('.',',')+' ngày', `${fmtVND(st.days)} ngày thuê`)
+    +card('Khách tiếp cận', fmtVND(st.reach), '2 người / booking')
+    +card('TB doanh thu / khách', fmtVND(Math.round(st.avgRev))+'đ', '')
+    +card('Tổng khách trong danh bạ', fmtVND(paCustDirectory().length), 'toàn thời gian');
+  const sc=document.getElementById('paCustSearch');
+  if(sc&&!sc._wired){ sc._wired=true; sc.oninput=()=>{paCustQ=sc.value.trim().toLowerCase(); paRenderCustTable();}; }
+  const op=document.getElementById('paCustOnlyPhone');
+  if(op&&!op._wired){ op._wired=true; op.onchange=()=>{paCustOnlyPhone=op.checked; paRenderCustTable();}; }
+  paRenderCustTable();
+}
+function paRenderCustTable(){
+  const t=document.getElementById('paCustTable'); if(!t)return;
+  let list=paCustDirectory();
+  if(paCustOnlyPhone)list=list.filter(c=>!!c.phone);
+  if(paCustQ)list=list.filter(c=>(c.name||'').toLowerCase().includes(paCustQ)||(c.phone||'').includes(paCustQ));
+  const th=`<tr><th class="l">#</th><th class="l">Tên khách</th><th class="l">Số điện thoại</th><th>Số lần thuê</th><th>Tổng ngày</th><th>Tổng chi tiêu</th><th class="l">Nguồn</th><th class="l">Lần gần nhất</th></tr>`;
+  const body=list.map((c,i)=>`<tr>
+    <td class="l">${i+1}</td>
+    <td class="l">${c.name||'—'}</td>
+    <td class="l">${c.phone?`<a href="tel:${c.phone}">${c.phone}</a>`:'<span class="muted">—</span>'}</td>
+    <td>${c.count}</td><td>${c.days}</td><td>${fmtVND(c.spend)}đ</td>
+    <td class="l">${[...c.srcs].join(', ')||'—'}</td>
+    <td class="l">${c.last?fmtDMY(c.last):'—'}</td></tr>`).join('');
+  t.innerHTML=th+(list.length?body:`<tr><td colspan="8" class="muted l" style="padding:14px">${paCustQ?'Không tìm thấy khách phù hợp.':'Chưa có khách hàng nào.'}</td></tr>`);
+  const nt=document.getElementById('paCustNote');
+  if(nt){ const noPh=paCustDirectory().filter(c=>!c.phone).length;
+    nt.innerHTML=`Gộp trùng theo <b>số điện thoại</b>; khách chưa có SĐT được gộp tạm theo tên nên có thể chưa chính xác${noPh?` (${noPh} khách chưa có SĐT)`:''}.`; }
+}
+
+/* ============ PHÂN TÍCH VẬN HÀNH ============ */
+function opDtime(b){return b.dtime||b.dplan||'';}
+function opRtime(b){return b.rtime||b.rplan||'';}
+function paOpsStats(from,to){
+  const byDay={}, hrD=new Array(24).fill(0), hrR=new Array(24).fill(0);
+  let nD=0,nR=0,kmD=0,kmR=0;
+  const touch=d=>byDay[d]||(byDay[d]={d,giao:0,nhan:0,km:0});
+  DB.bookings.forEach(b=>{
+    if(b.arrive&&b.arrive>=from&&b.arrive<=to){
+      const row=touch(b.arrive); row.giao++; nD++;
+      const k=+b.dkm||0; row.km+=k; kmD+=k;
+      const h=parseInt((opDtime(b)||'').slice(0,2),10); if(h>=0&&h<24)hrD[h]++;
+    }
+    if(b.depart&&b.depart>=from&&b.depart<=to){
+      const row=touch(b.depart); row.nhan++; nR++;
+      const k=+b.rkm||0; row.km+=k; kmR+=k;
+      const h=parseInt((opRtime(b)||'').slice(0,2),10); if(h>=0&&h<24)hrR[h]++;
+    }
+  });
+  const numDays=paDDiff(from,to)+1;
+  const rows=Object.values(byDay).sort((a,b)=>a.d<b.d?-1:1);
+  return {rows,hrD,hrR,giao:nD,nhan:nR,trips:nD+nR,km:kmD+kmR,kmD,kmR,numDays,
+    avgTrips:numDays?(nD+nR)/numDays:0, avgKm:numDays?(kmD+kmR)/numDays:0,
+    busiest:rows.slice().sort((a,b)=>(b.giao+b.nhan)-(a.giao+a.nhan))[0]||null};
+}
+function paRenderOps(){
+  const box=document.getElementById('paOpsKpis'); if(!box)return;
+  const o=paOpsStats(paState.from,paState.to);
+  const n1=v=>(Math.round(v*10)/10).toString().replace('.',',');
+  const card=(l,v,sub)=>`<div class="kpi"><div class="lbl">${l}</div><div class="val" style="font-size:19px">${v}</div>${sub?`<div class="lbl" style="margin-top:2px">${sub}</div>`:''}</div>`;
+  box.innerHTML=
+     card('Tổng lượt giao/nhận', fmtVND(o.trips), `${o.giao} giao · ${o.nhan} nhận`)
+    +card('TB lượt / ngày', n1(o.avgTrips), `trong ${o.numDays} ngày`)
+    +card('Tổng km đã chạy', n1(o.km)+' km', `${n1(o.kmD)} giao · ${n1(o.kmR)} nhận`)
+    +card('TB km / ngày', n1(o.avgKm)+' km', 'chỉ tính km đã nhập')
+    +card('Ngày bận nhất', o.busiest?`${fmtDM(o.busiest.d)}`:'—', o.busiest?`${o.busiest.giao+o.busiest.nhan} lượt`:'');
+  /* bảng theo ngày */
+  const t=document.getElementById('paOpsDayTable');
+  if(t){
+    const th=`<tr><th class="l">Ngày</th><th>Giao</th><th>Nhận</th><th>Tổng lượt</th><th>Km</th></tr>`;
+    const body=o.rows.map(r=>`<tr><td class="l">${fmtDMY(r.d)}</td><td>${r.giao||''}</td><td>${r.nhan||''}</td><td><b>${r.giao+r.nhan}</b></td><td>${r.km?n1(r.km)+' km':''}</td></tr>`).join('')
+      +`<tr class="total"><td class="l">Tổng (${o.rows.length} ngày có việc)</td><td>${o.giao}</td><td>${o.nhan}</td><td>${o.trips}</td><td>${n1(o.km)} km</td></tr>`;
+    t.innerHTML=th+(o.rows.length?body:`<tr><td colspan="5" class="muted l" style="padding:14px">Không có lượt giao/nhận nào trong khoảng này.</td></tr>`);
+  }
+  /* khung giờ cao điểm */
+  const hb=document.getElementById('paOpsHours');
+  if(hb){
+    const tot=o.hrD.map((v,i)=>v+o.hrR[i]);
+    const max=Math.max(1,...tot);
+    const hours=tot.map((v,i)=>i).filter(i=>tot[i]>0);
+    const peaks=tot.map((v,i)=>({i,v})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,3);
+    const bars=hours.map(i=>{
+      const wD=Math.round(o.hrD[i]/max*100), wR=Math.round(o.hrR[i]/max*100);
+      return `<div class="pa-hourbar"><span class="hl">${String(i).padStart(2,'0')}:00</span>
+        <span style="flex:1;display:flex;gap:2px;align-items:center">
+          <span class="hb" style="width:${wD}%" title="Giao: ${o.hrD[i]}"></span>
+          <span class="hb ret" style="width:${wR}%" title="Nhận: ${o.hrR[i]}"></span>
+        </span><span class="hv">${tot[i]}</span></div>`;
+    }).join('');
+    hb.innerHTML=(peaks.length?`<div style="margin-bottom:8px">Giờ cao điểm: ${peaks.map(x=>`<span class="pa-peak">${String(x.i).padStart(2,'0')}:00 — ${x.v} lượt</span>`).join('')}</div>`:'')
+      +(bars||'<div class="muted" style="font-size:12.5px">Chưa có dữ liệu giờ giao/nhận.</div>')
+      +`<div class="muted" style="font-size:11.5px;margin-top:8px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#1a73e8;margin-right:4px"></span>Giao xe
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e8710a;margin:0 4px 0 12px"></span>Nhận xe</div>`;
+  }
 }
 function openRoundMoves(ym,r){
   const w=roundWindow(ym,r);
