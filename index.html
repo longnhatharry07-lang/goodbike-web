@@ -1467,11 +1467,14 @@ function stampRev(x){
   x._dev=SB_DEV;
   return x;
 }
-/* moi có thắng cu không? Bằng _rev thì so _dev cho ổn định, hai máy không đá qua đá lại. */
+/* Bản nào thắng? CHỈ so mốc thời gian. Nếu bằng nhau thì LẤY BẢN TRÊN CLOUD —
+   cloud là bản chung, lấy nó thì mọi máy hội tụ về một chỗ và dừng lại.
+   (Bản trước so thêm mã máy rồi đẩy trả bản của mình lên, thành ra hai bên
+   giằng co vô hạn: đẩy lên → kéo về → lại đẩy lên, số mục chờ tăng mãi.) */
 function moiHon(moi,cu){
   const a=revOf(moi), b=revOf(cu);
   if(a!==b) return a>b;
-  return devOf(moi) > devOf(cu);
+  return true;
 }
 const XOA_TOI_DA=5;        // một lần lưu mà sinh quá số này lệnh xoá thì phải hỏi lại
 function sbGuardDeletes(rows){
@@ -1500,6 +1503,58 @@ function gio(){ return new Date().toLocaleTimeString('vi-VN'); }
 /* Giữ tên hàm cũ cho các chỗ đang gọi — nay chỉ vẽ lại nút trạng thái. */
 function sbBanner(){ sbStatus(sbMoTa||'', sbReady?'ok':'wait'); }
 let sbMoTa='Đang kết nối đồng bộ…';
+/* ---- Bảng "Các mục chưa gửi lên cloud" ---- */
+function moChoGui(){
+  const cu=document.getElementById('choGuiOv'); if(cu)cu.remove();
+  const ds=Object.values(sbPending);
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const ten=r=>{ const d=r.data||{};
+    if(r.kind==='bookings') return (d.guest||'(chưa có tên)')+' · xe '+(d.xe||'?')+' · '+(d.arrive||'');
+    if(r.kind==='expenses') return (d.cat||'khoản chi')+' · '+fmtVND(d.amt||0)+'đ · '+(d.date||'');
+    if(r.kind==='cfg') return 'Cài đặt: '+String(r.id).slice(4);
+    return (d.name||d.cat||d.note||r.id); };
+  const nhom={}; ds.forEach(r=>{ nhom[r.kind]=(nhom[r.kind]||0)+1; });
+  const ov=document.createElement('div');
+  ov.id='choGuiOv';
+  ov.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML='<div style="background:#fff;border-radius:14px;max-width:640px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35)">'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0">'
+      +'<div style="font-weight:800;font-size:16px">'+(ds.length?('⚠️ '+ds.length+' mục chưa gửi lên cloud'):'✅ Không còn mục nào đang chờ')+'</div>'
+      +'<div style="color:#64748b;font-size:12.5px;margin-top:4px">Dữ liệu vẫn nằm an toàn trong máy này. Chúng sẽ tự gửi khi kết nối trở lại.</div>'
+      +'<div style="color:#475569;font-size:12.5px;margin-top:6px">Trạng thái: <b>'+esc(sbMoTa)+'</b></div>'
+      +(Object.keys(nhom).length?('<div style="color:#475569;font-size:12.5px;margin-top:4px">'+Object.entries(nhom).map(function(e){return e[0]+': '+e[1];}).join(' · ')+'</div>'):'')
+    +'</div>'
+    +'<div style="overflow:auto;padding:8px 10px;flex:1">'
+      +(ds.length? ds.slice(0,300).map(function(r){
+          return '<div style="display:flex;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid #f1f5f9;font-size:13px">'
+            +'<span style="flex:0 0 auto;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;'
+              +(r.deleted?'background:#fee2e2;color:#b91c1c">XOÁ':'background:#dcfce7;color:#15803d">SỬA')+'</span>'
+            +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(ten(r))+'</span>'
+            +'<span style="color:#94a3b8;font-size:11px">'+esc(r.kind)+'</span></div>';
+        }).join('') : '<div style="padding:18px;color:#64748b">Mọi thay đổi đã được gửi lên cloud.</div>')
+      +(ds.length>300?'<div style="padding:8px;color:#64748b;font-size:12px">… và '+(ds.length-300)+' mục nữa</div>':'')
+    +'</div>'
+    +'<div style="padding:12px 16px;border-top:1px solid #e2e8f0;display:flex;gap:8px;flex-wrap:wrap">'
+      +'<button id="cgThuLai" class="primary">↻ Thử gửi lại ngay</button>'
+      +'<button id="cgTai" class="ghost">⬇ Tải file sao lưu về máy</button>'
+      +'<button id="cgBo" class="ghost" style="color:#b91c1c">🗑 Bỏ hàng chờ</button>'
+      +'<span style="flex:1"></span><button id="cgDong" class="ghost">Đóng</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);
+  const dong=function(){ov.remove();};
+  ov.addEventListener('click',function(e){ if(e.target===ov) dong(); });
+  ov.querySelector('#cgDong').onclick=dong;
+  ov.querySelector('#cgThuLai').onclick=function(){ sbFail=0; if(sb) sbSend(); else sbInit(); dong(); };
+  ov.querySelector('#cgTai').onclick=function(){
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,1)],{type:'application/json'}));
+    a.download='goodbike_saoluu_'+todayStr()+'.json'; a.click();
+  };
+  ov.querySelector('#cgBo').onclick=function(){
+    if(!confirm('Bỏ toàn bộ '+ds.length+' mục đang chờ gửi?\n\nDữ liệu trong máy KHÔNG bị xoá — chỉ ngừng cố gửi chúng lên cloud.\nDùng khi hàng chờ bị kẹt hoặc phình bất thường.')) return;
+    sbPending={}; sbSavePending(); sbStatus('Đã bỏ hàng chờ','ok'); dong();
+  };
+}
 /* Nút trạng thái ở cạnh tên app:
      XANH LÁ = dữ liệu đã an toàn (kéo về xong, không còn gì đang chờ gửi)
      ĐỎ      = chưa an toàn (chưa tải xong / mất kết nối / còn mục chưa gửi lên)
@@ -1514,12 +1569,7 @@ function sbStatus(txt,cls){
                  : (!sbReady ? '⛔ Chưa có dữ liệu'
                  : (cho ? '⚠️ Còn '+cho+' mục chưa gửi' : '⚠️ Mất kết nối'));
   el.title = sbMoTa;
-  el.onclick=()=>alert(
-    (xanh ? '✅ DỮ LIỆU ĐÃ AN TOÀN\n\n'
-          : '⛔ DỮ LIỆU CHƯA AN TOÀN\n\n'
-            + (!sbReady ? 'Máy này chưa tải xong dữ liệu từ cloud.\nHãy CHƯA nhập hay sửa gì cho tới khi nút chuyển sang màu xanh.\n\n'
-                        : 'Còn '+cho+' thay đổi chưa gửi lên cloud.\nDữ liệu vẫn nằm an toàn trong máy, sẽ tự gửi khi có mạng lại.\n\n'))
-    + 'Chi tiết: ' + sbMoTa);
+  el.onclick=moChoGui;
 }
 function sbChoCount(){ return Object.keys(sbPending).length; }
 
@@ -1588,7 +1638,6 @@ function sbDiff(cu,moi){
 /* --- Nhận các dòng từ cloud, đặt vào đúng chỗ trong DB --- */
 function sbApplyRows(rows){
   let n=0, caidat=false;
-  const traLai=[];        // bản của máy này mới hơn -> gửi trả lên cloud cho đúng
   if(!DB._cfgRev) DB._cfgRev={};
   rows.forEach(r=>{
     if(r.kind==='cfg'){
@@ -1608,24 +1657,20 @@ function sbApplyRows(rows){
     if(r.deleted){
       /* Chỉ xoá nếu lệnh xoá MỚI HƠN bản đang có. Lệnh xoá cũ (từ hàng chờ tồn
          đọng của một máy nào đó) không được phép xoá thứ vừa mới sửa. */
-      if(i>=0){
-        if(moiHon(r.data||{},arr[i])){ arr.splice(i,1); n++; }
-        else traLai.push({id:String(r.id),kind:r.kind,data:arr[i],deleted:false});
-      }
+      /* Chỉ giữ lại khi bản trong máy MỚI HƠN hẳn lệnh xoá — chống lệnh xoá cũ
+         tồn đọng xoá mất thứ vừa sửa. Còn lại thì xoá cho hai bên khớp nhau. */
+      if(i>=0 && revOf(arr[i])<=revOf(r.data)){ arr.splice(i,1); n++; }
       return;
     }
     if(!r.data||typeof r.data!=='object') return;
     if(i>=0){
       if(JSON.stringify(arr[i])===JSON.stringify(r.data)) return;
-      if(moiHon(r.data,arr[i])){ arr[i]=r.data; n++; }      // cloud mới hơn -> nhận
-      else traLai.push({id:String(r.id),kind:r.kind,data:arr[i],deleted:false});  // máy mình mới hơn -> đẩy trả
+      if(moiHon(r.data,arr[i])){ arr[i]=r.data; n++; }
+      /* Bản trong máy mới hơn -> GIỮ NGUYÊN, không đẩy trả ngay. Lần sửa thật
+         tiếp theo nó sẽ tự lên. Đẩy trả ngay chính là thứ tạo ra vòng lặp. */
     }
     else { arr.push(r.data); n++; }
   });
-  if(traLai.length && sbReady){
-    sbStatus('Đã chặn '+traLai.length+' bản cũ định ghi đè — đang gửi lại bản mới','wait');
-    setTimeout(()=>sbQueue(traLai),0);
-  }
   if(n){
     ITEM_PATHS.forEach(p=>{ const a=gbArr(DB,p); a.sort((x,y)=>((x&&x._seq)||0)-((y&&y._seq)||0)); });
     sbNormalize(DB);
@@ -1643,7 +1688,7 @@ function sbSaveLocal(){
 
 /* ---------------- GỬI LÊN ---------------- */
 function sbQueue(rows){
-  rows.forEach(r=>{ sbPending[r.kind+'|'+r.id]=r; });
+  rows.forEach(r=>{ sbPending[r.kind+'|'+r.id]=JSON.parse(JSON.stringify(r)); });   // chụp bản rời, không dính tham chiếu
   sbSavePending();
   sbStatus('Đang gửi lên cloud…','wait');
   clearTimeout(sbSendTimer);
