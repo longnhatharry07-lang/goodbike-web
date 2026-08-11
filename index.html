@@ -1434,7 +1434,7 @@ function snapDaily(){
 /* Số hiệu bản app. Mỗi lần cập nhật code là đổi số này -> các máy đang mở sẽ
    tự phát hiện và nhắc cập nhật. Máy chạy bản cũ chính là thứ gây ra cảnh
    "tua ngược": nó không hiểu luật mới nên cứ ghi đè theo kiểu cũ. */
-const BAN_APP = '2026-08-11-f';
+const BAN_APP = '2026-08-11-g';
 const SB_URL = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE  = 'goodbike_items';
@@ -1741,6 +1741,13 @@ function sbApplyRows(rows){
   return n;
 }
 
+/* Vẽ lại màn hình là việc NẶNG (bảng 450 booking x 31 ngày). Khi đồng bộ dồn
+   dập, gọi liên tiếp sẽ làm treo trình duyệt. Gom lại, chỉ vẽ một lần. */
+let _veTimer=null;
+function veLaiSau(ms){
+  clearTimeout(_veTimer);
+  _veTimer=setTimeout(function(){ try{ renderAll(); }catch(e){ console.warn(e); } }, ms||800);
+}
 /* --- Ghi vào máy sau khi nhận từ cloud (không coi là thao tác của mình) --- */
 function sbSaveLocal(){
   sbApplyingRemote=true;
@@ -1766,7 +1773,7 @@ async function sbSend(){
   const keys=Object.keys(sbPending);
   if(!keys.length){ sbStatus('Đã đồng bộ '+gio(),'ok'); return; }
   sbSending=true;
-  let lo=keys.slice(0,200).map(k=>sbPending[k]);
+  let lo=keys.slice(0,80).map(k=>sbPending[k]);      // lô nhỏ để không làm nghẽn trình duyệt
   try{
     /* Hàng chờ có thể tồn từ hôm trước (máy để nền, mất mạng lâu). Trước khi ghi
        đè, hỏi cloud xem bản trên đó có mới hơn không — nếu có thì bỏ bản của mình
@@ -1793,7 +1800,8 @@ async function sbSend(){
     if(error) throw error;
     lo.forEach(r=>{ delete sbPending[r.kind+'|'+r.id]; });
     sbSavePending(); sbFail=0; sbSending=false;
-    if(sbChoCount()) return sbSend();
+    if(sbChoCount()){ sbStatus('Đang gửi… còn '+sbChoCount()+' mục','wait');
+      return new Promise(function(res){ setTimeout(function(){ res(sbSend()); },120); }); }   // nhường CPU
     sbStatus('Đã đồng bộ '+gio(),'ok');
     sbPullSoon(200);
   }catch(e){
@@ -1832,7 +1840,7 @@ async function sbPull(tatCa){
                     : rows[rows.length-1].updated_at;
     const n=sbApplyRows(dung);
     sbPullOk=true;
-    if(n){ sbSaveLocal(); renderAll(); sbStatus('Đã nhận '+n+' cập nhật lúc '+gio(),'ok'); }
+    if(n){ sbSaveLocal(); veLaiSau(700); sbStatus('Đã nhận '+n+' cập nhật lúc '+gio(),'ok'); }
     else if(sbChoCount()===0) sbStatus('Đã đồng bộ '+gio(),'ok');
     return n;
   }catch(e){
@@ -3758,8 +3766,9 @@ function chayDonRacQuy(){
   const bo=donRacQuy();
   if(!bo) return;
   dangDonRac=true;                       // cho phép gửi lệnh xoá hàng loạt (đây là dọn rác có chủ đích)
-  try{ renderAll(); }catch(e){ save(); }
+  try{ save(); }catch(e){ console.warn(e); }   // CHỈ lưu + xếp hàng gửi, KHÔNG vẽ lại ngay
   dangDonRac=false;
+  veLaiSau(1500);
   sbStatus('Đã dọn '+bo+' dòng quỹ trùng lặp','wait');
   try{
     if(!localStorage.getItem('gb_daBaoDonQuy')){
