@@ -1431,6 +1431,10 @@ function snapDaily(){
    nhập hai mục khác nhau thì không hề đụng nhau — không cần gộp gì cả.
    localStorage vẫn là bộ nhớ đệm để app chạy nhanh và dùng được khi mất mạng.
    Thao tác làm lúc mất mạng được xếp hàng, tự gửi khi có mạng lại. */
+/* Số hiệu bản app. Mỗi lần cập nhật code là đổi số này -> các máy đang mở sẽ
+   tự phát hiện và nhắc cập nhật. Máy chạy bản cũ chính là thứ gây ra cảnh
+   "tua ngược": nó không hiểu luật mới nên cứ ghi đè theo kiểu cũ. */
+const BAN_APP = '2026-08-11-e';
 const SB_URL = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE  = 'goodbike_items';
@@ -1514,6 +1518,37 @@ function gio(){ return new Date().toLocaleTimeString('vi-VN'); }
 /* Giữ tên hàm cũ cho các chỗ đang gọi — nay chỉ vẽ lại nút trạng thái. */
 function sbBanner(){ sbStatus(sbMoTa||'', sbReady?'ok':'wait'); }
 let sbMoTa='Đang kết nối đồng bộ…';
+/* ---- Tự phát hiện bản mới trên máy chủ ---- */
+let banMoiCo=null;
+async function kiemTraBanMoi(){
+  try{
+    const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return;
+    const j=await r.json();
+    if(j && j.ban && j.ban!==BAN_APP){ banMoiCo=j.ban; hienNutCapNhat(); }
+  }catch(e){}
+}
+function hienNutCapNhat(){
+  if(document.getElementById('nutCapNhat')) return;
+  const b=document.createElement('button');
+  b.id='nutCapNhat'; b.type='button';
+  b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:10px;z-index:10001;'
+    +'background:#dc2626;color:#fff;border:none;border-radius:999px;padding:11px 20px;font-size:14px;'
+    +'font-weight:800;box-shadow:0 8px 24px rgba(220,38,38,.45);cursor:pointer;animation:syncpulse 1.4s infinite';
+  b.textContent='🔄 Có bản mới — bấm để cập nhật ngay';
+  b.onclick=async function(){
+    b.textContent='Đang cập nhật…'; b.style.animation='none';
+    try{ if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); for(const x of rs) await x.unregister(); } }catch(e){}
+    try{ if(window.caches){ const ks=await caches.keys(); for(const k of ks) await caches.delete(k); } }catch(e){}
+    location.reload(true);
+  };
+  document.body.appendChild(b);
+}
+setTimeout(kiemTraBanMoi,4000);
+setInterval(kiemTraBanMoi,180000);                                  // 3 phút một lần
+window.addEventListener('focus',kiemTraBanMoi);
+document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') kiemTraBanMoi(); });
+
 /* ---- Bảng "Các mục chưa gửi lên cloud" ---- */
 function moChoGui(){
   const cu=document.getElementById('choGuiOv'); if(cu)cu.remove();
@@ -1533,6 +1568,8 @@ function moChoGui(){
       +'<div style="font-weight:800;font-size:16px">'+(ds.length?('⚠️ '+ds.length+' mục chưa gửi lên cloud'):'✅ Không còn mục nào đang chờ')+'</div>'
       +'<div style="color:#64748b;font-size:12.5px;margin-top:4px">Dữ liệu vẫn nằm an toàn trong máy này. Chúng sẽ tự gửi khi kết nối trở lại.</div>'
       +'<div style="color:#475569;font-size:12.5px;margin-top:6px">Trạng thái: <b>'+esc(sbMoTa)+'</b></div>'
+      +'<div style="color:#475569;font-size:12.5px;margin-top:3px">Bản app máy này: <b>'+BAN_APP+'</b>'
+        +(banMoiCo?(' <span style="color:#b91c1c;font-weight:800">· có bản mới '+esc(banMoiCo)+', hãy cập nhật!</span>'):' <span style="color:#15803d;font-weight:700">· mới nhất</span>')+'</div>'
       +(Object.keys(nhom).length?('<div style="color:#475569;font-size:12.5px;margin-top:4px">'+Object.entries(nhom).map(function(e){return e[0]+': '+e[1];}).join(' · ')+'</div>'):'')
       +(function(){
           var may={}; (DB.bookings||[]).forEach(function(b){ if(b._dev) may[b._dev]=(may[b._dev]||0)+1; });
