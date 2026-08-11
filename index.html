@@ -1434,7 +1434,7 @@ function snapDaily(){
 /* Số hiệu bản app. Mỗi lần cập nhật code là đổi số này -> các máy đang mở sẽ
    tự phát hiện và nhắc cập nhật. Máy chạy bản cũ chính là thứ gây ra cảnh
    "tua ngược": nó không hiểu luật mới nên cứ ghi đè theo kiểu cũ. */
-const BAN_APP = '2026-08-11-e';
+const BAN_APP = '2026-08-11-f';
 const SB_URL = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE  = 'goodbike_items';
@@ -1495,6 +1495,7 @@ const XOA_TOI_DA=5;        // một lần lưu mà sinh quá số này lệnh xo
 function sbGuardDeletes(rows){
   const del=rows.filter(r=>r.deleted);
   if(!del.length) return rows;
+  if(dangDonRac) return rows;            // đang dọn rác có chủ đích -> không cần hỏi
   /* Cầu dao nổ khi: xoá quá 5 mục một lúc, HOẶC xoá từ 1/3 tổng số mục trở lên.
      Vế thứ hai bắt được cả trường hợp kho nhỏ (10 booking mà xoá 4). */
   const tong=ITEM_PATHS.reduce((a,p)=>a+gbArr(gbPrev||{},p,true).length,0);
@@ -1903,6 +1904,7 @@ async function sbInit(){
     await sbPull(true);
     if(!sbPullOk) throw new Error('chua_keo_ve_duoc');   // chưa chắc chắn thì KHÔNG mở khoá gửi
     sbReady=true;
+    chayDonRacQuy();                    // đã thấy đủ dữ liệu -> dọn bản sao (nếu còn)
     if(sbChoCount()) sbSend();          // gửi nốt phần làm lúc chưa kết nối
     sbStatus('Đã kết nối đồng bộ','ok');
     sb.channel('gb_items')
@@ -3695,16 +3697,77 @@ function ef(k,v){const el=document.getElementById('e_'+k);if(v!==undefined)el.va
 // Chi Khấu hao → quỹ khấu hao; chi Đầu tư → quỹ lãi ròng. Tự ghi 1 giao dịch "xuất ra" ở Dòng tiền,
 // liên kết qua expRef để khi sửa/xoá khoản chi thì cập nhật/gỡ theo. Loại chi khác không ghi quỹ.
 const EXP_FUND_MAP={khauhao:'khauhao',dautu:'lairong'};
+/* Mỗi khoản chi khấu hao/đầu tư kèm ĐÚNG MỘT dòng quỹ tự ghi, và dòng đó mang
+   ID CỐ ĐỊNH suy ra từ mã khoản chi ('exp:<mã>').
+
+   Bản cũ dùng uid() — sinh mã NGẪU NHIÊN MỚI mỗi lần chạy. Hàm này lại chạy
+   mỗi lần mở web, nên cứ mỗi lần mở là xoá dòng cũ rồi đẻ ra một dòng mã khác.
+   Máy A không biết mã máy B vừa tạo nên không xoá được, kết quả là các bản sao
+   chồng chất trên cloud (một khoản chi bị nhân tới 140 lần), số dư quỹ sai
+   hàng trăm triệu, và mỗi lần mở web lại phát sinh một đợt ghi/xoá lên cloud —
+   đó cũng chính là thứ làm màn hình tua đi tua lại.
+
+   Dùng mã cố định thì mọi máy tính ra CÙNG một mã: chạy bao nhiêu lần cũng chỉ
+   cập nhật đúng dòng đó, không đẻ thêm, không sinh lệnh xoá. */
+function autoFundId(expId){ return 'exp:'+expId; }
 function syncExpenseFunds(exp){
-  DB.funds.khauhao=DB.funds.khauhao.filter(x=>x.expRef!==exp.id);
-  DB.funds.lairong=DB.funds.lairong.filter(x=>x.expRef!==exp.id);
   const fundKey=EXP_FUND_MAP[exp.type];
-  if(fundKey && (exp.amt||0)>0){
-    DB.funds[fundKey].push({id:uid(),date:exp.date,dir:'out',amt:exp.amt,note:(exp.cat||'Chi')+(exp.note?(' - '+exp.note):'')+' (tự ghi từ Bảng chi)',expRef:exp.id});
+  const ma=autoFundId(exp.id);
+  ['khauhao','lairong'].forEach(fk=>{
+    DB.funds[fk]=(DB.funds[fk]||[]).filter(x=>{
+      if(!x||x.expRef!==exp.id) return true;              // không liên quan -> giữ
+      return fk===fundKey && x.id===ma;                    // chỉ giữ đúng 1 dòng chuẩn, đúng quỹ
+    });
+  });
+  if(!fundKey || !((exp.amt||0)>0)) return;
+  const arr=DB.funds[fundKey]=DB.funds[fundKey]||[];
+  const ghiChu=(exp.cat||'Chi')+(exp.note?(' - '+exp.note):'')+' (tự ghi từ Bảng chi)';
+  const i=arr.findIndex(x=>x&&x.id===ma);
+  if(i>=0){
+    const c=arr[i];                                        // cập nhật TẠI CHỖ, chỉ khi khác thật
+    if(c.date!==exp.date||c.amt!==exp.amt||c.note!==ghiChu||c.dir!=='out'||c.expRef!==exp.id){
+      c.date=exp.date; c.amt=exp.amt; c.note=ghiChu; c.dir='out'; c.expRef=exp.id;
+    }
+  } else {
+    arr.push({id:ma,date:exp.date,dir:'out',amt:exp.amt,note:ghiChu,expRef:exp.id});
   }
 }
 // Rà soát & bù: bảo đảm MỌI khoản chi khấu hao/đầu tư (kể cả nhập từ trước) đều có dòng quỹ tương ứng,
 // và gỡ các dòng quỹ tự ghi mồ côi (khoản chi đã xoá / đã đổi loại). Chạy 1 lần khi mở web.
+/* Dọn các bản sao đã lỡ sinh ra trước đây. Chạy sau khi đã kéo đủ dữ liệu từ
+   cloud để nhìn thấy toàn bộ bản sao, rồi xoá một lần cho sạch cả hai nơi. */
+let dangDonRac=false;
+function donRacQuy(){
+  let bo=0;
+  ['khauhao','lairong'].forEach(fk=>{
+    const daGiu=new Set();
+    DB.funds[fk]=(DB.funds[fk]||[]).filter(x=>{
+      if(!x||!x.expRef) return true;                       // dòng nhập tay -> giữ nguyên
+      const e=DB.expenses.find(y=>y&&y.id===x.expRef);
+      if(!e || EXP_FUND_MAP[e.type]!==fk){ bo++; return false; }   // mồ côi / sai quỹ
+      if(daGiu.has(x.expRef)){ bo++; return false; }               // bản sao
+      daGiu.add(x.expRef);
+      const ma=autoFundId(x.expRef);
+      if(x.id!==ma) x.id=ma;                                        // đưa về mã chuẩn
+      return true;
+    });
+  });
+  return bo;
+}
+function chayDonRacQuy(){
+  const bo=donRacQuy();
+  if(!bo) return;
+  dangDonRac=true;                       // cho phép gửi lệnh xoá hàng loạt (đây là dọn rác có chủ đích)
+  try{ renderAll(); }catch(e){ save(); }
+  dangDonRac=false;
+  sbStatus('Đã dọn '+bo+' dòng quỹ trùng lặp','wait');
+  try{
+    if(!localStorage.getItem('gb_daBaoDonQuy')){
+      localStorage.setItem('gb_daBaoDonQuy','1');
+      setTimeout(function(){ alert('🧹 ĐÃ DỌN DỮ LIỆU TRÙNG\n\nMục Dòng tiền trước đây bị lặp '+bo+' dòng do một lỗi tự ghi từ Bảng chi.\nCác dòng thừa đã được xoá, số dư hai quỹ giờ đã đúng.\n\nKhông có khoản chi nào bị mất — chỉ xoá các bản sao.'); },1200);
+    }
+  }catch(e){}
+}
 function reconcileExpenseFunds(){
   if(!DB.funds)DB.funds={khauhao:[],lairong:[]};
   const validExp=new Set(DB.expenses.filter(e=>EXP_FUND_MAP[e.type]).map(e=>e.id));
