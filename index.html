@@ -1348,6 +1348,7 @@ function normalizeDB(){
   if(!DB.inventoryChecks)DB.inventoryChecks={}; // {ym:{'10':{items:{itId:{qty,note}},done,doneAt},'25':{...}}}
   if(!DB.assetMoves)DB.assetMoves=[];           // biến động tài sản
   if(!DB.maintenance)DB.maintenance=[];         // bảo dưỡng xe
+  delete DB._cfgRev;                            // dọn dấu vết bản lỗi, không để lọt vào đồng bộ
   if(!DB.places)DB.places={};                   // {key:{name,km,n}} — thư viện địa điểm giao/trả đã lưu
   if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
@@ -1389,6 +1390,7 @@ function save(){
     rows = LOADED_FROM_LS ? rows.filter(r=>!r.deleted) : [];
   }
   if(rows.length) rows = sbGuardDeletes(rows);
+  rows.forEach(r=>{ if(r.deleted) ghiDaXoa(r.kind,r.id,revOf(r.data)); });   // nhớ là đã xoá
   try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){}
   snapDaily();
   gbRemember();
@@ -1434,7 +1436,7 @@ function snapDaily(){
 /* Số hiệu bản app. Mỗi lần cập nhật code là đổi số này -> các máy đang mở sẽ
    tự phát hiện và nhắc cập nhật. Máy chạy bản cũ chính là thứ gây ra cảnh
    "tua ngược": nó không hiểu luật mới nên cứ ghi đè theo kiểu cũ. */
-const BAN_APP = '2026-08-11-g';
+const BAN_APP = '2026-08-11-h';
 const SB_URL = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE  = 'goodbike_items';
@@ -1445,7 +1447,12 @@ const PEND_KEY  = 'goodbike_pending';    // hàng chờ gửi khi mất mạng
 const ITEM_PATHS = ['bookings','expenses','assets','maintenance','assetMoves',
                     'inventoryList','funds.khauhao','funds.lairong'];
 const ITEM_TOP = new Set(ITEM_PATHS.map(p=>p.split('.')[0]));
-const BO_QUA = new Set(['_tomb']);       // rác của bản cũ, không đồng bộ nữa
+/* _cfgRev là sổ ghi mốc của phần cài đặt — chỉ dùng nội bộ. Bản trước lỡ để nó
+   nằm trong DB nên bị đem đi đồng bộ; mỗi máy giữ một bản khác nhau, máy nhận
+   lại bỏ qua không áp dụng, thành ra hai máy đẩy qua đẩy lại vô tận. Mỗi lần
+   đẩy là một tín hiệu realtime khiến MỌI máy kéo về và vẽ lại — đó là cảnh
+   nhảy liên tục. Nay cấm tuyệt đối. */
+const BO_QUA = new Set(['_tomb','_cfgRev']);
 
 let sb=null, sbApplyingRemote=false;
 /* --- KHOÁ AN TOÀN ---
@@ -1453,6 +1460,29 @@ let sb=null, sbApplyingRemote=false;
    này chưa biết cloud đang có gì, nên không được phép ra lệnh xoá. Máy khởi động
    rỗng thì không được gửi bất cứ thứ gì — nó không có gì để đóng góp. */
 let sbReady=false, sbPullOk=false;
+let cfgRev={};                 // mốc phần cài đặt — CHỈ trong máy, KHÔNG đồng bộ
+/* --- SỔ GHI NHỚ ĐÃ XOÁ ---
+   Trước đây xoá một booking xong nó vẫn mọc lại: máy khác đang giữ bản có mốc
+   mới hơn nên từ chối lệnh xoá, rồi lần lưu sau lại đẩy bản đó lên như một mục
+   bình thường. Nay mỗi lệnh xoá được ghi vào sổ này; đã nằm trong sổ thì không
+   máy nào được dựng lại nữa. */
+const XOA_KEY='goodbike_daxoa';
+let daXoa={};
+try{ daXoa=JSON.parse(localStorage.getItem(XOA_KEY))||{}; }catch(e){ daXoa={}; }
+function luuDaXoa(){
+  const ks=Object.keys(daXoa);
+  if(ks.length>4000){ ks.sort((a,b)=>daXoa[a]-daXoa[b]).slice(0,ks.length-4000).forEach(k=>delete daXoa[k]); }
+  try{ localStorage.setItem(XOA_KEY,JSON.stringify(daXoa)); }catch(e){}
+}
+function ghiDaXoa(kind,id,rev){
+  const k=kind+'|'+id;
+  if(!daXoa[k] || rev>daXoa[k]) daXoa[k]=rev||Date.now();
+  luuDaXoa();
+}
+function biXoaRoi(kind,id,rev){
+  const m=daXoa[kind+'|'+id];
+  return m!=null && (rev||0)<=m;      // mục tới có mốc cũ hơn/bằng lệnh xoá -> không dựng lại
+}
 /* --- MỐC PHIÊN BẢN (_rev) ---
    Gốc của lỗi "tua ngược": khi nhận dữ liệu từ cloud, app ghi đè chỉ vì thấy
    KHÁC bản trong máy, không hề hỏi bản nào MỚI HƠN. Máy nào gửi sau thì thắng,
@@ -1698,17 +1728,17 @@ function sbDiff(cu,moi){
 /* --- Nhận các dòng từ cloud, đặt vào đúng chỗ trong DB --- */
 function sbApplyRows(rows){
   let n=0, caidat=false;
-  if(!DB._cfgRev) DB._cfgRev={};
+  // mốc cài đặt nằm ở biến cfgRev, không để trong DB
   rows.forEach(r=>{
     if(r.kind==='cfg'){
       const k=String(r.id).slice(4);
-      if(BO_QUA.has(k)||ITEM_TOP.has(k)||k==='_cfgRev') return;
+      if(BO_QUA.has(k)||ITEM_TOP.has(k)) return;
       const v=r.deleted?undefined:((r.data||{}).v);
       if(JSON.stringify(DB[k])===JSON.stringify(v)) return;
-      const cu=DB._cfgRev[k]||{};
+      const cu=cfgRev[k]||{};
       if(!moiHon(r.data||{},cu)) return;              // bản cloud cũ hơn -> bỏ qua
       if(r.deleted) delete DB[k]; else DB[k]=v;
-      DB._cfgRev[k]={_rev:revOf(r.data),_dev:devOf(r.data)};
+      cfgRev[k]={_rev:revOf(r.data),_dev:devOf(r.data)};
       n++; caidat=true; return;
     }
     if(ITEM_PATHS.indexOf(r.kind)<0) return;
@@ -1717,12 +1747,16 @@ function sbApplyRows(rows){
     if(r.deleted){
       /* Chỉ xoá nếu lệnh xoá MỚI HƠN bản đang có. Lệnh xoá cũ (từ hàng chờ tồn
          đọng của một máy nào đó) không được phép xoá thứ vừa mới sửa. */
-      /* Chỉ giữ lại khi bản trong máy MỚI HƠN hẳn lệnh xoá — chống lệnh xoá cũ
-         tồn đọng xoá mất thứ vừa sửa. Còn lại thì xoá cho hai bên khớp nhau. */
-      if(i>=0 && revOf(arr[i])<=revOf(r.data)){ arr.splice(i,1); n++; }
+      /* Lệnh xoá: chỉ bỏ qua khi bản trong máy MỚI HƠN HẲN (ai đó vừa sửa sau
+         khi lệnh xoá được phát) — chống lệnh xoá cũ tồn đọng. Còn lại thì xoá,
+         và ghi vào sổ để không bao giờ mọc lại. */
+      if(i>=0 && revOf(arr[i])>revOf(r.data)) return;
+      ghiDaXoa(r.kind,r.id,revOf(r.data));
+      if(i>=0){ arr.splice(i,1); n++; }
       return;
     }
     if(!r.data||typeof r.data!=='object') return;
+    if(biXoaRoi(r.kind,r.id,revOf(r.data))) return;      // đã xoá rồi thì không dựng lại
     if(i>=0){
       if(!khacNhau(arr[i],r.data)){                // nội dung y hệt, chỉ khác nhãn
         if(revOf(r.data)>revOf(arr[i])){ arr[i]._rev=r.data._rev; arr[i]._dev=r.data._dev; }
@@ -1779,14 +1813,16 @@ async function sbSend(){
        đè, hỏi cloud xem bản trên đó có mới hơn không — nếu có thì bỏ bản của mình
        đi, đừng tua ngược công việc của người khác. */
     try{
-      const {data:svr,error:e2}=await sb.from(SB_TABLE).select('id,kind,data')
+      const {data:svr,error:e2}=await sb.from(SB_TABLE).select('id,kind,data,deleted')
         .in('id',lo.map(r=>String(r.id)));
       if(!e2&&svr&&svr.length){
-        const tren={}; svr.forEach(r=>{ tren[r.kind+'|'+r.id]=r.data; });
+        const tren={}; svr.forEach(r=>{ tren[r.kind+'|'+r.id]={data:r.data,xoa:!!r.deleted}; });
         const bo=[];
         lo=lo.filter(r=>{
-          const t=tren[r.kind+'|'+r.id];
-          if(t&&moiHon(t,r.data)){ bo.push(r); return false; }
+          const c=tren[r.kind+'|'+r.id];
+          if(!c) return true;
+          if(!r.deleted && c.xoa){ bo.push(r); ghiDaXoa(r.kind,r.id,revOf(c.data)); return false; }  // trên cloud đã xoá -> đừng dựng lại
+          if(c.data && moiHon(c.data,r.data)){ bo.push(r); return false; }
           return true;
         });
         bo.forEach(r=>{ delete sbPending[r.kind+'|'+r.id]; });
@@ -1916,7 +1952,7 @@ async function sbInit(){
     if(sbChoCount()) sbSend();          // gửi nốt phần làm lúc chưa kết nối
     sbStatus('Đã kết nối đồng bộ','ok');
     sb.channel('gb_items')
-      .on('postgres_changes',{event:'*',schema:'public',table:SB_TABLE},()=>sbPullSoon(400))
+      .on('postgres_changes',{event:'*',schema:'public',table:SB_TABLE},()=>sbPullSoon(1200))
       .subscribe();
   }catch(e){
     console.warn('sbInit',e);
