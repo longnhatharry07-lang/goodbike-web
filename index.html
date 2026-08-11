@@ -536,6 +536,7 @@
     <button class="ghost" id="nextM">▶</button>
     <button class="primary" id="addBk">+ Thêm booking</button>
     <button class="ghost" id="backupBtn" title="Sao lưu & khôi phục dữ liệu">🛟 Sao lưu</button>
+    <button class="ghost" id="caiAppBtn" title="Cài app vào màn hình chính">📲 Cài app</button>
     <button class="ghost" id="cartBtn">🛒 Giỏ hàng<span class="cart-badge" id="cartCount" style="display:none">0</span></button>
     <button class="ghost" id="adminLock" style="display:none">🔓 Khoá nội bộ</button>
     <button class="ghost" id="changePass" style="display:none">Đổi MK</button>
@@ -1460,6 +1461,16 @@ const SB_DEV = (function(){
        return d; }catch(e){ return 'tam'+Math.random().toString(36).slice(2,8); }
 })();
 function revOf(x){ return (x&&+x._rev)||0; }
+/* _rev và _dev chỉ là NHÃN kỹ thuật, không phải nội dung booking. Nếu hai bản
+   chỉ khác nhau ở nhãn thì coi như GIỐNG NHAU: không đẩy lên, không vẽ lại màn
+   hình. Nhờ vậy một máy nào đó đang chạy bản lỗi và liên tục dập nhãn mới lên
+   toàn bộ dữ liệu cũng không làm các máy khác nhấp nháy hay tua ngược. */
+function noiDung(x){
+  if(!x||typeof x!=='object') return x;
+  const o={}; for(const k in x){ if(k!=='_rev'&&k!=='_dev') o[k]=x[k]; }
+  return o;
+}
+function khacNhau(a,b){ return JSON.stringify(noiDung(a))!==JSON.stringify(noiDung(b)); }
 function devOf(x){ return (x&&x._dev)||''; }
 function stampRev(x){
   if(!x||typeof x!=='object') return x;
@@ -1523,6 +1534,17 @@ function moChoGui(){
       +'<div style="color:#64748b;font-size:12.5px;margin-top:4px">Dữ liệu vẫn nằm an toàn trong máy này. Chúng sẽ tự gửi khi kết nối trở lại.</div>'
       +'<div style="color:#475569;font-size:12.5px;margin-top:6px">Trạng thái: <b>'+esc(sbMoTa)+'</b></div>'
       +(Object.keys(nhom).length?('<div style="color:#475569;font-size:12.5px;margin-top:4px">'+Object.entries(nhom).map(function(e){return e[0]+': '+e[1];}).join(' · ')+'</div>'):'')
+      +(function(){
+          var may={}; (DB.bookings||[]).forEach(function(b){ if(b._dev) may[b._dev]=(may[b._dev]||0)+1; });
+          var ds=Object.entries(may).sort(function(a,b){return b[1]-a[1];});
+          if(!ds.length) return '';
+          return '<div style="margin-top:9px;padding-top:8px;border-top:1px dashed #e2e8f0;font-size:12.5px">'
+            +'<b>Máy đã ghi dữ liệu:</b> '
+            +ds.map(function(e){ return '<span style="display:inline-block;margin:2px 4px 0 0;padding:2px 8px;border-radius:999px;background:'
+                +(e[0]===SB_DEV?'#dcfce7;color:#15803d':'#e2e8f0;color:#475569')+'">'
+                +e[0]+(e[0]===SB_DEV?' (máy này)':'')+' · '+e[1]+' mục</span>'; }).join('')
+            +'<div style="color:#64748b;margin-top:5px">Nếu thấy một mã máy lạ liên tục ghi đè, máy đó đang chạy bản cũ — hãy đóng hẳn app trên máy đó rồi mở lại.</div></div>';
+        })()
     +'</div>'
     +'<div style="overflow:auto;padding:8px 10px;flex:1">'
       +(ds.length? ds.slice(0,300).map(function(r){
@@ -1615,7 +1637,7 @@ function sbDiff(cu,moi){
         if(x._seq==null) x._seq=Date.now();
         stampRev(x);
         rows.push({id:key,kind:path,data:x,deleted:false});
-      }else if(JSON.stringify(t)!==JSON.stringify(x)){
+      }else if(khacNhau(t,x)){                     // chỉ tính khi NỘI DUNG đổi thật
         stampRev(x);                               // vừa sửa -> đóng dấu thời điểm
         rows.push({id:key,kind:path,data:x,deleted:false});
       }
@@ -1664,7 +1686,10 @@ function sbApplyRows(rows){
     }
     if(!r.data||typeof r.data!=='object') return;
     if(i>=0){
-      if(JSON.stringify(arr[i])===JSON.stringify(r.data)) return;
+      if(!khacNhau(arr[i],r.data)){                // nội dung y hệt, chỉ khác nhãn
+        if(revOf(r.data)>revOf(arr[i])){ arr[i]._rev=r.data._rev; arr[i]._dev=r.data._dev; }
+        return;                                    // -> nhận nhãn, KHÔNG vẽ lại, KHÔNG đẩy đi
+      }
       if(moiHon(r.data,arr[i])){ arr[i]=r.data; n++; }
       /* Bản trong máy mới hơn -> GIỮ NGUYÊN, không đẩy trả ngay. Lần sửa thật
          tiếp theo nó sẽ tự lên. Đẩy trả ngay chính là thứ tạo ra vòng lặp. */
@@ -4627,54 +4652,80 @@ gbRemember();          // mốc để dò thay đổi; phải chạy TRƯỚC sb
 sbStatus(LOADED_FROM_LS?'Đang kết nối đồng bộ…':'Máy này chưa có dữ liệu — đang tải từ cloud','wait');
 sbInit();
 </script>
-<!-- ===== PWA: đăng ký service worker + nút cài đặt ===== -->
+<!-- ===== PWA: đăng ký service worker + nút cài app ===== -->
 <script>
 (function(){
-  // Đăng ký service worker (chỉ chạy khi phục vụ qua http/https, không chạy khi mở file:// )
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('sw.js').catch(function(e){ console.warn('SW lỗi:', e); });
+      navigator.serviceWorker.register('sw.js').catch(function(e){ console.warn('SW loi:', e); });
     });
   }
 
-  // Nút cài đặt cho Android/Chrome (sự kiện beforeinstallprompt)
-  var deferredPrompt = null;
-  var btn = document.createElement('button');
-  btn.textContent = '⬇️ Cài đặt app';
-  btn.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:9999;display:none;'+
-    'background:linear-gradient(90deg,#34d399,#0ea5e9);color:#fff;font-weight:700;'+
-    'border:none;border-radius:24px;padding:12px 18px;box-shadow:0 6px 18px rgba(2,132,199,.4);cursor:pointer';
-  document.body.appendChild(btn);
+  /* Trước đây nút cài app CHỈ hiện khi trình duyệt tự bắn sự kiện
+     beforeinstallprompt — Safari trên iPhone không bao giờ bắn, còn Chrome thì
+     lúc có lúc không. Kết quả là nhiều máy không thấy nút nào cả.
+     Nay nút "📲 Cài app" luôn nằm sẵn trên thanh công cụ và tự hướng dẫn theo
+     đúng loại máy; chỉ ẩn đi khi app đã được cài rồi. */
+  var loiMoi = null;
+  var ua = navigator.userAgent;
+  var laIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var laAndroid = /android/i.test(ua);
+  var daCai = function(){
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  };
+  var nut = document.getElementById('caiAppBtn');
+  if (nut && daCai()) nut.style.display = 'none';
 
-  window.addEventListener('beforeinstallprompt', function(e){
-    e.preventDefault();
-    deferredPrompt = e;
-    btn.style.display = 'block';
-  });
-  btn.addEventListener('click', async function(){
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    btn.style.display = 'none';
-  });
-  window.addEventListener('appinstalled', function(){ btn.style.display = 'none'; });
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); loiMoi = e; });
+  window.addEventListener('appinstalled', function(){ loiMoi = null; if (nut) nut.style.display = 'none'; });
 
-  // Gợi ý cho iPhone/iPad (Safari không hỗ trợ beforeinstallprompt)
-  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  if (isIOS && !isStandalone && !sessionStorage.getItem('iosHintShown')) {
-    sessionStorage.setItem('iosHintShown','1');
-    var hint = document.createElement('div');
-    hint.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;'+
-      'background:#0f172a;color:#fff;padding:12px 14px;border-radius:12px;font-size:13px;'+
-      'box-shadow:0 6px 18px rgba(0,0,0,.35);line-height:1.4';
-    hint.innerHTML = 'Để cài lên iPhone: bấm nút <b>Chia sẻ</b> ⬆️ ở Safari → chọn '+
-      '<b>“Thêm vào MH chính”</b>. <span style="text-decoration:underline;cursor:pointer" id="iosHintClose">Đóng</span>';
-    document.body.appendChild(hint);
-    hint.querySelector('#iosHintClose').onclick = function(){ hint.remove(); };
-    setTimeout(function(){ if(hint.parentNode) hint.remove(); }, 12000);
+  function hop(tieuDe, than){
+    var cu = document.getElementById('caiAppOv'); if (cu) cu.remove();
+    var ov = document.createElement('div');
+    ov.id = 'caiAppOv';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.innerHTML = '<div style="background:#fff;border-radius:16px;max-width:430px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.35)">'
+      + '<div style="font-weight:800;font-size:17px;margin-bottom:10px">' + tieuDe + '</div>'
+      + '<div style="font-size:14px;line-height:1.65;color:#334155">' + than + '</div>'
+      + '<button id="caiAppDong" style="margin-top:16px;width:100%;padding:11px;border:0;border-radius:10px;background:#F58B41;color:#fff;font-weight:800;font-size:15px;cursor:pointer">Đã hiểu</button>'
+      + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+    ov.querySelector('#caiAppDong').onclick = function(){ ov.remove(); };
   }
+
+  if (nut) nut.onclick = async function(){
+    if (daCai()) { hop('✅ Đã cài rồi', 'Bạn đang mở GOODBIKE từ app đã cài trên máy.'); return; }
+    if (loiMoi) {                                   // Chrome/Edge Android: gọi thẳng hộp cài của máy
+      loiMoi.prompt();
+      try { await loiMoi.userChoice; } catch(e) {}
+      loiMoi = null;
+      return;
+    }
+    if (laIOS) {
+      hop('📲 Cài GOODBIKE lên iPhone / iPad',
+          'Mở trang này bằng <b>Safari</b> (Chrome trên iPhone không cài được), rồi:<br><br>'
+        + '<b>1.</b> Bấm nút <b>Chia sẻ</b> ⬆️ ở thanh dưới màn hình<br>'
+        + '<b>2.</b> Kéo xuống, chọn <b>“Thêm vào MH chính”</b><br>'
+        + '<b>3.</b> Bấm <b>Thêm</b> ở góc trên bên phải<br><br>'
+        + 'Xong, biểu tượng GOODBIKE sẽ nằm ngoài màn hình chính như một app bình thường.');
+      return;
+    }
+    if (laAndroid) {
+      hop('📲 Cài GOODBIKE lên Android',
+          'Mở trang này bằng <b>Chrome</b>, rồi:<br><br>'
+        + '<b>1.</b> Bấm nút <b>⋮</b> (ba chấm) ở góc trên bên phải<br>'
+        + '<b>2.</b> Chọn <b>“Thêm vào Màn hình chính”</b> hoặc <b>“Cài đặt ứng dụng”</b><br>'
+        + '<b>3.</b> Bấm <b>Cài đặt</b><br><br>'
+        + 'Nếu không thấy mục đó, hãy tải lại trang rồi thử lại sau vài giây.');
+      return;
+    }
+    hop('📲 Cài GOODBIKE lên máy tính',
+        'Dùng <b>Chrome</b> hoặc <b>Edge</b>:<br><br>'
+      + '<b>1.</b> Nhìn vào thanh địa chỉ, tìm biểu tượng <b>màn hình có mũi tên ⊕</b> ở bên phải<br>'
+      + '<b>2.</b> Bấm vào đó rồi chọn <b>Cài đặt</b><br><br>'
+      + 'Hoặc vào menu <b>⋮</b> → <b>Truyền, lưu và chia sẻ</b> → <b>Cài đặt trang này dưới dạng ứng dụng</b>.');
+  };
 })();
 </script>
 </body>
