@@ -1391,7 +1391,17 @@ function save(){
   }
   if(rows.length) rows = sbGuardDeletes(rows);
   rows.forEach(r=>{ if(r.deleted) ghiDaXoa(r.kind,r.id,revOf(r.data)); });   // nhớ là đã xoá
-  try{localStorage.setItem(STORE_KEY,JSON.stringify(DB));}catch(e){}
+  /* Bản trước nuốt im lặng lỗi "đầy bộ nhớ": app vẫn chạy bình thường trong RAM
+     nhưng KHÔNG còn ghi được xuống máy. Tải lại trang là quay về bản cũ. Nay dọn
+     bớt bản sao để nhường chỗ, không được nữa thì báo đỏ. */
+  try{ localStorage.setItem(STORE_KEY,JSON.stringify(DB)); }
+  catch(e){
+    try{ localStorage.removeItem(SNAP_KEY); localStorage.setItem(STORE_KEY,JSON.stringify(DB)); }
+    catch(e2){
+      console.error('save(): localStorage đầy',e2);
+      try{ sbStatus('⚠️ Bộ nhớ trình duyệt đầy — chưa lưu được vào máy này. Hãy tải lại trang.','err'); }catch(_){}
+    }
+  }
   snapDaily();
   gbRemember();
   if(rows.length) sbQueue(rows);
@@ -1411,16 +1421,22 @@ function snapWrite(list){
 function snapSave(reason,db){
   if(!db||!db.bookings||!db.bookings.length) return;
   const list=snapRead();
-  list.push({t:new Date().toISOString(),reason:reason,n:db.bookings.length,data:db});
+  list.push({t:new Date().toISOString(),ngay:ngayLocal(),reason:reason,n:db.bookings.length,data:db});
   while(list.length>3) list.shift();
   snapWrite(list);
 }
 let snapDayDone=null;
+/* Ngày theo đồng hồ máy (giờ VN). Bản trước dùng toISOString() = giờ UTC nên mốc
+   sang ngày rơi vào 07:00 sáng giờ VN — ngay giữa ca làm việc. */
+function ngayLocal(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 function snapDaily(){
-  const d=new Date().toISOString().slice(0,10);
+  const d=ngayLocal();
   if(snapDayDone===d) return; snapDayDone=d;
   const list=snapRead();
-  if(list.some(s=>(s.t||'').slice(0,10)===d && s.reason==='hằng ngày')) return;
+  if(list.some(s=>(s.ngay||(s.t||'').slice(0,10))===d && s.reason==='hằng ngày')) return;
   snapSave('hằng ngày',DB);
 }
 
@@ -1436,7 +1452,7 @@ function snapDaily(){
 /* Số hiệu bản app. Mỗi lần cập nhật code là đổi số này -> các máy đang mở sẽ
    tự phát hiện và nhắc cập nhật. Máy chạy bản cũ chính là thứ gây ra cảnh
    "tua ngược": nó không hiểu luật mới nên cứ ghi đè theo kiểu cũ. */
-const BAN_APP = '2026-08-11-h';
+const BAN_APP = '2026-08-12-a';
 const SB_URL = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE  = 'goodbike_items';
@@ -2978,7 +2994,7 @@ function openSchAct(id,kind){
   else{callBtn.style.display='none';callBtn.onclick=null;}
   document.getElementById('schActDone').textContent=kind==='Giao'?'✓ Hoàn thành & Giao xe':'✓ Hoàn thành & Thu hồi';
   const ub=document.getElementById('schActUndo');
-  if(b.undoState){ ub.style.display=''; ub.textContent='↩ Hoàn tác '+(b._undoKind==='Giao'?'giao xe':'thu hồi'); ub.onclick=()=>doUndoFor(id); }
+  if(undoConHan(b)){ ub.style.display=''; ub.textContent='↩ Hoàn tác '+(b._undoKind==='Giao'?'giao xe':'thu hồi'); ub.onclick=()=>doUndoFor(id); }
   else { ub.style.display='none'; ub.onclick=null; }
   document.getElementById('schActOverlay').classList.add('open');
 }
@@ -3012,17 +3028,34 @@ document.getElementById('schActCancel').onclick=()=>document.getElementById('sch
 // Ảnh chụp các trường bị đổi khi giao/thu hồi — lưu vào b.undoState (TRƯỚC khi đổi)
 function snapshotBk(b){return {status:b.status,dtime:b.dtime,rtime:b.rtime,arrive:b.arrive,depart:b.depart,prices:JSON.parse(JSON.stringify(b.prices||{})),payments:JSON.parse(JSON.stringify(b.payments||[])),prepaid:b.prepaid,pay:b.pay};}
 let _undoTimer=null;
+/* --- CỬA SỔ HOÀN TÁC ---
+   Bản trước: nút "↩ Hoàn tác trả xe" LUÔN hiện với mọi booking đã nhận/đã trả — kể cả
+   booking đã trả từ mấy hôm trước — và bấm là chạy ngay, không hỏi lại. Chạm nhầm một
+   cái là booking quay về "chưa trả" rồi đồng bộ sang tất cả các máy. Đúng triệu chứng
+   "đã trả xe nhưng bị về trạng thái chưa trả". Nay chỉ hoàn tác được trong 15 phút. */
+const UNDO_HAN_MS=15*60*1000;
+function undoConHan(b){
+  if(!b) return false;
+  if(b._swapNewId) return true;                 // đổi xe: vẫn cho hoàn tác
+  if(!b.undoState) return false;                // không có ảnh chụp -> không đoán mò lùi trạng thái
+  const t=+b._undoAt||0;
+  return t>0 && (Date.now()-t)<UNDO_HAN_MS;
+}
 // Toast hoàn tác màu đen đã được gỡ bỏ theo yêu cầu (quá vướng).
 // Vẫn giữ nút "↩ Hoàn tác" trong chi tiết booking & modal giao/thu hồi để lùi 1 bước khi cần.
 function showUndoToast(id,kind,xe){ /* no-op: không hiện toast nổi nữa */ }
 function doUndoFor(id){
   const b=DB.bookings.find(x=>x.id===id); if(!b)return;
+  if(!confirm('↩ HOÀN TÁC — XÁC NHẬN\n\nBooking: '+(b.guest||'(chưa có tên)')+' · xe '+(b.xe||'?')+'\n\n'
+    +'Booking sẽ quay về trạng thái TRƯỚC khi giao/thu hồi'
+    +(b.undoState?', đồng thời khôi phục lại giờ, ngày và tiền đã thu của lúc đó':'')+'.\n'
+    +'Thay đổi áp dụng trên TẤT CẢ các máy.\n\nVẫn hoàn tác?')) return;
   if(b._swapNewId){ DB.bookings=DB.bookings.filter(x=>x.id!==b._swapNewId); delete b._swapNewId; delete b._swapToXe; } // hoàn tác đổi xe: xóa booking xe mới + bỏ dấu ⇶
   if(b.undoState){                                   // có ảnh chụp (vừa giao/thu hồi/đổi xe) → khôi phục đầy đủ cả giờ/ngày/giá
     const s=b.undoState;
     b.status=s.status;b.dtime=s.dtime;b.rtime=s.rtime;b.arrive=s.arrive;b.depart=s.depart;
     b.prices=JSON.parse(JSON.stringify(s.prices));b.payments=JSON.parse(JSON.stringify(s.payments));b.prepaid=s.prepaid;b.pay=s.pay;
-    delete b.undoState; delete b._undoKind;
+    delete b.undoState; delete b._undoKind; delete b._undoAt;
   } else {                                            // không có ảnh chụp → lùi đúng 1 bước trạng thái
     if(b.status==='datra') b.status='danhan';         // đã trả → đang thuê
     else if(b.status==='danhan') b.status='sapnhan';  // đã nhận → sắp nhận
@@ -3054,7 +3087,7 @@ document.getElementById('schActDone').onclick=()=>{
     if(b.depart>_td){ b.depart=_td; if(b.prices) Object.keys(b.prices).forEach(ds=>{ if(ds>_td) delete b.prices[ds]; }); }
   }
   b.status=schActKind==='Giao'?'danhan':'datra';
-  b.undoState=_snap; b._undoKind=schActKind;                    // lưu để Hoàn tác từ chi tiết
+  b.undoState=_snap; b._undoKind=schActKind; b._undoAt=Date.now();                    // lưu để Hoàn tác từ chi tiết
   document.getElementById('schActOverlay').classList.remove('open');renderAll();
   showUndoToast(b.id,schActKind,b.xe);                          // toast hoàn tác nhanh
 };
@@ -3378,7 +3411,7 @@ function openBooking(id,prefill,schedKind){
   // Nút Hoàn tác trạng thái — LUÔN hiện khi xe đã nhận/đã trả (lùi 1 bước, kiểu undo check-in/out ezCloud)
   const ub=document.getElementById('bkUndo');
   const _bb=id?DB.bookings.find(x=>x.id===id):null;
-  if(_bb && (_bb.status==='danhan'||_bb.status==='datra')){
+  if(_bb && (_bb.status==='danhan'||_bb.status==='datra') && undoConHan(_bb)){
     ub.style.display='';
     ub.textContent = _bb._swapNewId ? '↩ Hoàn tác đổi xe' : (_bb.status==='datra' ? '↩ Hoàn tác trả xe' : '↩ Hoàn tác nhận xe');
     ub.onclick=()=>doUndoFor(id);
@@ -3530,7 +3563,7 @@ document.getElementById('bkSchDone').onclick=()=>{ // từ Lịch giao trả: se
   if(_b&&_snap&&_kind){
     // Thu hồi mà trả SỚM hơn ngày hẹn → rút ngắn ngày trả về hôm nay + cắt giá ngày sau (giải phóng xe, doanh thu theo ngày thực)
     if(_kind!=='Giao' && _b.depart>todayStr()){ _b.depart=todayStr(); if(_b.prices) Object.keys(_b.prices).forEach(ds=>{ if(ds>todayStr()) delete _b.prices[ds]; }); }
-    _b.undoState=_snap; _b._undoKind=_kind; showUndoToast(_b.id,_kind,_b.xe);
+    _b.undoState=_snap; _b._undoKind=_kind; _b._undoAt=Date.now(); showUndoToast(_b.id,_kind,_b.xe);
     renderAll();
   }
 };
@@ -3738,6 +3771,7 @@ document.getElementById('swapSave').onclick=()=>{
   if(!newXe||newXe===b.xe){alert('Hãy chọn một xe khác để đổi.');return;}
   if(swapNew.depart<swapNew.arrive||swapOld.depart<swapOld.arrive){alert('Ngày trả phải ≥ ngày nhận ở cả hai booking.');return;}
   if(xeBusy(newXe,swapNew.arrive,swapNew.depart,null,swapNew.dtime,swapNew.rtime)){alert('Xe mới '+newXe+' bị trùng giờ với booking khác. Chọn xe khác hoặc chỉnh giờ.');return;}
+  b._undoAt=Date.now();
   b.undoState=snapshotBk(b);                              // ảnh chụp để Hoàn tác đổi xe
   const opt=swapOptVal();
   const allPay=(b.payments||[]).map(p=>({...p}));
