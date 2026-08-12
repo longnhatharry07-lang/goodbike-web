@@ -1,6 +1,6 @@
 // Service Worker cho GOODBIKE PWA
 // Tăng số phiên bản này mỗi khi bạn cập nhật app để buộc làm mới cache.
-const VERSION = 'goodbike-2026-08-11-h';
+const VERSION = 'goodbike-2026-08-12-a';
 const APP_SHELL = [
   './',
   './index.html',
@@ -33,6 +33,13 @@ self.addEventListener('fetch', (event) => {
 
   // Chỉ xử lý GET cùng origin. Bỏ qua Supabase / API bên ngoài để không phá realtime.
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
+    return;
+  }
+
+  // version.json phải LUÔN lấy từ mạng, không bao giờ lấy từ cache —
+  // nếu không thì máy chạy bản cũ sẽ không bao giờ biết là có bản mới.
+  if (new URL(req.url).pathname.endsWith('/version.json')) {
+    event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => new Response('{}', { headers: { 'Content-Type': 'application/json' } })));
     return;
   }
 
