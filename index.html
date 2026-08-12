@@ -1586,24 +1586,44 @@ async function kiemTraBanMoi(){
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
     if(!r.ok) return;
     const j=await r.json();
-    if(j && j.ban && j.ban!==BAN_APP){ banMoiCo=j.ban; hienNutCapNhat(); }
+    /* CHỈ chặn khi bản trên máy chủ MỚI HƠN bản đang chạy. So khác nhau đơn thuần
+       thì một file version.json lỡ cũ sẽ khoá chết toàn bộ máy — không đáng. */
+    if(j && j.ban && String(j.ban)>String(BAN_APP)){ banMoiCo=j.ban; hienNutCapNhat(); }
   }catch(e){}
 }
+/* --- MÁY CHẠY BẢN CŨ: CHẶN GHI, KHÔNG CHỈ NHẮC ---
+   Bản trước chỉ hiện một nút nhắc. Không ai bấm thì máy đó vẫn ghi dữ liệu lên
+   cloud theo luật cũ suốt cả ngày — đúng thứ gây nhiễu loạn. Nay phát hiện bản
+   mới là KHOÁ NGAY đường gửi lên và bắt cập nhật. Dữ liệu đang làm dở vẫn nằm
+   an toàn trong máy và sẽ tự gửi sau khi cập nhật xong. */
+let buocCapNhat=false;
 function hienNutCapNhat(){
-  if(document.getElementById('nutCapNhat')) return;
-  const b=document.createElement('button');
-  b.id='nutCapNhat'; b.type='button';
-  b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:10px;z-index:10001;'
-    +'background:#dc2626;color:#fff;border:none;border-radius:999px;padding:11px 20px;font-size:14px;'
-    +'font-weight:800;box-shadow:0 8px 24px rgba(220,38,38,.45);cursor:pointer;animation:syncpulse 1.4s infinite';
-  b.textContent='🔄 Có bản mới — bấm để cập nhật ngay';
-  b.onclick=async function(){
-    b.textContent='Đang cập nhật…'; b.style.animation='none';
+  buocCapNhat=true;                                   // khoá ghi lên cloud ngay lập tức
+  try{ clearTimeout(sbSendTimer); }catch(e){}
+  if(document.getElementById('manCapNhat')) return;
+  const ov=document.createElement('div');
+  ov.id='manCapNhat';
+  ov.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(15,23,42,.92);'
+    +'display:flex;align-items:center;justify-content:center;padding:20px;'
+    +'font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  ov.innerHTML='<div style="background:#fff;border-radius:16px;max-width:460px;width:100%;padding:26px 24px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45)">'
+    +'<div style="font-size:44px;line-height:1">🔄</div>'
+    +'<div style="font-weight:800;font-size:19px;margin-top:10px;color:#0f172a">Máy này đang chạy bản cũ</div>'
+    +'<div style="color:#475569;font-size:14px;margin-top:10px;line-height:1.55">'
+      +'Đã tạm khoá việc gửi dữ liệu lên cloud để bản cũ không ghi đè công việc của các máy khác.<br><br>'
+      +'<b>Mọi thứ bạn vừa nhập vẫn nằm an toàn trong máy</b> và sẽ tự gửi lên ngay sau khi cập nhật.'
+    +'</div>'
+    +'<div style="color:#64748b;font-size:12.5px;margin-top:12px">Bản máy này: <b>'+BAN_APP+'</b> · Bản mới: <b>'+(banMoiCo||'?')+'</b></div>'
+    +'<button id="nutCapNhat" type="button" style="margin-top:18px;width:100%;background:#dc2626;color:#fff;border:none;'
+      +'border-radius:11px;padding:14px;font-size:15.5px;font-weight:800;cursor:pointer">Cập nhật ngay</button>'
+    +'</div>';
+  document.body.appendChild(ov);
+  document.getElementById('nutCapNhat').onclick=async function(){
+    const b=this; b.textContent='Đang cập nhật…'; b.disabled=true;
     try{ if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); for(const x of rs) await x.unregister(); } }catch(e){}
     try{ if(window.caches){ const ks=await caches.keys(); for(const k of ks) await caches.delete(k); } }catch(e){}
     location.reload(true);
   };
-  document.body.appendChild(b);
 }
 setTimeout(kiemTraBanMoi,4000);
 setInterval(kiemTraBanMoi,180000);                                  // 3 phút một lần
@@ -1842,6 +1862,10 @@ function sbLoadPending(){
 }
 async function sbSend(){
   if(!sb||sbSending) return;
+  if(buocCapNhat){                                   // bản cũ -> cấm ghi lên cloud
+    sbStatus('Máy này đang chạy bản cũ — đã tạm khoá gửi lên cloud. Hãy cập nhật.','err');
+    return;
+  }
   const keys=Object.keys(sbPending);
   if(!keys.length){ sbStatus('Đã đồng bộ '+gio(),'ok'); return; }
   sbSending=true;
@@ -1869,7 +1893,7 @@ async function sbSend(){
       }
     }catch(e3){ /* không kiểm tra được thì vẫn gửi — máy nhận đã có khoá _rev chặn */ }
     const {error}=await sb.from(SB_TABLE).upsert(
-      lo.map(r=>({id:String(r.id),kind:r.kind,data:r.data===undefined?null:r.data,deleted:!!r.deleted})),
+      lo.map(r=>({id:String(r.id),kind:r.kind,data:r.data===undefined?null:r.data,deleted:!!r.deleted,ban:BAN_APP})),
       {onConflict:'id'});
     if(error) throw error;
     lo.forEach(r=>{ delete sbPending[r.kind+'|'+r.id]; });
