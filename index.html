@@ -1495,6 +1495,20 @@ const SB_DEV = (function(){
        return d; }catch(e){ return 'tam'+Math.random().toString(36).slice(2,8); }
 })();
 function revOf(x){ return (x&&+x._rev)||0; }
+/* --- THỨ TỰ HIỂN THỊ ỔN ĐỊNH ---
+   Lỗi "booking nhảy chỗ": mảng được sắp bằng _seq, mà _seq lại trộn hai loại số
+   hoàn toàn khác thang đo — mục chuyển đổi lần đầu nhận 0,1,2,3… còn mục mới
+   nhận Date.now() (~1.7 nghìn tỉ), gán vào đúng lúc MÁY NÀO vẽ lại màn hình
+   trước. Hai máy ra hai thứ tự khác nhau, và mỗi lần kéo dữ liệu về là xáo lại.
+   Nay khoá sắp xếp lấy thẳng từ nội dung (ngày + id) nên MỌI MÁY, MỌI LẦN đều
+   ra đúng một thứ tự. _seq vẫn giữ nguyên trong dữ liệu để không phá bản cũ. */
+function gbKey(x){
+  if(!x||typeof x!=='object') return '~~~~~~~~~~|';
+  const d=String(x.created||x.arrive||x.date||'').slice(0,10);
+  return (d||'~~~~~~~~~~')+'|'+String(x.id||'');
+}
+function gbSapXep(a){ a.sort((x,y)=>gbKey(x)<gbKey(y)?-1:(gbKey(x)>gbKey(y)?1:0)); return a; }
+function gbSeq0(x){ const t=Date.parse(String((x&&(x.created||x.arrive||x.date))||'').slice(0,10)); return isNaN(t)?0:t; }
 /* _rev và _dev chỉ là NHÃN kỹ thuật, không phải nội dung booking. Nếu hai bản
    chỉ khác nhau ở nhãn thì coi như GIỐNG NHAU: không đẩy lên, không vẽ lại màn
    hình. Nhờ vậy một máy nào đó đang chạy bản lỗi và liên tục dập nhãn mới lên
@@ -1702,7 +1716,7 @@ function sbDiff(cu,moi){
       const key=String(x.id);
       const t=truoc.get(key);
       if(!t){                                      // mục mới -> đánh số thứ tự để giữ đúng vị trí
-        if(x._seq==null) x._seq=Date.now();
+        if(x._seq==null) x._seq=gbSeq0(x);   // mốc suy từ chính dữ liệu, không phụ thuộc máy nào chạy trước
         stampRev(x);
         rows.push({id:key,kind:path,data:x,deleted:false});
       }else if(khacNhau(t,x)){                     // chỉ tính khi NỘI DUNG đổi thật
@@ -1769,7 +1783,7 @@ function sbApplyRows(rows){
     else { arr.push(r.data); n++; }
   });
   if(n){
-    ITEM_PATHS.forEach(p=>{ const a=gbArr(DB,p); a.sort((x,y)=>((x&&x._seq)||0)-((y&&y._seq)||0)); });
+    ITEM_PATHS.forEach(p=>{ gbSapXep(gbArr(DB,p)); });   // thứ tự giống hệt nhau trên mọi máy
     sbNormalize(DB);
   }
   return n;
@@ -1798,7 +1812,15 @@ function sbQueue(rows){
   clearTimeout(sbSendTimer);
   sbSendTimer=setTimeout(sbSend,400);
 }
-function sbSavePending(){ try{localStorage.setItem(PEND_KEY,JSON.stringify(Object.values(sbPending)));}catch(e){} }
+function sbSavePending(){
+  /* Trước đây lỗi "đầy bộ nhớ" bị nuốt im lặng: cả hàng chờ — kể cả lệnh XOÁ —
+     bốc hơi mà không ai biết, nên thao tác vừa làm không bao giờ lên tới cloud.
+     Nay dọn bớt bản sao lưu để nhường chỗ, không được nữa thì báo đỏ. */
+  const val=JSON.stringify(Object.values(sbPending));
+  try{ localStorage.setItem(PEND_KEY,val); return; }catch(e){}
+  try{ localStorage.removeItem(SNAP_KEY); localStorage.setItem(PEND_KEY,val); return; }catch(e){}
+  try{ sbStatus('Bộ nhớ trình duyệt đầy — hãy bấm 🛟 Sao lưu rồi tải lại trang','err'); }catch(e){}
+}
 function sbLoadPending(){
   try{ (JSON.parse(localStorage.getItem(PEND_KEY))||[]).forEach(r=>{ if(r&&r.id&&r.kind) sbPending[r.kind+'|'+r.id]=r; }); }catch(e){}
 }
