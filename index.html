@@ -1291,13 +1291,13 @@
 /* ============ CONFIG ============ */
 const VEHICLES = [
   {id:'A1',typ:'Vision'},{id:'A2',typ:'Vision'},{id:'A3',typ:'Vision'},
-  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'OVER1',typ:'Xe số',over:true},
-  {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},
+  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'A7',typ:'Vision'},{id:'OVER1',typ:'Xe số',over:true},
+  {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},{id:'L3',typ:'NVX/Lead'},
   {id:'B1',typ:'NVX/Lead'},
   {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},{id:'G5',typ:'Xe số'},
   {id:'E1',typ:'Xe điện'},{id:'E2',typ:'Xe điện'},{id:'E3',typ:'Xe điện'}
 ];
-const FLEET_CAPACITY = 15; // mẫu số tính công suất (khớp sheet GOODBIKE) — +1 sau khi thêm xe G4
+const FLEET_CAPACITY = 15; // (không còn dùng để tính công suất — xem FLEET_MOC / capacityOn)
 const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
   'iRest':'#43A047',
@@ -2434,7 +2434,20 @@ function revHeader(ndays){
 }
 function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="background:${bg};color:${dark?'#1f2937':'#fff'}"`;}
 // Mẫu số tính công suất theo THÁNG: 16 đến hết tháng này, 18 từ tháng sau trở đi.
-function capacityOn(ds){ return ds.slice(0,7) > todayStr().slice(0,7) ? 18 : 16; }
+/* ===== MẪU SỐ TÍNH CÔNG SUẤT (số xe đang khai thác) =====
+   Cách cũ so tháng với "tháng hiện tại" nên mẫu số TỰ ĐỔI theo thời gian: cùng
+   một ngày, hôm nay chia 18 nhưng sang tháng sau lại chia 16 -> báo cáo cũ đọc
+   lại ra số khác. Nay ghi rõ theo MỐC NGÀY, quá khứ đứng yên vĩnh viễn.
+   Thêm xe thì chỉ cần thêm một dòng vào bảng dưới. */
+const FLEET_MOC = [
+  {tu:'0000-01-01', so:18},   // đội xe gốc: A1–A6, OVER1, L1–L2, B1, G1–G5, E1–E3
+  {tu:'2026-08-16', so:20}    // 16/8/2026: nhập thêm A7 (Vision) + L3 (Lead) -> 20 xe
+];
+function capacityOn(ds){
+  let so=FLEET_MOC[0].so;
+  for(let i=0;i<FLEET_MOC.length;i++){ if(ds>=FLEET_MOC[i].tu) so=FLEET_MOC[i].so; }
+  return so;
+}
 function renderRevenue(){
   const {top,bottom,extra,ndays}=buildMatrices();
   const chiByDay={};DB.expenses.filter(e=>e.date.slice(0,7)===curMonth&&e.type==='honhop').forEach(e=>{const dd=+e.date.split('-')[2];chiByDay[dd]=(chiByDay[dd]||0)+e.amt;});
@@ -3952,7 +3965,12 @@ function periodStats(from,to){
   let cost=0;
   DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to){ const g=costGroup(e.type); if(g==='bien'||g==='dinh'||g==='honhop')cost+=e.amt; } });
   const numDays=paDDiff(from,to)+1;
-  const cap=(FLEET_CAPACITY*numDays)>0?days/(FLEET_CAPACITY*numDays)*100:0;
+  /* Dùng CHUNG mẫu số với bảng Tổng doanh thu (cộng số xe của từng ngày).
+     Trước đây chỗ này chia cứng FLEET_CAPACITY=15 nên tab Phân tích và bảng
+     Tổng doanh thu ra hai con số công suất khác nhau cho cùng một khoảng ngày. */
+  let capDays=0, _ds=from;
+  for(let i=0;i<numDays;i++){ capDays+=capacityOn(_ds); _ds=addDays(_ds,1); }
+  const cap=capDays>0?days/capDays*100:0;
   return {rev,cost,profit:rev-cost,customers:cust.size,days,avg:cust.size?days/cust.size:0,cap};
 }
 /* ===== Cấu hình chỉ số ===== */
