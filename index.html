@@ -1431,6 +1431,7 @@ let sbReady=false;             // đã tải xong dữ liệu từ máy chủ l�
 let sbApplyingRemote=false;    // đang áp dữ liệu máy chủ -> save() không được chạy
 let banGoc=null;               // bản chụp ĐÚNG BẰNG máy chủ, để biết cái gì vừa đổi
 let dangGhi=false;             // đang ghi lên máy chủ
+let luuLai=false;              // có thay đổi mới phát sinh trong lúc đang ghi
 let sbSince=null;              // mốc để lấy phần thay đổi
 let sbMoTa='Đang tải dữ liệu…';
 let dangDonRac=false;          // giữ tên cũ cho phần dọn quỹ trùng
@@ -1632,11 +1633,10 @@ function save(){
     khoiPhucTuMayChu();
     return;
   }
-  if(dangGhi){
-    alert('Đang lưu thay đổi trước, chờ một chút rồi làm lại.');
-    khoiPhucTuMayChu();
-    return;
-  }
+  /* Một thao tác (vd "Hoàn thành & Thu hồi") có thể gọi save() hai lần liên tiếp.
+     Lần sau phải XẾP LƯỢT chờ lần trước ghi xong, tuyệt đối không từ chối và
+     không hoàn tác — làm vậy là chặn mất thao tác của nhân viên. */
+  if(dangGhi){ luuLai=true; return; }
   let rows=sbDiff(banGoc,DB);
   if(!rows.length) return;
   rows=sbGuardDeletes(rows);
@@ -1645,7 +1645,7 @@ function save(){
 }
 
 async function ghiLenMayChu(rows){
-  dangGhi=true;
+  dangGhi=true; let xong=false;
   khoaMan('Đang lưu lên máy chủ…');
   try{
     for(let i=0;i<rows.length;i+=200){
@@ -1659,8 +1659,10 @@ async function ghiLenMayChu(rows){
     }
     chotBanGoc();
     sbStatus('Đã lưu lúc '+gio(),'ok');
+    xong=true;
   }catch(e){
     console.error('ghiLenMayChu',e);
+    luuLai=false;
     khoiPhucTuMayChu();                       // màn hình luôn khớp máy chủ
     sbStatus('Chưa lưu được — đã hoàn lại thay đổi','err');
     alert('❌ CHƯA LƯU ĐƯỢC LÊN MÁY CHỦ\n\n'
@@ -1671,6 +1673,10 @@ async function ghiLenMayChu(rows){
     dangGhi=false;
     moKhoaMan();
   }
+  /* Có thay đổi phát sinh trong lúc đang ghi -> ghi nốt ngay. Đây KHÔNG phải
+     hàng chờ kiểu cũ: nó chỉ xếp lượt trong đúng tab này, trong vài mili giây,
+     và không bao giờ sống sót qua một lần tải lại trang. */
+  if(xong && luuLai){ luuLai=false; setTimeout(save,0); }
 }
 
 /* ---------------- LẤY VỀ TỪ MÁY CHỦ ---------------- */
