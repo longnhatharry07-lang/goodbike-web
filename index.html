@@ -922,7 +922,7 @@
       <div class="ct-top">
         <div>
           <h2 style="margin:0">Thống kê khách hàng liên hệ</h2>
-          <div class="ct-sub">Booking nguồn <b>Zalo / Walk in / Telephone</b> tạo trên Sơ đồ xe tự vào bảng (theo ngày tạo booking) · khách hỏi mà không chốt thì thêm thủ công</div>
+          <div class="ct-sub"><b>Mọi booking</b> tạo trên Sơ đồ xe tự vào bảng, không phân biệt nguồn (theo ngày tạo booking) · booking không cần tính thì bấm 🗑 · khách hỏi mà không chốt thì thêm thủ công</div>
           <div class="ct-sub" id="ctRangeLbl" style="font-weight:700;color:var(--brand-d)"></div>
         </div>
         <div class="ct-range">
@@ -1026,7 +1026,6 @@
         </div>
         <div style="margin-top:8px;font-size:12.5px;color:var(--muted)">Xem trước: <span class="ct-src" id="sq_prev">Tên nguồn</span></div>
       </div>
-      <label class="full" style="display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer"><input type="checkbox" id="sq_track" checked> Booking có nguồn này tự vào <b>Thống kê KH liên hệ</b></label>
       <div class="full muted" id="sq_hint" style="font-size:12.5px"></div>
     </div>
     <details id="sq_edit" style="margin-top:14px;border-top:1px solid var(--line);padding-top:10px">
@@ -1414,7 +1413,7 @@ function normalizeDB(){
   if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
   if(!DB.sourceColors||typeof DB.sourceColors!=='object')DB.sourceColors={};   // màu tự chọn cho nguồn có sẵn (Walk in, Zalo, Meta, iRest) & 2 nhóm công nợ (__recv, __pay)
   if(!Array.isArray(DB.contacts))DB.contacts=[];  // Thống kê KH liên hệ: khách thêm tay + phần chọn thêm cho dòng booking
-  if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // nguồn tự thêm được tính vào Thống kê KH liên hệ (ngoài Zalo/Walk in/Telephone)
+  if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
   if(!Array.isArray(DB.contactNeeds))DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));   // danh mục nhu cầu khách
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
   if(!DB.debtCompanies.receivable)DB.debtCompanies.receivable=[];
@@ -1478,7 +1477,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-4';
+const BAN_APP  = '2026-09-12-lienhe-5';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4166,7 +4165,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 /* ============ THỐNG KÊ KHÁCH HÀNG LIÊN HỆ ============
    Mục đích: đếm khách liên hệ trong ngày để đánh giá hiệu quả marketing.
 
-   Dòng TỰ ĐỘNG: mọi booking có nguồn Zalo / Walk in / Telephone, tính theo NGÀY TẠO
+   Dòng TỰ ĐỘNG: MỌI booking (không phân biệt nguồn), tính theo NGÀY TẠO
      booking (b.created). Không sao chép booking — đọc thẳng từ DB.bookings, nên sửa hay
      xoá booking thì bảng đổi theo. Một khách đặt nhiều xe cùng lúc (giỏ hàng) = 1 dòng.
      Loại chốt tự điền: nhận xe ngay trong ngày tạo → "Trong ngày", ngày khác → "Đặt trước".
@@ -4194,13 +4193,11 @@ function ctKind(src){
   if(/tele|phone|điện\s*thoại|hotline/i.test(s)) return 'phone';
   return 'other';
 }
-/* Nhóm nguồn cho thống kê: 3 nguồn gốc + nguồn tự thêm được đánh dấu "tính vào thống kê" */
+/* Nhóm nguồn cho thống kê: Zalo / Walk in / Telephone gộp các biến thể tên; nguồn khác giữ nguyên tên */
 function ctSrcInfo(src){
   const s=String(src||'').trim(), k=ctKind(s);
-  if(k!=='other') return {k, label:CT_KIND[k], track:true};
-  const ex=(DB.contactSrcs||[]).find(x=>x.toLowerCase()===s.toLowerCase());
-  if(ex) return {k:'c:'+ex.toLowerCase(), label:ex, track:true};
-  return {k:'c:'+(s||'Khác').toLowerCase(), label:s||'Khác', track:false};
+  if(k!=='other') return {k, label:CT_KIND[k]};
+  return {k:'c:'+(s||'Khác').toLowerCase(), label:s||'Khác'};
 }
 function ctBadge(src,label){
   const si=ctSrcInfo(src), txt=ctEsc(label||src||si.label);
@@ -4208,12 +4205,11 @@ function ctBadge(src,label){
   const c=sourceColor(src||si.label);
   return c?`<span class="ct-src" style="background:${c};color:${isLight(c)?'#1f2937':'#fff'}">${txt}</span>`:`<span class="ct-src other">${txt}</span>`;
 }
-/* Thứ tự nhóm nguồn: Zalo, Walk in, Telephone, nguồn tự thêm đang theo dõi, rồi các nguồn khác có phát sinh */
+/* Các nguồn có phát sinh trong khoảng đang xem, nhiều khách nhất lên đầu */
 function ctSrcGroups(all){
-  const g=[['zalo','Zalo','Zalo'],['walkin','Walk in','Walk in'],['phone','Telephone','Telephone']]
-    .concat((DB.contactSrcs||[]).map(x=>['c:'+x.toLowerCase(),x,x]));
-  all.forEach(r=>{ if(!g.some(x=>x[0]===r.kind)) g.push([r.kind,r.srcLabel,r.src]); });
-  return g;   // [key, nhãn, tên nguồn gốc để lấy màu]
+  const g=[], n={};
+  all.forEach(r=>{ n[r.kind]=(n[r.kind]||0)+1; if(!g.some(x=>x[0]===r.kind)) g.push([r.kind,r.srcLabel,r.src]); });
+  return g.sort((a,b)=>(n[b[0]]-n[a[0]])||String(a[1]).localeCompare(String(b[1]),'vi'));   // [key, nhãn, tên nguồn gốc để lấy màu]
 }
 function ctCurRange(){ return ctRange?[ctRange.from,ctRange.to]:[todayStr(),todayStr()]; }
 function ctCurDay(){ return ctCurRange()[0]; }
@@ -4240,7 +4236,7 @@ function ctBookingRows(day){
   const groups=new Map();
   (DB.bookings||[]).forEach(b=>{
     if(!b||String(b.created||'').slice(0,10)!==day) return;
-    const si=ctSrcInfo(b.src); if(!si.track) return;
+    const si=ctSrcInfo(b.src);                       // mọi nguồn đều được tính
     const g=splitGuest(b.guest||'');
     const who=(g.phone||'').replace(/\D/g,'')||(g.name||'').trim().toLowerCase();
     const key=who?(si.k+'|'+who):('id|'+b.id);
@@ -4330,10 +4326,9 @@ function renderContacts(){
     h+=`<tr><td>${ctBadge(src,lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td><b>${rs.length?Math.round((x('today')+x('advance'))/rs.length*100)+'%':'—'}</b></td></tr>`;
   });
   document.getElementById('ctSrcTbl').innerHTML=h;
-  document.getElementById('ctSrcTrack').innerHTML='<span>Nguồn tự vào thống kê:</span>'
-    +['Zalo','Walk in','Telephone'].map(n=>ctBadge(n)).join('')
-    +(DB.contactSrcs||[]).map(n=>ctBadge(n,n).replace(/<\/span>$/,`<button class="x" data-untrack="${ctEsc(n)}" title="Không tính nguồn này nữa">✕</button></span>`)).join('')
-    +'<button class="ct-btn" id="ctSrcAdd" style="padding:3px 10px;font-size:12.5px">＋ Thêm nguồn</button>';
+  if(!groups.length) document.getElementById('ctSrcTbl').innerHTML=h+'<tr><td colspan="6" style="text-align:left;color:var(--muted)">Chưa có khách liên hệ.</td></tr>';
+  document.getElementById('ctSrcTrack').innerHTML='<span>Tính tất cả booking, mọi nguồn.</span>'
+    +'<button class="ct-btn" id="ctSrcAdd" style="padding:3px 10px;font-size:12.5px">＋ Thêm nguồn / 🎨 sửa màu</button>';
   const fsEl=document.getElementById('ctFSrc'), fsv=fsEl.value;
   fsEl.innerHTML='<option value="">Tất cả nguồn</option>'+groups.map(([k,lbl])=>`<option value="${ctEsc(k)}">${ctEsc(lbl)}</option>`).join('');
   fsEl.value=groups.some(x=>x[0]===fsv)?fsv:'';
@@ -4492,7 +4487,7 @@ document.getElementById('ctCatList').onclick=e=>{
 /* ---------- Nguồn khách: danh sách chọn, bỏ theo dõi, thêm nhanh (＋) ---------- */
 function ctFillSrcSel(val){
   const sel=document.getElementById('ctE_src');
-  const list=['Zalo','Walk in','Telephone'].concat(DB.contactSrcs||[], Object.keys(SOURCES), Object.keys(DB.customSources||{}));
+  const list=['Zalo','Walk in','Telephone'].concat(Object.keys(SOURCES), Object.keys(DB.customSources||{}));
   const seen=new Set(), opts=[];
   list.concat(val?[val]:[]).forEach(n=>{ const k=String(n||'').toLowerCase(); if(k&&!seen.has(k)){ seen.add(k); opts.push(n); } });
   if(!seen.has('khác')) opts.push('Khác');
@@ -4501,9 +4496,6 @@ function ctFillSrcSel(val){
 }
 document.getElementById('ctSrcTrack').addEventListener('click',e=>{
   if(e.target.id==='ctSrcAdd'){ openSrcQuick(()=>ctCommit()); return; }
-  const n=e.target.dataset&&e.target.dataset.untrack; if(!n) return;
-  if(!confirm('Booking nguồn "'+n+'" sẽ không tự vào Thống kê KH liên hệ nữa (nguồn vẫn giữ nguyên trên Sơ đồ xe và Bảng tổng doanh thu). Tiếp tục?')) return;
-  DB.contactSrcs=(DB.contactSrcs||[]).filter(x=>x!==n); ctCommit();
 });
 document.getElementById('ctE_srcAdd').onclick=()=>openSrcQuick(n=>{ ctFillSrcSel(n); });
 
@@ -4514,7 +4506,7 @@ function sqPreview(){
   pv.textContent=n; pv.style.background=c; pv.style.color=isLight(c)?'#1f2937':'#fff';
   document.querySelectorAll('#sq_sw button').forEach(b=>b.classList.toggle('on',b.dataset.c.toLowerCase()===c.toLowerCase()));
   const ex=sqFind(n);
-  document.getElementById('sq_hint').textContent=!ex?'':'Nguồn "'+ex+'" đã có — bấm Lưu để đổi sang màu này / cập nhật việc tính vào thống kê.';
+  document.getElementById('sq_hint').textContent=!ex?'':'Nguồn "'+ex+'" đã có — bấm Lưu để đổi sang màu này.';
   document.getElementById('sq_save').textContent=ex?'Lưu':'Thêm nguồn';
 }
 function sqDrawRows(){ const box=document.getElementById('sq_rows'); box.innerHTML=srcColorRowsHTML(); bindSrcColorRows(box,sqDrawRows); }
@@ -4527,7 +4519,6 @@ function openSrcQuick(done){
   const used=new Set(Object.values(DB.customSources||{}).map(c=>String(c).toLowerCase()));
   document.getElementById('sq_name').value='';
   document.getElementById('sq_color').value=SQ_SWATCH.find(c=>!used.has(c.toLowerCase()))||SQ_SWATCH[0];
-  document.getElementById('sq_track').checked=true;
   document.getElementById('sq_list').innerHTML=Object.keys(SOURCES).concat(Object.keys(DB.customSources||{})).map(n=>`<option value="${ctEsc(n)}">`).join('');
   document.getElementById('sq_sw').innerHTML=SQ_SWATCH.map(c=>`<button type="button" data-c="${c}" style="background:${c}" title="${c}"></button>`).join('');
   sqPreview(); sqDrawRows();
@@ -4544,17 +4535,13 @@ document.getElementById('sq_name').addEventListener('input',()=>{
 document.getElementById('sq_name').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('sq_save').click(); });
 document.getElementById('sq_cancel').onclick=()=>document.getElementById('srcQuickOverlay').classList.remove('open');
 document.getElementById('sq_save').onclick=()=>{
-  const raw=document.getElementById('sq_name').value.trim(), color=document.getElementById('sq_color').value, track=document.getElementById('sq_track').checked;
+  const raw=document.getElementById('sq_name').value.trim(), color=document.getElementById('sq_color').value;
   if(!raw){ alert('Nhập tên nguồn.'); return; }
   if(raw===DEBT_RECV||raw===DEBT_PAY||raw.startsWith('__')){ alert('Tên này dành cho nguồn công nợ, hãy đặt tên khác.'); return; }
   if(raw.toLowerCase()==='khác'){ alert('"Khác" là nhóm mặc định, hãy đặt tên cụ thể hơn.'); return; }
   const ex=sqFind(raw), name=ex||raw;
   if(!DB.customSources) DB.customSources={};
   setSourceColor(name,color);                                     // nguồn mới, nguồn tự thêm hoặc nguồn có sẵn đều đổi được màu
-  if(!Array.isArray(DB.contactSrcs)) DB.contactSrcs=[];
-  const builtinTrack=ctKind(name)!=='other';
-  if(track && !builtinTrack && !DB.contactSrcs.some(x=>x.toLowerCase()===name.toLowerCase())) DB.contactSrcs.push(name);
-  if(!track) DB.contactSrcs=DB.contactSrcs.filter(x=>x.toLowerCase()!==name.toLowerCase());
   document.getElementById('srcQuickOverlay').classList.remove('open');
   renderAll();                                   // vẽ lại mọi bảng (có Bảng tổng doanh thu) + lưu lên máy chủ
   const fn=sqDone; sqDone=null; if(fn) fn(name);
