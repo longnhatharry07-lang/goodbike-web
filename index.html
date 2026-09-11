@@ -568,6 +568,9 @@
   #ctTable td.ct-act{text-align:right;white-space:nowrap}
   #ctTable td.ct-act button{padding:4px 8px;font-size:13px}
   #ctTable tr.ct-empty td{text-align:center;color:var(--muted);padding:28px}
+  #ctTable tr.ct-hid td{background:#f8fafc;color:#94a3b8}
+  #ctTable tr.ct-hid .ct-name{text-decoration:line-through;color:#94a3b8}
+  #ctTable tr.ct-hidsep td{background:#f1f5f9;color:#475569;font-size:12.5px;font-weight:700;padding:6px 10px}
   .ct-src{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
   .ct-src.zalo{background:#e0edff;color:#0068ff} .ct-src.walkin{background:#fdf0e3;color:#b35d0b}
   .ct-src.phone{background:#dcfce7;color:#15803d} .ct-src.other{background:#f1f5f9;color:#475569}
@@ -969,7 +972,7 @@
         <button class="ct-pri" id="ctAdd">＋ Thêm thủ công</button>
       </div>
       <div class="tbl-wrap" style="border:none;border-radius:0"><table id="ctTable"></table></div>
-      <div class="ct-foot"><span id="ctCount"></span><span>Bấm vào SĐT để hiện riêng một số · bấm ô Nhu cầu để chọn nhiều mục</span></div>
+      <div class="ct-foot"><span><span id="ctCount"></span> <button class="ct-btn" id="ctHidTog" style="display:none;padding:3px 10px;font-size:12.5px;margin-left:6px"></button></span><span>Bấm vào SĐT để hiện riêng một số · bấm ô Nhu cầu để chọn nhiều mục</span></div>
     </div>
   </section>
 </main>
@@ -1475,7 +1478,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-3';
+const BAN_APP  = '2026-09-12-lienhe-4';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4179,6 +4182,7 @@ var ctRange=null;             // null = luôn là hôm nay · {from:'YYYY-MM-DD'
 var ctShowAll=false;          // hiện toàn bộ SĐT
 try{ ctShowAll=localStorage.getItem('gb_ctShowPhone')==='1'; }catch(e){}
 var ctShown=new Set();        // SĐT đang hiện riêng từng dòng
+var ctShowHidden=false;       // đang xem các booking đã bỏ khỏi thống kê
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
 var ctPop=null;
 
@@ -4255,7 +4259,7 @@ function ctBookingRows(day){
       src:b0.src, kind:ctSrcInfo(b0.src).k, srcLabel:ctSrcInfo(b0.src).label, name:g.name||'(chưa có tên)', phone:g.phone||'',
       xe:list.map(b=>b.xe).filter(Boolean), arrive, autoClose,
       close:(o&&o.close)||autoClose, closeAuto:!(o&&o.close),
-      needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], note:(o&&o.note)||'', ov:o});
+      needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], note:(o&&o.note)||'', ov:o, hidden:!!(o&&o.hidden)});
   });
   return out;
 }
@@ -4293,8 +4297,9 @@ function renderContacts(){
   if(fEl.value!==from) fEl.value=from; if(tEl.value!==to) tEl.value=to;
   document.getElementById('ctRangeLbl').textContent='📅 '+ctRangeText(from,to);
   document.getElementById('ctNeedTitle').textContent=multi?'Nhu cầu khách trong khoảng này':'Nhu cầu khách trong ngày';
-  const all=ctRowsIn(from,to);
-  ctLast=new Map(all.map(r=>[r.key,r]));
+  const allRaw=ctRowsIn(from,to);
+  ctLast=new Map(allRaw.map(r=>[r.key,r]));
+  const all=allRaw.filter(r=>!r.hidden), hid=allRaw.filter(r=>r.hidden);   // booking đã bỏ khỏi thống kê không tính vào số liệu
   const q=(document.getElementById('ctQ').value||'').trim().toLowerCase();
   const fs=document.getElementById('ctFSrc').value, fc=document.getElementById('ctFClose').value;
   const qd=q.replace(/\D/g,'');
@@ -4355,6 +4360,15 @@ function renderContacts(){
   if(miss) document.getElementById('ctShowMiss').onclick=()=>{ document.getElementById('ctFClose').value='needless'; renderContacts(); };
 
   const head='<tr><th style="width:34px">#</th>'+(multi?'<th>Ngày</th>':'')+'<th>Giờ</th><th>Nguồn</th><th>Tên khách</th><th>SĐT</th><th style="min-width:230px">Nhu cầu khách</th><th>Loại chốt</th><th></th></tr>';
+  const hb=document.getElementById('ctHidTog');
+  if(!hid.length) ctShowHidden=false;
+  hb.style.display=hid.length?'':'none';
+  hb.textContent=`🚫 Đã bỏ khỏi thống kê: ${hid.length} · ${ctShowHidden?'Ẩn đi':'Xem'}`;
+  const hidBody=ctShowHidden&&hid.length?`<tr class="ct-hidsep"><td colspan="${multi?9:8}">🚫 Booking đã bỏ khỏi thống kê (không tính vào số liệu) — bấm ↩ để đưa lại</td></tr>`
+    +hid.map(r=>`<tr data-k="${ctEsc(r.key)}" class="ct-hid"><td class="ct-time">—</td>${multi?`<td class="ct-time">${ctDM(r.day)}</td>`:''}<td class="ct-time">${r.time||'—'}</td>
+      <td>${ctBadge(r.src)}</td><td><div class="ct-name">${ctEsc(r.name)}</div><div class="ct-origin"><a data-open="${ctEsc(r.rep)}">Booking ${ctEsc(r.xe.join(', ')||'')}</a>${r.note?' · '+ctEsc(r.note):''}</div></td>
+      <td>${r.phone?ctMask(r.phone):'—'}</td><td colspan="2" style="font-size:12.5px">Đã bỏ khỏi thống kê</td>
+      <td class="ct-act"><button data-unhide title="Đưa lại vào thống kê">↩ Đưa lại</button></td></tr>`).join(''):'';
   const body=list.map((r,i)=>{
     const shown=ctShowAll||ctShown.has(r.key);
     const needs=r.needs.length?r.needs.map(n=>`<span class="ct-chip">${ctEsc(ctNeedName(n))}</span>`).join(''):'<span class="empty">＋ Chọn nhu cầu</span>';
@@ -4370,9 +4384,9 @@ function renderContacts(){
       <td>${ph}</td>
       <td><div class="ct-needs" data-needs>${needs}</div></td>
       <td><div class="ct-seg">${seg}</div></td>
-      <td class="ct-act"><button data-edit title="Sửa">✎</button>${r.auto?'':' <button data-del title="Xoá">🗑</button>'}</td></tr>`;
+      <td class="ct-act"><button data-edit title="Sửa">✎</button> ${r.auto?'<button data-hide title="Bỏ booking này khỏi thống kê (booking vẫn giữ nguyên)">🗑</button>':'<button data-del title="Xoá">🗑</button>'}</td></tr>`;
   }).join('');
-  document.getElementById('ctTable').innerHTML=head+(body||`<tr class="ct-empty"><td colspan="${multi?9:8}">${T?'Không có khách nào khớp bộ lọc.':(multi?'Chưa có khách liên hệ nào trong khoảng này.':'Chưa có khách liên hệ nào trong ngày này.')}</td></tr>`);
+  document.getElementById('ctTable').innerHTML=head+(body||(hidBody&&!T?'':`<tr class="ct-empty"><td colspan="${multi?9:8}">${T?'Không có khách nào khớp bộ lọc.':(multi?'Chưa có khách liên hệ nào trong khoảng này.':'Chưa có khách liên hệ nào trong ngày này.')}</td></tr>`))+hidBody;
   const nb=all.filter(r=>r.auto).length;
   document.getElementById('ctCount').textContent=`${multi?fmtDMY(from)+' → '+fmtDMY(to):fmtDMY(from)} · hiển thị ${list.length} / ${T} khách · ${nb} từ booking, ${T-nb} thêm thủ công`;
   const tp=document.getElementById('ctTogPhone');
@@ -4392,6 +4406,11 @@ document.getElementById('ctTable').addEventListener('click',e=>{
   if(t.closest('[data-needs]')){ ctOpenPop(r,t.closest('[data-needs]')); return; }
   if(t.dataset.open){ if(DB.bookings.some(b=>b.id===t.dataset.open)) openBooking(t.dataset.open); return; }
   if(t.closest('[data-edit]')){ ctOpenEdit(r); return; }
+  if(t.closest('[data-hide]')){
+    if(!confirm('Bỏ booking của "'+r.name+'" ('+r.xe.join(', ')+') khỏi thống kê?\n\nBooking vẫn giữ nguyên trên Sơ đồ xe và doanh thu — chỉ không tính vào Thống kê KH liên hệ. Muốn đưa lại thì bấm "Đã bỏ khỏi thống kê" ở cuối bảng.')) return;
+    const en=ctEntry(r); en.hidden=true; ctCommit(); return;
+  }
+  if(t.closest('[data-unhide]')){ const en=ctEntry(r); delete en.hidden; ctCommit(); return; }
   if(t.closest('[data-del]')){
     if(!confirm('Xoá khách "'+r.name+'" khỏi thống kê?')) return;
     DB.contacts=(DB.contacts||[]).filter(c=>c.id!==r.id); ctCommit();
@@ -4610,6 +4629,7 @@ document.getElementById('ctPreset').onchange=e=>{
 };
 document.getElementById('ctDaysTbl').addEventListener('click',e=>{ const tr=e.target.closest('tr[data-day]'); if(tr) ctSetRange(tr.dataset.day,tr.dataset.day); });
 ['ctQ','ctFSrc','ctFClose'].forEach(id=>document.getElementById(id).addEventListener('input',renderContacts));
+document.getElementById('ctHidTog').onclick=()=>{ ctShowHidden=!ctShowHidden; renderContacts(); };
 document.getElementById('ctTogPhone').onclick=()=>{
   ctShowAll=!ctShowAll; ctShown.clear();
   try{ localStorage.setItem('gb_ctShowPhone',ctShowAll?'1':'0'); }catch(e){}
@@ -4619,7 +4639,7 @@ document.getElementById('ctTogPhone').onclick=()=>{
 /* ---------- XUẤT PDF (khoảng ngày đang xem, không theo bộ lọc) ---------- */
 function ctBuildPdfNode(from,to){
   const multi=from!==to;
-  const all=ctRowsIn(from,to), T=all.length, cnt=k=>all.filter(r=>r.close===k).length;
+  const all=ctRowsIn(from,to).filter(r=>!r.hidden), T=all.length, cnt=k=>all.filter(r=>r.close===k).length;
   const a=cnt('today'), b=cnt('advance'), c=cnt('none'), pct=x=>T?Math.round(x/T*100)+'%':'0%';
   const now=new Date();
   const col={today:'#16a34a',advance:'#2563eb',none:'#dc2626'};
