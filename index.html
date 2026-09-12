@@ -608,6 +608,14 @@
   .ct-chk label:has(input:checked){background:#e0f2fe;border-color:#7dd3fc}
   .ct-chk input{margin:0}
   .ct-mft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  /* Chế độ CHỈ XEM (link ?xem=1): chỉ còn tab Thống kê KH liên hệ, SĐT luôn ẩn, không sửa được gì */
+  body.viewmode #ctAdd,body.viewmode #ctCatsBtn,body.viewmode #ctTogPhone,body.viewmode #ctHidTog,
+  body.viewmode #ctShare,body.viewmode .ct-track button,body.viewmode #ctTable .ct-act{display:none !important}
+  body.viewmode .ct-needs,body.viewmode .ct-seg,body.viewmode #view-contacts .ct-origin a{pointer-events:none}
+  body.viewmode .ct-needs{cursor:default}
+  body.viewmode #view-contacts .ct-origin a{color:var(--muted);text-decoration:none}
+  body.viewmode .ct-needs .empty{color:var(--muted);background:#f1f5f9;border-color:var(--line)}
+  .view-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:700;margin-left:8px}
   .ct-plus{flex:0 0 auto;width:40px;padding:0;font-size:20px;font-weight:800;line-height:1;background:#e0f2fe;color:var(--brand-d);border:1px solid #7dd3fc}
   .ct-plus:hover{background:#bae6fd;filter:none}
   .ct-track{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12.5px;color:var(--muted)}
@@ -969,6 +977,7 @@
         <span style="flex:1"></span>
         <button class="ct-btn" id="ctTogPhone">👁 Hiện SĐT</button>
         <button class="ct-btn" id="ctCatsBtn">⚙ Danh mục nhu cầu</button>
+        <button class="ct-btn" id="ctShare" title="Cho người khác xem riêng mục này (số điện thoại luôn ẩn)">🔗 Chia sẻ chỉ xem</button>
         <button class="ct-btn" id="ctPdf" title="Xuất khoảng ngày đang xem ra PDF — SĐT ẩn/hiện theo nút 👁">📄 Xuất PDF</button>
         <button class="ct-pri" id="ctAdd">＋ Thêm thủ công</button>
       </div>
@@ -1013,6 +1022,30 @@
     </div>
     <div class="muted" style="font-size:12.5px;margin-top:10px">Xoá một mục chỉ ẩn nó khỏi danh sách chọn — các ngày cũ đã gắn mục đó vẫn giữ nguyên để số liệu không bị sai.</div>
     <div class="ct-mft"><button id="ctCatClose">Đóng</button></div>
+  </div>
+</div>
+<!-- Chia sẻ mục Thống kê KH liên hệ ở chế độ CHỈ XEM -->
+<div class="overlay" id="ctShareOverlay">
+  <div class="modal" style="width:min(520px,100%)">
+    <h2 style="margin:0 0 10px;font-size:17px">🔗 Chia sẻ mục Thống kê KH liên hệ (chỉ xem)</h2>
+    <div class="muted" style="font-size:13px;line-height:1.6;margin-bottom:12px">
+      Người mở link này chỉ thấy <b>mục Thống kê KH liên hệ</b>, <b>số điện thoại luôn bị ẩn</b> và không sửa được gì.
+      Các mục Sơ đồ xe, Thu tiền, Kế toán đều không vào được.
+    </div>
+    <div class="ct-form">
+      <div class="full"><label class="lb">Mật khẩu chỉ xem (đặt khác mật khẩu Kế toán)</label>
+        <div style="display:flex;gap:6px"><input id="ctShare_pass" placeholder="VD: xem2026" style="flex:1;min-width:0">
+          <button class="ct-btn" id="ctShare_gen" title="Tạo mật khẩu ngẫu nhiên">🎲</button></div></div>
+      <div class="full"><label class="lb">Link gửi cho người đó</label>
+        <div style="display:flex;gap:6px"><input id="ctShare_link" readonly style="flex:1;min-width:0">
+          <button class="ct-btn" id="ctShare_copy">Copy</button></div></div>
+      <div class="full muted" id="ctShare_state" style="font-size:12.5px"></div>
+    </div>
+    <div class="muted" style="font-size:12px;line-height:1.55;margin-top:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:9px 11px">
+      ⚠️ Đây là khoá ở phần màn hình: đủ để nhân viên chỉ xem được đúng mục này, nhưng người biết kỹ thuật vẫn có thể lấy dữ liệu gốc.
+      Chỉ gửi link cho người bạn tin tưởng. Muốn chặn thật thì phải phân quyền ở máy chủ Supabase.
+    </div>
+    <div class="ct-mft"><button id="ctShare_off">Tắt chia sẻ</button><button class="ct-pri" id="ctShare_save">Lưu mật khẩu</button></div>
   </div>
 </div>
 <!-- Thêm nguồn khách nhanh (dùng ở form booking và tab Thống kê KH liên hệ) -->
@@ -1417,6 +1450,7 @@ function normalizeDB(){
   if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
   if(!DB.sourceColors||typeof DB.sourceColors!=='object')DB.sourceColors={};   // màu tự chọn cho nguồn có sẵn (Walk in, Zalo, Meta, iRest) & 2 nhóm công nợ (__recv, __pay)
   if(!Array.isArray(DB.contacts))DB.contacts=[];  // Thống kê KH liên hệ: khách thêm tay + phần chọn thêm cho dòng booking
+  if(DB.viewPass!==undefined && !String(DB.viewPass).trim()) delete DB.viewPass;   // mật khẩu chế độ chỉ xem (link ?xem=1)
   if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
   if(!Array.isArray(DB.contactNeeds))DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));   // danh mục nhu cầu khách
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
@@ -1481,7 +1515,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-6';
+const BAN_APP  = '2026-09-12-lienhe-7';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -1695,6 +1729,7 @@ function khoiPhucTuMayChu(){
 /* ---------------- GHI LÊN MÁY CHỦ ---------------- */
 function save(){
   if(sbApplyingRemote) return;
+  if(typeof viewMode!=='undefined' && viewMode) return;   // chế độ chỉ xem: không ghi gì lên máy chủ
   if(!sbReady) return;        // chưa tải xong -> màn hình đang bị lớp phủ che, bỏ qua im lặng
   if(navigator.onLine===false){
     alert('⛔ MẤT MẠNG\n\nWeb này lấy dữ liệu trực tiếp từ máy chủ nên khi mất mạng chỉ xem được, không nhập được.\n\nThay đổi vừa rồi đã được hoàn lại. Có mạng lại thì làm lại.');
@@ -1816,6 +1851,7 @@ async function sbInit(){
     try{ renderAll(); }catch(e){ console.warn(e); }
     setTimeout(function(){ try{ scrollTimelineToToday(); }catch(e){} },80);
     try{ chayDonRacQuy(); }catch(e){ console.warn(e); }
+    if(VIEW_ASK){ try{ ctAskViewPass(); }catch(e){ console.warn('view',e); } }   // link ?xem=1 → hỏi mật khẩu chỉ xem
     sbStatus('Đã đồng bộ '+gio(),'ok');
     sb.channel('gb_items')
       .on('postgres_changes',{event:'*',schema:'public',table:SB_TABLE},()=>keoVeSoon(600))
@@ -4201,6 +4237,8 @@ var ctShowAll=false;          // hiện toàn bộ SĐT
 try{ ctShowAll=localStorage.getItem('gb_ctShowPhone')==='1'; }catch(e){}
 var ctShown=new Set();        // SĐT đang hiện riêng từng dòng
 var ctShowHidden=false;       // đang xem các booking đã bỏ khỏi thống kê
+var viewMode=false;           // true = mở bằng link chỉ xem (?xem=1)
+const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
 var ctPop=null;
 
@@ -4370,7 +4408,7 @@ function renderContacts(){
     document.getElementById('ctDaysTbl').innerHTML=dh;
   }
   const miss=all.filter(r=>!r.needs.length).length, al=document.getElementById('ctAlert');
-  al.style.display=miss?'':'none';
+  al.style.display=(miss&&!viewMode)?'':'none';
   al.innerHTML=miss?`<span>⚠ Còn <b>${miss}</b> khách chưa chọn nhu cầu — cuối ngày chọn nốt để thống kê đủ.</span> <button class="ct-btn" id="ctShowMiss" style="padding:4px 10px">Lọc ra để chọn</button>`:'';
   if(miss) document.getElementById('ctShowMiss').onclick=()=>{ document.getElementById('ctFClose').value='needless'; renderContacts(); };
 
@@ -4385,8 +4423,8 @@ function renderContacts(){
       <td>${r.phone?ctMask(r.phone):'—'}</td><td>${r.addr?ctEsc(r.addr):'—'}</td><td colspan="2" style="font-size:12.5px">Đã bỏ khỏi thống kê</td>
       <td class="ct-act"><button data-unhide title="Đưa lại vào thống kê">↩ Đưa lại</button></td></tr>`).join(''):'';
   const body=list.map((r,i)=>{
-    const shown=ctShowAll||ctShown.has(r.key);
-    const needs=r.needs.length?r.needs.map(n=>`<span class="ct-chip">${ctEsc(ctNeedName(n))}</span>`).join(''):'<span class="empty">＋ Chọn nhu cầu</span>';
+    const shown=!viewMode&&(ctShowAll||ctShown.has(r.key));
+    const needs=r.needs.length?r.needs.map(n=>`<span class="ct-chip">${ctEsc(ctNeedName(n))}</span>`).join(''):(viewMode?'<span class="muted">—</span>':'<span class="empty">＋ Chọn nhu cầu</span>');
     const seg=Object.keys(CT_CLOSE).map(k=>`<button class="${k} ${r.close===k?'on':''}" data-cl="${k}">${k==='none'?'Không chốt':CT_CLOSE[k]}</button>`).join('');
     const origin=r.auto
       ? `<a data-open="${ctEsc(r.rep)}">Booking ${ctEsc(r.xe.join(', ')||'')}</a>${r.closeAuto?' · chốt tự động':''}${r.note?' · '+ctEsc(r.note):''}`
@@ -4414,6 +4452,7 @@ document.getElementById('ctTable').addEventListener('click',e=>{
   const tr=e.target.closest('tr[data-k]'); if(!tr) return;
   const r=ctLast.get(tr.dataset.k); if(!r) return;
   const t=e.target;
+  if(viewMode) return;                                  // chế độ chỉ xem: không sửa gì
   if(t.closest('[data-ph]')){ if(ctShowAll) return; ctShown.has(r.key)?ctShown.delete(r.key):ctShown.add(r.key); renderContacts(); return; }
   if(t.dataset.cl){
     if(t.dataset.cl===r.close && !r.closeAuto) return;
@@ -4647,6 +4686,78 @@ document.getElementById('ctTogPhone').onclick=()=>{
   try{ localStorage.setItem('gb_ctShowPhone',ctShowAll?'1':'0'); }catch(e){}
   renderContacts();
 };
+
+/* ---------- CHẾ ĐỘ CHỈ XEM (link ?xem=1) ----------
+   Mở web kèm ?xem=1 → hỏi mật khẩu chỉ xem (DB.viewPass) → chỉ hiện mục Thống kê KH liên hệ,
+   SĐT luôn ẩn, mọi nút sửa bị ẩn và save() bị chặn. Chủ đặt/tắt mật khẩu ở nút "🔗 Chia sẻ chỉ xem". */
+function ctShareLink(){ return location.href.split('#')[0].split('?')[0]+'?xem=1'; }
+function ctDrawShare(){
+  const has=!!(DB.viewPass&&String(DB.viewPass).trim());
+  document.getElementById('ctShare_pass').value=has?DB.viewPass:'';
+  document.getElementById('ctShare_link').value=ctShareLink();
+  document.getElementById('ctShare_state').textContent=has
+    ? '✅ Đang bật. Người có link + mật khẩu này xem được mục Thống kê KH liên hệ.'
+    : '⛔ Đang tắt. Đặt mật khẩu rồi bấm "Lưu mật khẩu" thì link mới dùng được.';
+  document.getElementById('ctShare_off').style.display=has?'':'none';
+}
+{
+  const sb=document.getElementById('ctShare');
+  if(sb) sb.onclick=()=>{ ctDrawShare(); document.getElementById('ctShareOverlay').classList.add('open'); };
+  document.getElementById('ctShare_gen').onclick=()=>{
+    const c='abcdefghijkmnpqrstuvwxyz23456789'; let v='';
+    for(let i=0;i<8;i++) v+=c[Math.floor(Math.random()*c.length)];
+    document.getElementById('ctShare_pass').value=v;
+  };
+  document.getElementById('ctShare_copy').onclick=async()=>{
+    const el=document.getElementById('ctShare_link');
+    try{ await navigator.clipboard.writeText(el.value); alert('Đã copy link. Gửi kèm mật khẩu chỉ xem cho người đó.'); }
+    catch(e){ el.select(); alert('Hãy copy link đang được chọn (Ctrl/Cmd + C).'); }
+  };
+  document.getElementById('ctShare_save').onclick=()=>{
+    const v=document.getElementById('ctShare_pass').value.trim();
+    if(v.length<4){ alert('Mật khẩu cần từ 4 ký tự.'); return; }
+    if(v===(DB.password||'goodbike')){ alert('Đừng dùng trùng mật khẩu khu Kế toán — đặt mật khẩu khác.'); return; }
+    DB.viewPass=v; save(); ctDrawShare();
+    alert('Đã bật chế độ chỉ xem.\n\nGửi cho người đó:\n• Link: '+ctShareLink()+'\n• Mật khẩu: '+v);
+  };
+  document.getElementById('ctShare_off').onclick=()=>{
+    if(!confirm('Tắt chia sẻ? Link chỉ xem sẽ không dùng được nữa.')) return;
+    delete DB.viewPass; save(); ctDrawShare();
+  };
+}
+function ctApplyViewMode(){
+  viewMode=true; ctShowAll=false; ctShown.clear();
+  document.body.classList.add('viewmode');
+  document.querySelectorAll('#tabs .tab, #tabs .tab-group').forEach(el=>{ if(el.dataset&&el.dataset.t==='contacts') return; el.style.display='none'; });
+  ['prevM','nextM','monthPick','addBk','adminLock','changePass','accToggle'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
+  const h1=document.querySelector('header h1'); if(h1 && !document.getElementById('viewBadge')){
+    const b=document.createElement('span'); b.id='viewBadge'; b.className='view-badge'; b.textContent='👁 Chế độ chỉ xem'; h1.appendChild(b);
+  }
+  const sub=document.querySelector('#view-contacts .ct-sub');
+  if(sub) sub.innerHTML='Số liệu khách liên hệ theo ngày tạo booking · <b>số điện thoại đã được ẩn</b> · chế độ chỉ xem nên không sửa được gì';
+  const hint=document.querySelector('#view-contacts .ct-foot span:last-child');
+  if(hint) hint.textContent='Chế độ chỉ xem — có thể đổi khoảng ngày, lọc, tìm kiếm và xuất PDF.';
+  try{ switchTab('contacts'); }catch(e){}
+  try{ renderContacts(); }catch(e){}
+}
+function ctAskViewPass(){
+  const ok=String(DB.viewPass||'').trim();
+  const box=(msg,err)=>manChan('gbXem',
+    '<div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:26px 24px;box-shadow:0 24px 60px rgba(0,0,0,.45)">'
+    +'<div style="font-size:40px;line-height:1">👁</div>'
+    +'<div style="font-weight:800;font-size:18px;margin-top:8px;color:#0f172a">Thống kê khách hàng liên hệ</div>'
+    +'<div style="color:#475569;font-size:13.5px;margin-top:8px">'+msg+'</div>'
+    +(err===false?'':'<input id="gbXemPass" type="password" placeholder="Mật khẩu chỉ xem" '
+      +'style="width:100%;margin-top:14px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;text-align:center">'
+      +'<button id="gbXemOk" style="margin-top:12px;width:100%;background:#0284c7;color:#fff;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:800;cursor:pointer">Xem thống kê</button>')
+    +'</div>');
+  if(!ok){ box('Chủ cửa hàng chưa bật chế độ chỉ xem cho mục này. Hãy nhờ chủ bật ở nút “🔗 Chia sẻ chỉ xem”.',false); return; }
+  box('Nhập mật khẩu chỉ xem để vào mục thống kê. Số điện thoại khách sẽ được ẩn.');
+  const inp=document.getElementById('gbXemPass'), btn=document.getElementById('gbXemOk');
+  const go=()=>{ if(inp.value===ok){ dongMan('gbXem'); ctApplyViewMode(); } else { inp.value=''; inp.placeholder='Sai mật khẩu, thử lại'; inp.focus(); } };
+  btn.onclick=go; inp.onkeydown=e=>{ if(e.key==='Enter') go(); };
+  setTimeout(()=>{ try{ inp.focus(); }catch(e){} },60);
+}
 
 /* ---------- XUẤT PDF (khoảng ngày đang xem, không theo bộ lọc) ---------- */
 function ctBuildPdfNode(from,to){
