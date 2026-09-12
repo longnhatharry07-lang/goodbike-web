@@ -561,7 +561,8 @@
   .ct-alert{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:9px 14px;margin-bottom:16px;font-size:13.5px}
   .ct-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
   .ct-toolbar input[type=search]{min-width:200px}
-  #ctTable{min-width:940px}
+  #ctTable{min-width:1080px}
+  .ct-addr{display:inline-block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:12.5px}
   #ctTable th,#ctTable td{text-align:left;white-space:normal;vertical-align:middle;border-left:0;border-right:0;padding:8px 10px}
   #ctTable th{font-size:12px;color:var(--muted);white-space:nowrap}
   #ctTable td.ct-time{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -956,7 +957,7 @@
     <div class="ct-alert" id="ctAlert" style="display:none"></div>
     <div class="card" style="padding:0">
       <div class="ct-toolbar">
-        <input type="search" id="ctQ" placeholder="Tìm tên / SĐT…">
+        <input type="search" id="ctQ" placeholder="Tìm tên / SĐT / địa chỉ…">
         <select id="ctFSrc"><option value="">Tất cả nguồn</option></select>
         <select id="ctFClose">
           <option value="">Tất cả loại chốt</option>
@@ -988,6 +989,7 @@
         <div style="display:flex;gap:6px"><select id="ctE_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="ctE_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       <div><label class="lb">Tên khách</label><input id="ctE_name" placeholder="VD: Anh Tuấn"></div>
       <div class="full"><label class="lb">SĐT</label><input id="ctE_phone" inputmode="tel" placeholder="09xx xxx xxx"></div>
+      <div class="full"><label class="lb">Địa chỉ thường trú (không bắt buộc)</label><input id="ctE_addr" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM"></div>
       <div class="full"><label class="lb">Nhu cầu khách (chọn nhiều)</label><div class="ct-chk" id="ctE_needs"></div></div>
       <div class="full"><label class="lb">Loại chốt</label>
         <div class="ct-seg" id="ctE_close">
@@ -1073,6 +1075,8 @@
         <div class="field"><label>Nguồn khách</label>
           <div style="display:flex;gap:6px"><select id="f_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="f_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       </div>
+      <div class="field" style="margin-top:8px"><label>Địa chỉ thường trú <span class="muted" style="font-weight:400">(không bắt buộc)</span></label>
+        <input type="text" id="f_resaddr" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM" autocomplete="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
       <datalist id="guestList"></datalist>
       <datalist id="phoneList"></datalist>
       <div id="f_guestHint" class="guest-hint" style="display:none"></div>
@@ -1477,7 +1481,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-5';
+const BAN_APP  = '2026-09-12-lienhe-6';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3193,6 +3197,18 @@ function refreshGuestList(){
   pl.innerHTML=dir.filter(c=>c.phone)
     .map(c=>`<option value="${esc(c.phone)}">${esc(c.name)} · ${c.count} lần</option>`).join('');
 }
+/* Địa chỉ thường trú đã lưu của khách (theo SĐT) — lấy từ booking gần nhất có địa chỉ */
+function resaddrByPhone(ph){
+  const p=String(ph||'').replace(/\D/g,''); if(p.length<6) return '';
+  let best=null;
+  (DB.bookings||[]).forEach(b=>{
+    if(!b||!b.resaddr) return;
+    const g=splitGuest(b.guest||'');
+    if((g.phone||'').replace(/\D/g,'')!==p) return;
+    if(!best || String(b.created||b.arrive||'')>String(best.created||best.arrive||'')) best=b;
+  });
+  return best?best.resaddr:'';
+}
 function findCustByPhone(ph){ ph=(ph||'').replace(/\s/g,''); if(ph.length<6)return null;
   return paCustDirectory().find(c=>c.phone&&c.phone.replace(/\s/g,'')===ph)||null; }
 function findCustByName(nm){ nm=(nm||'').trim().toLowerCase(); if(!nm)return null;
@@ -3210,8 +3226,11 @@ function showGuestHint(c,matchedBy){
 function wireGuestInputs(){
   const g=document.getElementById('f_guest'), ph=document.getElementById('f_phone');
   if(!g||!ph||g._gWired)return; g._gWired=true;
+  const ra=document.getElementById('f_resaddr');
   const byPhone=()=>{ const c=findCustByPhone(ph.value);
-    if(c){ if(c.name&&c.name!=='—'&&!g.value.trim())g.value=c.name; showGuestHint(c,'phone'); }
+    if(c){ if(c.name&&c.name!=='—'&&!g.value.trim())g.value=c.name;
+      if(ra&&!ra.value.trim()){ const ad=resaddrByPhone(ph.value); if(ad)ra.value=ad; }    // khách quen → điền sẵn địa chỉ thường trú đã lưu
+      showGuestHint(c,'phone'); }
     else showGuestHint(null); };
   const byName=()=>{ if(findCustByPhone(ph.value))return;      // đã khớp SĐT thì ưu tiên SĐT
     const c=findCustByName(g.value);
@@ -3261,7 +3280,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Chi tiết booking — '+b.xe;
     const grp = b.debt || debtGroupOf(b.src);     // booking cũ chưa có cờ debt → suy ra từ tên công ty
     const srcDisplay = grp==='receivable'?DEBT_RECV:(grp==='payable'?DEBT_PAY:b.src);
-    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}
+    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}f('resaddr',b.resaddr||'');
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
@@ -3272,7 +3291,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Thêm booking';
     // mặc định: nếu bấm từ ô sơ đồ xe (prefill.ds) → đúng ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
     const ds = (prefill&&prefill.ds) ? prefill.ds : todayStr();
-    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('bknote','');
+    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     onSrcChange();
@@ -3469,7 +3488,7 @@ document.getElementById('bkSave').onclick=()=>{
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
   rememberPlace(f('daddr'),f('dkm')); rememberPlace(f('raddr'),f('rkm'));   // tự nhớ địa điểm + km cho lần sau
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),note:f('bknote')};
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote')};
   if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
     // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
@@ -4253,6 +4272,7 @@ function ctBookingRows(day){
     const time=list.map(b=>b.ctime||'').filter(Boolean).sort()[0]||'';
     out.push({key:'b:'+b0.id, auto:true, ids:list.map(b=>b.id), rep:b0.id, day, time,
       src:b0.src, kind:ctSrcInfo(b0.src).k, srcLabel:ctSrcInfo(b0.src).label, name:g.name||'(chưa có tên)', phone:g.phone||'',
+      addr:(list.map(b=>b.resaddr).find(Boolean)||''),
       xe:list.map(b=>b.xe).filter(Boolean), arrive, autoClose,
       close:(o&&o.close)||autoClose, closeAuto:!(o&&o.close),
       needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], note:(o&&o.note)||'', ov:o, hidden:!!(o&&o.hidden)});
@@ -4262,7 +4282,7 @@ function ctBookingRows(day){
 function ctManualRows(day){
   return (DB.contacts||[]).filter(c=>c&&!c.bk&&c.date===day).map(c=>({
     key:'m:'+c.id, auto:false, id:c.id, day, time:c.time||'', src:c.src||'Khác', kind:ctSrcInfo(c.src||'Khác').k, srcLabel:ctSrcInfo(c.src||'Khác').label,
-    name:c.name||'(chưa có tên)', phone:c.phone||'', close:c.close||'none', closeAuto:false,
+    name:c.name||'(chưa có tên)', phone:c.phone||'', addr:c.addr||'', close:c.close||'none', closeAuto:false,
     needs:Array.isArray(c.needs)?c.needs.slice():[], note:c.note||''}));
 }
 function ctRowsIn(from,to){
@@ -4303,7 +4323,7 @@ function renderContacts(){
     if(fs && r.kind!==fs) return false;
     if(fc==='needless'){ if(r.needs.length) return false; }
     else if(fc && r.close!==fc) return false;
-    if(q && !(r.name.toLowerCase().includes(q) || (qd && r.phone.replace(/\D/g,'').includes(qd)))) return false;
+    if(q && !(r.name.toLowerCase().includes(q) || (r.addr||'').toLowerCase().includes(q) || (qd && r.phone.replace(/\D/g,'').includes(qd)))) return false;
     return true;
   });
 
@@ -4354,15 +4374,15 @@ function renderContacts(){
   al.innerHTML=miss?`<span>⚠ Còn <b>${miss}</b> khách chưa chọn nhu cầu — cuối ngày chọn nốt để thống kê đủ.</span> <button class="ct-btn" id="ctShowMiss" style="padding:4px 10px">Lọc ra để chọn</button>`:'';
   if(miss) document.getElementById('ctShowMiss').onclick=()=>{ document.getElementById('ctFClose').value='needless'; renderContacts(); };
 
-  const head='<tr><th style="width:34px">#</th>'+(multi?'<th>Ngày</th>':'')+'<th>Giờ</th><th>Nguồn</th><th>Tên khách</th><th>SĐT</th><th style="min-width:230px">Nhu cầu khách</th><th>Loại chốt</th><th></th></tr>';
+  const head='<tr><th style="width:34px">#</th>'+(multi?'<th>Ngày</th>':'')+'<th>Giờ</th><th>Nguồn</th><th>Tên khách</th><th>SĐT</th><th>Địa chỉ thường trú</th><th style="min-width:230px">Nhu cầu khách</th><th>Loại chốt</th><th></th></tr>';
   const hb=document.getElementById('ctHidTog');
   if(!hid.length) ctShowHidden=false;
   hb.style.display=hid.length?'':'none';
   hb.textContent=`🚫 Đã bỏ khỏi thống kê: ${hid.length} · ${ctShowHidden?'Ẩn đi':'Xem'}`;
-  const hidBody=ctShowHidden&&hid.length?`<tr class="ct-hidsep"><td colspan="${multi?9:8}">🚫 Booking đã bỏ khỏi thống kê (không tính vào số liệu) — bấm ↩ để đưa lại</td></tr>`
+  const hidBody=ctShowHidden&&hid.length?`<tr class="ct-hidsep"><td colspan="${multi?10:9}">🚫 Booking đã bỏ khỏi thống kê (không tính vào số liệu) — bấm ↩ để đưa lại</td></tr>`
     +hid.map(r=>`<tr data-k="${ctEsc(r.key)}" class="ct-hid"><td class="ct-time">—</td>${multi?`<td class="ct-time">${ctDM(r.day)}</td>`:''}<td class="ct-time">${r.time||'—'}</td>
       <td>${ctBadge(r.src)}</td><td><div class="ct-name">${ctEsc(r.name)}</div><div class="ct-origin"><a data-open="${ctEsc(r.rep)}">Booking ${ctEsc(r.xe.join(', ')||'')}</a>${r.note?' · '+ctEsc(r.note):''}</div></td>
-      <td>${r.phone?ctMask(r.phone):'—'}</td><td colspan="2" style="font-size:12.5px">Đã bỏ khỏi thống kê</td>
+      <td>${r.phone?ctMask(r.phone):'—'}</td><td>${r.addr?ctEsc(r.addr):'—'}</td><td colspan="2" style="font-size:12.5px">Đã bỏ khỏi thống kê</td>
       <td class="ct-act"><button data-unhide title="Đưa lại vào thống kê">↩ Đưa lại</button></td></tr>`).join(''):'';
   const body=list.map((r,i)=>{
     const shown=ctShowAll||ctShown.has(r.key);
@@ -4377,11 +4397,12 @@ function renderContacts(){
       <td>${ctBadge(r.src)}</td>
       <td><div class="ct-name">${ctEsc(r.name)}</div><div class="ct-origin">${origin}</div></td>
       <td>${ph}</td>
+      <td>${r.addr?`<span class="ct-addr" title="${ctEsc(r.addr)}">${ctEsc(r.addr)}</span>`:'<span class="muted">—</span>'}</td>
       <td><div class="ct-needs" data-needs>${needs}</div></td>
       <td><div class="ct-seg">${seg}</div></td>
       <td class="ct-act"><button data-edit title="Sửa">✎</button> ${r.auto?'<button data-hide title="Bỏ booking này khỏi thống kê (booking vẫn giữ nguyên)">🗑</button>':'<button data-del title="Xoá">🗑</button>'}</td></tr>`;
   }).join('');
-  document.getElementById('ctTable').innerHTML=head+(body||(hidBody&&!T?'':`<tr class="ct-empty"><td colspan="${multi?9:8}">${T?'Không có khách nào khớp bộ lọc.':(multi?'Chưa có khách liên hệ nào trong khoảng này.':'Chưa có khách liên hệ nào trong ngày này.')}</td></tr>`))+hidBody;
+  document.getElementById('ctTable').innerHTML=head+(body||(hidBody&&!T?'':`<tr class="ct-empty"><td colspan="${multi?10:9}">${T?'Không có khách nào khớp bộ lọc.':(multi?'Chưa có khách liên hệ nào trong khoảng này.':'Chưa có khách liên hệ nào trong ngày này.')}</td></tr>`))+hidBody;
   const nb=all.filter(r=>r.auto).length;
   document.getElementById('ctCount').textContent=`${multi?fmtDMY(from)+' → '+fmtDMY(to):fmtDMY(from)} · hiển thị ${list.length} / ${T} khách · ${nb} từ booking, ${T-nb} thêm thủ công`;
   const tp=document.getElementById('ctTogPhone');
@@ -4565,8 +4586,10 @@ function ctOpenEdit(r){
   ctFillSrcSel(r?r.src:'Zalo');
   $('ctE_name').value=r?(r.auto&&r.name==='(chưa có tên)'?'':r.name):'';
   $('ctE_phone').value=r?r.phone:'';
+  $('ctE_addr').value=r?r.addr:'';
   $('ctE_note').value=r?r.note:'';
   ['ctE_date','ctE_time','ctE_src','ctE_name','ctE_phone'].forEach(id=>{ $(id).disabled=lock; $(id).title=lock?'Lấy từ booking — muốn đổi thì sửa booking':''; });
+  $('ctE_addr').title=lock?'Sửa ở đây sẽ lưu vào booking của khách':'';
   const sel=r?r.needs:[];
   $('ctE_needs').innerHTML=ctNeeds().filter(n=>!n.off||sel.includes(n.id))
     .map(n=>`<label><input type="checkbox" value="${ctEsc(n.id)}" ${sel.includes(n.id)?'checked':''}>${ctEsc(n.name)}</label>`).join('');
@@ -4580,13 +4603,15 @@ document.getElementById('ctE_save').onclick=()=>{
   const $=id=>document.getElementById(id), r=ctEditing;
   const needs=[...document.querySelectorAll('#ctE_needs input:checked')].map(i=>i.value), note=$('ctE_note').value.trim();
   if(r&&r.auto){
+    const addr=$('ctE_addr').value.trim();
+    if(addr!==(r.addr||'')) (DB.bookings||[]).forEach(b=>{ if(r.ids.indexOf(b.id)>=0) b.resaddr=addr; });   // địa chỉ thường trú thuộc về khách → lưu vào booking
     const en=ctEntry(r); en.needs=needs; en.note=note;
     if(ctEClose!==r.close || !r.closeAuto) en.close=ctEClose;
   }else{
     const name=$('ctE_name').value.trim();
     if(!name){ alert('Nhập tên khách.'); $('ctE_name').focus(); return; }
     const date=$('ctE_date').value||todayStr();
-    const data={date, time:$('ctE_time').value||'', src:$('ctE_src').value, name, phone:$('ctE_phone').value.trim(), needs, close:ctEClose, note};
+    const data={date, time:$('ctE_time').value||'', src:$('ctE_src').value, name, phone:$('ctE_phone').value.trim(), addr:$('ctE_addr').value.trim(), needs, close:ctEClose, note};
     if(r){ const en=ctEntry(r); if(en) Object.assign(en,data); }
     else { if(!Array.isArray(DB.contacts)) DB.contacts=[]; DB.contacts.push({id:'ct_'+uid()+uid(), ...data}); }
     { const [rf,rt]=ctCurRange(); if(date<rf||date>rt) ctRange=(date===todayStr()?null:{from:date,to:date}); }   // ngày ngoài khoảng đang xem → nhảy tới ngày đó
@@ -4651,10 +4676,11 @@ function ctBuildPdfNode(from,to){
       <td>${i+1}</td>${multi?`<td>${ctDM(r.day)}</td>`:''}<td>${r.time||'—'}</td><td class="l">${ctEsc(r.src)}</td>
       <td class="l"><b>${ctEsc(r.name)}</b><div class="o">${r.auto?'Booking '+ctEsc(r.xe.join(', ')):'Thủ công'}</div></td>
       <td class="l">${r.phone?(ctShowAll?ctEsc(ctFmtPhone(r.phone)):ctMask(r.phone)):'—'}</td>
+      <td class="l">${r.addr?ctEsc(r.addr):'—'}</td>
       <td class="l">${r.needs.map(n=>ctEsc(ctNeedName(n))).join(', ')||'<span style="color:#c2410c">chưa chọn</span>'}</td>
       <td class="l" style="color:${col[r.close]};font-weight:700">${CT_CLOSE[r.close]}</td>
       <td class="l">${ctEsc(r.note)}</td></tr>`).join('')
-    ||`<tr><td colspan="${multi?9:8}" style="color:#64748b;padding:16px">Không có khách liên hệ nào trong ${multi?'khoảng này':'ngày'}.</td></tr>`;
+    ||`<tr><td colspan="${multi?10:9}" style="color:#64748b;padding:16px">Không có khách liên hệ nào trong ${multi?'khoảng này':'ngày'}.</td></tr>`;
   const kpi=(l,v,h,cl)=>`<td><div class="kl">${l}</div><div class="kv" style="color:${cl||'#0f172a'}">${v}</div><div class="kh">${h||''}</div></td>`;
   const wrap=document.createElement('div');
   wrap.id='ctPdfCapture';
@@ -4690,7 +4716,7 @@ function ctBuildPdfNode(from,to){
     ${multi?`<h3 class="ctp-brk">Theo từng ngày</h3>
     <table><tr class="ctp-brk"><th class="l">Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Tỉ lệ chốt</th></tr>${days}</table>`:''}
     <h3 class="ctp-brk">Danh sách khách liên hệ (${T})</h3>
-    <table><tr class="ctp-brk"><th>#</th>${multi?'<th>Ngày</th>':''}<th>Giờ</th><th class="l">Nguồn</th><th class="l">Tên khách</th><th class="l">SĐT</th><th class="l">Nhu cầu</th><th class="l">Loại chốt</th><th class="l">Ghi chú</th></tr>${rows}</table>`;
+    <table><tr class="ctp-brk"><th>#</th>${multi?'<th>Ngày</th>':''}<th>Giờ</th><th class="l">Nguồn</th><th class="l">Tên khách</th><th class="l">SĐT</th><th class="l">Địa chỉ thường trú</th><th class="l">Nhu cầu</th><th class="l">Loại chốt</th><th class="l">Ghi chú</th></tr>${rows}</table>`;
   return wrap;
 }
 function ctPrintFallback(node,title){
