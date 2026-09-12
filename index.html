@@ -623,7 +623,7 @@
   .ct-plus{flex:0 0 auto;width:40px;padding:0;font-size:20px;font-weight:800;line-height:1;background:#e0f2fe;color:var(--brand-d);border:1px solid #7dd3fc}
   .ct-plus:hover{background:#bae6fd;filter:none}
   .ct-track{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12.5px;color:var(--muted)}
-  .ct-track .x{border:0;background:none;padding:0 0 0 4px;font-size:12px;color:inherit;opacity:.7;cursor:pointer}
+  .ct-track .x{border:0;background:none;padding:0 0 0 5px;font-size:12px;color:inherit;opacity:.75;cursor:pointer;font-weight:700}
   .ct-track .x:hover{opacity:1}
   .ct-track .ct-src{display:inline-flex;align-items:center}
   .ct-sw{display:flex;flex-wrap:wrap;gap:5px}
@@ -935,7 +935,7 @@
       <div class="ct-top">
         <div>
           <h2 style="margin:0">Thống kê khách hàng liên hệ</h2>
-          <div class="ct-sub"><b>Mọi booking</b> tạo trên Sơ đồ xe tự vào bảng, không phân biệt nguồn (theo ngày tạo booking) · booking không cần tính thì bấm 🗑 · khách hỏi mà không chốt thì thêm thủ công</div>
+          <div class="ct-sub"><b>Mọi booking</b> tạo trên Sơ đồ xe tự vào bảng theo ngày tạo — trừ khách quen và công nợ phải thu/phải trả (xem dòng “Không tính vào thống kê”) · booking lẻ không cần tính thì bấm 🗑 · khách hỏi mà không chốt thì thêm thủ công</div>
           <div class="ct-sub" id="ctRangeLbl" style="font-weight:700;color:var(--brand-d)"></div>
         </div>
         <div class="ct-range">
@@ -1458,6 +1458,8 @@ function normalizeDB(){
   if(!DB.sourceColors||typeof DB.sourceColors!=='object')DB.sourceColors={};   // màu tự chọn cho nguồn có sẵn (Walk in, Zalo, Meta, iRest) & 2 nhóm công nợ (__recv, __pay)
   if(!Array.isArray(DB.contacts))DB.contacts=[];  // Thống kê KH liên hệ: khách thêm tay + phần chọn thêm cho dòng booking
   if(DB.viewPass!==undefined && !String(DB.viewPass).trim()) delete DB.viewPass;   // mật khẩu chế độ chỉ xem (link ?xem=1)
+  if(!Array.isArray(DB.contactSkip))DB.contactSkip=[];   // nguồn KHÔNG tính vào Thống kê KH liên hệ (chủ tự chọn thêm)
+  if(!Array.isArray(DB.contactKeep))DB.contactKeep=[];   // nguồn khách quen được tính lại (ghi đè luật mặc định)
   if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
   if(!Array.isArray(DB.contactNeeds))DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));   // danh mục nhu cầu khách
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
@@ -1522,7 +1524,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-9';
+const BAN_APP  = '2026-09-12-lienhe-10';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4227,7 +4229,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 /* ============ THỐNG KÊ KHÁCH HÀNG LIÊN HỆ ============
    Mục đích: đếm khách liên hệ trong ngày để đánh giá hiệu quả marketing.
 
-   Dòng TỰ ĐỘNG: MỌI booking (không phân biệt nguồn), tính theo NGÀY TẠO
+   Dòng TỰ ĐỘNG: mọi booking TRỪ khách quen & công nợ phải thu/phải trả (xem ctSkipSrc), tính theo NGÀY TẠO
      booking (b.created). Không sao chép booking — đọc thẳng từ DB.bookings, nên sửa hay
      xoá booking thì bảng đổi theo. Một khách đặt nhiều xe cùng lúc (giỏ hàng) = 1 dòng.
      Loại chốt tự điền: nhận xe ngay trong ngày tạo → "Trong ngày", ngày khác → "Đặt trước".
@@ -4270,6 +4272,21 @@ function ctBadge(src,label){
   const c=sourceColor(src||si.label);
   return c?`<span class="ct-src" style="background:${c};color:${isLight(c)?'#1f2937':'#fff'}">${txt}</span>`:`<span class="ct-src other">${txt}</span>`;
 }
+/* Nguồn KHÔNG tính vào thống kê khách liên hệ:
+     · công ty công nợ phải thu / phải trả (VNA, Atlantis, Vexere, HaYe…) — đây là khách của đối tác, không phải khách tự liên hệ
+     · khách quen / khách quay lại — không phải khách mới do marketing đem về (chủ có thể bật lại)
+     · các nguồn chủ tự loại thêm (DB.contactSkip) */
+function ctSkipSrc(src,b){
+  if(b && b.debt) return true;
+  if(debtGroupOf(src)) return true;
+  const l=String(src||'').trim().toLowerCase();
+  if((DB.contactSkip||[]).some(x=>String(x).trim().toLowerCase()===l)) return true;
+  if(/kh[áa]ch\s*quen|quay\s*l[aạ]i/.test(l) && !(DB.contactKeep||[]).some(x=>String(x).trim().toLowerCase()===l)) return true;
+  return false;
+}
+/* Mọi nguồn đang có trong app (nguồn có sẵn + nguồn tự thêm) */
+function ctAllSrcNames(){ return [...new Set(Object.keys(SOURCES).concat(Object.keys(DB.customSources||{})))]; }
+
 /* Các nguồn có phát sinh trong khoảng đang xem, nhiều khách nhất lên đầu */
 function ctSrcGroups(all){
   const g=[], n={};
@@ -4301,7 +4318,8 @@ function ctBookingRows(day){
   const groups=new Map();
   (DB.bookings||[]).forEach(b=>{
     if(!b||String(b.created||'').slice(0,10)!==day) return;
-    const si=ctSrcInfo(b.src);                       // mọi nguồn đều được tính
+    if(ctSkipSrc(b.src,b)) return;                   // bỏ khách quen & công nợ phải thu/phải trả
+    const si=ctSrcInfo(b.src);                       // các nguồn còn lại đều được tính
     const g=splitGuest(b.guest||'');
     const who=(g.phone||'').replace(/\D/g,'')||(g.name||'').trim().toLowerCase();
     const key=who?(si.k+'|'+who):('id|'+b.id);
@@ -4397,7 +4415,12 @@ function renderContacts(){
   });
   document.getElementById('ctSrcTbl').innerHTML=h;
   if(!groups.length) document.getElementById('ctSrcTbl').innerHTML=h+'<tr><td colspan="7" style="text-align:left;color:var(--muted)">Chưa có khách liên hệ.</td></tr>';
-  document.getElementById('ctSrcTrack').innerHTML='<span>Tính tất cả booking, mọi nguồn.</span>'
+  const skipped=ctAllSrcNames().filter(n=>ctSkipSrc(n,null));
+  const canAdd=ctAllSrcNames().filter(n=>!ctSkipSrc(n,null)).sort((x,y)=>x.localeCompare(y,'vi'));
+  document.getElementById('ctSrcTrack').innerHTML='<span>Không tính vào thống kê:</span>'
+    +'<span class="ct-src other">Công nợ phải thu</span><span class="ct-src other">Công nợ phải trả</span>'
+    +skipped.map(n=>`<span class="ct-src other">${ctEsc(n)}<button class="x" data-unskip="${ctEsc(n)}" title="Tính nguồn này vào thống kê">✕</button></span>`).join('')
+    +`<select id="ctSkipAdd" style="padding:3px 8px;font-size:12.5px"><option value="">＋ Loại thêm nguồn…</option>${canAdd.map(n=>`<option value="${ctEsc(n)}">${ctEsc(n)}</option>`).join('')}</select>`
     +'<button class="ct-btn" id="ctSrcAdd" style="padding:3px 10px;font-size:12.5px">＋ Thêm nguồn / 🎨 sửa màu</button>';
   const fsEl=document.getElementById('ctFSrc'), fsv=fsEl.value;
   fsEl.innerHTML='<option value="">Tất cả nguồn</option>'+groups.map(([k,lbl])=>`<option value="${ctEsc(k)}">${ctEsc(lbl)}</option>`).join('');
@@ -4569,6 +4592,21 @@ function ctFillSrcSel(val){
 }
 document.getElementById('ctSrcTrack').addEventListener('click',e=>{
   if(e.target.id==='ctSrcAdd'){ openSrcQuick(()=>ctCommit()); return; }
+  const n=e.target.dataset&&e.target.dataset.unskip; if(!n) return;
+  if(!Array.isArray(DB.contactSkip)) DB.contactSkip=[];
+  if(!Array.isArray(DB.contactKeep)) DB.contactKeep=[];
+  DB.contactSkip=DB.contactSkip.filter(x=>String(x).trim().toLowerCase()!==n.trim().toLowerCase());
+  if(ctSkipSrc(n,null) && !DB.contactKeep.some(x=>String(x).trim().toLowerCase()===n.trim().toLowerCase())) DB.contactKeep.push(n);
+  ctCommit();
+});
+document.getElementById('ctSrcTrack').addEventListener('change',e=>{
+  if(e.target.id!=='ctSkipAdd') return;
+  const n=e.target.value; e.target.value=''; if(!n) return;
+  if(!confirm('Không tính booking nguồn "'+n+'" vào Thống kê KH liên hệ nữa?\n\nBooking vẫn giữ nguyên trên Sơ đồ xe và Bảng tổng doanh thu.')) return;
+  if(!Array.isArray(DB.contactSkip)) DB.contactSkip=[];
+  DB.contactKeep=(DB.contactKeep||[]).filter(x=>String(x).trim().toLowerCase()!==n.trim().toLowerCase());
+  if(!DB.contactSkip.some(x=>String(x).trim().toLowerCase()===n.trim().toLowerCase())) DB.contactSkip.push(n);
+  ctCommit();
 });
 document.getElementById('ctE_srcAdd').onclick=()=>openSrcQuick(n=>{ ctFillSrcSel(n); });
 
