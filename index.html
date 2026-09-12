@@ -531,7 +531,7 @@
   #view-contacts .ct-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
   .ct-range{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .ct-range input[type=date]{width:150px}
-  #ctDaysTbl{min-width:560px}
+  #ctDaysTbl{min-width:640px}
   #ctDaysTbl th,#ctDaysTbl td{border:0;border-bottom:1px solid #eef2f7;padding:6px 8px;position:static;background:none}
   #ctDaysTbl th{color:var(--muted);font-weight:600;font-size:12px}
   #ctDaysTbl th:first-child,#ctDaysTbl td:first-child{text-align:left}
@@ -539,17 +539,18 @@
   #ctDaysTbl tr[data-day]:hover td{background:#f0f9ff}
   #ctDaysTbl tr.zero td{color:#94a3b8}
   #ctDaysTbl tr.total td{font-weight:800;border-top:2px solid var(--line)}
-  .ct-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+  .ct-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:14px}
+  @media(max-width:1250px){.ct-kpis{grid-template-columns:repeat(3,1fr)}}
   .ct-kpi{background:var(--soft);border-radius:12px;padding:12px 14px}
   .ct-kpi .l{font-size:12px;color:var(--muted)}
   .ct-kpi .v{font-size:24px;font-weight:800;line-height:1.2;margin-top:2px}
   .ct-kpi .h{font-size:11.5px;color:var(--muted)}
-  .ct-kpi.today .v{color:#16a34a} .ct-kpi.advance .v{color:#2563eb} .ct-kpi.none .v{color:#dc2626}
+  .ct-kpi.today .v{color:#16a34a} .ct-kpi.advance .v{color:#2563eb} .ct-kpi.none .v{color:#dc2626} .ct-kpi.soldout .v{color:#d97706}
   .ct-kpi .bar{height:5px;border-radius:3px;background:#e2e8f0;margin-top:8px;overflow:hidden;display:flex}
   .ct-kpi .bar i{display:block;height:100%}
   .ct-panels{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
   .ct-panels>.card{min-width:0}
-  #ctSrcTbl{min-width:420px}
+  #ctSrcTbl{min-width:480px}
   #ctTable td:nth-child(4){min-width:160px}
   #ctSrcTbl th,#ctSrcTbl td{border:0;border-bottom:1px solid #eef2f7;padding:6px;position:static;background:none}
   #ctSrcTbl th{color:var(--muted);font-weight:600;font-size:12px}
@@ -561,7 +562,7 @@
   .ct-alert{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:9px 14px;margin-bottom:16px;font-size:13.5px}
   .ct-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
   .ct-toolbar input[type=search]{min-width:200px}
-  #ctTable{min-width:1080px}
+  #ctTable{min-width:1180px}
   .ct-addr{display:inline-block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:12.5px}
   #ctTable th,#ctTable td{text-align:left;white-space:normal;vertical-align:middle;border-left:0;border-right:0;padding:8px 10px}
   #ctTable th{font-size:12px;color:var(--muted);white-space:nowrap}
@@ -591,6 +592,7 @@
   .ct-seg button.on.today{background:#16a34a;color:#fff;font-weight:700}
   .ct-seg button.on.advance{background:#2563eb;color:#fff;font-weight:700}
   .ct-seg button.on.none{background:#dc2626;color:#fff;font-weight:700}
+  .ct-seg button.on.soldout{background:#d97706;color:#fff;font-weight:700}
   .ct-foot{padding:10px 14px;color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
   .ct-pop{position:absolute;z-index:60;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.2);padding:10px;width:270px}
   .ct-pop h4{margin:0 0 6px;font-size:13px}
@@ -608,6 +610,8 @@
   .ct-chk label:has(input:checked){background:#e0f2fe;border-color:#7dd3fc}
   .ct-chk input{margin:0}
   .ct-mft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  /* Link ?xem=1: che sạch nội dung cho tới khi nhập đúng mật khẩu chỉ xem */
+  body.viewpending #tabs,body.viewpending main,body.viewpending header .toolbar{display:none !important}
   /* Chế độ CHỈ XEM (link ?xem=1): chỉ còn tab Thống kê KH liên hệ, SĐT luôn ẩn, không sửa được gì */
   body.viewmode #ctAdd,body.viewmode #ctCatsBtn,body.viewmode #ctTogPhone,body.viewmode #ctHidTog,
   body.viewmode #ctShare,body.viewmode .ct-track button,body.viewmode #ctTable .ct-act{display:none !important}
@@ -972,6 +976,7 @@
           <option value="today">Trong ngày</option>
           <option value="advance">Đặt trước</option>
           <option value="none">Không chốt được</option>
+          <option value="soldout">Hết xe</option>
           <option value="needless">⚠ Chưa chọn nhu cầu</option>
         </select>
         <span style="flex:1"></span>
@@ -1005,6 +1010,7 @@
           <button type="button" data-v="today" class="today">Trong ngày</button>
           <button type="button" data-v="advance" class="advance">Đặt trước</button>
           <button type="button" data-v="none" class="none">Không chốt được</button>
+          <button type="button" data-v="soldout" class="soldout">Hết xe</button>
         </div></div>
       <div class="full"><label class="lb">Ghi chú</label><textarea id="ctE_note" rows="2" placeholder="VD: chê giá cao, hẹn gọi lại…"></textarea></div>
     </div>
@@ -1392,7 +1398,8 @@ const SOURCES = {
   'Meta':'#A4C2F4','Walk in':'#FFE599','Zalo':'#FFE599'
 };
 // Thống kê khách hàng liên hệ — loại chốt, nhóm nguồn, danh mục nhu cầu mặc định
-const CT_CLOSE={today:'Trong ngày',advance:'Đặt trước',none:'Không chốt được'};
+const CT_CLOSE={today:'Trong ngày',advance:'Đặt trước',none:'Không chốt được',soldout:'Hết xe'};
+/* 'soldout' (Hết xe) KHÔNG tính vào tỉ lệ chốt: tỉ lệ = (trong ngày + đặt trước) / (tổng − hết xe) */
 const CT_KIND={zalo:'Zalo',walkin:'Walk in',phone:'Telephone',other:'Khác'};
 const CT_NEEDS_DEFAULT=[
   {id:'so',name:'Thuê xe số'},{id:'ga',name:'Thuê xe tay ga'},{id:'con',name:'Thuê xe côn / PKL'},
@@ -1515,7 +1522,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-7';
+const BAN_APP  = '2026-09-12-lienhe-9';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4239,6 +4246,7 @@ var ctShown=new Set();        // SĐT đang hiện riêng từng dòng
 var ctShowHidden=false;       // đang xem các booking đã bỏ khỏi thống kê
 var viewMode=false;           // true = mở bằng link chỉ xem (?xem=1)
 const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
+if(VIEW_ASK) document.body.classList.add('viewpending');   // che nội dung ngay, chưa nhập mật khẩu thì không thấy gì
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
 var ctPop=null;
 
@@ -4366,25 +4374,29 @@ function renderContacts(){
   });
 
   const T=all.length, cnt=k=>all.filter(r=>r.close===k).length;
-  const a=cnt('today'), b=cnt('advance'), c=cnt('none');
+  const a=cnt('today'), b=cnt('advance'), c=cnt('none'), so=cnt('soldout');
+  const base=T-so;                                        // hết xe không tính vào tỉ lệ chốt
+  const rate=base?Math.round((a+b)/base*100):0;
   const pct=x=>T?Math.round(x/T*100)+'%':'0%';
   document.getElementById('ctKpis').innerHTML=
     `<div class="ct-kpi"><div class="l">Tổng khách liên hệ</div><div class="v">${T}</div>
-       <div class="bar"><i style="width:${pct(a)};background:#16a34a"></i><i style="width:${pct(b)};background:#2563eb"></i><i style="width:${pct(c)};background:#dc2626"></i></div></div>
+       <div class="bar"><i style="width:${pct(a)};background:#16a34a"></i><i style="width:${pct(b)};background:#2563eb"></i><i style="width:${pct(c)};background:#dc2626"></i><i style="width:${pct(so)};background:#d97706"></i></div></div>
      <div class="ct-kpi today"><div class="l">Chốt trong ngày</div><div class="v">${a}</div><div class="h">${pct(a)} tổng</div></div>
      <div class="ct-kpi advance"><div class="l">Đặt trước</div><div class="v">${b}</div><div class="h">${pct(b)} tổng</div></div>
      <div class="ct-kpi none"><div class="l">Không chốt được</div><div class="v">${c}</div><div class="h">${pct(c)} tổng</div></div>
-     <div class="ct-kpi"><div class="l">Tỉ lệ chốt</div><div class="v">${T?Math.round((a+b)/T*100):0}%</div><div class="h">(trong ngày + đặt trước) / tổng</div></div>`;
+     <div class="ct-kpi soldout"><div class="l">Hết xe</div><div class="v">${so}</div><div class="h">${pct(so)} tổng · không tính tỉ lệ</div></div>
+     <div class="ct-kpi"><div class="l">Tỉ lệ chốt</div><div class="v">${rate}%</div><div class="h">(trong ngày + đặt trước) / ${so?`(tổng − ${so} hết xe) = ${base}`:'tổng'}</div></div>`;
 
   const groups=ctSrcGroups(all);
-  let h='<tr><th>Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Tỉ lệ chốt</th></tr>';
+  let h='<tr><th>Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>';
   groups.forEach(([k,lbl,src])=>{
     const rs=all.filter(r=>r.kind===k);
     const x=s=>rs.filter(r=>r.close===s).length;
-    h+=`<tr><td>${ctBadge(src,lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td><b>${rs.length?Math.round((x('today')+x('advance'))/rs.length*100)+'%':'—'}</b></td></tr>`;
+    const bs=rs.length-x('soldout');
+    h+=`<tr><td>${ctBadge(src,lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td><b>${bs?Math.round((x('today')+x('advance'))/bs*100)+'%':'—'}</b></td></tr>`;
   });
   document.getElementById('ctSrcTbl').innerHTML=h;
-  if(!groups.length) document.getElementById('ctSrcTbl').innerHTML=h+'<tr><td colspan="6" style="text-align:left;color:var(--muted)">Chưa có khách liên hệ.</td></tr>';
+  if(!groups.length) document.getElementById('ctSrcTbl').innerHTML=h+'<tr><td colspan="7" style="text-align:left;color:var(--muted)">Chưa có khách liên hệ.</td></tr>';
   document.getElementById('ctSrcTrack').innerHTML='<span>Tính tất cả booking, mọi nguồn.</span>'
     +'<button class="ct-btn" id="ctSrcAdd" style="padding:3px 10px;font-size:12.5px">＋ Thêm nguồn / 🎨 sửa màu</button>';
   const fsEl=document.getElementById('ctFSrc'), fsv=fsEl.value;
@@ -4399,12 +4411,13 @@ function renderContacts(){
 
   const dc=document.getElementById('ctDaysCard'); dc.style.display=multi?'':'none';
   if(multi){
-    let dh='<tr><th>Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Tỉ lệ chốt</th></tr>';
+    let dh='<tr><th>Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>';
     for(let d=from,n=0; d<=to&&n<400; d=addDays(d,1),n++){
       const rs=all.filter(r=>r.day===d), x=k=>rs.filter(r=>r.close===k).length;
-      dh+=`<tr data-day="${d}" class="${rs.length?'':'zero'}"><td>${ctDow(d)}, ${ctDM(d)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${rs.length?Math.round((x('today')+x('advance'))/rs.length*100)+'%':'—'}</td></tr>`;
+      const bd=rs.length-x('soldout');
+      dh+=`<tr data-day="${d}" class="${rs.length?'':'zero'}"><td>${ctDow(d)}, ${ctDM(d)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td>${bd?Math.round((x('today')+x('advance'))/bd*100)+'%':'—'}</td></tr>`;
     }
-    dh+=`<tr class="total"><td>Tổng</td><td>${T}</td><td>${a}</td><td>${b}</td><td>${c}</td><td>${T?Math.round((a+b)/T*100)+'%':'—'}</td></tr>`;
+    dh+=`<tr class="total"><td>Tổng</td><td>${T}</td><td>${a}</td><td>${b}</td><td>${c}</td><td>${so}</td><td>${base?rate+'%':'—'}</td></tr>`;
     document.getElementById('ctDaysTbl').innerHTML=dh;
   }
   const miss=all.filter(r=>!r.needs.length).length, al=document.getElementById('ctAlert');
@@ -4425,7 +4438,7 @@ function renderContacts(){
   const body=list.map((r,i)=>{
     const shown=!viewMode&&(ctShowAll||ctShown.has(r.key));
     const needs=r.needs.length?r.needs.map(n=>`<span class="ct-chip">${ctEsc(ctNeedName(n))}</span>`).join(''):(viewMode?'<span class="muted">—</span>':'<span class="empty">＋ Chọn nhu cầu</span>');
-    const seg=Object.keys(CT_CLOSE).map(k=>`<button class="${k} ${r.close===k?'on':''}" data-cl="${k}">${k==='none'?'Không chốt':CT_CLOSE[k]}</button>`).join('');
+    const seg=Object.keys(CT_CLOSE).map(k=>`<button class="${k} ${r.close===k?'on':''}" data-cl="${k}">${k==='none'?'Không chốt':CT_CLOSE[k]}</button>`).join('');   // 4 loại: trong ngày / đặt trước / không chốt / hết xe
     const origin=r.auto
       ? `<a data-open="${ctEsc(r.rep)}">Booking ${ctEsc(r.xe.join(', ')||'')}</a>${r.closeAuto?' · chốt tự động':''}${r.note?' · '+ctEsc(r.note):''}`
       : `<span class="man">Thủ công</span>${r.note?' · '+ctEsc(r.note):''}`;
@@ -4727,6 +4740,7 @@ function ctDrawShare(){
 }
 function ctApplyViewMode(){
   viewMode=true; ctShowAll=false; ctShown.clear();
+  document.body.classList.remove('viewpending');
   document.body.classList.add('viewmode');
   document.querySelectorAll('#tabs .tab, #tabs .tab-group').forEach(el=>{ if(el.dataset&&el.dataset.t==='contacts') return; el.style.display='none'; });
   ['prevM','nextM','monthPick','addBk','adminLock','changePass','accToggle'].forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display='none'; });
@@ -4763,14 +4777,16 @@ function ctAskViewPass(){
 function ctBuildPdfNode(from,to){
   const multi=from!==to;
   const all=ctRowsIn(from,to).filter(r=>!r.hidden), T=all.length, cnt=k=>all.filter(r=>r.close===k).length;
-  const a=cnt('today'), b=cnt('advance'), c=cnt('none'), pct=x=>T?Math.round(x/T*100)+'%':'0%';
+  const a=cnt('today'), b=cnt('advance'), c=cnt('none'), so=cnt('soldout'), pct=x=>T?Math.round(x/T*100)+'%':'0%';
+  const base=T-so, rate=base?Math.round((a+b)/base*100):0;   // hết xe không tính vào tỉ lệ chốt
   const now=new Date();
-  const col={today:'#16a34a',advance:'#2563eb',none:'#dc2626'};
+  const col={today:'#16a34a',advance:'#2563eb',none:'#dc2626',soldout:'#d97706'};
   let src='';
   ctSrcGroups(all).forEach(([k,lbl])=>{
     const rs=all.filter(r=>r.kind===k);
     const x=s=>rs.filter(r=>r.close===s).length;
-    src+=`<tr class="ctp-brk"><td class="l">${ctEsc(lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td><b>${rs.length?Math.round((x('today')+x('advance'))/rs.length*100)+'%':'—'}</b></td></tr>`;
+    const bs=rs.length-x('soldout');
+    src+=`<tr class="ctp-brk"><td class="l">${ctEsc(lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td><b>${bs?Math.round((x('today')+x('advance'))/bs*100)+'%':'—'}</b></td></tr>`;
   });
   const nc={}; all.forEach(r=>r.needs.forEach(n=>nc[n]=(nc[n]||0)+1));
   const needs=Object.entries(nc).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(ctNeedName(k))}</td><td><b>${v}</b></td><td>${pct(v)}</td></tr>`).join('')
@@ -4779,9 +4795,10 @@ function ctBuildPdfNode(from,to){
   if(multi){
     for(let d=from,n=0; d<=to&&n<400; d=addDays(d,1),n++){
       const rs=all.filter(r=>r.day===d), x=k=>rs.filter(r=>r.close===k).length;
-      days+=`<tr class="ctp-brk"${rs.length?'':' style="color:#94a3b8"'}><td class="l">${ctDow(d)}, ${ctDM(d)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${rs.length?Math.round((x('today')+x('advance'))/rs.length*100)+'%':'—'}</td></tr>`;
+      const bd=rs.length-x('soldout');
+      days+=`<tr class="ctp-brk"${rs.length?'':' style="color:#94a3b8"'}><td class="l">${ctDow(d)}, ${ctDM(d)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td>${bd?Math.round((x('today')+x('advance'))/bd*100)+'%':'—'}</td></tr>`;
     }
-    days+=`<tr class="ctp-brk" style="font-weight:800;background:#f8fafc"><td class="l">Tổng</td><td>${T}</td><td>${a}</td><td>${b}</td><td>${c}</td><td>${T?Math.round((a+b)/T*100)+'%':'—'}</td></tr>`;
+    days+=`<tr class="ctp-brk" style="font-weight:800;background:#f8fafc"><td class="l">Tổng</td><td>${T}</td><td>${a}</td><td>${b}</td><td>${c}</td><td>${so}</td><td>${base?rate+'%':'—'}</td></tr>`;
   }
   const rows=all.map((r,i)=>`<tr class="ctp-brk">
       <td>${i+1}</td>${multi?`<td>${ctDM(r.day)}</td>`:''}<td>${r.time||'—'}</td><td class="l">${ctEsc(r.src)}</td>
@@ -4802,7 +4819,7 @@ function ctBuildPdfNode(from,to){
       #ctPdfCapture th{background:#f1f5f9;font-weight:700}
       #ctPdfCapture td.l,#ctPdfCapture th.l{text-align:left}
       #ctPdfCapture .o{font-size:11px;color:#64748b}
-      #ctPdfCapture table.k td{border:1px solid #e2e8f0;background:#f8fafc;text-align:left;width:20%}
+      #ctPdfCapture table.k td{border:1px solid #e2e8f0;background:#f8fafc;text-align:left;width:16.6%}
       #ctPdfCapture .kl{font-size:11.5px;color:#64748b} #ctPdfCapture .kv{font-size:22px;font-weight:800} #ctPdfCapture .kh{font-size:11px;color:#64748b}
       #ctPdfCapture h1{font-size:19px;margin:0} #ctPdfCapture h3{font-size:14px;margin:18px 0 2px}
     </style>
@@ -4815,17 +4832,18 @@ function ctBuildPdfNode(from,to){
       </div>
       <table class="k" style="margin-top:14px"><tr>
         ${kpi('Tổng khách liên hệ',T)}${kpi('Chốt trong ngày',a,pct(a)+' tổng',col.today)}${kpi('Đặt trước',b,pct(b)+' tổng',col.advance)}
-        ${kpi('Không chốt được',c,pct(c)+' tổng',col.none)}${kpi('Tỉ lệ chốt',(T?Math.round((a+b)/T*100):0)+'%','(trong ngày + đặt trước) / tổng')}
+        ${kpi('Không chốt được',c,pct(c)+' tổng',col.none)}${kpi('Hết xe',so,pct(so)+' tổng · không tính tỉ lệ',col.soldout)}
+        ${kpi('Tỉ lệ chốt',rate+'%','(trong ngày + đặt trước) / '+(so?('tổng − '+so+' hết xe = '+base):'tổng'))}
       </tr></table>
     </div>
     <div style="display:flex;gap:18px">
-      <div style="flex:1.3"><h3 class="ctp-brk">Hiệu quả theo nguồn</h3>
-        <table><tr><th class="l">Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Tỉ lệ chốt</th></tr>${src}</table></div>
+      <div style="flex:1.5"><h3 class="ctp-brk">Hiệu quả theo nguồn</h3>
+        <table><tr><th class="l">Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${src}</table></div>
       <div style="flex:1"><h3 class="ctp-brk">Nhu cầu khách</h3>
         <table><tr><th class="l">Nhu cầu</th><th>Số khách</th><th>% tổng</th></tr>${needs}</table></div>
     </div>
     ${multi?`<h3 class="ctp-brk">Theo từng ngày</h3>
-    <table><tr class="ctp-brk"><th class="l">Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Tỉ lệ chốt</th></tr>${days}</table>`:''}
+    <table><tr class="ctp-brk"><th class="l">Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${days}</table>`:''}
     <h3 class="ctp-brk">Danh sách khách liên hệ (${T})</h3>
     <table><tr class="ctp-brk"><th>#</th>${multi?'<th>Ngày</th>':''}<th>Giờ</th><th class="l">Nguồn</th><th class="l">Tên khách</th><th class="l">SĐT</th><th class="l">Địa chỉ thường trú</th><th class="l">Nhu cầu</th><th class="l">Loại chốt</th><th class="l">Ghi chú</th></tr>${rows}</table>`;
   return wrap;
