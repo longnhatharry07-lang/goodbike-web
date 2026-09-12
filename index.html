@@ -559,6 +559,7 @@
   .ct-nb .t{height:12px;background:#eef2f7;border-radius:6px;overflow:hidden}
   .ct-nb .t i{display:block;height:100%;background:#38bdf8;border-radius:6px}
   .ct-nb .c{text-align:right;font-weight:700}
+  .ct-alert-hid{background:#fef2f2;border-color:#fecaca;color:#991b1b}
   .ct-alert{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:9px 14px;margin-bottom:16px;font-size:13.5px}
   .ct-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
   .ct-toolbar input[type=search]{min-width:200px}
@@ -966,6 +967,7 @@
       <h2>Theo từng ngày <span class="muted" style="font-weight:400;font-size:12.5px">· bấm một ngày để xem riêng ngày đó</span></h2>
       <div style="overflow-x:auto"><table id="ctDaysTbl"></table></div>
     </div>
+    <div class="ct-alert ct-alert-hid" id="ctHidAlert" style="display:none"></div>
     <div class="ct-alert" id="ctAlert" style="display:none"></div>
     <div class="card" style="padding:0">
       <div class="ct-toolbar">
@@ -1524,7 +1526,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-10';
+const BAN_APP  = '2026-09-12-lienhe-11';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4449,6 +4451,20 @@ function renderContacts(){
   if(miss) document.getElementById('ctShowMiss').onclick=()=>{ document.getElementById('ctFClose').value='needless'; renderContacts(); };
 
   const head='<tr><th style="width:34px">#</th>'+(multi?'<th>Ngày</th>':'')+'<th>Giờ</th><th>Nguồn</th><th>Tên khách</th><th>SĐT</th><th>Địa chỉ thường trú</th><th style="min-width:230px">Nhu cầu khách</th><th>Loại chốt</th><th></th></tr>';
+  const ha=document.getElementById('ctHidAlert');
+  ha.style.display=(hid.length&&!viewMode)?'':'none';
+  if(hid.length&&!viewMode){
+    const ds=[...new Set(hid.map(r=>r.srcLabel+(r.xe&&r.xe.length?' '+r.xe.join(', '):'')))].slice(0,6).join(' · ');
+    ha.innerHTML=`<span>🚫 Đang có <b>${hid.length}</b> booking bị bỏ khỏi thống kê (không tính vào số liệu): ${ctEsc(ds)}${hid.length>6?'…':''}</span>`
+      +`<button class="ct-btn" id="ctHidShow" style="padding:4px 10px">${ctShowHidden?'Ẩn danh sách':'Xem'}</button>`
+      +`<button class="ct-btn" id="ctHidAll" style="padding:4px 10px">↩ Đưa lại tất cả</button>`;
+    document.getElementById('ctHidShow').onclick=()=>{ ctShowHidden=!ctShowHidden; renderContacts(); };
+    document.getElementById('ctHidAll').onclick=()=>{
+      if(!confirm('Đưa lại tất cả '+hid.length+' booking vào thống kê?')) return;
+      hid.forEach(r=>{ const en=ctEntry(r); if(en) delete en.hidden; });
+      ctCommit();
+    };
+  }
   const hb=document.getElementById('ctHidTog');
   if(!hid.length) ctShowHidden=false;
   hb.style.display=hid.length?'':'none';
