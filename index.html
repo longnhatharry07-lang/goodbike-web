@@ -624,6 +624,7 @@
   /* Link ?xem=1: che sạch nội dung cho tới khi nhập đúng mật khẩu chỉ xem */
   body.viewpending #tabs,body.viewpending main,body.viewpending header .toolbar{display:none !important}
   /* Chế độ CHỈ XEM (link ?xem=1): chỉ còn tab Thống kê KH liên hệ, SĐT luôn ẩn, không sửa được gì */
+  body.viewmode .ct-money{display:none !important}   /* bản chia sẻ: không cho xem doanh thu & tiền quảng cáo */
   body.viewmode #ctAdd,body.viewmode #ctCatsBtn,body.viewmode #ctTogPhone,body.viewmode #ctHidTog,
   body.viewmode #ctShare,body.viewmode .ct-track button,body.viewmode #ctTable .ct-act{display:none !important}
   body.viewmode .ct-needs,body.viewmode .ct-seg,body.viewmode #view-contacts .ct-origin a{pointer-events:none}
@@ -1538,7 +1539,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-14-doanhthu';
+const BAN_APP  = '2026-09-14-doanhthu-2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4932,13 +4933,13 @@ function ctBuildPdfNode(from,to){
         ${kpi('Không chốt được',c,pct(c)+' tổng',col.none)}${kpi('Hết xe',so,pct(so)+' tổng · không tính tỉ lệ',col.soldout)}
         ${kpi('Tỉ lệ chốt',rate+'%','(trong ngày + đặt trước) / '+(so?('tổng − '+so+' hết xe = '+base):'tổng'))}
       </tr></table>
-      <table class="k" style="margin-top:8px"><tr>
+      ${viewMode?'':`<table class="k" style="margin-top:8px"><tr>
         ${kpi('Tổng doanh thu mang về',fmtVND(doanhThu)+'đ',soBk+' booking phát sinh','#0369a1')}
         ${kpi('Tiền quảng cáo / ngày',fmtVND(adDay)+'đ','','#c2410c')}
         ${kpi('Chi quảng cáo cả kỳ',fmtVND(adTong)+'đ',fmtVND(adDay)+'đ × '+nDays+' ngày','#c2410c')}
         ${kpi('Quảng cáo / doanh thu',doanhThu?tyLeAd.toFixed(1)+'%':'—','','#0f172a')}
         ${kpi('Chi phí / khách liên hệ',(T?fmtVND(adTong/T):0)+'đ','','#0f172a')}
-      </tr></table>
+      </tr></table>`}
     </div>
     <div style="display:flex;gap:18px">
       <div style="flex:1.5"><h3 class="ctp-brk">Hiệu quả theo nguồn</h3>
