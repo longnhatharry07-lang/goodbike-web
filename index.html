@@ -539,6 +539,16 @@
   #ctDaysTbl tr[data-day]:hover td{background:#f0f9ff}
   #ctDaysTbl tr.zero td{color:#94a3b8}
   #ctDaysTbl tr.total td{font-weight:800;border-top:2px solid var(--line)}
+  .ct-money{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+  .ct-money .m{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px 14px}
+  .ct-money .m.ad{background:#fff7ed;border-color:#fed7aa}
+  .ct-money .m .l{font-size:12px;color:var(--muted)}
+  .ct-money .m .v{font-size:22px;font-weight:800;line-height:1.25;margin-top:2px;color:#0369a1}
+  .ct-money .m.ad .v{color:#c2410c}
+  .ct-money .m .h{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .ct-money .m input{width:130px;padding:5px 8px;text-align:right;font-weight:700}
+  @media(max-width:1100px){.ct-money{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.ct-money{grid-template-columns:1fr}}
   .ct-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:14px}
   @media(max-width:1250px){.ct-kpis{grid-template-columns:repeat(3,1fr)}}
   .ct-kpi{background:var(--soft);border-radius:12px;padding:12px 14px}
@@ -958,6 +968,7 @@
         </div>
       </div>
       <div class="ct-kpis" id="ctKpis"></div>
+      <div class="ct-money" id="ctMoney"></div>
     </div>
     <div class="ct-panels">
       <div class="card"><h2>Hiệu quả theo nguồn</h2><div style="overflow-x:auto"><table id="ctSrcTbl"></table></div><div class="ct-track" id="ctSrcTrack"></div></div>
@@ -1460,6 +1471,7 @@ function normalizeDB(){
   if(!DB.sourceColors||typeof DB.sourceColors!=='object')DB.sourceColors={};   // màu tự chọn cho nguồn có sẵn (Walk in, Zalo, Meta, iRest) & 2 nhóm công nợ (__recv, __pay)
   if(!Array.isArray(DB.contacts))DB.contacts=[];  // Thống kê KH liên hệ: khách thêm tay + phần chọn thêm cho dòng booking
   if(DB.viewPass!==undefined && !String(DB.viewPass).trim()) delete DB.viewPass;   // mật khẩu chế độ chỉ xem (link ?xem=1)
+  if(typeof DB.adCostPerDay!=='number')DB.adCostPerDay=+DB.adCostPerDay||0;   // tiền quảng cáo/ngày (Thống kê KH liên hệ)
   if(!Array.isArray(DB.contactSkip))DB.contactSkip=[];   // nguồn KHÔNG tính vào Thống kê KH liên hệ (chủ tự chọn thêm)
   if(!Array.isArray(DB.contactKeep))DB.contactKeep=[];   // nguồn khách quen được tính lại (ghi đè luật mặc định)
   if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
@@ -1526,7 +1538,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-12-lienhe-11';
+const BAN_APP  = '2026-09-14-doanhthu';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4339,6 +4351,7 @@ function ctBookingRows(day){
     out.push({key:'b:'+b0.id, auto:true, ids:list.map(b=>b.id), rep:b0.id, day, time,
       src:b0.src, kind:ctSrcInfo(b0.src).k, srcLabel:ctSrcInfo(b0.src).label, name:g.name||'(chưa có tên)', phone:g.phone||'',
       addr:(list.map(b=>b.resaddr).find(Boolean)||''),
+      money:list.reduce((a,b)=>a+totalOf(b),0),   // tổng tiền khách trả của (các) booking trong dòng này
       xe:list.map(b=>b.xe).filter(Boolean), arrive, autoClose,
       close:(o&&o.close)||autoClose, closeAuto:!(o&&o.close),
       needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], note:(o&&o.note)||'', ov:o, hidden:!!(o&&o.hidden)});
@@ -4348,7 +4361,7 @@ function ctBookingRows(day){
 function ctManualRows(day){
   return (DB.contacts||[]).filter(c=>c&&!c.bk&&c.date===day).map(c=>({
     key:'m:'+c.id, auto:false, id:c.id, day, time:c.time||'', src:c.src||'Khác', kind:ctSrcInfo(c.src||'Khác').k, srcLabel:ctSrcInfo(c.src||'Khác').label,
-    name:c.name||'(chưa có tên)', phone:c.phone||'', addr:c.addr||'', close:c.close||'none', closeAuto:false,
+    name:c.name||'(chưa có tên)', phone:c.phone||'', addr:c.addr||'', money:0, close:c.close||'none', closeAuto:false,
     needs:Array.isArray(c.needs)?c.needs.slice():[], note:c.note||''}));
 }
 function ctRowsIn(from,to){
@@ -4433,6 +4446,33 @@ function renderContacts(){
   document.getElementById('ctNeedBars').innerHTML=ent.length
     ? ent.map(([k,v])=>`<div class="ct-nb"><span>${ctEsc(ctNeedName(k))}</span><div class="t"><i style="width:${v/mx*100}%"></i></div><span class="c">${v}</span></div>`).join('')
     : '<div class="muted" style="font-size:13px">Chưa có khách nào được chọn nhu cầu.</div>';
+
+  /* ---- Doanh thu mang về & chi phí quảng cáo ---- */
+  const doanhThu=all.reduce((x,r)=>x+(r.money||0),0);
+  const soBk=all.filter(r=>r.auto).length;
+  const nDays=ctDaysBetween(from,to);
+  const adDay=+DB.adCostPerDay||0, adTong=adDay*nDays;
+  const tyLeAd=doanhThu?(adTong/doanhThu*100):0;
+  const moneyBox=document.getElementById('ctMoney');
+  moneyBox.innerHTML=
+    `<div class="m"><div class="l">Tổng doanh thu mang về</div><div class="v">${fmtVND(doanhThu)}đ</div>
+       <div class="h">${soBk} booking phát sinh ${nDays>1?'trong khoảng này':'trong ngày'}</div></div>
+     <div class="m ad"><div class="l">Tiền quảng cáo / ngày</div>
+       <div class="v"><input type="text" inputmode="numeric" id="ctAdDay" value="${adDay?fmtVND(adDay):''}" placeholder="0"> đ</div>
+       <div class="h">Gõ số tiền rồi Enter — lưu cho mọi máy</div></div>
+     <div class="m ad"><div class="l">Chi quảng cáo cả kỳ</div><div class="v">${fmtVND(adTong)}đ</div>
+       <div class="h">${fmtVND(adDay)}đ × ${nDays} ngày</div></div>
+     <div class="m"><div class="l">Quảng cáo / doanh thu</div><div class="v" style="color:${tyLeAd>30?'#b91c1c':(tyLeAd>15?'#c2410c':'#15803d')}">${doanhThu?tyLeAd.toFixed(1)+'%':'—'}</div>
+       <div class="h">${T?('≈ '+fmtVND(T?adTong/T:0)+'đ / khách liên hệ'):'chưa có khách'}</div></div>`;
+  {
+    const ai=document.getElementById('ctAdDay');
+    const luu=()=>{ const v=Math.max(0,Math.round(+String(ai.value).replace(/[^\d]/g,'')||0));
+      if(v===(+DB.adCostPerDay||0)){ ai.value=v?fmtVND(v):''; return; }
+      DB.adCostPerDay=v; ctCommit(); };
+    ai.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); ai.blur(); } };
+    ai.onblur=luu;
+    if(viewMode){ ai.readOnly=true; ai.title='Chế độ chỉ xem'; }
+  }
 
   const dc=document.getElementById('ctDaysCard'); dc.style.display=multi?'':'none';
   if(multi){
@@ -4863,6 +4903,9 @@ function ctBuildPdfNode(from,to){
       <td class="l" style="color:${col[r.close]};font-weight:700">${CT_CLOSE[r.close]}</td>
       <td class="l">${ctEsc(r.note)}</td></tr>`).join('')
     ||`<tr><td colspan="${multi?10:9}" style="color:#64748b;padding:16px">Không có khách liên hệ nào trong ${multi?'khoảng này':'ngày'}.</td></tr>`;
+  const doanhThu=all.reduce((x,r)=>x+(r.money||0),0), soBk=all.filter(r=>r.auto).length;
+  const nDays=ctDaysBetween(from,to), adDay=+DB.adCostPerDay||0, adTong=adDay*nDays;
+  const tyLeAd=doanhThu?(adTong/doanhThu*100):0;
   const kpi=(l,v,h,cl)=>`<td><div class="kl">${l}</div><div class="kv" style="color:${cl||'#0f172a'}">${v}</div><div class="kh">${h||''}</div></td>`;
   const wrap=document.createElement('div');
   wrap.id='ctPdfCapture';
@@ -4888,6 +4931,13 @@ function ctBuildPdfNode(from,to){
         ${kpi('Tổng khách liên hệ',T)}${kpi('Chốt trong ngày',a,pct(a)+' tổng',col.today)}${kpi('Đặt trước',b,pct(b)+' tổng',col.advance)}
         ${kpi('Không chốt được',c,pct(c)+' tổng',col.none)}${kpi('Hết xe',so,pct(so)+' tổng · không tính tỉ lệ',col.soldout)}
         ${kpi('Tỉ lệ chốt',rate+'%','(trong ngày + đặt trước) / '+(so?('tổng − '+so+' hết xe = '+base):'tổng'))}
+      </tr></table>
+      <table class="k" style="margin-top:8px"><tr>
+        ${kpi('Tổng doanh thu mang về',fmtVND(doanhThu)+'đ',soBk+' booking phát sinh','#0369a1')}
+        ${kpi('Tiền quảng cáo / ngày',fmtVND(adDay)+'đ','','#c2410c')}
+        ${kpi('Chi quảng cáo cả kỳ',fmtVND(adTong)+'đ',fmtVND(adDay)+'đ × '+nDays+' ngày','#c2410c')}
+        ${kpi('Quảng cáo / doanh thu',doanhThu?tyLeAd.toFixed(1)+'%':'—','','#0f172a')}
+        ${kpi('Chi phí / khách liên hệ',(T?fmtVND(adTong/T):0)+'đ','','#0f172a')}
       </tr></table>
     </div>
     <div style="display:flex;gap:18px">
