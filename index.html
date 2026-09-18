@@ -46,6 +46,11 @@
   button.ghost{background:rgba(255,255,255,.15);color:#fff}
   button.danger{background:#fee2e2;color:var(--warn)}
   input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);max-width:100%}
+  /* Máy để định dạng 12 giờ (Windows/Edge tiếng Anh) hiện thêm AM/PM, máy để dd/mm/yyyy cần chỗ rộng hơn.
+     Ô hẹp quá sẽ cắt mất AM/PM → không đổi được sang buổi chiều. Cho ô đủ rộng ở mọi máy. */
+  input[type=time]{min-width:134px}
+  input[type=date]{min-width:152px}
+  @media(max-width:430px){ input[type=time]{min-width:118px} input[type=date]{min-width:136px} }
   .tabs{display:flex;gap:4px;padding:10px 18px 0;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
   .tab{padding:9px 16px;border-radius:10px 10px 0 0;background:transparent;color:var(--muted);font-weight:600}
   .tab.active{background:var(--soft);color:var(--brand-d)}
@@ -400,9 +405,9 @@
   .trip-box{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:#f8fafc;transition:border-color .15s,box-shadow .15s}
   .trip-box:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px rgba(2,132,199,.12);background:#fff}
   .trip-h{font-weight:800;font-size:12px;margin-bottom:8px;letter-spacing:.2px}
-  .trip-fields{display:flex;gap:8px}
-  .trip-fields input{flex:1;min-width:0;height:42px;padding:8px 12px;border-radius:10px;font-weight:600}
-  .trip-fields input[type=date]{flex:1.4}
+  .trip-fields{display:flex;gap:8px;flex-wrap:wrap}
+  .trip-fields input{flex:1 1 130px;height:42px;padding:8px 12px;border-radius:10px;font-weight:600}
+  .trip-fields input[type=date]{flex:1.4 1 145px}
   .trip-arrow{align-self:center;font-size:22px;color:var(--brand);font-weight:800}
   .addr-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:2px}
   /* tiêu đề từng bước trong form thêm booking */
@@ -1539,7 +1544,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-14-doanhthu-2';
+const BAN_APP  = '2026-09-18-ogio';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
