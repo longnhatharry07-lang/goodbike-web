@@ -563,7 +563,7 @@
   .ct-kpi.today .v{color:#16a34a} .ct-kpi.advance .v{color:#2563eb} .ct-kpi.none .v{color:#dc2626} .ct-kpi.soldout .v{color:#d97706}
   .ct-kpi .bar{height:5px;border-radius:3px;background:#e2e8f0;margin-top:8px;overflow:hidden;display:flex}
   .ct-kpi .bar i{display:block;height:100%}
-  .ct-panels{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+  .ct-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
   .ct-panels>.card{min-width:0}
   #ctSrcTbl{min-width:480px}
   #ctTable td:nth-child(4){min-width:160px}
@@ -574,6 +574,11 @@
   .ct-nb .t{height:12px;background:#eef2f7;border-radius:6px;overflow:hidden}
   .ct-nb .t i{display:block;height:100%;background:#38bdf8;border-radius:6px}
   .ct-nb .c{text-align:right;font-weight:700}
+  .ct-pb{cursor:pointer;border-radius:8px;padding:2px 4px;margin:0 -4px}
+  .ct-pb:hover{background:#f0f9ff}
+  .ct-pb.on{background:#e0f2fe;outline:1px solid #7dd3fc}
+  .ct-pb .t i{background:#0ea5e9}
+  .ct-pb.none .t i{background:#cbd5e1}
   .ct-alert-hid{background:#fef2f2;border-color:#fecaca;color:#991b1b}
   .ct-alert{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:9px 14px;margin-bottom:16px;font-size:13.5px}
   .ct-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -979,6 +984,7 @@
     <div class="ct-panels">
       <div class="card"><h2>Hiệu quả theo nguồn</h2><div style="overflow-x:auto"><table id="ctSrcTbl"></table></div><div class="ct-track" id="ctSrcTrack"></div></div>
       <div class="card"><h2 id="ctNeedTitle">Nhu cầu khách trong ngày</h2><div id="ctNeedBars"></div></div>
+      <div class="card"><h2>Nơi thường trú của khách <span class="muted" style="font-weight:400;font-size:12.5px">· bấm để lọc</span></h2><div id="ctPlaceBars"></div></div>
     </div>
     <div class="card" id="ctDaysCard" style="display:none">
       <h2>Theo từng ngày <span class="muted" style="font-weight:400;font-size:12.5px">· bấm một ngày để xem riêng ngày đó</span></h2>
@@ -1022,7 +1028,7 @@
         <div style="display:flex;gap:6px"><select id="ctE_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="ctE_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       <div><label class="lb">Tên khách</label><input id="ctE_name" placeholder="VD: Anh Tuấn"></div>
       <div class="full"><label class="lb">SĐT</label><input id="ctE_phone" inputmode="tel" placeholder="09xx xxx xxx"></div>
-      <div class="full"><label class="lb">Địa chỉ thường trú (không bắt buộc)</label><input id="ctE_addr" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM"></div>
+      <div class="full"><label class="lb">Địa chỉ thường trú (không bắt buộc)</label><input id="ctE_addr" list="addrList" autocomplete="off" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM"></div>
       <div class="full"><label class="lb">Nhu cầu khách (chọn nhiều)</label><div class="ct-chk" id="ctE_needs"></div></div>
       <div class="full"><label class="lb">Loại chốt</label>
         <div class="ct-seg" id="ctE_close">
@@ -1134,7 +1140,8 @@
           <div style="display:flex;gap:6px"><select id="f_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="f_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       </div>
       <div class="field" style="margin-top:8px"><label>Địa chỉ thường trú <span class="muted" style="font-weight:400">(không bắt buộc)</span></label>
-        <input type="text" id="f_resaddr" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM" autocomplete="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+        <input type="text" id="f_resaddr" list="addrList" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM" autocomplete="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+      <datalist id="addrList"></datalist>
       <datalist id="guestList"></datalist>
       <datalist id="phoneList"></datalist>
       <div id="f_guestHint" class="guest-hint" style="display:none"></div>
@@ -1544,7 +1551,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-18-ogio';
+const BAN_APP  = '2026-09-18-noio';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4266,6 +4273,7 @@ var ctShowAll=false;          // hiện toàn bộ SĐT
 try{ ctShowAll=localStorage.getItem('gb_ctShowPhone')==='1'; }catch(e){}
 var ctShown=new Set();        // SĐT đang hiện riêng từng dòng
 var ctShowHidden=false;       // đang xem các booking đã bỏ khỏi thống kê
+var ctPlace='';               // đang lọc theo tỉnh/thành nào (bấm ở bảng Nơi thường trú)
 var viewMode=false;           // true = mở bằng link chỉ xem (?xem=1)
 const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
 if(VIEW_ASK) document.body.classList.add('viewpending');   // che nội dung ngay, chưa nhập mật khẩu thì không thấy gì
@@ -4292,6 +4300,48 @@ function ctBadge(src,label){
   const c=sourceColor(src||si.label);
   return c?`<span class="ct-src" style="background:${c};color:${isLight(c)?'#1f2937':'#fff'}">${txt}</span>`:`<span class="ct-src other">${txt}</span>`;
 }
+/* ---- Nơi thường trú: nhận ra tỉnh/thành từ địa chỉ tự do ---- */
+function ctKhongDau(t){ return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').toLowerCase(); }
+const CT_TINH=[
+ ['TP.HCM',['ho chi minh','hcm','tphcm','tp hcm','sai gon','saigon','thu duc']],
+ ['Hà Nội',['ha noi','hanoi','hn']],['Đà Nẵng',['da nang','danang']],['Hải Phòng',['hai phong']],['Cần Thơ',['can tho']],
+ ['Huế',['thua thien hue','hue']],['Quảng Ninh',['quang ninh','ha long']],['Khánh Hòa',['khanh hoa','nha trang']],
+ ['Lâm Đồng',['lam dong','da lat','dalat']],['Bình Dương',['binh duong','thu dau mot']],['Đồng Nai',['dong nai','bien hoa']],
+ ['Bà Rịa - Vũng Tàu',['ba ria','vung tau']],['Long An',['long an']],['Tiền Giang',['tien giang','my tho']],
+ ['Bến Tre',['ben tre']],['Vĩnh Long',['vinh long']],['Đồng Tháp',['dong thap']],['An Giang',['an giang','long xuyen','chau doc']],
+ ['Kiên Giang',['kien giang','rach gia','phu quoc']],['Cà Mau',['ca mau']],['Bạc Liêu',['bac lieu']],['Sóc Trăng',['soc trang']],
+ ['Hậu Giang',['hau giang']],['Trà Vinh',['tra vinh']],['Tây Ninh',['tay ninh']],['Bình Phước',['binh phuoc']],
+ ['Bình Thuận',['binh thuan','phan thiet','mui ne']],['Ninh Thuận',['ninh thuan','phan rang']],['Phú Yên',['phu yen','tuy hoa']],
+ ['Bình Định',['binh dinh','quy nhon']],['Quảng Ngãi',['quang ngai']],['Quảng Nam',['quang nam','hoi an','tam ky']],
+ ['Quảng Trị',['quang tri','dong ha']],['Quảng Bình',['quang binh','dong hoi']],['Hà Tĩnh',['ha tinh']],['Nghệ An',['nghe an','vinh']],
+ ['Thanh Hóa',['thanh hoa','sam son']],['Ninh Bình',['ninh binh']],['Nam Định',['nam dinh']],['Thái Bình',['thai binh']],
+ ['Hà Nam',['ha nam','phu ly']],['Hưng Yên',['hung yen']],['Hải Dương',['hai duong']],['Bắc Ninh',['bac ninh']],
+ ['Bắc Giang',['bac giang']],['Vĩnh Phúc',['vinh phuc']],['Phú Thọ',['phu tho','viet tri']],['Thái Nguyên',['thai nguyen']],
+ ['Tuyên Quang',['tuyen quang']],['Hà Giang',['ha giang']],['Cao Bằng',['cao bang']],['Bắc Kạn',['bac kan']],
+ ['Lạng Sơn',['lang son']],['Lào Cai',['lao cai','sa pa','sapa']],['Yên Bái',['yen bai','mu cang chai']],['Điện Biên',['dien bien']],
+ ['Lai Châu',['lai chau']],['Sơn La',['son la','moc chau']],['Hòa Bình',['hoa binh','mai chau']],['Gia Lai',['gia lai','pleiku']],
+ ['Kon Tum',['kon tum']],['Đắk Lắk',['dak lak','buon ma thuot','daklak']],['Đắk Nông',['dak nong','gia nghia']],
+ ['Nước ngoài',['viet nam ngoai','usa','united states','korea','japan','china','taiwan','thailand','singapore','malaysia','india','russia','france','germany','england','uk','australia','canada','philippines','indonesia','han quoc','nhat ban','trung quoc','dai loan','thai lan','nga','phap','duc','anh','uc','my']]
+];
+function ctTinh(addr){
+  const l=' '+ctKhongDau(addr).replace(/[^a-z0-9]+/g,' ').trim()+' ';
+  if(l.trim()==='') return '';
+  let best='', bestLen=0;
+  CT_TINH.forEach(([ten,keys])=>keys.forEach(k=>{ if(l.includes(' '+k+' ') && k.length>bestLen){ best=ten; bestLen=k.length; } }));
+  return best||'Nơi khác';
+}
+/* Gợi nhớ địa chỉ đã nhập trước đó (dùng cho ô Địa chỉ thường trú) */
+function ctRefreshAddrList(){
+  const dl=document.getElementById('addrList'); if(!dl) return;
+  const dem={};
+  (DB.bookings||[]).forEach(b=>{ const a=(b.resaddr||'').trim(); if(a) dem[a]=(dem[a]||0)+1; });
+  (DB.contacts||[]).forEach(c=>{ const a=(c.addr||'').trim(); if(a) dem[a]=(dem[a]||0)+1; });
+  const ds=Object.entries(dem).sort((x,y)=>y[1]-x[1]).slice(0,80);
+  const tinh=[...new Set(Object.keys(dem).map(ctTinh).filter(x=>x&&x!=='Nơi khác'))];
+  dl.innerHTML=ds.map(([a,n])=>`<option value="${ctEsc(a)}">${n>1?n+' khách':''}</option>`).join('')
+    +tinh.map(t=>`<option value="${ctEsc(t)}">tỉnh/thành</option>`).join('');
+}
+
 /* Nguồn KHÔNG tính vào thống kê khách liên hệ:
      · công ty công nợ phải thu / phải trả (VNA, Atlantis, Vexere, HaYe…) — đây là khách của đối tác, không phải khách tự liên hệ
      · khách quen / khách quay lại — không phải khách mới do marketing đem về (chủ có thể bật lại)
@@ -4408,6 +4458,7 @@ function renderContacts(){
     if(fs && r.kind!==fs) return false;
     if(fc==='needless'){ if(r.needs.length) return false; }
     else if(fc && r.close!==fc) return false;
+    if(ctPlace && (r.addr?ctTinh(r.addr):'(chưa ghi)')!==ctPlace) return false;
     if(q && !(r.name.toLowerCase().includes(q) || (r.addr||'').toLowerCase().includes(q) || (qd && r.phone.replace(/\D/g,'').includes(qd)))) return false;
     return true;
   });
@@ -4491,6 +4542,16 @@ function renderContacts(){
     dh+=`<tr class="total"><td>Tổng</td><td>${T}</td><td>${a}</td><td>${b}</td><td>${c}</td><td>${so}</td><td>${base?rate+'%':'—'}</td></tr>`;
     document.getElementById('ctDaysTbl').innerHTML=dh;
   }
+  /* ---- Nơi thường trú ---- */
+  const pc={}; all.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
+  const pe=Object.entries(pc).sort((x,y)=>(x[0]==='(chưa ghi)')-(y[0]==='(chưa ghi)')||y[1]-x[1]);
+  const pmx=Math.max(1,...pe.map(e=>e[1]));
+  document.getElementById('ctPlaceBars').innerHTML=pe.length
+    ? pe.map(([k,v])=>`<div class="ct-nb ct-pb ${k==='(chưa ghi)'?'none':''} ${ctPlace===k?'on':''}" data-place="${ctEsc(k)}"><span>${ctEsc(k)}</span><div class="t"><i style="width:${v/pmx*100}%"></i></div><span class="c">${v}</span></div>`).join('')
+      +`<div class="muted" style="font-size:12px;margin-top:8px">${T-(pc['(chưa ghi)']||0)}/${T} khách đã có địa chỉ${ctPlace?' · đang lọc: <b>'+ctEsc(ctPlace)+'</b> — bấm lại để bỏ lọc':''}</div>`
+    : '<div class="muted" style="font-size:13px">Chưa có khách nào.</div>';
+  ctRefreshAddrList();
+
   const miss=all.filter(r=>!r.needs.length).length, al=document.getElementById('ctAlert');
   al.style.display=(miss&&!viewMode)?'':'none';
   al.innerHTML=miss?`<span>⚠ Còn <b>${miss}</b> khách chưa chọn nhu cầu — cuối ngày chọn nốt để thống kê đủ.</span> <button class="ct-btn" id="ctShowMiss" style="padding:4px 10px">Lọc ra để chọn</button>`:'';
@@ -4652,6 +4713,10 @@ function ctFillSrcSel(val){
   sel.innerHTML=opts.map(n=>`<option value="${ctEsc(n)}">${ctEsc(n)}</option>`).join('');
   sel.value=val||'Zalo';
 }
+document.getElementById('ctPlaceBars').addEventListener('click',e=>{
+  const el=e.target.closest('[data-place]'); if(!el) return;
+  ctPlace=(ctPlace===el.dataset.place)?'':el.dataset.place; renderContacts();
+});
 document.getElementById('ctSrcTrack').addEventListener('click',e=>{
   if(e.target.id==='ctSrcAdd'){ openSrcQuick(()=>ctCommit()); return; }
   const n=e.target.dataset&&e.target.dataset.unskip; if(!n) return;
@@ -4889,6 +4954,10 @@ function ctBuildPdfNode(from,to){
     src+=`<tr class="ctp-brk"><td class="l">${ctEsc(lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td><b>${bs?Math.round((x('today')+x('advance'))/bs*100)+'%':'—'}</b></td></tr>`;
   });
   const nc={}; all.forEach(r=>r.needs.forEach(n=>nc[n]=(nc[n]||0)+1));
+  const pc={}; all.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
+  const noiO=Object.entries(pc).sort((x,y)=>(x[0]==='(chưa ghi)')-(y[0]==='(chưa ghi)')||y[1]-x[1])
+    .map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(k)}</td><td><b>${v}</b></td><td>${pct(v)}</td></tr>`).join('')
+    ||'<tr><td class="l" colspan="3" style="color:#64748b">Chưa có khách.</td></tr>';
   const needs=Object.entries(nc).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(ctNeedName(k))}</td><td><b>${v}</b></td><td>${pct(v)}</td></tr>`).join('')
     ||'<tr><td class="l" colspan="3" style="color:#64748b">Chưa chọn nhu cầu cho khách nào.</td></tr>';
   let days='';
@@ -4951,6 +5020,8 @@ function ctBuildPdfNode(from,to){
         <table><tr><th class="l">Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${src}</table></div>
       <div style="flex:1"><h3 class="ctp-brk">Nhu cầu khách</h3>
         <table><tr><th class="l">Nhu cầu</th><th>Số khách</th><th>% tổng</th></tr>${needs}</table></div>
+      <div style="flex:1"><h3 class="ctp-brk">Nơi thường trú</h3>
+        <table><tr><th class="l">Tỉnh / thành</th><th>Số khách</th><th>% tổng</th></tr>${noiO}</table></div>
     </div>
     ${multi?`<h3 class="ctp-brk">Theo từng ngày</h3>
     <table><tr class="ctp-brk"><th class="l">Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${days}</table>`:''}
