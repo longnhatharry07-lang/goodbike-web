@@ -1585,7 +1585,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-25-bieudo';
+const BAN_APP  = '2026-09-25-bieudo-3';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3970,8 +3970,10 @@ function paRenderRevChart(){
   const btn=document.getElementById('paRevTblBtn');
   if(btn&&!btn._wired){ btn._wired=true; btn.onclick=()=>{ paRevShowTbl=!paRevShowTbl; paRenderRevChart(); }; }
 
-  const ms=paRevOfMonths(paMonthsBack(paRevN));
-  const vals=ms.map(m=>m.rev), ests=ms.map(m=>m.est), n=ms.length;
+  let ms=paRevOfMonths(paMonthsBack(paRevN));
+  let boQua=0; while(boQua<ms.length-1 && ms[boQua].rev===0) boQua++;   // bỏ các tháng đầu chưa có dữ liệu (trước khi dùng app)
+  if(boQua>0) ms=ms.slice(boQua);
+  const ests=ms.map(m=>m.est), n=ms.length;
   const ma=ms.map((_,i)=> i<2?null:(ests[i]+ests[i-1]+ests[i-2])/3);        // trung bình trượt 3 tháng
   const [sl,ic]=paSlope(ests);                                               // đường xu hướng
   const yMax=Math.max(1,...ests)*1.18;
@@ -3988,43 +3990,60 @@ function paRenderRevChart(){
     grid+=`<line x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}" stroke="#eef1f5" stroke-width="1"/>`;
     ylab+=`<text x="${padL-10}" y="${(yy+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#94a3b8">${g?paCompact(v):'0'}</text>`;
   }
-  let bars='', xlab='', labels='';
-  const step=n>14?2:1;
-  const iMax=ests.indexOf(Math.max(...ests));
+  /* ----- Đường doanh thu + vùng nền (kiểu biểu đồ chứng khoán, rút gọn) ----- */
+  const doneIdx = ms[n-1].done ? n-1 : n-2;          // điểm cuối của phần CHẮC CHẮN (tháng đã xong)
+  const pts = ms.map((m,i)=>[xC(i), yOf(m.est)]);
+  const solid = pts.slice(0, Math.max(1,doneIdx+1));
+  const dLine = p=>p.map((pt,i)=>(i?'L':'M')+pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' ');
+  const yBase = padT+plotH;
+  let area='', line='', dots='';
+  if(solid.length>1){
+    area=`<path d="${dLine(solid)} L${solid[solid.length-1][0].toFixed(1)} ${yBase} L${solid[0][0].toFixed(1)} ${yBase} Z" fill="${PA_REV_BAR}" fill-opacity=".10"/>`;
+    line=`<path d="${dLine(solid)}" fill="none" stroke="${PA_REV_BAR}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  if(doneIdx<n-1 && doneIdx>=0){                      // tháng đang chạy: nối bằng nét đứt tới số ƯỚC TÍNH
+    line+=`<path d="M${pts[doneIdx][0].toFixed(1)} ${pts[doneIdx][1].toFixed(1)} L${pts[n-1][0].toFixed(1)} ${pts[n-1][1].toFixed(1)}" fill="none" stroke="${PA_REV_BAR}" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>`;
+    const yNow=yOf(ms[n-1].rev);                      // chấm rỗng = đã đạt đến hôm nay
+    dots+=`<circle cx="${pts[n-1][0].toFixed(1)}" cy="${yNow.toFixed(1)}" r="4" fill="#fff" stroke="${PA_REV_BAR}" stroke-width="2"/>`;
+  }
+  const iMax=ests.indexOf(Math.max(...ests)), iMin=ests.indexOf(Math.min(...ests));
   ms.forEach((m,i)=>{
-    const x=xC(i)-barW/2, yv=yOf(m.rev), h=Math.max(0,padT+plotH-yv);
-    bars+=`<path d="${paRoundedBar(x,yv,barW,h,4)}" fill="${PA_REV_BAR}" ${m.done?'':'fill-opacity=".55"'}/>`;
-    if(!m.done && m.est>m.rev){                                              // phần ước tính còn lại của tháng đang chạy
-      const yE=yOf(m.est), hE=yv-yE;
-      bars+=`<path d="${paRoundedBar(x,yE,barW,hE,4)}" fill="${PA_REV_BAR}" fill-opacity=".18"/>`
-          + `<line x1="${x}" y1="${yE.toFixed(1)}" x2="${(x+barW).toFixed(1)}" y2="${yE.toFixed(1)}" stroke="${PA_REV_LINE}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-    }
-    if(i%step===0||i===n-1) xlab+=`<text x="${xC(i).toFixed(1)}" y="${H-14}" text-anchor="middle" font-size="11" fill="${i===n-1?'#0f172a':'#94a3b8'}" ${i===n-1?'font-weight="700"':''}>${m.label}</text>`;
-    if(i===n-1||i===iMax){                                                   // chỉ gắn nhãn tháng mới nhất và tháng cao nhất
-      const yTop=yOf(Math.max(m.rev,m.est));
-      labels+=`<text x="${xC(i).toFixed(1)}" y="${(yTop-8).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">${paCompact(m.est)}</text>`;
-    }
+    const big = (i===n-1||i===iMax||i===iMin);
+    dots+=`<circle class="pa-rev-dot" data-i="${i}" cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="${big?5:3.5}" fill="${PA_REV_BAR}" stroke="#fff" stroke-width="2"/>`;
   });
-  // đường xu hướng (đứt) + trung bình trượt 3 tháng (liền)
+  /* nhãn chỉ ở 3 điểm đáng nhớ: mới nhất, đỉnh, đáy */
+  let labels='';
+  [[n-1,'',-12],[iMax,'đỉnh ',-12],[iMin,'đáy ',20]].forEach(([i,pre,dy])=>{
+    if(i==null||i<0) return;
+    if(pre&&(i===n-1)) return;
+    labels+=`<text x="${pts[i][0].toFixed(1)}" y="${(pts[i][1]+dy).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="${pre==='đáy '?'#b91c1c':(pre==='đỉnh '?'#15803d':'#0f172a')}">${pre}${paCompact(ests[i])}</text>`;
+  });
+  /* mốc tháng dưới trục */
+  let xlab='';
+  const step=n>14?2:1;
+  ms.forEach((m,i)=>{ if(i%step===0||i===n-1)
+    xlab+=`<text x="${xC(i).toFixed(1)}" y="${H-14}" text-anchor="middle" font-size="11" fill="${i===n-1?'#0f172a':'#94a3b8'}" ${i===n-1?'font-weight="700"':''}>${m.label}</text>`; });
+  /* đường xu hướng (hồi quy) + trung bình trượt 3 tháng */
   let trend='';
   if(n>=3){
     const y0=yOf(Math.max(0,ic)), y1=yOf(Math.max(0,ic+sl*(n-1)));
     trend=`<line x1="${xC(0).toFixed(1)}" y1="${y0.toFixed(1)}" x2="${xC(n-1).toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>`;
   }
-  let maPath='', maDots='';
+  let maPath='';
   const maPts=ma.map((v,i)=>v==null?null:[xC(i),yOf(v)]).filter(Boolean);
-  if(maPts.length>1){
-    maPath=`<path d="${maPts.map((pt,i)=>(i?'L':'M')+pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' ')}" fill="none" stroke="${PA_REV_LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    maDots=maPts.map(pt=>`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="4" fill="${PA_REV_LINE}" stroke="#fff" stroke-width="2"/>`).join('');
-  }
+  if(maPts.length>1) maPath=`<path d="${dLine(maPts)}" fill="none" stroke="${PA_REV_LINE}" stroke-width="2" stroke-dasharray="7 4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const bars=area+trend+maPath+line+dots;             // thứ tự vẽ: nền → xu hướng → TB → đường chính → chấm
+  const cross=`<line id="paRevCross" x1="0" y1="${padT}" x2="0" y2="${yBase}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4" style="display:none"/>`;
+  grid+=cross;
   const hits=ms.map((m,i)=>`<rect class="pa-rev-hit" data-i="${i}" x="${(padL+band*i).toFixed(1)}" y="${padT}" width="${band.toFixed(1)}" height="${plotH}" fill="transparent"/>`).join('');
-  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${grid}${ylab}${trend}${bars}${maPath}${maDots}${labels}${xlab}${hits}</svg>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}">${grid}${ylab}${bars}${labels}${xlab}${hits}</svg>`;
 
   document.getElementById('paRevLegend').innerHTML=
-    `<span class="lg"><i class="sw" style="background:${PA_REV_BAR}"></i> Doanh thu từng tháng</span>`
-   +`<span class="lg"><i class="swl"></i> Trung bình 3 tháng (xu hướng mượt)</span>`
+    `<span class="lg"><i class="swl" style="border-top-width:2.5px;border-color:${PA_REV_BAR}"></i> Doanh thu từng tháng</span>`
+   +`<span class="lg"><i class="swl" style="border-top-style:dashed"></i> Trung bình 3 tháng (xu hướng mượt)</span>`
    +`<span class="lg"><i class="swl" style="border-top-style:dashed;border-color:#94a3b8"></i> Đường xu hướng chung</span>`
-   +(ms[n-1].done?'':`<span class="lg muted">Cột nhạt + viền đứt của ${ms[n-1].label} là ƯỚC TÍNH cả tháng (đến hôm nay đã ${ms[n-1].daysDone}/${ms[n-1].days} ngày)</span>`);
+   +(boQua?`<span class="lg muted">Đã bỏ ${boQua} tháng đầu chưa có dữ liệu</span>`:'')
+   +(ms[n-1].done?'':`<span class="lg muted">Đoạn nét đứt của ${ms[n-1].label} là ƯỚC TÍNH cả tháng (đến hôm nay đã ${ms[n-1].daysDone}/${ms[n-1].days} ngày)</span>`);
 
   paRevGeom={W,H,padT,plotH,band,padL,ms,ma,xC};
   paWireRevHover();
@@ -4046,9 +4065,12 @@ function paRenderRevChart(){
 function paWireRevHover(){
   const svg=document.querySelector('#paRevChart svg'); if(!svg)return;
   const tip=document.getElementById('paRevTip'), box=svg.closest('.pa-chart-box'), g=paRevGeom;
+  const cross=svg.querySelector('#paRevCross');
   svg.querySelectorAll('.pa-rev-hit').forEach(r=>{
     r.onmouseenter=r.onmousemove=e=>{
       const i=+r.dataset.i, m=g.ms[i], prev=i?g.ms[i-1]:null;
+      if(cross){ const x=g.xC(i); cross.setAttribute('x1',x); cross.setAttribute('x2',x); cross.style.display=''; }
+      svg.querySelectorAll('.pa-rev-dot').forEach(d=>d.setAttribute('r', +d.dataset.i===i?6:(d.getAttribute('r')>4.5?5:3.5)));
       const gr=prev?paPctTxt(m.est,prev.est):null;
       tip.innerHTML=`<div class="tt-d">${m.label}${m.done?'':' · đang chạy'}</div>`
         +`<div class="tt-row"><span class="tt-dot" style="background:${PA_REV_BAR}"></span>Doanh thu: <b>${fmtVND(m.rev)}đ</b></div>`
@@ -4061,7 +4083,7 @@ function paWireRevHover(){
       tip.style.left=Math.max(0,Math.min(xPx, bRect.width-10))+'px';
       tip.style.top=((g.padT/g.H)*rect.height+(rect.top-bRect.top)+6)+'px';
     };
-    r.onmouseleave=()=>{ tip.style.display='none'; };
+    r.onmouseleave=()=>{ tip.style.display='none'; if(cross) cross.style.display='none'; };
   });
 }
 function paRenderRevAnalysis(ms,ma,sl){
