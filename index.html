@@ -1411,7 +1411,7 @@
 /* ============ CONFIG ============ */
 const VEHICLES = [
   {id:'A1',typ:'Vision'},{id:'A2',typ:'Vision'},{id:'A3',typ:'Vision'},
-  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'A7',typ:'Vision'},{id:'A8',typ:'Vision'},
+  {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'A7',typ:'Vision'},{id:'A8',typ:'Vision'},{id:'A9',typ:'Vision'},
   {id:'OVER1',typ:'Xe số',over:true},{id:'OVER2',typ:'Xe số',over:true},
   {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},{id:'L3',typ:'NVX/Lead'},
   {id:'B1',typ:'NVX/Lead'},
@@ -1552,7 +1552,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-18-xe-a8';
+const BAN_APP  = '2026-09-25-xe-a9';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2442,7 +2442,8 @@ function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="ba
 const FLEET_MOC = [
   {tu:'0000-01-01', so:18},   // đội xe gốc: A1–A6, OVER1, L1–L2, B1, G1–G5, E1–E3
   {tu:'2026-08-16', so:20},   // 16/8/2026: nhập thêm A7 (Vision) + L3 (Lead) -> 20 xe
-  {tu:'2026-09-18', so:21}    // 18/9/2026: thêm A8 (Vision) -> 21 xe. OVER2 là xe ngoài đội, không tính vào mẫu số
+  {tu:'2026-09-18', so:21},   // 18/9/2026: thêm A8 (Vision) -> 21 xe
+  {tu:'2026-09-25', so:23}    // 25/9/2026: thêm A9 (Vision) -> mẫu số 23 (theo chủ xe chốt)
 ];
 function capacityOn(ds){
   let so=FLEET_MOC[0].so;
