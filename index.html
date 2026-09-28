@@ -808,10 +808,19 @@
     <div id="chiArea">
       <div class="card">
         <div class="row">
-          <h2 style="margin:0">Bảng chi — <span class="revMonthLabel"></span></h2><span id="chiFilterChip"></span>
+          <h2 style="margin:0">Bảng chi — <span id="chiRangeLbl"></span></h2><span id="chiFilterChip"></span>
           <div class="right row">
             <button class="primary" id="addExp">+ Thêm khoản chi</button>
           </div>
+        </div>
+        <div class="row" style="margin-top:10px;gap:8px">
+          <span class="muted">Từ</span><input type="date" id="chiFrom">
+          <span class="muted">đến</span><input type="date" id="chiTo">
+          <button class="ct-btn" id="chiThisMonth">Cả tháng này</button>
+          <button class="ct-btn" id="chiLastMonth">Tháng trước</button>
+          <button class="ct-btn" id="chi30d">30 ngày qua</button>
+          <button class="ct-btn" id="chiThisYear">Từ đầu năm</button>
+          <span class="muted" id="chiRangeNote" style="font-size:12.5px"></span>
         </div>
         <div class="kpis" id="chiKpis" style="margin-top:12px"></div>
       </div>
@@ -1552,7 +1561,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-27-quay-lai';   // quay lại bản trước khi sửa biểu đồ (biểu đồ Phân tích tài chính như cũ)
+const BAN_APP  = '2026-09-28-bangchi';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2655,9 +2664,37 @@ function renderThuChi(){
 /* ============ CHI (locked) ============ */
 let chiFilter=null; // null = tất cả; hoặc 1 key của EXP_TYPES
 function expInMonth(){return DB.expenses.filter(e=>e.date.slice(0,7)===curMonth);}
+/* ===== Bảng chi: chọn khoảng ngày (mặc định = tháng đang chọn ở đầu trang) ===== */
+var chiFrom=null, chiTo=null, chiMonthSeen=null;
+function chiRange(){
+  if(chiFrom&&chiTo) return [chiFrom,chiTo];
+  const last=daysInMonth(curMonth);
+  return [curMonth+'-01', curMonth+'-'+String(last).padStart(2,'0')];
+}
+function expInRange(){ const [f,t]=chiRange(); return DB.expenses.filter(e=>e.date>=f&&e.date<=t); }
+function chiSetRange(f,t){ chiFrom=f; chiTo=t; if(chiFrom>chiTo){const x=chiFrom;chiFrom=chiTo;chiTo=x;} renderChi(); }
+function chiWire(){
+  const fi=document.getElementById('chiFrom'), ti=document.getElementById('chiTo');
+  if(!fi||fi._wired) return; fi._wired=true;
+  const onDate=()=>chiSetRange(fi.value||chiRange()[0], ti.value||chiRange()[1]);
+  fi.onchange=onDate; ti.onchange=onDate;
+  document.getElementById('chiThisMonth').onclick=()=>{ chiFrom=chiTo=null; renderChi(); };
+  document.getElementById('chiLastMonth').onclick=()=>{ const pm=prevMonthYM(curMonth);
+    chiSetRange(pm+'-01', pm+'-'+String(daysInMonth(pm)).padStart(2,'0')); };
+  document.getElementById('chi30d').onclick=()=>chiSetRange(addDays(todayStr(),-29), todayStr());
+  document.getElementById('chiThisYear').onclick=()=>chiSetRange(todayStr().slice(0,4)+'-01-01', todayStr());
+}
 function renderChi(){
   if(!accUnlocked)return;
-  const all=expInMonth().sort((a,b)=>a.date<b.date?-1:1);
+  chiWire();
+  if(chiMonthSeen!==curMonth){ chiMonthSeen=curMonth; chiFrom=chiTo=null; }   // đổi tháng ở đầu trang → về cả tháng đó
+  const [rf,rt]=chiRange(), tuChon=!!(chiFrom&&chiTo);
+  document.getElementById('chiFrom').value=rf; document.getElementById('chiTo').value=rt;
+  document.getElementById('chiRangeLbl').textContent = tuChon? (fmtDMY(rf)+' → '+fmtDMY(rt)) : monthLabel(curMonth);
+  document.getElementById('chiRangeNote').textContent = tuChon
+    ? (paDDiff(rf,rt)+1)+' ngày · đang xem khoảng tự chọn'
+    : 'đang xem cả tháng — chọn ngày để xem khoảng khác';
+  const all=expInRange().sort((a,b)=>a.date<b.date?-1:1);
   const byType={};Object.keys(EXP_TYPES).forEach(k=>byType[k]=0);
   all.forEach(e=>byType[e.type]=(byType[e.type]||0)+e.amt);
   const tot=all.reduce((a,e)=>a+e.amt,0);
@@ -2672,7 +2709,8 @@ function renderChi(){
   }).join('');
   const label = chiFilter? ('Tổng '+EXP_TYPES[chiFilter].label.toLowerCase()) : 'Tổng chi';
   body+=`<tr class="total"><td class="l" colspan="3">${label}</td><td>${fmtVND(listTot)}</td><td class="l" colspan="2">${list.length} khoản</td></tr>`;
-  const empty = chiFilter? `Không có khoản "${EXP_TYPES[chiFilter].label}" trong tháng.` : 'Chưa có khoản chi trong tháng.';
+  const kyTxt = (chiFrom&&chiTo)? 'trong khoảng này' : 'trong tháng';
+  const empty = chiFilter? `Không có khoản "${EXP_TYPES[chiFilter].label}" ${kyTxt}.` : `Chưa có khoản chi ${kyTxt}.`;
   document.getElementById('chiTable').innerHTML=th+(list.length?body:`<tr><td colspan="6" class="l muted" style="padding:14px">${empty}</td></tr>`);
   // banners bấm được — bấm để lọc
   const kpiC=(lbl,val,key,active)=>`<div class="kpi clickable ${active?'active':''}" data-ft="${key}"><div class="lbl">${lbl} ▾</div><div class="val">${val}</div></div>`;
