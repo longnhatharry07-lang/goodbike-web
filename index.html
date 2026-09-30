@@ -761,7 +761,7 @@
     <div class="card" style="padding:0">
       <div class="tbl-wrap" id="wrapBot"><table id="revTableBot"></table></div>
     </div>
-    <div class="muted" style="font-size:12px;margin-top:-4px">💡 Ở các dòng tổng (Tổng doanh thu, Công suất, Chi, Đã thu, Chưa thanh toán): bấm và <b>kéo ngang</b> để chọn nhiều ngày — hệ thống tự tính tổng và trung bình. Trên điện thoại: chạm ô đầu rồi chạm ô cuối.</div>
+    <div class="muted" style="font-size:12px;margin-top:-4px">💡 <b>Chọn ô như Excel:</b> ở bảng trên bấm giữ và <b>kéo</b> qua bất kỳ ô nào — ngang, dọc hay chéo (nhiều xe × nhiều ngày) — hệ thống tự tính Tổng / Trung bình / Cao nhất / Thấp nhất. Bấm 1 ô rồi <b>Shift+bấm</b> ô khác để chọn cả vùng; <b>Esc</b> để bỏ chọn. Trên điện thoại: chạm ô đầu rồi chạm ô cuối.</div>
     <div id="revSelBar" class="sel-bar" style="display:none"></div>
   </section>
 
@@ -1561,7 +1561,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-09-28-bangchi';
+const BAN_APP  = '2026-09-30-excel';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2441,7 +2441,9 @@ function revHeader(ndays){
   th+='<th>Tổng</th></tr>';
   return th;
 }
-function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="background:${bg};color:${dark?'#1f2937':'#fff'}"`;}
+// Dùng background-color (KHÔNG dùng shorthand "background") để lớp phủ xanh khi
+// chọn ô (.selcell.sel dùng background-image) không bị style inline xoá mất.
+function cellStyle(bg){if(!bg)return '';const dark=isLight(bg);return `style="background-color:${bg};color:${dark?'#1f2937':'#fff'}"`;}
 // Mẫu số tính công suất theo THÁNG: 16 đến hết tháng này, 18 từ tháng sau trở đi.
 /* ===== MẪU SỐ TÍNH CÔNG SUẤT (số xe đang khai thác) =====
    Cách cũ so tháng với "tháng hiện tại" nên mẫu số TỰ ĐỔI theo thời gian: cùng
@@ -2463,25 +2465,33 @@ function renderRevenue(){
   const {top,bottom,extra,ndays}=buildMatrices();
   const chiByDay={};DB.expenses.filter(e=>e.date.slice(0,7)===curMonth&&e.type==='honhop').forEach(e=>{const dd=+e.date.split('-')[2];chiByDay[dd]=(chiByDay[dd]||0)+e.amt;});
   /* ---------- BẢNG TRÊN ---------- */
+  /* MỌI ô đều chọn được như Excel: data-row = số thứ tự dòng, data-i = ngày,
+     data-v = giá trị số (ô trống thì KHÔNG có data-v → coi như ô rỗng, không tính trung bình). */
   let body='';let colTot={};let grand=0;
+  const rowsTop=[];
   VEHICLES.forEach(v=>{
+    const ri=rowsTop.length; rowsTop.push({key:v.id,label:`${v.id} · ${v.typ}`,kind:'money'});
     let rowTot=0;let tds='';
     for(let i=1;i<=ndays;i++){const c=top[v.id][i];const val=c?c.amt:0;rowTot+=val;colTot[i]=(colTot[i]||0)+val;
       const tiny = (c&&debtGroupOf(c.src)) ? `<small style="display:block;font-size:8px;line-height:1.05;opacity:.9;font-weight:600">${c.src}</small>` : '';
-      tds+=`<td ${c?cellStyle(sourceColor(c.src)):''}>${val?fmtVND(val)+'đ':''}${tiny}</td>`;}
+      tds+=`<td class="selcell" data-tb="top" data-row="${ri}" data-r="${v.id}" data-i="${i}"${c?` data-v="${val}"`:''} ${c?cellStyle(sourceColor(c.src)):''}>${val?fmtVND(val)+'đ':''}${tiny}</td>`;}
     grand+=rowTot;
     body+=`<tr><td class="l"><b>${v.id}</b> <span class="muted">${v.typ}</span></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
   let chiTds='';let chiTot=0;
-  for(let i=1;i<=ndays;i++){const val=chiByDay[i]||0;chiTot+=val;chiTds+=`<td class="selcell" data-r="chi" data-i="${i}" data-v="${val}" style="color:#dc2626">${val?'-'+fmtVND(val)+'đ':''}</td>`;}
+  const riChi=rowsTop.length; rowsTop.push({key:'Chi',label:'Chi',kind:'money'});
+  for(let i=1;i<=ndays;i++){const val=chiByDay[i]||0;chiTot+=val;chiTds+=`<td class="selcell" data-tb="top" data-row="${riChi}" data-r="chi" data-i="${i}" data-v="${val}" style="color:#dc2626">${val?'-'+fmtVND(val)+'đ':''}</td>`;}
   body+=`<tr><td class="l">Chi</td>${chiTds}<td style="color:#dc2626">${chiTot?'-'+fmtVND(chiTot):''}</td></tr>`;
-  let ttds='';for(let i=1;i<=ndays;i++)ttds+=`<td class="selcell" data-r="rev" data-i="${i}" data-v="${colTot[i]||0}">${colTot[i]?fmtVND(colTot[i])+'đ':'0 đ'}</td>`;
+  const riRev=rowsTop.length; rowsTop.push({key:'Tổng DT',label:'Tổng doanh thu',kind:'money'});
+  let ttds='';for(let i=1;i<=ndays;i++)ttds+=`<td class="selcell" data-tb="top" data-row="${riRev}" data-r="rev" data-i="${i}" data-v="${colTot[i]||0}">${colTot[i]?fmtVND(colTot[i])+'đ':'0 đ'}</td>`;
   body+=`<tr class="total"><td class="l">Tổng Doanh Thu</td>${ttds}<td>${fmtVND(grand)}đ</td></tr>`;
+  const riCap=rowsTop.length; rowsTop.push({key:'Công suất',label:'Công suất',kind:'pct'});
   let ctds='';
   for(let i=1;i<=ndays;i++){let cnt=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);
     const cap=capacityOn(`${curMonth}-${String(i).padStart(2,'0')}`);
-    const pct=cap?cnt/cap*100:0;ctds+=`<td class="selcell" data-r="cap" data-i="${i}" data-v="${pct}">${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
+    const pct=cap?cnt/cap*100:0;ctds+=`<td class="selcell" data-tb="top" data-row="${riCap}" data-r="cap" data-i="${i}" data-v="${pct}">${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
   body+=`<tr class="total"><td class="l">Công suất</td>${ctds}<td></td></tr>`;
+  REV_ROWS.top=rowsTop;
   document.getElementById('revTableTop').innerHTML=revHeader(ndays)+body;
   /* ---------- BẢNG DƯỚI (đã thanh toán) ---------- */
   let body2='';let colTot2={};let owedCol={};let grand2=0;let grandOwed=0;
@@ -2498,9 +2508,9 @@ function renderRevenue(){
     grand2+=rowTot;
     body2+=`<tr><td class="l"><b>${v.id}</b></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
-  let ttds2='';for(let i=1;i<=ndays;i++)ttds2+=`<td class="selcell" data-r="thu" data-i="${i}" data-v="${colTot2[i]||0}">${colTot2[i]?fmtVND(colTot2[i])+'đ':'0 đ'}</td>`;
+  let ttds2='';for(let i=1;i<=ndays;i++)ttds2+=`<td class="selcell" data-tb="bot" data-row="0" data-r="thu" data-i="${i}" data-v="${colTot2[i]||0}">${colTot2[i]?fmtVND(colTot2[i])+'đ':'0 đ'}</td>`;
   body2+=`<tr class="total"><td class="l">Đã thu</td>${ttds2}<td>${fmtVND(grand2)}đ</td></tr>`;
-  let owtds='';for(let i=1;i<=ndays;i++){const o=owedCol[i]||0;grandOwed+=o;owtds+=`<td class="selcell" data-r="no" data-i="${i}" data-v="${o}" style="color:#dc2626">${o?fmtVND(o)+'đ':''}</td>`;}
+  let owtds='';for(let i=1;i<=ndays;i++){const o=owedCol[i]||0;grandOwed+=o;owtds+=`<td class="selcell" data-tb="bot" data-row="1" data-r="no" data-i="${i}" data-v="${o}" style="color:#dc2626">${o?fmtVND(o)+'đ':''}</td>`;}
   body2+=`<tr class="total"><td class="l" style="color:#dc2626">Chưa thanh toán</td>${owtds}<td style="color:#dc2626">${fmtVND(grandOwed)}đ</td></tr>`;
   document.getElementById('revTableBot').innerHTML=revHeader(ndays)+body2;
   /* ---------- Legends ---------- */
@@ -2533,75 +2543,122 @@ function renderRevenue(){
 function kpi(l,v,cls=''){return `<div class="kpi ${cls}"><div class="lbl">${l}</div><div class="val">${v}</div></div>`;}
 
 /* ============ CHỌN Ô KIỂU BẢNG TÍNH (Bảng tổng doanh thu) ============
-   Kéo ngang trên một dòng tổng để xem nhanh tổng / trung bình của khoảng ngày đó —
-   giống thanh trạng thái của Google Sheets. Chỉ cho chọn trong CÙNG một dòng vì
-   cộng doanh thu với % công suất thì con số vô nghĩa. */
-const REV_ROW_META={
-  rev:{label:'Tổng doanh thu', kind:'money'},
-  cap:{label:'Công suất',      kind:'pct'},
-  chi:{label:'Chi',            kind:'money'},
-  thu:{label:'Đã thu',         kind:'money'},
-  no :{label:'Chưa thanh toán',kind:'money'}
-};
-let revSel={r:null,a:null,b:null,drag:false};
-function revSelClear(){ revSel={r:null,a:null,b:null,drag:false}; revSelPaint(); }
+   Giống Excel / Google Sheets: bấm giữ rồi kéo qua BẤT KỲ ô nào (mọi dòng xe,
+   mọi ngày) — kéo ngang, kéo dọc hay kéo chéo đều được. Thanh dưới màn hình
+   hiện Tổng / Trung bình / Cao nhất / Thấp nhất của vùng đang chọn.
+   Bảng dưới (Đã thu / Chưa thanh toán) giữ nguyên cách chọn theo từng dòng. */
+let REV_ROWS={top:[],bot:[{key:'Đã thu',label:'Đã thu',kind:'money'},{key:'Chưa TT',label:'Chưa thanh toán',kind:'money'}]};
+let revSel={tb:null,r0:0,c0:0,r1:0,c1:0,drag:false};
+function revSelClear(){ revSel={tb:null,r0:0,c0:0,r1:0,c1:0,drag:false}; revSelPaint(); }
+function revSelBox(){
+  return { r0:Math.min(revSel.r0,revSel.r1), r1:Math.max(revSel.r0,revSel.r1),
+           c0:Math.min(revSel.c0,revSel.c1), c1:Math.max(revSel.c0,revSel.c1) };
+}
 function revSelCells(){
-  if(!revSel.r||revSel.a==null)return [];
-  const lo=Math.min(revSel.a,revSel.b), hi=Math.max(revSel.a,revSel.b);
-  return [...document.querySelectorAll(`#view-revenue td.selcell[data-r="${revSel.r}"]`)]
-    .filter(td=>{const i=+td.dataset.i; return i>=lo&&i<=hi;});
+  if(!revSel.tb)return [];
+  const t=document.getElementById(revSel.tb==='bot'?'revTableBot':'revTableTop'); if(!t)return [];
+  const b=revSelBox();
+  return [...t.querySelectorAll('td.selcell')].filter(td=>{
+    const r=+td.dataset.row, i=+td.dataset.i;
+    return r>=b.r0&&r<=b.r1&&i>=b.c0&&i<=b.c1;
+  });
 }
 function revSelPaint(){
   document.querySelectorAll('#view-revenue td.selcell.sel').forEach(td=>td.classList.remove('sel','anchor'));
   const bar=document.getElementById('revSelBar'); if(!bar)return;
   const cells=revSelCells();
   if(!cells.length){ bar.style.display='none'; bar.innerHTML=''; return; }
-  cells.forEach(td=>{ td.classList.add('sel'); if(+td.dataset.i===revSel.a)td.classList.add('anchor'); });
-  const meta=REV_ROW_META[revSel.r]||{label:revSel.r,kind:'money'};
-  const vals=cells.map(td=>+td.dataset.v||0);
-  const n=vals.length, sum=vals.reduce((a,v)=>a+v,0), avg=sum/n;
-  const mx=Math.max(...vals), mn=Math.min(...vals);
-  const lo=Math.min(revSel.a,revSel.b), hi=Math.max(revSel.a,revSel.b);
-  const dayLbl=i=>`${i}/${+curMonth.split('-')[1]}`;
+  cells.forEach(td=>{ td.classList.add('sel');
+    if(+td.dataset.row===revSel.r0&&+td.dataset.i===revSel.c0)td.classList.add('anchor'); });
+  const box=revSelBox();
+  const rows=REV_ROWS[revSel.tb]||[];
+  const metas=[]; for(let r=box.r0;r<=box.r1;r++) if(rows[r]) metas.push(rows[r]);
+  const kinds=[...new Set(metas.map(m=>m.kind))];
+  const nRow=box.r1-box.r0+1, nCol=box.c1-box.c0+1, nCell=cells.length;
+  const vals=cells.filter(td=>td.dataset.v!==undefined).map(td=>+td.dataset.v||0);
+  const mo=+curMonth.split('-')[1];
+  const dayLbl=i=>`${i}/${mo}`;
   const money=v=>fmtVND(Math.round(v))+'đ';
   const pct=v=>(Math.round(v*10)/10).toString().replace('.',',')+'%';
-  const fmt=meta.kind==='pct'?pct:money;
+  const fmt=(kinds.length===1&&kinds[0]==='pct')?pct:money;
   const item=(l,v)=>`<span class="sb-item"><span class="sb-l">${l}</span><span class="sb-v">${v}</span></span>`;
-  bar.innerHTML=`<span class="sb-head">${meta.label}<br>${lo===hi?dayLbl(lo):`${dayLbl(lo)} → ${dayLbl(hi)}`}</span>`
-    + item('Số ngày', n)
-    + (meta.kind==='pct'?'':item('Tổng', fmt(sum)))
-    + item('Trung bình', fmt(avg))
-    + item('Cao nhất', fmt(mx))
-    + item('Thấp nhất', fmt(mn))
-    + `<span class="sb-hint">${n===1?'Chạm/Shift+bấm ô khác cùng dòng để chọn khoảng.':'Kéo hoặc chạm để đổi khoảng.'}</span>`
+  /* Tiêu đề: 1 dòng thì ghi tên dòng, nhiều dòng thì ghi "A1 → A5 · 5 dòng" */
+  const rowLbl = nRow===1 ? (rows[box.r0]?rows[box.r0].label:'') 
+               : `${rows[box.r0]?rows[box.r0].key:''} → ${rows[box.r1]?rows[box.r1].key:''} · ${nRow} dòng`;
+  const colLbl = box.c0===box.c1 ? dayLbl(box.c0) : `${dayLbl(box.c0)} → ${dayLbl(box.c1)}${nCol>1?` · ${nCol} ngày`:''}`;
+  let items='';
+  if(!vals.length){
+    items = item(nRow===1?'Số ngày':'Số ô', nCell) + `<span class="sb-hint">Vùng chọn không có số liệu.</span>`;
+  }else if(kinds.length>1){
+    items = item('Số ô', nCell) + item('Ô có số', vals.length)
+          + `<span class="sb-hint">Vùng chọn lẫn tiền và %, không cộng được. Chọn lại trong cùng loại dòng.</span>`;
+  }else{
+    const sum=vals.reduce((a,v)=>a+v,0), avg=sum/vals.length;
+    const mx=Math.max(...vals), mn=Math.min(...vals);
+    items = item(nRow===1?'Số ngày':'Số ô', nCell)
+          + (vals.length!==nCell ? item('Ô có số', vals.length) : '')
+          + (kinds[0]==='pct' ? '' : item('Tổng', fmt(sum)))
+          + item('Trung bình', fmt(avg))
+          + item('Cao nhất', fmt(mx))
+          + item('Thấp nhất', fmt(mn))
+          + `<span class="sb-hint">${nCell===1?'Shift+bấm (hoặc chạm) ô khác để chọn cả vùng.':'Kéo hoặc chạm để đổi vùng chọn. Esc để bỏ.'}</span>`;
+  }
+  bar.innerHTML=`<span class="sb-head">${rowLbl}<br>${colLbl}</span>`+items
     + `<button class="sb-x" id="revSelX" title="Bỏ chọn (Esc)">✕</button>`;
   bar.style.display='flex';
   const x=document.getElementById('revSelX'); if(x)x.onclick=revSelClear;
 }
+/* Kéo tới mép bảng thì tự cuộn ngang, giống Excel khi kéo quá khung nhìn */
+let revAutoTimer=null, revAutoDx=0, revAutoWrap=null, revTouchAt=0;
+function revAutoStop(){ if(revAutoTimer){clearInterval(revAutoTimer);revAutoTimer=null;} revAutoDx=0; }
+function revAutoScroll(wrap,dx){
+  if(!dx){ revAutoStop(); return; }
+  revAutoWrap=wrap; revAutoDx=dx;
+  if(!revAutoTimer) revAutoTimer=setInterval(()=>{ if(revAutoWrap)revAutoWrap.scrollLeft+=revAutoDx; },30);
+}
 function revWireSel(){
   const root=document.getElementById('view-revenue'); if(!root||root._selWired)return; root._selWired=true;
   const cellOf=t=>(t&&t.closest)?t.closest('td.selcell'):null;
-  const anchorAt=td=>{ revSel={r:td.dataset.r,a:+td.dataset.i,b:+td.dataset.i,drag:true}; revSelPaint(); };
-  const extendTo=td=>{ if(td.dataset.r!==revSel.r)return; revSel.b=+td.dataset.i; revSelPaint(); };
-  /* --- chuột: bấm giữ rồi kéo --- */
+  const anchorAt=td=>{ revSel={tb:td.dataset.tb||'top',r0:+td.dataset.row,c0:+td.dataset.i,
+                               r1:+td.dataset.row,c1:+td.dataset.i,drag:true}; revSelPaint(); };
+  const extendTo=td=>{
+    if((td.dataset.tb||'top')!==revSel.tb)return;                 // không kéo chéo giữa 2 bảng
+    revSel.r1 = revSel.tb==='bot' ? revSel.r0 : +td.dataset.row;  // bảng dưới: giữ trong 1 dòng như cũ
+    revSel.c1 = +td.dataset.i; revSelPaint();
+  };
+  /* --- chuột: bấm giữ rồi kéo (ngang / dọc / chéo) --- */
   root.addEventListener('mousedown',e=>{
+    if(Date.now()-revTouchAt<800)return;    // bỏ qua chuột "giả" mà trình duyệt bắn ra sau khi chạm
     const td=cellOf(e.target);
     if(!td){ revSelClear(); return; }
     e.preventDefault();
-    if(e.shiftKey&&revSel.r===td.dataset.r){ extendTo(td); revSel.drag=true; }
+    if(e.shiftKey&&revSel.tb===(td.dataset.tb||'top')){ extendTo(td); revSel.drag=true; }
     else anchorAt(td);
   });
   root.addEventListener('mouseover',e=>{ if(!revSel.drag)return; const td=cellOf(e.target); if(td)extendTo(td); });
-  document.addEventListener('mouseup',()=>{ revSel.drag=false; });
-  /* --- cảm ứng: chạm ô đầu → chạm ô cuối (kéo ngang bị vướng cuộn bảng nên dùng 2 lần chạm) --- */
+  root.addEventListener('mousemove',e=>{
+    if(!revSel.drag){ revAutoStop(); return; }
+    const wrap=e.target&&e.target.closest?e.target.closest('.tbl-wrap'):null;
+    if(!wrap){ revAutoStop(); return; }
+    const r=wrap.getBoundingClientRect(), EDGE=48;
+    if(e.clientX>r.right-EDGE) revAutoScroll(wrap, 22);
+    else if(e.clientX<r.left+EDGE) revAutoScroll(wrap, -22);
+    else revAutoStop();
+  });
+  document.addEventListener('mouseup',()=>{ revSel.drag=false; revAutoStop(); });
+  /* --- cảm ứng: chạm ô đầu → chạm ô cuối (kéo tay bị vướng cuộn bảng nên dùng 2 lần chạm) --- */
   root.addEventListener('touchend',e=>{
     const t=e.changedTouches&&e.changedTouches[0]; if(!t)return;
+    revTouchAt=Date.now();
     const td=cellOf(document.elementFromPoint(t.clientX,t.clientY)); if(!td)return;
-    if(revSel.r===td.dataset.r&&revSel.a===revSel.b&&+td.dataset.i!==revSel.a) extendTo(td);   // lần chạm thứ 2 → mở rộng
+    const same=revSel.tb===(td.dataset.tb||'top');
+    const single=revSel.r0===revSel.r1&&revSel.c0===revSel.c1;
+    const other=+td.dataset.row!==revSel.r0||+td.dataset.i!==revSel.c0;
+    if(same&&single&&other) extendTo(td);      // lần chạm thứ 2 → mở rộng thành vùng
     else anchorAt(td);
     revSel.drag=false;
   },{passive:true});
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&revSel.r)revSelClear(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&revSel.tb)revSelClear(); });
 }
 
 /* ============ THU CHI TABLE ============ */
