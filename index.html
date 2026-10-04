@@ -362,6 +362,9 @@
   .payline .pamt{font-size:16px;font-weight:800;color:#15803d;text-align:right}
   .payline .pamt::placeholder{font-size:13px;font-weight:500;color:#9ca3af}
   .payline:last-child{border-bottom:none}
+  .payline input.pnote{grid-column:1/-1;font-size:12.5px;padding:5px 8px;color:#334155;background:#f8fafc}
+  .payline input.pnote::placeholder{color:#9ca3af;font-style:italic}
+  .payrow-locked .pnote-txt{display:block;color:#64748b;font-size:12px;margin-top:2px}
   .payline input,.payline select{padding:5px 6px;font-size:13px;width:100%}
   .payline .del{background:#fee2e2;color:#dc2626;padding:4px 8px;font-weight:700}
   .payline .pbtns{display:flex;gap:5px;align-items:center}
@@ -1562,7 +1565,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-02-a10';
+const BAN_APP  = '2026-10-04-ghichu';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2706,7 +2709,7 @@ function renderThuChi(){
     const col=tcCol(b,p.method);sum[col]+=(+p.amount||0);
     const tiny=`<small style="display:block;font-size:9px;line-height:1.05;opacity:.85;font-weight:600">${b.src}</small>`;
     const cell=c=>col===c?(fmtVND(p.amount)+(c==='RECV'?tiny:'')):'';
-    const content=`${b.xe} (${fmtDM(b.arrive)} - ${fmtDM(b.depart)}) - ${b.src}`;
+    const content=`${b.xe} (${fmtDM(b.arrive)} - ${fmtDM(b.depart)}) - ${b.src}`+(p.desc?` <i style="color:#64748b">· 📝 ${escNote(p.desc)}</i>`:'');
     return `<tr><td class="l">${fmtDMY(p.date)}${p.time?(' '+p.time):''}</td><td>${cell('CK')}</td><td>${cell('TM')}</td><td ${col==='RECV'?cellStyle('#FF6D01'):''}>${cell('RECV')}</td><td class="l">${content}</td></tr>`;
   }).join('');
   const totalThu=sum.CK+sum.TM+sum.RECV;
@@ -3058,7 +3061,8 @@ function renderSaPayments(){
     <span class="pdate">${p.date?fmtDMY(p.date):todayStr()}${p.time?(' · '+p.time):''}</span>
     <input type="number" data-i="${i}" data-k="amount" step="10000" value="${p.amount||0}" placeholder="Số tiền">
     <select data-i="${i}" data-k="method">${['TM','CK'].map(m=>`<option value="${m}" ${p.method===m?'selected':''}>${PAY_LABEL[m]}</option>`).join('')}</select>
-    <button class="del" data-i="${i}" title="Xóa lệnh">✕</button></div>`).join('')
+    <button class="del" data-i="${i}" title="Xóa lệnh">✕</button>
+    <input type="text" class="pnote" data-i="${i}" data-k="desc" maxlength="200" value="${escNote(p.desc)}" placeholder="📝 Ghi chú (không bắt buộc)"></div>`).join('')
     + '<div class="muted" style="font-size:11px;padding:5px 2px 0">(Ngày giờ được hệ thống tự ghi nhận lúc thêm lệnh)</div>')
     : '<div class="muted" style="padding:6px">Chưa có lệnh thanh toán. Bấm "+ Thêm lệnh" để ghi nhận.</div>';
   el.querySelectorAll('input,select').forEach(inp=>inp.addEventListener('input',()=>{const i=+inp.dataset.i,k=inp.dataset.k;saPayments[i][k]=k==='amount'?(+inp.value||0):inp.value;saRecalc();}));
@@ -3559,6 +3563,7 @@ function renderDayPrices(prices, commissions){ // 1 ô / NGÀY thuê GỒM cả 
 function readDayPrices(){const o={};document.querySelectorAll('#f_dayPrices .dp').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
 function readDayComm(){const o={};document.querySelectorAll('#f_dayPrices .dpc').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
 function formTotal(){return [...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);}   // khách trả = giá (ô Doanh thu); hoa hồng đã nằm trong giá
+function escNote(t){return String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderBkPayments(){
   const el=document.getElementById('bk_paylist');
   if(!bkPayments.length){
@@ -3570,7 +3575,7 @@ function renderBkPayments(){
   el.innerHTML = bkPayments.map((p,i)=>{
     if(p._locked){ // đã thanh toán → 1 dòng chữ nghiêng hơi mờ, gọn gàng + banner chỉnh sửa
       const when=(p.date?fmtDMY(p.date):todayStr())+(p.time?(' '+p.time):'');
-      return `<div class="payrow-locked"><span class="ptxt"><b>${moneyVN(p.amount)}</b> · ${payLabelFull(p.method)} · ${when}</span><button class="pedit" data-edit="${i}" title="Bấm để chỉnh sửa lệnh">✏️ Chỉnh sửa</button></div>`;
+      return `<div class="payrow-locked"><span class="ptxt"><b>${moneyVN(p.amount)}</b> · ${payLabelFull(p.method)} · ${when}${p.desc?`<span class="pnote-txt">📝 ${escNote(p.desc)}</span>`:''}</span><button class="pedit" data-edit="${i}" title="Bấm để chỉnh sửa lệnh">✏️ Chỉnh sửa</button></div>`;
     }
     const methodCtrl = recv
       ? `<span class="pmethod-fixed">${payLabelFull('CONGNO')}</span><input type="hidden" class="pmethod" data-i="${i}" value="CONGNO">`
@@ -3579,15 +3584,17 @@ function renderBkPayments(){
     <span class="pdate">${p.date?fmtDMY(p.date):todayStr()}${p.time?('<br>'+p.time):''}</span>
     <input type="text" inputmode="numeric" class="pamt" data-i="${i}" value="${moneyVN(p.amount)}" placeholder="Nhập tiền">
     ${methodCtrl}
-    <span class="pbtns"><button class="pconfirm" data-pay="${i}" title="Thanh toán &amp; khoá lệnh">✓ Thanh toán</button><button class="del" data-i="${i}" title="Xóa lệnh">✕</button></span></div>`;
+    <span class="pbtns"><button class="pconfirm" data-pay="${i}" title="Thanh toán &amp; khoá lệnh">✓ Thanh toán</button><button class="del" data-i="${i}" title="Xóa lệnh">✕</button></span>
+    <input type="text" class="pnote" data-i="${i}" maxlength="200" value="${escNote(p.desc)}" placeholder="📝 Ghi chú (không bắt buộc)"></div>`;
   }).join('')
-    + '<div class="muted" style="font-size:11px;padding:5px 2px 0">(Ngày giờ tự ghi nhận. Bấm ✓ Thanh toán để khoá lệnh; bấm ✏️ Chỉnh sửa để mở lại.)</div>';
+    + '<div class="muted" style="font-size:11px;padding:5px 2px 0">(Ngày giờ tự ghi nhận. Ghi chú không bắt buộc. Bấm ✓ Thanh toán để khoá lệnh; bấm ✏️ Chỉnh sửa để mở lại.)</div>';
   el.querySelectorAll('.pamt').forEach(inp=>{
     inp.addEventListener('focus',()=>{ if((bkPayments[+inp.dataset.i].amount||0)===0) inp.value=''; });
     inp.addEventListener('input',()=>{const i=+inp.dataset.i;const n=parseInt(inp.value.replace(/[^\d]/g,''))||0;bkPayments[i].amount=n;inp.value=n?n.toLocaleString('en-US')+'đ':'';recalcPay();});
     inp.addEventListener('blur',()=>{const i=+inp.dataset.i;inp.value=moneyVN(bkPayments[i].amount);});
   });
   el.querySelectorAll('.pmethod').forEach(sel=>sel.addEventListener('input',()=>{bkPayments[+sel.dataset.i].method=sel.value;}));
+  el.querySelectorAll('.pnote').forEach(inp=>inp.addEventListener('input',()=>{bkPayments[+inp.dataset.i].desc=inp.value;}));
   el.querySelectorAll('.pconfirm').forEach(b=>b.onclick=()=>{const i=+b.dataset.pay;if((bkPayments[i].amount||0)<=0){alert('Nhập số tiền trước khi thanh toán.');return;}if(!bkPayments[i].date)bkPayments[i].date=todayStr();if(!bkPayments[i].time)bkPayments[i].time=nowHHMM();bkPayments[i]._locked=true;renderBkPayments();recalcPay();});
   el.querySelectorAll('.pedit').forEach(b=>b.onclick=()=>{bkPayments[+b.dataset.edit]._locked=false;renderBkPayments();recalcPay();});
   el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{bkPayments.splice(+b.dataset.i,1);renderBkPayments();recalcPay();});
