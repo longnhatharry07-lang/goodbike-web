@@ -355,14 +355,6 @@
   #view-schedule #schTable td:nth-child(3) b{font-size:14.5px;font-weight:800}
   #view-schedule #schTable .pill{font-size:12px;padding:4px 11px;border-radius:999px}
   #view-schedule #schTable td:last-child{color:#475569;white-space:normal;line-height:1.35}
-  #view-schedule #schTable tr.schsec td{background:#f1f5f9;font-weight:800;font-size:13px;letter-spacing:.3px;padding:9px 14px;text-align:left;border-left:4px solid #94a3b8}
-  #view-schedule #schTable tr.schsec.giao td{background:#ecfdf5;color:#15803d;border-left-color:#22c55e}
-  #view-schedule #schTable tr.schsec.tra td{background:#fef2f2;color:#b91c1c;border-left-color:#ef4444}
-  #view-schedule tr.schsec .sec-sub{font-weight:600;color:#64748b;font-size:12px;margin-left:8px}
-  #view-schedule tr.schrow.prio td{background:#fffbeb}
-  #view-schedule tr.schrow.prio td:first-child{border-left-color:#f59e0b;background:#fef3c7}
-  .prio-badge{display:inline-block;background:#f59e0b;color:#fff;font-weight:800;font-size:11.5px;padding:3px 10px;border-radius:999px;margin-left:6px;white-space:nowrap;box-shadow:0 1px 3px rgba(245,158,11,.4)}
-  .wait-badge{display:inline-block;background:#fef3c7;color:#b45309;font-weight:700;font-size:11.5px;padding:3px 10px;border-radius:999px;margin-left:6px;white-space:nowrap;border:1px solid #fcd34d}
   #view-schedule #schKpis .kpi{border:1px solid #eef2f7;box-shadow:0 1px 2px rgba(15,23,42,.04)}
   .callbtn{padding:5px 10px;background:#dcfce7;color:#15803d;font-weight:600}
   .payline{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.4fr) minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #eef2f7}
@@ -748,7 +740,7 @@
         </div>
       </div>
       <div class="kpis" id="schKpis" style="margin-top:12px"></div>
-      <div class="muted" style="margin-top:8px">Chia 2 nhóm 🟢 Giao xe · 🔴 Thu hồi/Trả xe, mỗi nhóm xếp theo giờ. <b style="color:#b45309">⚡ Ưu tiên</b> = xe trả xong còn phải giao lại trong ngày → thu hồi trước.</div>
+      <div class="muted" style="margin-top:8px">Xếp theo giờ trong ngày. 🟢 Giao xe · 🔴 Trả xe. Nhân viên xem để nắm lịch chạy.</div>
     </div>
     <div class="card" style="padding:0">
       <div class="tbl-wrap"><table id="schTable"></table></div>
@@ -1577,7 +1569,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-05-lich-uutien';
+const BAN_APP  = '2026-10-05-quaylai';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3027,13 +3019,6 @@ function renderSchedule(){
     // Xem lịch NGÀY TƯƠNG LAI thì KHÔNG hiện quá hạn, chỉ hiện giao/trả dự kiến của ngày đó.
     else if(schDate<=todayStr() && b.depart<schDate && b.status==='danhan')events.push({kind:'Trả',time:planRtime(b)||'12:00',act:actRtime(b),xe:b.xe,src:b.src,guest:b.guest,addr:b.raddr,km:+b.rkm||0,pay:b.pay,b,overdue:true});
   });
-  // ƯU TIÊN: xe TRẢ hôm nay mà CŨNG có lượt GIAO trong ngày (booking khác) → phải thu hồi sớm để kịp giao lại
-  const giaoEv=events.filter(e=>e.kind==='Giao');
-  events.forEach(e=>{
-    if(e.kind!=='Trả')return;
-    const nx=giaoEv.filter(g=>g.xe===e.xe && g.b.id!==e.b.id).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-    if(nx.length){ e.prio=nx[0]; nx.forEach(g=>{ if(!g.waitFor) g.waitFor=e; }); }
-  });
   events.sort((a,b)=>{if(!!a.overdue!==!!b.overdue)return a.overdue?-1:1;return (a.time||'').localeCompare(b.time||'');});
   const nGiao=events.filter(e=>e.kind==='Giao').length, nTra=events.filter(e=>e.kind==='Trả'&&!e.overdue).length, nOver=events.filter(e=>e.overdue).length;
   document.getElementById('schKpis').innerHTML=`
@@ -3043,7 +3028,7 @@ function renderSchedule(){
     ${kpi('⚠️ Quá hạn chưa trả',nOver+' xe',nOver>0?'neg':'')}
     ${kpi('🛣️ Tổng km phải chạy',(Math.round(events.reduce((a,e)=>a+(e.km||0),0)*10)/10).toString().replace('.',',')+' km')}`;
   let th=`<tr><th>Giờ (dự kiến · thực tế)</th><th class="l">Việc</th><th class="l">Xe / Tình trạng</th><th class="l">Địa chỉ</th></tr>`;
-  const rowOf=e=>{
+  let body=events.map(e=>{
     const ss=schedState(e);
     const tag=ss.done?`<span class="pill" style="background:#e5e7eb;color:#9ca3af">⚪ ${e.kind==='Giao'?'Giao':'Trả'}</span>`
       :e.overdue?`<span class="pill" style="background:#fee2e2;color:#b91c1c">⚠️ Trả QUÁ HẠN (${fmtDM(e.b.depart)})</span>`
@@ -3051,23 +3036,8 @@ function renderSchedule(){
     const stp=`<span class="pill" style="background:${ss.color};color:${isLight(ss.color)?'#1f2937':'#fff'}">${ss.label}</span>`;
     const actTxt=e.act?`<span class="t-act done">${e.act}</span>`:'';
     const timeCell=`<div class="schtime"><span class="t-plan">${e.time||'--:--'}</span>${actTxt}</div>`;
-    const isPrio=e.prio && !ss.done;
-    const prioTag=isPrio?`<span class="prio-badge" title="Xe này có lượt GIAO lại trong ngày — thu hồi sớm">⚡ ƯU TIÊN · giao lại ${e.prio.time}</span>`:'';
-    const wr=e.waitFor, waitTag=(e.kind==='Giao' && !ss.done && wr && !schedState(wr).done)?`<span class="wait-badge" title="Xe chưa thu hồi từ khách trước">⏳ chờ thu hồi ${wr.time}</span>`:'';
-    return `<tr class="schrow ${e.kind==='Giao'?'giao':'tra'}${e.overdue?' overdue':''}${ss.done?' done':''}${isPrio?' prio':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td>${timeCell}</td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}${prioTag}${waitTag}</td><td class="l">${e.addr||'<span class="muted">—</span>'}${e.km?` <span class="pill kmpill">🛣️ ${(Math.round(e.km*10)/10).toString().replace('.',',')} km</span>`:''}</td></tr>`;
-  };
-  // CHIA 2 NHÓM: GIAO XE và THU HỒI / TRẢ XE. Trong nhóm trả: quá hạn → ưu tiên (chưa thu hồi) → còn lại theo giờ.
-  const gList=events.filter(e=>e.kind==='Giao');
-  const tList=events.filter(e=>e.kind==='Trả').sort((a,b)=>{
-    const ra=a.overdue?0:(a.prio&&!schedState(a).done?1:2), rb=b.overdue?0:(b.prio&&!schedState(b).done?1:2);
-    return ra-rb || (a.time||'').localeCompare(b.time||'');
-  });
-  const nPrio=tList.filter(e=>e.prio&&!schedState(e).done).length;
-  const secRow=(cls,title,list,sub)=>`<tr class="schsec ${cls}"><td colspan="4">${title} (${list.length})${sub?`<span class="sec-sub">${sub}</span>`:''}</td></tr>`
-    +(list.length?list.map(rowOf).join(''):'<tr><td colspan="4" class="l muted" style="padding:10px 14px">Không có.</td></tr>');
-  const body=events.length
-    ? secRow('giao','🟢 GIAO XE',gList,'')+secRow('tra','🔴 THU HỒI / TRẢ XE',tList,nPrio?`⚡ ${nPrio} xe ưu tiên thu hồi sớm (có lượt giao lại trong ngày)`:'')
-    : '';
+    return `<tr class="schrow ${e.kind==='Giao'?'giao':'tra'}${e.overdue?' overdue':''}${ss.done?' done':''}" data-id="${e.b.id}" data-kind="${e.kind}"><td>${timeCell}</td><td class="l">${tag}</td><td class="l"><b>${e.xe}</b> ${stp}</td><td class="l">${e.addr||'<span class="muted">—</span>'}${e.km?` <span class="pill kmpill">🛣️ ${(Math.round(e.km*10)/10).toString().replace('.',',')} km</span>`:''}</td></tr>`;
+  }).join('');
   document.getElementById('schTable').innerHTML=th+(events.length?body:'<tr><td colspan="4" class="l muted" style="padding:14px">Không có lịch giao/trả trong ngày này.</td></tr>');
   document.querySelectorAll('#schTable .schrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id,null,r.dataset.kind));
 }
