@@ -498,6 +498,10 @@
   .fb-list{display:flex;flex-direction:column;gap:6px}
   .fb-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid #eef2f7;border-radius:10px;background:#f8fafc}
   .fb-row .fb-xe{font-weight:700;color:#0f172a}
+  .fb-group{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+  .fb-gh{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:#0369a1;font-size:13px;padding:6px 4px 2px;border-bottom:2px solid #e0f2fe}
+  .fb-gh .fb-gc{font-weight:600;color:#64748b;font-size:11.5px}
+  .fb-gh .fb-gc b{color:#15803d}
   .fb-row .fb-xe small{font-weight:600;color:#94a3b8;font-size:11px;margin-left:4px}
   .fb-rdy{font-weight:700;color:#15803d;background:#dcfce7;border-radius:999px;padding:3px 12px;font-size:12px}
   .fb-time{font-weight:700;color:#b45309;background:#fef3c7;border-radius:999px;padding:3px 12px;font-size:12px}
@@ -1565,7 +1569,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-04-ghichu';
+const BAN_APP  = '2026-10-05-xetrong-loai';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2291,8 +2295,14 @@ function openFreeBikes(){
   const T=todayStr();
   const rows=VEHICLES.map(v=>({v,a:bikeAvailability(v.id,T)})).filter(x=>x.a.state!=='busy');
   rows.sort((a,b)=>(a.a.state==='ready'?0:1)-(b.a.state==='ready'?0:1) || ((a.a.time||'')<(b.a.time||'')?-1:1));
+  // PHÂN LOẠI theo loại xe (Vision / Xe số / NVX-Lead / Xe điện…), thứ tự nhóm theo thứ tự trong VEHICLES
+  const typOrder=[...new Set(VEHICLES.map(v=>vehTyp(v.id)))];
+  const groups={}; rows.forEach(x=>{const t=vehTyp(x.v.id)||'Khác';(groups[t]=groups[t]||[]).push(x);});
+  const gKeys=Object.keys(groups).sort((a,b)=>{const ia=typOrder.indexOf(a),ib=typOrder.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
+  const rowHtml=x=>`<div class="fb-row"><span class="fb-xe">${x.v.id}</span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`;
   const list=rows.length
-    ? rows.map(x=>`<div class="fb-row"><span class="fb-xe">${x.v.id}<small>${x.v.typ}</small></span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`).join('')
+    ? gKeys.map(t=>{const g=groups[t];const rd=g.filter(x=>x.a.state==='ready').length;
+        return `<div class="fb-group"><div class="fb-gh"><span>${t}</span><span class="fb-gc">${g.length} xe${rd?` · <b>${rd} sẵn sàng</b>`:''}</span></div>${g.map(rowHtml).join('')}</div>`;}).join('')
     : '<div class="muted" style="padding:10px">Hôm nay không có xe trống.</div>';
   showModal(`🅿️ Xe có thể cho thuê — ${fmtDM(T)}`,
     `<div class="muted" style="font-size:12px;padding:0 2px 8px">Trống/sẽ trống: <b>${rows.length}</b> xe</div><div class="fb-list">${list}</div><div class="muted" style="font-size:11px;padding:9px 2px 0">“Sẵn sàng” = xe có sẵn ngay (đã trả xong hoặc không có khách). “Trống từ HH:MM” = xe còn ở chỗ khách, sẽ trống sau giờ trả.</div>`);
