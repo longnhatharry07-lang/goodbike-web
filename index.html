@@ -397,18 +397,19 @@
   .dep-row .dep-note{grid-column:1/-1}
   button.coc-btn{background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0;padding:7px 12px;font-weight:600;font-size:13px}
   button.coc-btn:hover{background:#e2e8f0}
-  .coc-tbl .coc-xe{display:inline-block;background:#ede9fe;color:#6d28d9;font-weight:800;font-size:14px;padding:3px 12px;border-radius:8px;border:1px solid #c4b5fd;letter-spacing:.3px}
+  .coc-tbl .coc-xe{display:inline-block;background:#f5f3ff;color:#6d28d9;font-weight:700;font-size:13.5px;padding:2px 10px;border-radius:6px;border:1px solid #ddd6fe}
   .coc-tbl tr.coc-done .coc-xe{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
-  .coc-h{padding:12px 16px;font-weight:800;font-size:14px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-  .coc-h.tra{background:#fef2f2;color:#b91c1c}
-  .coc-h.hold{background:#fffbeb;color:#92400e}
+  .coc-h{padding:12px 16px;font-weight:700;font-size:14px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .coc-h.tra,.coc-h.hold{background:#f8fafc;color:#0f172a;border-left:4px solid #64748b}
+  .coc-h.tra{border-left-color:#dc2626}
+  .coc-h.hold{border-left-color:#d97706}
   .coc-h .coc-sum{font-size:13px;font-weight:700;color:#334155}
   .coc-tbl tr.cocrow{cursor:pointer}
   .coc-tbl tr.cocrow:hover td{background:#f8fafc}
-  .coc-tbl td.coc-amt{font-weight:800;color:#b45309;text-align:right;white-space:nowrap}
+  .coc-tbl td.coc-amt{font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
   .coc-tbl tr.coc-done td{color:#94a3b8}
   .coc-tbl tr.coc-done td.coc-amt{color:#94a3b8;text-decoration:line-through}
-  .coc-tbl tr.coc-day td{background:#f1f5f9;font-weight:800;color:#0f172a;font-size:12.5px}
+  .coc-tbl tr.coc-day td{background:#f8fafc;font-weight:700;color:#475569;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
   .coc-pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
   .pay-block-h{background:linear-gradient(90deg,#f8fafc,#eff6ff);font-weight:800;font-size:13px;color:#0f172a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
   .dayprice-wrap{max-height:210px;overflow-y:auto;overflow-x:hidden;padding:2px 14px}
@@ -780,7 +781,7 @@
   <section class="view" id="view-coc" style="display:none">
     <div class="card">
       <div class="row">
-        <h2 style="margin:0">🔒 Tiền cọc</h2>
+        <h2 style="margin:0">Tiền cọc</h2>
         <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
           <button class="coc-btn" id="cocPrev">◀</button>
           <span class="muted">Từ</span><input type="date" id="cocFrom">
@@ -1637,7 +1638,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-08-tiencoc';
+const BAN_APP  = '2026-10-08-tiencoc-2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3110,26 +3111,26 @@ function renderCoc(){
   let lastDay='', rb='';
   ret.forEach(b=>{
     const day=b.depart<today&&b.status!=='datra'?'__over':b.depart;
-    if(day!==lastDay){ lastDay=day; rb+=`<tr class="coc-day"><td colspan="7" class="l">${day==='__over'?'⚠️ Quá hạn chưa trả xe':('📅 '+dow(b.depart)+' '+fmtDMY(b.depart))}</td></tr>`; }
+    if(day!==lastDay){ lastDay=day; rb+=`<tr class="coc-day"><td colspan="7" class="l">${day==='__over'?'Quá hạn chưa trả xe':(dow(b.depart)+', '+fmtDMY(b.depart))}</td></tr>`; }
     rb+=`<tr class="cocrow${b.status==='datra'?' coc-done':''}" data-id="${b.id}"><td class="l">${fmtDM(b.depart)} · <b>${b.rplan||b.rtime||'12:00'}</b></td><td class="l"><span class="coc-xe">${b.xe}</span></td><td class="l">${who(b)}</td><td class="coc-amt">${money(+b.deposit.amount)}</td><td class="l">${mLabel(b.deposit.method)}</td><td class="l">${b.deposit.note||''}</td><td class="l">${stPill(b)}</td></tr>`;
   });
   document.getElementById('cocRetTable').innerHTML=thR+(rb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có cọc phải hoàn trong khoảng này.</td></tr>');
-  document.getElementById('cocHRet').innerHTML=`<span>💸 PHẢI HOÀN CỌC · ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}</span><span class="coc-sum">${ret.length} xe · ${money(retTot)}${retDone.length?` · đã thu hồi ${retDone.length} xe`:''}</span>`;
+  document.getElementById('cocHRet').innerHTML=`<span>Phải hoàn cọc · ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}</span><span class="coc-sum">${ret.length} xe · ${money(retTot)}${retDone.length?` · đã thu hồi ${retDone.length} xe`:''}</span>`;
   // 2) ĐANG CẦM tại ngày F
   const hold=DB.bookings.filter(b=>cocHolding(b,F)).sort((a,b)=>a.depart.localeCompare(b.depart)||a.xe.localeCompare(b.xe));
   const holdTot=hold.reduce((a,b)=>a+(+b.deposit.amount||0),0);
   const holdTM=hold.filter(b=>b.deposit.method!=='CK').reduce((a,b)=>a+(+b.deposit.amount||0),0);
   const thH=`<tr><th class="l">Xe</th><th class="l">Khách</th><th class="l">Nhận → Trả</th><th>Tiền cọc</th><th class="l">Hình thức</th><th class="l">Ghi chú cọc</th><th class="l">Tình trạng</th></tr>`;
   const hb=hold.map(b=>{const dl=Math.round((new Date(b.depart+'T00:00:00Z')-new Date(F+'T00:00:00Z'))/864e5);
-    const when=dl<0?`<b style="color:#b91c1c">quá hạn ${-dl} ngày</b>`:(dl===0?'<b style="color:#c2410c">trả hôm đó</b>':`còn ${dl} ngày`);
+    const when=dl<0?`<span style="color:#b91c1c">quá hạn ${-dl} ngày</span>`:(dl===0?'<span style="color:#c2410c">trả hôm đó</span>':`còn ${dl} ngày`);
     return `<tr class="cocrow" data-id="${b.id}"><td class="l"><span class="coc-xe">${b.xe}</span></td><td class="l">${who(b)}</td><td class="l">${fmtDM(b.arrive)} → ${fmtDM(b.depart)} <small class="muted">(${when})</small></td><td class="coc-amt">${money(+b.deposit.amount)}</td><td class="l">${mLabel(b.deposit.method)}</td><td class="l">${b.deposit.note||''}</td><td class="l">${stPill(b)}</td></tr>`;}).join('');
   document.getElementById('cocHoldTable').innerHTML=thH+(hb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có tiền cọc nào đang cầm.</td></tr>');
-  document.getElementById('cocHHold').innerHTML=`<span>🔒 ĐANG CẦM CỌC · ngày ${fmtDMY(F)}</span><span class="coc-sum">${hold.length} xe · ${money(holdTot)}</span>`;
+  document.getElementById('cocHHold').innerHTML=`<span>Đang cầm cọc · ngày ${fmtDMY(F)}</span><span class="coc-sum">${hold.length} xe · ${money(holdTot)}</span>`;
   document.getElementById('cocKpis').innerHTML=`
-    ${kpi('🔒 Đang cầm ('+fmtDM(F)+')',money(holdTot))}
-    ${kpi('💵 Trong đó tiền mặt',money(holdTM)+' <small class="muted">· CK '+money(holdTot-holdTM)+'</small>')}
-    ${kpi('💸 Phải hoàn trong khoảng',money(retTot)+' <small class="muted">· '+ret.length+' xe</small>')}
-    ${kpi('⏳ Còn phải hoàn',money(leftTot)+' <small class="muted">· TM '+money(leftTM)+'</small>',leftTot>0?'neg':'')}`;
+    ${kpi('Đang cầm ('+fmtDM(F)+')',money(holdTot))}
+    ${kpi('Trong đó tiền mặt',money(holdTM)+' <small class="muted">· CK '+money(holdTot-holdTM)+'</small>')}
+    ${kpi('Phải hoàn trong khoảng',money(retTot)+' <small class="muted">· '+ret.length+' xe</small>')}
+    ${kpi('Còn phải hoàn',money(leftTot)+' <small class="muted">· TM '+money(leftTM)+'</small>',leftTot>0?'neg':'')}`;
   document.querySelectorAll('#view-coc .cocrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id));
 }
 function cocSet(f,t){cocFrom=f;cocTo=t<f?f:t;renderCoc();}
