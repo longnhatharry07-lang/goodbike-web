@@ -395,6 +395,21 @@
   .dep-row .dep-amt{font-size:16px;font-weight:800;color:#b45309;text-align:right}
   .dep-row .dep-amt::placeholder{font-size:13px;font-weight:500;color:#9ca3af}
   .dep-row .dep-note{grid-column:1/-1}
+  button.coc-btn{background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0;padding:7px 12px;font-weight:600;font-size:13px}
+  button.coc-btn:hover{background:#e2e8f0}
+  .coc-tbl .coc-xe{display:inline-block;background:#ede9fe;color:#6d28d9;font-weight:800;font-size:14px;padding:3px 12px;border-radius:8px;border:1px solid #c4b5fd;letter-spacing:.3px}
+  .coc-tbl tr.coc-done .coc-xe{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+  .coc-h{padding:12px 16px;font-weight:800;font-size:14px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .coc-h.tra{background:#fef2f2;color:#b91c1c}
+  .coc-h.hold{background:#fffbeb;color:#92400e}
+  .coc-h .coc-sum{font-size:13px;font-weight:700;color:#334155}
+  .coc-tbl tr.cocrow{cursor:pointer}
+  .coc-tbl tr.cocrow:hover td{background:#f8fafc}
+  .coc-tbl td.coc-amt{font-weight:800;color:#b45309;text-align:right;white-space:nowrap}
+  .coc-tbl tr.coc-done td{color:#94a3b8}
+  .coc-tbl tr.coc-done td.coc-amt{color:#94a3b8;text-decoration:line-through}
+  .coc-tbl tr.coc-day td{background:#f1f5f9;font-weight:800;color:#0f172a;font-size:12.5px}
+  .coc-pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
   .pay-block-h{background:linear-gradient(90deg,#f8fafc,#eff6ff);font-weight:800;font-size:13px;color:#0f172a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
   .dayprice-wrap{max-height:210px;overflow-y:auto;overflow-x:hidden;padding:2px 14px}
   .dayprice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #eef2f7;flex-wrap:wrap}
@@ -707,6 +722,7 @@
   <button class="tab" data-t="schedule">Lịch giao trả</button>
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
+  <button class="tab" data-t="coc">Tiền cọc</button>
   <button class="tab admin-toggle" id="accToggle">🔒 Kế toán</button>
   <span class="tab-group" id="accGroupLabel" style="display:none">📊 Kế toán</span>
   <button class="tab admin acc" data-t="revenue" style="display:none">Tổng doanh thu</button>
@@ -757,6 +773,34 @@
     </div>
     <div class="card" style="padding:0">
       <div class="tbl-wrap"><table id="schTable"></table></div>
+    </div>
+  </section>
+
+  <!-- TIỀN CỌC -->
+  <section class="view" id="view-coc" style="display:none">
+    <div class="card">
+      <div class="row">
+        <h2 style="margin:0">🔒 Tiền cọc</h2>
+        <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button class="coc-btn" id="cocPrev">◀</button>
+          <span class="muted">Từ</span><input type="date" id="cocFrom">
+          <span class="muted">đến</span><input type="date" id="cocTo">
+          <button class="coc-btn" id="cocNext">▶</button>
+          <button class="coc-btn" id="cocToday">Hôm nay</button>
+          <button class="coc-btn" id="cocTomorrow">Ngày mai</button>
+          <button class="coc-btn" id="cocWeek">7 ngày tới</button>
+        </div>
+      </div>
+      <div class="kpis" id="cocKpis" style="margin-top:12px"></div>
+      <div class="muted" style="margin-top:8px">Đang cầm = cọc của xe đang ở chỗ khách tại ngày đầu khoảng chọn. Phải hoàn = cọc của xe có ngày trả trong khoảng chọn. Bấm 1 dòng để mở booking.</div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="coc-h tra" id="cocHRet"></div>
+      <div class="tbl-wrap"><table id="cocRetTable" class="coc-tbl"></table></div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="coc-h hold" id="cocHHold"></div>
+      <div class="tbl-wrap"><table id="cocHoldTable" class="coc-tbl"></table></div>
     </div>
   </section>
 
@@ -1593,7 +1637,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-07-a11b';
+const BAN_APP  = '2026-10-08-tiencoc';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2136,6 +2180,7 @@ function switchTab(t){
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   document.getElementById('view-'+t).style.display='';
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
+  if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
   if(t==='thuchi'){
     document.getElementById('tcFrom').value=todayStr();
     document.getElementById('tcTo').value=todayStr();
@@ -2176,7 +2221,7 @@ function renderAll(){
   normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
   const label=monthLabel(curMonth);
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
-  renderLegend();renderTimeline();renderSchedule();renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
+  renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
   save();
 }
@@ -3034,6 +3079,67 @@ document.getElementById('assetDelete').onclick=()=>{if(!confirm('Xóa tài sản
 
 /* ============ SCHEDULE (giao/trả theo giờ) ============ */
 let schDate = todayStr();
+/* ====== TIỀN CỌC: đang cầm + lịch hoàn cọc ====== */
+let cocFrom=todayStr(), cocTo=todayStr();
+function cocOf(b){ return (b&&b.deposit&&(+b.deposit.amount||0)>0)?b.deposit:null; }
+// Xe còn ở chỗ khách (đang giữ cọc) tại ngày X
+function cocHolding(b,X){
+  if(!cocOf(b) || b.arrive>X) return false;
+  if(X===todayStr()) return b.status!=='datra' && (b.status==='danhan'||b.status==='quahan'||b.arrive<=X);
+  if(X<todayStr()) return b.depart>=X;               // quá khứ: tính theo ngày thuê
+  return b.depart>=X && b.status!=='datra';          // tương lai: chưa trả & còn thuê tới ngày X
+}
+function renderCoc(){
+  const F=cocFrom, T=cocTo<cocFrom?cocFrom:cocTo, today=todayStr();
+  document.getElementById('cocFrom').value=F; document.getElementById('cocTo').value=T;
+  const money=n=>fmtVND(n)+'đ';
+  const mLabel=m=>m==='CK'?'Chuyển khoản':'Tiền mặt';
+  const who=b=>{const g=splitGuest(b.guest||'');return `${g.name||'<span class="muted">—</span>'}${g.phone?`<br><small class="muted">${g.phone}</small>`:''}`;};
+  const stPill=b=>b.status==='datra'?'<span class="coc-pill" style="background:#e5e7eb;color:#64748b">Đã thu hồi xe</span>'
+     :(b.depart<today?'<span class="coc-pill" style="background:#fee2e2;color:#b91c1c">Quá hạn trả</span>'
+     :(b.status==='danhan'||b.status==='quahan'?'<span class="coc-pill" style="background:#ffedd5;color:#c2410c">Chưa thu hồi</span>'
+     :'<span class="coc-pill" style="background:#dbeafe;color:#1d4ed8">Chưa giao xe</span>'));
+  // 1) PHẢI HOÀN trong khoảng: ngày trả nằm trong [F,T]; xem có hôm nay → kèm xe quá hạn chưa trả
+  const ret=DB.bookings.filter(b=>cocOf(b) && ((b.depart>=F&&b.depart<=T) || (F<=today&&today<=T&&b.depart<today&&b.status!=='datra'&&b.status!=='sapnhan')));
+  ret.sort((a,b)=>(a.depart+(a.rplan||a.rtime||'12:00')).localeCompare(b.depart+(b.rplan||b.rtime||'12:00')));
+  const retTot=ret.reduce((a,b)=>a+(+b.deposit.amount||0),0);
+  const retDone=ret.filter(b=>b.status==='datra'), retLeft=ret.filter(b=>b.status!=='datra');
+  const leftTot=retLeft.reduce((a,b)=>a+(+b.deposit.amount||0),0);
+  const leftTM=retLeft.filter(b=>b.deposit.method!=='CK').reduce((a,b)=>a+(+b.deposit.amount||0),0);
+  const thR=`<tr><th class="l">Ngày giờ trả</th><th class="l">Xe</th><th class="l">Khách</th><th>Tiền cọc</th><th class="l">Hình thức</th><th class="l">Ghi chú cọc</th><th class="l">Tình trạng</th></tr>`;
+  let lastDay='', rb='';
+  ret.forEach(b=>{
+    const day=b.depart<today&&b.status!=='datra'?'__over':b.depart;
+    if(day!==lastDay){ lastDay=day; rb+=`<tr class="coc-day"><td colspan="7" class="l">${day==='__over'?'⚠️ Quá hạn chưa trả xe':('📅 '+dow(b.depart)+' '+fmtDMY(b.depart))}</td></tr>`; }
+    rb+=`<tr class="cocrow${b.status==='datra'?' coc-done':''}" data-id="${b.id}"><td class="l">${fmtDM(b.depart)} · <b>${b.rplan||b.rtime||'12:00'}</b></td><td class="l"><span class="coc-xe">${b.xe}</span></td><td class="l">${who(b)}</td><td class="coc-amt">${money(+b.deposit.amount)}</td><td class="l">${mLabel(b.deposit.method)}</td><td class="l">${b.deposit.note||''}</td><td class="l">${stPill(b)}</td></tr>`;
+  });
+  document.getElementById('cocRetTable').innerHTML=thR+(rb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có cọc phải hoàn trong khoảng này.</td></tr>');
+  document.getElementById('cocHRet').innerHTML=`<span>💸 PHẢI HOÀN CỌC · ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}</span><span class="coc-sum">${ret.length} xe · ${money(retTot)}${retDone.length?` · đã thu hồi ${retDone.length} xe`:''}</span>`;
+  // 2) ĐANG CẦM tại ngày F
+  const hold=DB.bookings.filter(b=>cocHolding(b,F)).sort((a,b)=>a.depart.localeCompare(b.depart)||a.xe.localeCompare(b.xe));
+  const holdTot=hold.reduce((a,b)=>a+(+b.deposit.amount||0),0);
+  const holdTM=hold.filter(b=>b.deposit.method!=='CK').reduce((a,b)=>a+(+b.deposit.amount||0),0);
+  const thH=`<tr><th class="l">Xe</th><th class="l">Khách</th><th class="l">Nhận → Trả</th><th>Tiền cọc</th><th class="l">Hình thức</th><th class="l">Ghi chú cọc</th><th class="l">Tình trạng</th></tr>`;
+  const hb=hold.map(b=>{const dl=Math.round((new Date(b.depart+'T00:00:00Z')-new Date(F+'T00:00:00Z'))/864e5);
+    const when=dl<0?`<b style="color:#b91c1c">quá hạn ${-dl} ngày</b>`:(dl===0?'<b style="color:#c2410c">trả hôm đó</b>':`còn ${dl} ngày`);
+    return `<tr class="cocrow" data-id="${b.id}"><td class="l"><span class="coc-xe">${b.xe}</span></td><td class="l">${who(b)}</td><td class="l">${fmtDM(b.arrive)} → ${fmtDM(b.depart)} <small class="muted">(${when})</small></td><td class="coc-amt">${money(+b.deposit.amount)}</td><td class="l">${mLabel(b.deposit.method)}</td><td class="l">${b.deposit.note||''}</td><td class="l">${stPill(b)}</td></tr>`;}).join('');
+  document.getElementById('cocHoldTable').innerHTML=thH+(hb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có tiền cọc nào đang cầm.</td></tr>');
+  document.getElementById('cocHHold').innerHTML=`<span>🔒 ĐANG CẦM CỌC · ngày ${fmtDMY(F)}</span><span class="coc-sum">${hold.length} xe · ${money(holdTot)}</span>`;
+  document.getElementById('cocKpis').innerHTML=`
+    ${kpi('🔒 Đang cầm ('+fmtDM(F)+')',money(holdTot))}
+    ${kpi('💵 Trong đó tiền mặt',money(holdTM)+' <small class="muted">· CK '+money(holdTot-holdTM)+'</small>')}
+    ${kpi('💸 Phải hoàn trong khoảng',money(retTot)+' <small class="muted">· '+ret.length+' xe</small>')}
+    ${kpi('⏳ Còn phải hoàn',money(leftTot)+' <small class="muted">· TM '+money(leftTM)+'</small>',leftTot>0?'neg':'')}`;
+  document.querySelectorAll('#view-coc .cocrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id));
+}
+function cocSet(f,t){cocFrom=f;cocTo=t<f?f:t;renderCoc();}
+document.getElementById('cocFrom').onchange=e=>{if(e.target.value)cocSet(e.target.value,cocTo<e.target.value?e.target.value:cocTo);};
+document.getElementById('cocTo').onchange=e=>{if(e.target.value)cocSet(cocFrom>e.target.value?e.target.value:cocFrom,e.target.value);};
+document.getElementById('cocPrev').onclick=()=>{const n=Math.round((new Date(cocTo)-new Date(cocFrom))/864e5)+1;cocSet(addDays(cocFrom,-n),addDays(cocTo,-n));};
+document.getElementById('cocNext').onclick=()=>{const n=Math.round((new Date(cocTo)-new Date(cocFrom))/864e5)+1;cocSet(addDays(cocFrom,n),addDays(cocTo,n));};
+document.getElementById('cocToday').onclick=()=>cocSet(todayStr(),todayStr());
+document.getElementById('cocTomorrow').onclick=()=>{const d=addDays(todayStr(),1);cocSet(d,d);};
+document.getElementById('cocWeek').onclick=()=>cocSet(todayStr(),addDays(todayStr(),6));
 function renderSchedule(){
   const picker=document.getElementById('schDate');
   if(picker.value!==schDate)picker.value=schDate;
