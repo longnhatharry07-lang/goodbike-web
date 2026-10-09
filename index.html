@@ -532,6 +532,10 @@
   .fb-gh .fb-gc b{color:#15803d}
   .fb-row .fb-xe small{font-weight:600;color:#94a3b8;font-size:11px;margin-left:4px}
   .fb-row .fb-xe.sp{color:#7c3aed}
+  .ws-log{font-size:12.5px;padding:5px 8px;border-left:3px solid #cbd5e1;margin-bottom:4px;background:#f8fafc;border-radius:0 6px 6px 0}
+  .ws-log.ok{border-left-color:#16a34a}
+  .ws-log.warn{border-left-color:#f59e0b;background:#fffbeb}
+  .ws-log.err{border-left-color:#dc2626;background:#fef2f2;color:#991b1b}
   .fb-row .fb-xe.sp small{color:#a78bfa}
   .fb-rdy{font-weight:700;color:#15803d;background:#dcfce7;border-radius:999px;padding:3px 12px;font-size:12px}
   .fb-time{font-weight:700;color:#b45309;background:#fef3c7;border-radius:999px;padding:3px 12px;font-size:12px}
@@ -733,6 +737,7 @@
   <button class="tab admin acc" data-t="funds" style="display:none">Dòng tiền</button>
   <button class="tab admin acc" data-t="assets" style="display:none">Tài sản</button>
   <button class="tab admin acc" data-t="phantich" style="display:none">Phân tích tài chính</button>
+  <button class="tab admin acc" data-t="websync" style="display:none">Web bán hàng</button>
 </div>
 
 <main>
@@ -1089,6 +1094,11 @@
       <div class="tbl-wrap" style="border:none;border-radius:0"><table id="ctTable"></table></div>
       <div class="ct-foot"><span><span id="ctCount"></span> <button class="ct-btn" id="ctHidTog" style="display:none;padding:3px 10px;font-size:12.5px;margin-left:6px"></button></span><span>Bấm vào SĐT để hiện riêng một số · bấm ô Nhu cầu để chọn nhiều mục</span></div>
     </div>
+  </section>
+
+  <!-- WEB BÁN HÀNG: đồng bộ 2 chiều với goodbikevietnamrental.com -->
+  <section class="view" id="view-websync" style="display:none">
+    <div id="wsBody"></div>
   </section>
 </main>
 
@@ -1577,6 +1587,8 @@ function normalizeDB(){
   if(!Array.isArray(DB.contactKeep))DB.contactKeep=[];   // nguồn khách quen được tính lại (ghi đè luật mặc định)
   if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
   if(!Array.isArray(DB.contactNeeds))DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));   // danh mục nhu cầu khách
+  if(!DB.webSync||typeof DB.webSync!=='object')DB.webSync={};      // kết nối web bán hàng {url,key,auto,lastAt,runAt,done[]}
+  if(!Array.isArray(DB.webSync.done))DB.webSync.done=[];           // id đơn web đã nhập, để không nhập trùng
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
   if(!DB.debtCompanies.receivable)DB.debtCompanies.receivable=[];
   if(!DB.debtCompanies.payable)DB.debtCompanies.payable=[];
@@ -1639,7 +1651,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-09-a12';
+const BAN_APP  = '2026-10-09-weblink';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2173,7 +2185,7 @@ document.getElementById('prevM').onclick=()=>{shiftMonth(-1)};
 document.getElementById('nextM').onclick=()=>{shiftMonth(1)};
 document.getElementById('monthPick').onchange=e=>{curMonth=e.target.value;renderAll();};
 function shiftMonth(n){const [y,m]=curMonth.split('-').map(Number);const d=new Date(y,m-1+n,1);curMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');document.getElementById('monthPick').value=curMonth;renderAll();}
-const ACC_TABS=['revenue','chi','profit','funds','assets','phantich'];
+const ACC_TABS=['revenue','chi','profit','funds','assets','phantich','websync'];
 const OP_TABS=[];
 const ADMIN_TABS=ACC_TABS.concat(OP_TABS);
 function switchTab(t){
@@ -2183,6 +2195,7 @@ function switchTab(t){
   document.getElementById('view-'+t).style.display='';
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
+  if(t==='websync'){ try{ renderWebSync(); }catch(e){ console.warn('renderWebSync',e); } }
   if(t==='thuchi'){
     document.getElementById('tcFrom').value=todayStr();
     document.getElementById('tcTo').value=todayStr();
@@ -5338,6 +5351,249 @@ async function ctExportPdf(){
 document.getElementById('ctPdf').onclick=ctExportPdf;
 
 
+/* ============ WEB BÁN HÀNG — ĐỒNG BỘ 2 CHIỀU ============
+   Nối web quản lí này với goodbikevietnamrental.com (một Supabase riêng).
+
+   Chiều 1 — ĐẨY TÌNH TRẠNG XE: mỗi mẫu xe trên web bán hàng ứng với một nhóm xe
+   thật ở đây (xem WEB_GROUPS). Với 90 ngày tới, tính số xe còn trống và giờ xe
+   đầu tiên trống trong ngày, ghi vào bảng bike_availability của web bán hàng.
+
+   Chiều 2 — KÉO ĐƠN VỀ: đọc bảng bookings của web bán hàng, tự chọn một xe còn
+   trống trong nhóm, tạo booking nguồn "Web", trạng thái "Sắp nhận".
+
+   LƯU Ý QUAN TRỌNG về cách đếm: web bán hàng TỰ TRỪ các đơn trong bảng bookings
+   của nó. Nên ở chiều 1 ta phải BỎ QUA các booking nguồn Web, nếu không một đơn
+   bị trừ hai lần. Nhờ vậy con số luôn đúng kể cả khi đơn chưa kịp kéo về. */
+
+const WEB_GROUPS=[
+  {id:'8fa69085-6e0c-41bb-9a14-6300e17b9be6', ten:'Honda Vision 110 (bản phổ thông)',    xe:['A1','A2','A4','A6']},
+  {id:'801d1cf0-2369-46eb-9d8d-dd5b7e284135', ten:'Honda Vision 110 Thể thao/Đặc biệt',  xe:['A3','A5','A7','A8','A9','A10','A11','A12']},
+  {id:'4ec5d5a0-a15b-40f5-ad4d-9fc6d3bdaa5f', ten:'Vinfast Evo200',                      xe:['E1','E2','E3','K2']},
+  {id:'7f69e2d5-95a5-4307-ac74-58cd922d120d', ten:'Vinfast Klara S',                     xe:['K1']},
+  {id:'6d511695-8d4e-473c-a724-c4f8422fd8a6', ten:'Wave 50cc',                           xe:['OVER2']},
+  {id:'ffe5e332-f38a-44c4-85e1-683d81402238', ten:'Honda Wave Alpha 110',                xe:['G1','G2','G3','G4','G5']},
+  {id:'3be512b8-3137-4a73-a628-ddf82aeb0941', ten:'Honda Lead 125',                      xe:['L1','L2','L3']},
+  {id:'ea8f3efa-8d9f-4571-8243-ea6b33c0195e', ten:'Yamaha NVX 125',                      xe:['B1']},
+  {id:'611bf66e-4ec3-4495-8135-17c274375eb5', ten:'Honda Future 125',                    xe:['OVER1']}
+];
+const WEB_SRC='Web';          // nguồn khách gán cho mọi đơn đặt từ web bán hàng
+const WEB_DAYS=90;            // đẩy tình trạng xe cho bao nhiêu ngày tới
+const WEB_EVERY=120000;       // tự đồng bộ mỗi 2 phút
+let webBusy=false, webPushed={}, webTimer=null;
+let webLog=[];                // nhật ký ngắn hiện trên tab
+
+function webCfg(){ if(!DB.webSync||typeof DB.webSync!=='object')DB.webSync={}; return DB.webSync; }
+function webOn(){ const c=webCfg(); return !!(c.url&&c.key); }
+function webSay(t,loai){ webLog.unshift({t:new Date().toTimeString().slice(0,8)+' — '+t,loai:loai||''}); webLog=webLog.slice(0,40); try{renderWebSync();}catch(e){} }
+
+async function webReq(path,opt){
+  const c=webCfg();
+  const o=Object.assign({},opt||{});
+  o.headers=Object.assign({apikey:c.key,Authorization:'Bearer '+c.key,'Content-Type':'application/json'},o.headers||{});
+  const r=await fetch(c.url.replace(/\/+$/,'')+'/rest/v1/'+path,o);
+  if(!r.ok) throw new Error('HTTP '+r.status+' — '+(await r.text()).slice(0,180));
+  const txt=await r.text();
+  return txt?JSON.parse(txt):null;
+}
+
+/* ---------- CHIỀU 1: tình trạng xe → web bán hàng ---------- */
+/* Xe bận TRỌN ngày ds khi arrive <= ds < depart. Ngày depart xe trống lại từ giờ trả,
+   nên không tính là bận mà dùng để tính "trống từ mấy giờ". */
+function webBusyAllDay(b,ds){ return b.arrive<=ds && ds<b.depart; }
+function webCalcDay(g,ds){
+  const bks=DB.bookings.filter(b=>b.src!==WEB_SRC && g.xe.includes(b.xe));
+  let trong=0, somNhat=null;
+  g.xe.forEach(x=>{
+    const cua=bks.filter(b=>b.xe===x);
+    if(cua.some(b=>webBusyAllDay(b,ds))) return;                 // bận cả ngày
+    trong++;
+    const tra=cua.filter(b=>b.depart===ds).map(b=>b.rtime||b.rplan||'12:00').sort();
+    const gio=tra.length?tra[tra.length-1]:'00:00';              // xe này sẵn sàng từ mấy giờ
+    if(somNhat===null||gio<somNhat) somNhat=gio;
+  });
+  return {units:trong, ready:(somNhat&&somNhat!=='00:00')?somNhat:null};
+}
+function webBuildRows(){
+  const T=todayStr(), rows=[];
+  for(let i=0;i<WEB_DAYS;i++){
+    const ds=addDays(T,i);
+    WEB_GROUPS.forEach(g=>{
+      const r=webCalcDay(g,ds);
+      rows.push({bike_id:g.id, day:ds, available_units:r.units, ready_from:r.ready});
+    });
+  }
+  return rows;
+}
+async function webPushAvail(full){
+  const rows=webBuildRows();
+  // chỉ gửi những dòng đổi so với lần trước để đỡ tốn mạng
+  const gui=full?rows:rows.filter(r=>{const k=r.bike_id+'|'+r.day; return webPushed[k]!==r.available_units+'|'+(r.ready_from||'');});
+  if(!gui.length) return 0;
+  for(let i=0;i<gui.length;i+=300){
+    await webReq('bike_availability?on_conflict=bike_id,day',{
+      method:'POST', headers:{Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify(gui.slice(i,i+300))
+    });
+  }
+  gui.forEach(r=>{ webPushed[r.bike_id+'|'+r.day]=r.available_units+'|'+(r.ready_from||''); });
+  return gui.length;
+}
+
+/* ---------- CHIỀU 2: đơn khách đặt → sơ đồ xe ---------- */
+function webGroupOf(bikeId){ return WEB_GROUPS.find(g=>g.id===bikeId)||null; }
+function webPickXe(g,a,d,dt,rt,daDung){
+  for(const x of g.xe){ if(daDung.includes(x))continue; if(!xeBusy(x,a,d,null,dt,rt))return x; }
+  return null;
+}
+function webMakeBooking(o,xe,gia,ghiChu){
+  const nights=dayList(o.arrive,o.depart);
+  const prices={}; nights.forEach(ds=>prices[ds]=gia);
+  return {
+    id:uid(), xe, src:WEB_SRC,
+    arrive:o.arrive, depart:o.depart,
+    dtime:o.dtime, rtime:o.rtime, dplan:o.dtime, rplan:o.rtime,
+    daddr:'', raddr:'', dkm:0, rkm:0,
+    status:'sapnhan', price:gia, prices,
+    payments:[], prepaid:0, pay:'',
+    guest:o.guest, resaddr:'', note:ghiChu,
+    created:o.created, ctime:o.ctime, webId:o.id
+  };
+}
+async function webPullOrders(){
+  const c=webCfg();
+  const tu=c.lastAt||new Date(Date.now()-14*864e5).toISOString();
+  const cols='id,customer_name,customer_phone,bike_id,rental_date,rental_time,return_date,return_time,quantity,total_price,status,created_at';
+  const rows=await webReq('bookings?select='+cols+'&created_at=gte.'+encodeURIComponent(tu)+'&order=created_at.asc&limit=200')||[];
+  if(!Array.isArray(rows)||!rows.length) return {them:0,ket:[]};
+  const done=c.done||(c.done=[]);
+  /* Chống trùng CHẮC CHẮN: nhìn vào chính các booking đã có webId, không phụ thuộc
+     danh sách done (Apps Script chạy song song có thể ghi đè danh sách đó). */
+  const daCo=new Set(DB.bookings.filter(b=>b.webId).map(b=>String(b.webId)));
+  let them=0; const ket=[];
+  let maxAt=c.lastAt||'';
+  rows.forEach(r=>{
+    if(r.created_at>maxAt) maxAt=r.created_at;
+    if(daCo.has(String(r.id))||done.includes(r.id)) return;
+    if((r.status||'').toLowerCase()==='cancelled'||(r.status||'').toLowerCase()==='canceled'){ done.push(r.id); return; }
+    const g=webGroupOf(r.bike_id);
+    if(!g){ done.push(r.id); ket.push('Đơn '+String(r.id).slice(0,8)+': mẫu xe chưa ghép nhóm, bỏ qua.'); return; }
+    const arrive=r.rental_date, depart=r.return_date||r.rental_date;
+    if(!arrive){ done.push(r.id); return; }
+    const dtime=(r.rental_time||'08:00').slice(0,5), rtime=(r.return_time||'18:00').slice(0,5);
+    const sl=Math.max(1,+r.quantity||1);
+    const nights=dayList(arrive,depart).length;
+    const gia=Math.round((+r.total_price||0)/sl/Math.max(1,nights));
+    const o={id:r.id, arrive, depart, dtime, rtime,
+      guest:joinGuest((r.customer_name||'Khách web').trim(),(r.customer_phone||'').trim()),
+      created:(r.created_at||'').slice(0,10)||arrive, ctime:(r.created_at||'').slice(11,16)||'00:00'};
+    const daDung=[];
+    for(let i=0;i<sl;i++){
+      const xe=webPickXe(g,arrive,depart,dtime,rtime,daDung);
+      const ghi='Đơn đặt từ web #'+String(r.id).slice(0,8)+(sl>1?(' ('+(i+1)+'/'+sl+')'):'' );
+      if(xe){ daDung.push(xe); DB.bookings.push(webMakeBooking(o,xe,gia,ghi)); them++; }
+      else{
+        const xeTam=g.xe[0];
+        DB.bookings.push(webMakeBooking(o,xeTam,gia,'⚠️ TRÙNG XE — CẦN ĐỔI. '+ghi));
+        them++; ket.push('Đơn '+String(r.id).slice(0,8)+' ('+g.ten+'): hết xe trống, tạm xếp vào '+xeTam+' — cần đổi xe.');
+      }
+    }
+    done.push(r.id);
+  });
+  if(maxAt) c.lastAt=maxAt;
+  c.done=done.slice(-800);
+  return {them,ket};
+}
+
+/* ---------- chạy đồng bộ ---------- */
+async function webSyncRun(thuCong){
+  if(!webOn()){ if(thuCong)alert('Chưa khai báo địa chỉ và khoá của web bán hàng.'); return; }
+  if(typeof viewMode!=='undefined'&&viewMode) return;              // chế độ chỉ xem: không đụng gì
+  if(!sbReady){ if(thuCong)alert('Dữ liệu chưa tải xong, chờ một chút rồi bấm lại.'); return; }
+  if(webBusy) return;
+  webBusy=true;
+  try{
+    const kq=await webPullOrders();
+    if(kq.them){ webSay('Nhận '+kq.them+' booking mới từ web bán hàng.','ok'); renderAll(); }
+    if(kq.ket.length){
+      const c=webCfg(); if(!Array.isArray(c.warns))c.warns=[];
+      kq.ket.forEach(t=>{ c.warns.unshift({t,at:new Date().toISOString()}); webSay(t,'warn'); });
+      c.warns=c.warns.slice(0,20);
+    }
+    const n=await webPushAvail(thuCong===true);
+    if(n) webSay('Đã cập nhật tình trạng '+n+' dòng xe-ngày lên web bán hàng.','ok');
+    else if(thuCong) webSay('Tình trạng xe trên web bán hàng đã khớp, không có gì phải sửa.','');
+    webCfg().runAt=new Date().toISOString();
+    if(kq.them||n) save();
+    try{renderWebSync();}catch(e){}
+  }catch(e){
+    webSay('Lỗi: '+(e&&e.message||e),'err');
+  }finally{ webBusy=false; }
+}
+function webSyncStart(){
+  if(webTimer)clearInterval(webTimer);
+  if(!webOn())return;
+  webTimer=setInterval(()=>{ if(webCfg().auto!==false) webSyncRun(false); },WEB_EVERY);
+  setTimeout(()=>{ if(webCfg().auto!==false) webSyncRun(false); },4000);
+}
+
+/* ---------- giao diện tab "Web bán hàng" ---------- */
+function renderWebSync(){
+  const el=document.getElementById('wsBody'); if(!el)return;
+  const c=webCfg();
+  const T=todayStr();
+  const bang=WEB_GROUPS.map(g=>{
+    const r=webCalcDay(g,T);
+    return `<tr><td class="l">${g.ten}</td><td class="l">${g.xe.join(', ')}</td><td>${g.xe.length}</td>
+      <td><b${r.units?'':' style="color:#dc2626"'}>${r.units}</b></td><td>${r.units?(r.ready?('từ '+r.ready):'cả ngày'):'<span style="color:#dc2626">hết xe</span>'}</td></tr>`;
+  }).join('');
+  const warns=Array.isArray(c.warns)?c.warns:[];
+  const khoiCanhBao=warns.length?`
+    <div class="card" style="border:2px solid #dc2626;background:#fef2f2">
+      <div class="row"><h2 style="margin:0;color:#991b1b">⚠️ Đơn từ web cần xử lý tay (${warns.length})</h2>
+        <button class="ct-btn" id="wsClrWarn" style="margin-left:auto">Đã xử lý xong, xoá</button></div>
+      ${warns.map(w=>`<div class="ws-log warn">${new Date(w.at).toLocaleString('vi-VN')} — ${w.t}</div>`).join('')}
+    </div>`:'';
+  const nhatKy=webLog.length
+    ? webLog.map(l=>`<div class="ws-log ${l.loai}">${l.t}</div>`).join('')
+    : '<div class="muted" style="padding:8px">Chưa có hoạt động nào trong phiên này.</div>';
+  el.innerHTML=`
+    <div class="card">
+      <h2 style="margin:0 0 8px">Kết nối web bán hàng</h2>
+      <div class="muted" style="font-size:12.5px;margin-bottom:10px">Dán địa chỉ Supabase và khoá <b>anon</b> của goodbikevietnamrental.com. Hai ô này lưu trên máy chủ của web quản lí, không nằm trong mã nguồn công khai.</div>
+      <div class="grid2" style="gap:8px">
+        <div><label>Địa chỉ Supabase</label><input type="text" id="wsUrl" placeholder="https://xxxx.supabase.co" value="${(c.url||'').replace(/"/g,'&quot;')}"></div>
+        <div><label>Khoá anon</label><input type="password" id="wsKey" placeholder="eyJ..." value="${(c.key||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="row" style="margin-top:10px;gap:8px">
+        <button class="ct-btn" id="wsSave">💾 Lưu kết nối</button>
+        <button class="ct-btn" id="wsTest">🔌 Kiểm tra</button>
+        <button class="primary" id="wsNow">🔄 Đồng bộ ngay</button>
+        <label class="row" style="gap:6px;margin-left:8px"><input type="checkbox" id="wsAuto" ${c.auto===false?'':'checked'}> <span class="muted">Tự đồng bộ mỗi 2 phút</span></label>
+        <span class="muted" style="margin-left:auto">${c.runAt?('Lần cuối: '+new Date(c.runAt).toLocaleString('vi-VN')):'Chưa chạy lần nào'}</span>
+      </div>
+    </div>
+    <div class="card" style="padding:0">
+      <div style="padding:12px 14px 0"><h2 style="margin:0">Tình trạng hôm nay sẽ hiện trên web bán hàng</h2></div>
+      <div class="tbl-wrap" style="max-height:none"><table>
+        <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Trống</th><th>Trống từ</th></tr>
+        ${bang}
+      </table></div>
+      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Bảng này bỏ qua các booking nguồn <b>Web</b> vì web bán hàng tự trừ đơn của nó — nhờ vậy không bị trừ hai lần.</div>
+    </div>
+    ${khoiCanhBao}
+    <div class="card">
+      <h2 style="margin:0 0 8px">Nhật ký phiên này</h2>${nhatKy}
+    </div>`;
+  const g=id=>document.getElementById(id);
+  g('wsSave').onclick=()=>{ const cc=webCfg(); cc.url=g('wsUrl').value.trim(); cc.key=g('wsKey').value.trim(); save(); webSay('Đã lưu kết nối.','ok'); webSyncStart(); };
+  g('wsTest').onclick=async()=>{ const cc=webCfg(); cc.url=g('wsUrl').value.trim(); cc.key=g('wsKey').value.trim();
+    try{ const r=await webReq('bikes?select=id,name&limit=50'); webSay('Kết nối tốt — đọc được '+((r||[]).length)+' mẫu xe.','ok'); save(); }
+    catch(e){ webSay('Không kết nối được: '+(e&&e.message||e),'err'); } };
+  g('wsNow').onclick=()=>webSyncRun(true);
+  g('wsAuto').onchange=e=>{ webCfg().auto=e.target.checked; save(); webSyncStart(); };
+  if(g('wsClrWarn')) g('wsClrWarn').onclick=()=>{ webCfg().warns=[]; save(); renderWebSync(); };
+}
+
 /* ============ GO ============ */
 document.getElementById('tlToday').onclick=scrollTimelineToToday;
 document.getElementById('tlRangeGo').onclick=()=>{
@@ -5357,6 +5613,7 @@ setTimeout(function(){ try{ scrollTimelineToToday(); }catch(e){} },60);
 delete DB._tomb;
 sbStatus('Đang tải dữ liệu từ máy chủ…','wait');
 sbInit();
+try{ webSyncStart(); }catch(e){ console.warn('webSyncStart',e); }
 </script>
 <!-- ===== PWA: đăng ký service worker ===== -->
 <script>
