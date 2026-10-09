@@ -1651,7 +1651,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-09-weblink';
+const BAN_APP  = '2026-10-10-weblink2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5361,9 +5361,13 @@ document.getElementById('ctPdf').onclick=ctExportPdf;
    Chiều 2 — KÉO ĐƠN VỀ: đọc bảng bookings của web bán hàng, tự chọn một xe còn
    trống trong nhóm, tạo booking nguồn "Web", trạng thái "Sắp nhận".
 
-   LƯU Ý QUAN TRỌNG về cách đếm: web bán hàng TỰ TRỪ các đơn trong bảng bookings
-   của nó. Nên ở chiều 1 ta phải BỎ QUA các booking nguồn Web, nếu không một đơn
-   bị trừ hai lần. Nhờ vậy con số luôn đúng kể cả khi đơn chưa kịp kéo về. */
+   NGUYÊN TẮC ĐẾM: web quản lí là NGUỒN SỰ THẬT DUY NHẤT — đếm TẤT CẢ booking,
+   không trừ ngoại lệ nào. Phía web bán hàng chỉ tự trừ những đơn vừa đặt trong
+   45 phút gần nhất (khoảng chưa kịp đồng bộ về), nên không bao giờ trừ hai lần.
+
+   (Bản trước bỏ qua booking nguồn Web vì tưởng web bán hàng đã trừ rồi. Sai:
+   các booking nguồn Web nhập TAY từ trước không có bản ghi tương ứng bên kia,
+   nên xe đã có khách vẫn bị báo là còn trống.) */
 
 const WEB_GROUPS=[
   {id:'8fa69085-6e0c-41bb-9a14-6300e17b9be6', ten:'Honda Vision 110 (bản phổ thông)',    xe:['A1','A2','A4','A6']},
@@ -5401,7 +5405,7 @@ async function webReq(path,opt){
    nên không tính là bận mà dùng để tính "trống từ mấy giờ". */
 function webBusyAllDay(b,ds){ return b.arrive<=ds && ds<b.depart; }
 function webCalcDay(g,ds){
-  const bks=DB.bookings.filter(b=>b.src!==WEB_SRC && g.xe.includes(b.xe));
+  const bks=DB.bookings.filter(b=>g.xe.includes(b.xe));   // đếm TẤT CẢ, kể cả nguồn Web
   let trong=0, somNhat=null;
   g.xe.forEach(x=>{
     const cua=bks.filter(b=>b.xe===x);
@@ -5578,7 +5582,7 @@ function renderWebSync(){
         <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Trống</th><th>Trống từ</th></tr>
         ${bang}
       </table></div>
-      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Bảng này bỏ qua các booking nguồn <b>Web</b> vì web bán hàng tự trừ đơn của nó — nhờ vậy không bị trừ hai lần.</div>
+      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Bảng này đếm <b>tất cả</b> booking trong web quản lí. Web bán hàng chỉ tự trừ thêm các đơn vừa đặt trong 45 phút gần nhất, nên không bị trừ hai lần.</div>
     </div>
     ${khoiCanhBao}
     <div class="card">
