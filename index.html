@@ -1651,7 +1651,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-10-weblink3';
+const BAN_APP  = '2026-10-10-donweb';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5528,7 +5528,9 @@ async function webSyncRun(thuCong){
   if(webBusy) return;
   webBusy=true;
   try{
-    const kq=await webPullOrders();
+    /* Nhập đơn web do Google Apps Script làm mỗi phút (một nơi ghi duy nhất, tránh hai
+       nơi cùng nhập một đơn). Tab này chỉ còn đẩy Lịch xe trống khi anh bấm Đồng bộ ngay. */
+    const kq={them:0,ket:[]};
     if(kq.them){ webSay('Nhận '+kq.them+' booking mới từ web bán hàng.','ok'); renderAll(); }
     if(kq.ket.length){
       const c=webCfg(); if(!Array.isArray(c.warns))c.warns=[];
@@ -5569,6 +5571,18 @@ function renderWebSync(){
         <button class="ct-btn" id="wsClrWarn" style="margin-left:auto">Đã xử lý xong, xoá</button></div>
       ${warns.map(w=>`<div class="ws-log warn">${new Date(w.at).toLocaleString('vi-VN')} — ${w.t}</div>`).join('')}
     </div>`:'';
+  const donWeb=DB.bookings.filter(b=>b.webId).sort((a,b)=>((b.created||'')+(b.ctime||''))>((a.created||'')+(a.ctime||''))?1:-1);
+  const canDoi=donWeb.filter(b=>/^⚠️ TRÙNG XE/.test(b.note||''));
+  const dongDon=b=>`<tr${/^⚠️/.test(b.note||'')?' style="background:#fef2f2"':''}><td class="l">${fmtDMY(b.created||b.arrive)} ${b.ctime||''}</td><td class="l"><b${isSpXe(b.xe)?' style="color:#7c3aed"':''}>${b.xe}</b></td><td class="l">${(b.guest||'').replace(/</g,'&lt;')}</td><td class="l">${fmtDMY(b.arrive)} ${b.dtime||''} → ${fmtDMY(b.depart)} ${b.rtime||''}</td><td>${b.price?fmtVND(b.price)+'đ':''}</td><td class="l" style="font-size:12px">${/^⚠️/.test(b.note||'')?'<b style="color:#dc2626">⚠️ Trùng xe — cần đổi</b>':'Đã xếp xe'}</td></tr>`;
+  const khoiDonWeb=`
+    <div class="card" style="padding:0${canDoi.length?';border:2px solid #dc2626':''}">
+      <div style="padding:12px 14px 4px"><h2 style="margin:0">Đơn khách đặt trên web${canDoi.length?` <span style="color:#dc2626;font-size:14px">· ${canDoi.length} đơn cần đổi xe</span>`:''}</h2>
+        <div class="muted" style="font-size:12px;margin-top:4px">Google Apps Script kiểm tra web bán hàng <b>mỗi phút</b>; có đơn là tự tạo booking (nguồn Web, Sắp nhận) và tự chọn xe trống. Hết xe trống thì vẫn tạo nhưng đánh dấu đỏ để anh đổi xe.</div></div>
+      ${donWeb.length?`<div class="tbl-wrap" style="max-height:340px"><table>
+        <tr><th class="l">Lúc đặt</th><th class="l">Xe</th><th class="l">Khách</th><th class="l">Thuê</th><th>Giá/ngày</th><th class="l">Tình trạng</th></tr>
+        ${donWeb.slice(0,30).map(dongDon).join('')}
+      </table></div>`:'<div class="muted" style="padding:6px 14px 14px">Chưa có đơn nào tự về từ web.</div>'}
+    </div>`;
   const nhatKy=webLog.length
     ? webLog.map(l=>`<div class="ws-log ${l.loai}">${l.t}</div>`).join('')
     : '<div class="muted" style="padding:8px">Chưa có hoạt động nào trong phiên này.</div>';
@@ -5594,8 +5608,9 @@ function renderWebSync(){
         <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Trống</th><th>Trống từ</th></tr>
         ${bang}
       </table></div>
-      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Đây chính là con số khách thấy trên web bán hàng. Google Apps Script tự chép sang bảng <b>Lịch xe trống</b> mỗi 5 phút, kể cả khi không ai mở web quản lí. Giá thuê vẫn do anh đặt bên web bán hàng, không bị ghi đè.</div>
+      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Đây chính là con số khách thấy trên web bán hàng. Google Apps Script tự chép sang bảng <b>Lịch xe trống</b> mỗi 5 phút và ngay sau khi có đơn web mới, kể cả khi không ai mở web quản lí. Giá thuê vẫn do anh đặt bên web bán hàng, không bị ghi đè.</div>
     </div>
+    ${khoiDonWeb}
     ${khoiCanhBao}
     <div class="card">
       <h2 style="margin:0 0 8px">Nhật ký phiên này</h2>${nhatKy}
