@@ -620,6 +620,35 @@
   .ct-pb.on{background:#e0f2fe;outline:1px solid #7dd3fc}
   .ct-pb .t i{background:#0ea5e9}
   .ct-pb.none .t i{background:#cbd5e1}
+  .ct-lost-sum{font-size:13.5px;margin:-4px 0 10px;color:var(--muted)}
+  .ct-lost-sum b{color:var(--text,#0f172a)}
+  .ct-lost{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px}
+  @media(max-width:900px){.ct-lost{grid-template-columns:1fr}}
+  .ct-lost h3{font-size:13px;margin:0 0 6px;color:var(--muted);font-weight:700}
+  .ct-lost .ct-nb{grid-template-columns:minmax(120px,210px) 1fr 64px}
+  .ct-lost .ct-nb .c small{font-weight:400;color:var(--muted);margin-left:3px}
+  .ct-wb .t i{background:#ef4444}
+  .ct-wb.so .t i{background:#f59e0b}
+  .ct-wb.nr .t i{background:#cbd5e1}
+  .ct-wb.nr span:first-child{color:#c2410c}
+  .ct-lneed{margin-top:12px;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .ct-lneed .ct-chip{background:#fef3c7;color:#92400e}
+  .ct-hr{display:flex;align-items:stretch;gap:3px;height:150px;border-bottom:1px solid var(--line);padding-top:16px}
+  .ct-hr .col{flex:1;position:relative;min-width:0}
+  .ct-hr .col i{position:absolute;left:12%;right:12%;bottom:0;border-radius:3px 3px 0 0;display:block}
+  .ct-hr .col i.tot{left:0;right:0;background:#eef2f7}
+  .ct-hr .col i.n{background:#ef4444;border-radius:0}
+  .ct-hr .col i.s{background:#f59e0b}
+  .ct-hr .col b{position:absolute;left:0;right:0;text-align:center;font-size:11px;font-weight:700;color:#334155;line-height:14px}
+  .ct-hrl{display:flex;gap:3px;font-size:10.5px;color:var(--muted);margin-top:3px}
+  .ct-hrl span{flex:1;text-align:center;min-width:0}
+  .ct-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}
+  .ct-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+  .ct-peak{font-size:12.5px;margin-top:8px;line-height:1.7}
+  .ct-rsnw{margin-top:5px}
+  .ct-rsn{font-size:12px;padding:3px 6px;max-width:230px;border-color:#fecaca;background:#fef2f2;color:#991b1b}
+  .ct-rsn.miss{border:1px dashed #fb923c;background:#fff7ed;color:#c2410c}
+  .ct-cattabs button.on{background:var(--brand-d,#0369a1);color:#fff;font-weight:700}
   .ct-alert-hid{background:#fef2f2;border-color:#fecaca;color:#991b1b}
   .ct-alert{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:9px 14px;margin-bottom:16px;font-size:13.5px}
   .ct-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -1064,7 +1093,15 @@
     <div class="ct-panels">
       <div class="card"><h2>Hiệu quả theo nguồn</h2><div style="overflow-x:auto"><table id="ctSrcTbl"></table></div><div class="ct-track" id="ctSrcTrack"></div></div>
       <div class="card"><h2 id="ctNeedTitle">Nhu cầu khách trong ngày</h2><div id="ctNeedBars"></div></div>
-      <div class="card"><h2>Nơi thường trú của khách <span class="muted" style="font-weight:400;font-size:12.5px">· bấm để lọc</span></h2><div id="ctPlaceBars"></div></div>
+      <div class="card"><h2>Nơi thường trú của khách <span class="muted" style="font-weight:400;font-size:12.5px">· chỉ khách đã chốt · bấm để lọc</span></h2><div id="ctPlaceBars"></div></div>
+    </div>
+    <div class="card" id="ctLostCard">
+      <h2>Vì sao mất khách <span class="muted" style="font-weight:400;font-size:12.5px">· gộp “Không chốt được” + “Hết xe” · bấm một lí do để lọc bảng</span></h2>
+      <div class="ct-lost-sum" id="ctLostSum"></div>
+      <div class="ct-lost">
+        <div><h3>Lí do</h3><div id="ctLostWhy"></div><div id="ctLostNeed"></div></div>
+        <div><h3>Mất khách theo giờ liên hệ</h3><div id="ctLostHour"></div></div>
+      </div>
     </div>
     <div class="card" id="ctDaysCard" style="display:none">
       <h2>Theo từng ngày <span class="muted" style="font-weight:400;font-size:12.5px">· bấm một ngày để xem riêng ngày đó</span></h2>
@@ -1083,10 +1120,11 @@
           <option value="none">Không chốt được</option>
           <option value="soldout">Hết xe</option>
           <option value="needless">⚠ Chưa chọn nhu cầu</option>
+          <option value="noreason">⚠ Không chốt · chưa ghi lí do</option>
         </select>
         <span style="flex:1"></span>
         <button class="ct-btn" id="ctTogPhone">👁 Hiện SĐT</button>
-        <button class="ct-btn" id="ctCatsBtn">⚙ Danh mục nhu cầu</button>
+        <button class="ct-btn" id="ctCatsBtn" title="Sửa danh mục nhu cầu khách & lí do không chốt">⚙ Danh mục</button>
         <button class="ct-btn" id="ctShare" title="Cho người khác xem riêng mục này (số điện thoại luôn ẩn)">🔗 Chia sẻ chỉ xem</button>
         <button class="ct-btn" id="ctPdf" title="Xuất khoảng ngày đang xem ra PDF — SĐT ẩn/hiện theo nút 👁">📄 Xuất PDF</button>
         <button class="ct-pri" id="ctAdd">＋ Thêm thủ công</button>
@@ -1113,7 +1151,7 @@
         <div style="display:flex;gap:6px"><select id="ctE_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="ctE_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       <div><label class="lb">Tên khách</label><input id="ctE_name" placeholder="VD: Anh Tuấn"></div>
       <div class="full"><label class="lb">SĐT</label><input id="ctE_phone" inputmode="tel" placeholder="09xx xxx xxx"></div>
-      <div class="full"><label class="lb">Địa chỉ thường trú (không bắt buộc)</label><input id="ctE_addr" list="addrList" autocomplete="off" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM"></div>
+      <div class="full" id="ctE_addrRow"><label class="lb">Địa chỉ thường trú (không bắt buộc · chỉ cần cho khách đã chốt)</label><input id="ctE_addr" list="addrList" autocomplete="off" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM"></div>
       <div class="full"><label class="lb">Nhu cầu khách (chọn nhiều)</label><div class="ct-chk" id="ctE_needs"></div></div>
       <div class="full"><label class="lb">Loại chốt</label>
         <div class="ct-seg" id="ctE_close">
@@ -1122,6 +1160,7 @@
           <button type="button" data-v="none" class="none">Không chốt được</button>
           <button type="button" data-v="soldout" class="soldout">Hết xe</button>
         </div></div>
+      <div class="full" id="ctE_rsnRow"><label class="lb">Lí do không chốt được</label><div class="ct-chk" id="ctE_rsn"></div></div>
       <div class="full"><label class="lb">Ghi chú</label><textarea id="ctE_note" rows="2" placeholder="VD: chê giá cao, hẹn gọi lại…"></textarea></div>
     </div>
     <div class="ct-mft"><button id="ctE_cancel">Hủy</button><button class="ct-pri" id="ctE_save">Lưu</button></div>
@@ -1130,7 +1169,8 @@
 <!-- Thống kê KH liên hệ: danh mục nhu cầu -->
 <div class="overlay" id="ctCatsOverlay">
   <div class="modal">
-    <h2 style="margin:0 0 12px;font-size:17px">Danh mục nhu cầu khách</h2>
+    <h2 style="margin:0 0 10px;font-size:17px">Danh mục</h2>
+    <div class="ct-seg ct-cattabs" id="ctCatTabs" style="margin-bottom:10px"><button type="button" data-m="needs">Nhu cầu khách</button><button type="button" data-m="reasons">Lí do không chốt</button></div>
     <ul class="ct-cats" id="ctCatList"></ul>
     <div style="display:flex;gap:6px;margin-top:10px">
       <input id="ctCatNew" placeholder="Thêm mục mới…" style="flex:1;min-width:0">
@@ -1530,6 +1570,12 @@ const CT_NEEDS_DEFAULT=[
   {id:'dien',name:'Thuê xe điện'},{id:'dai',name:'Thuê dài ngày (tuần/tháng)'},{id:'phuot',name:'Đi phượt / tour'},
   {id:'giao',name:'Giao xe tận nơi'},{id:'gia',name:'Hỏi giá, tham khảo'},{id:'khac',name:'Khác'}
 ];
+// Lí do KHÔNG chốt được (chỉ hỏi khi loại chốt = "Không chốt được"; "Hết xe" là loại chốt riêng, tự gộp vào thống kê mất khách)
+const CT_REASONS_DEFAULT=[
+  {id:'gia',name:'Chê giá cao'},{id:'tg',name:'Không đáp ứng thời gian giao/trả'},{id:'loai',name:'Không có loại xe khách cần'},
+  {id:'blx',name:'Không có bằng lái / cần xe 50cc'},{id:'giayto',name:'Không đồng ý thủ tục, giấy tờ, cọc'},
+  {id:'ben',name:'Đã thuê bên khác'},{id:'thamkhao',name:'Chỉ hỏi tham khảo / không phản hồi'},{id:'khac',name:'Khác'}
+];
 // VNA, Atlantis, Vexere nay là CÔNG TY thuộc nguồn công nợ (xem DB.debtCompanies), không còn là nguồn riêng.
 // Tình trạng xe — màu kiểu ezCloud
 const STATUS = {
@@ -1587,6 +1633,7 @@ function normalizeDB(){
   if(!Array.isArray(DB.contactKeep))DB.contactKeep=[];   // nguồn khách quen được tính lại (ghi đè luật mặc định)
   if(!Array.isArray(DB.contactSrcs))DB.contactSrcs=[];   // (không còn dùng từ bản -lienhe-5: mọi nguồn đều được tính) — giữ để không đụng dữ liệu cũ
   if(!Array.isArray(DB.contactNeeds))DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));   // danh mục nhu cầu khách
+  if(!Array.isArray(DB.contactReasons))DB.contactReasons=CT_REASONS_DEFAULT.map(x=>({...x}));   // danh mục lí do không chốt được
   if(!DB.webSync||typeof DB.webSync!=='object')DB.webSync={};      // kết nối web bán hàng {url,key,auto,lastAt,runAt,done[]}
   if(!Array.isArray(DB.webSync.done))DB.webSync.done=[];           // id đơn web đã nhập, để không nhập trùng
   if(!DB.debtCompanies)DB.debtCompanies={receivable:['VNA'],payable:['Atlantis','Vexere']};  // mặc định: VNA=phải thu; Atlantis,Vexere=phải trả
@@ -1651,7 +1698,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP  = '2026-10-10-donweb';
+const BAN_APP  = '2026-10-11-lido';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4648,7 +4695,30 @@ function ctSetRange(f,t){
 }
 function ctNowHM(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
 function ctNeeds(){ return Array.isArray(DB.contactNeeds)?DB.contactNeeds:CT_NEEDS_DEFAULT; }
+function ctReasons(){ return Array.isArray(DB.contactReasons)?DB.contactReasons:CT_REASONS_DEFAULT; }
+function ctReasonName(id){ const n=ctReasons().find(x=>x.id===id); return n?n.name:id; }
+function ctIsChot(r){ return r.close==='today'||r.close==='advance'; }   // chỉ khách đã chốt mới cần địa chỉ thường trú
+function ctHour(t){ const m=/^(\d{1,2}):/.exec(String(t||'')); return m?Math.min(23,+m[1]):null; }
+/* Thống kê mất khách: lí do (không chốt) + hết xe, và phân bố theo giờ liên hệ */
+function ctLostStats(all){
+  const none=all.filter(r=>r.close==='none'), so=all.filter(r=>r.close==='soldout'), lost=none.concat(so);
+  const rc={}; let noR=0;
+  none.forEach(r=>{ if(r.reason) rc[r.reason]=(rc[r.reason]||0)+1; else noR++; });
+  const why=Object.entries(rc).map(([k,v])=>({key:k,label:ctReasonName(k),n:v,cls:''}));
+  if(so.length) why.push({key:'__soldout',label:'Hết xe',n:so.length,cls:'so'});
+  why.sort((a,b)=>b.n-a.n||a.label.localeCompare(b.label,'vi'));
+  if(noR) why.push({key:'__norsn',label:'(chưa ghi lí do)',n:noR,cls:'nr'});
+  const hours={}; let hMin=8, hMax=21, noTime=0;
+  all.forEach(r=>{ const h=ctHour(r.time); if(h===null){ if(r.close==='none'||r.close==='soldout') noTime++; return; }
+    hMin=Math.min(hMin,h); hMax=Math.max(hMax,h);
+    const o=hours[h]||(hours[h]={tot:0,n:0,s:0}); o.tot++; if(r.close==='none') o.n++; if(r.close==='soldout') o.s++; });
+  const peak=k=>{ let best=null; for(let h=hMin;h<hMax;h++){ const v=((hours[h]||{})[k]||0)+((hours[h+1]||{})[k]||0); if(v>=2&&(!best||v>best.v)) best={h,v}; } return best; };
+  const sn={}; so.forEach(r=>r.needs.forEach(n=>sn[n]=(sn[n]||0)+1));
+  return {none:none.length, so:so.length, lost:lost.length, why, noR, hours, hMin, hMax, noTime,
+    peakS:peak('s'), peakN:peak('n'), soNeeds:Object.entries(sn).sort((a,b)=>b[1]-a[1])};
+}
 function ctNeedName(id){ const n=ctNeeds().find(x=>x.id===id); return n?n.name:id; }
+var ctRsn='';                 // đang lọc theo lí do mất khách nào (bấm ở bảng Vì sao mất khách)
 function ctMask(p){ const d=String(p||'').replace(/\D/g,''); if(!d) return ''; return d.length<7?'•••':d.slice(0,4)+' ••• '+d.slice(-3); }
 function ctFmtPhone(p){ const d=String(p||'').replace(/\D/g,''); return d.length===10?d.slice(0,4)+' '+d.slice(4,7)+' '+d.slice(7):String(p||''); }
 function ctDow(ds){ return ['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'][new Date(ds+'T00:00:00').getDay()]; }
@@ -4682,7 +4752,7 @@ function ctBookingRows(day){
       money:list.reduce((a,b)=>a+totalOf(b),0),   // tổng tiền khách trả của (các) booking trong dòng này
       xe:list.map(b=>b.xe).filter(Boolean), arrive, autoClose,
       close:(o&&o.close)||autoClose, closeAuto:!(o&&o.close),
-      needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], note:(o&&o.note)||'', ov:o, hidden:!!(o&&o.hidden)});
+      needs:(o&&Array.isArray(o.needs))?o.needs.slice():[], reason:(o&&o.reason)||'', note:(o&&o.note)||'', ov:o, hidden:!!(o&&o.hidden)});
   });
   return out;
 }
@@ -4690,7 +4760,7 @@ function ctManualRows(day){
   return (DB.contacts||[]).filter(c=>c&&!c.bk&&c.date===day).map(c=>({
     key:'m:'+c.id, auto:false, id:c.id, day, time:c.time||'', src:c.src||'Khác', kind:ctSrcInfo(c.src||'Khác').k, srcLabel:ctSrcInfo(c.src||'Khác').label,
     name:c.name||'(chưa có tên)', phone:c.phone||'', addr:c.addr||'', money:0, close:c.close||'none', closeAuto:false,
-    needs:Array.isArray(c.needs)?c.needs.slice():[], note:c.note||''}));
+    needs:Array.isArray(c.needs)?c.needs.slice():[], reason:c.reason||'', note:c.note||''}));
 }
 function ctRowsIn(from,to){
   let out=[], d=from, n=0;
@@ -4729,8 +4799,13 @@ function renderContacts(){
   const list=all.filter(r=>{
     if(fs && r.kind!==fs) return false;
     if(fc==='needless'){ if(r.needs.length) return false; }
+    else if(fc==='noreason'){ if(r.close!=='none'||r.reason) return false; }
     else if(fc && r.close!==fc) return false;
-    if(ctPlace && (r.addr?ctTinh(r.addr):'(chưa ghi)')!==ctPlace) return false;
+    if(ctPlace && (!ctIsChot(r) || (r.addr?ctTinh(r.addr):'(chưa ghi)')!==ctPlace)) return false;
+    if(ctRsn){
+      if(ctRsn==='__soldout'){ if(r.close!=='soldout') return false; }
+      else if(r.close!=='none' || (ctRsn==='__norsn'?!!r.reason:r.reason!==ctRsn)) return false;
+    }
     if(q && !(r.name.toLowerCase().includes(q) || (r.addr||'').toLowerCase().includes(q) || (qd && r.phone.replace(/\D/g,'').includes(qd)))) return false;
     return true;
   });
@@ -4740,12 +4815,13 @@ function renderContacts(){
   const base=T-so;                                        // hết xe không tính vào tỉ lệ chốt
   const rate=base?Math.round((a+b)/base*100):0;
   const pct=x=>T?Math.round(x/T*100)+'%':'0%';
+  const LS=ctLostStats(all), topR=LS.why.find(w=>w.key!=='__soldout'&&w.key!=='__norsn');
   document.getElementById('ctKpis').innerHTML=
     `<div class="ct-kpi"><div class="l">Tổng khách liên hệ</div><div class="v">${T}</div>
        <div class="bar"><i style="width:${pct(a)};background:#16a34a"></i><i style="width:${pct(b)};background:#2563eb"></i><i style="width:${pct(c)};background:#dc2626"></i><i style="width:${pct(so)};background:#d97706"></i></div></div>
      <div class="ct-kpi today"><div class="l">Chốt trong ngày</div><div class="v">${a}</div><div class="h">${pct(a)} tổng</div></div>
      <div class="ct-kpi advance"><div class="l">Đặt trước</div><div class="v">${b}</div><div class="h">${pct(b)} tổng</div></div>
-     <div class="ct-kpi none"><div class="l">Không chốt được</div><div class="v">${c}</div><div class="h">${pct(c)} tổng</div></div>
+     <div class="ct-kpi none"><div class="l">Không chốt được</div><div class="v">${c}</div><div class="h">${pct(c)} tổng${topR?' · nhiều nhất: '+ctEsc(topR.label):''}</div></div>
      <div class="ct-kpi soldout"><div class="l">Hết xe</div><div class="v">${so}</div><div class="h">${pct(so)} tổng · không tính tỉ lệ</div></div>
      <div class="ct-kpi"><div class="l">Tỉ lệ chốt</div><div class="v">${rate}%</div><div class="h">(trong ngày + đặt trước) / ${so?`(tổng − ${so} hết xe) = ${base}`:'tổng'}</div></div>`;
 
@@ -4815,19 +4891,48 @@ function renderContacts(){
     document.getElementById('ctDaysTbl').innerHTML=dh;
   }
   /* ---- Nơi thường trú ---- */
-  const pc={}; all.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
+  const chot=all.filter(ctIsChot), TC=chot.length;          // địa chỉ thường trú: chỉ tính khách đã chốt (trong ngày + đặt trước)
+  const pc={}; chot.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
   const pe=Object.entries(pc).sort((x,y)=>(x[0]==='(chưa ghi)')-(y[0]==='(chưa ghi)')||y[1]-x[1]);
   const pmx=Math.max(1,...pe.map(e=>e[1]));
   document.getElementById('ctPlaceBars').innerHTML=pe.length
     ? pe.map(([k,v])=>`<div class="ct-nb ct-pb ${k==='(chưa ghi)'?'none':''} ${ctPlace===k?'on':''}" data-place="${ctEsc(k)}"><span>${ctEsc(k)}</span><div class="t"><i style="width:${v/pmx*100}%"></i></div><span class="c">${v}</span></div>`).join('')
-      +`<div class="muted" style="font-size:12px;margin-top:8px">${T-(pc['(chưa ghi)']||0)}/${T} khách đã có địa chỉ${ctPlace?' · đang lọc: <b>'+ctEsc(ctPlace)+'</b> — bấm lại để bỏ lọc':''}</div>`
-    : '<div class="muted" style="font-size:13px">Chưa có khách nào.</div>';
+      +`<div class="muted" style="font-size:12px;margin-top:8px">${TC-(pc['(chưa ghi)']||0)}/${TC} khách đã chốt có địa chỉ · khách không chốt & hết xe không cần ghi${ctPlace?' · đang lọc: <b>'+ctEsc(ctPlace)+'</b> — bấm lại để bỏ lọc':''}</div>`
+    : '<div class="muted" style="font-size:13px">Chưa có khách nào chốt.</div>';
   ctRefreshAddrList();
 
-  const miss=all.filter(r=>!r.needs.length).length, al=document.getElementById('ctAlert');
-  al.style.display=(miss&&!viewMode)?'':'none';
-  al.innerHTML=miss?`<span>⚠ Còn <b>${miss}</b> khách chưa chọn nhu cầu — cuối ngày chọn nốt để thống kê đủ.</span> <button class="ct-btn" id="ctShowMiss" style="padding:4px 10px">Lọc ra để chọn</button>`:'';
+  /* ---- Vì sao mất khách: lí do + hết xe, theo giờ ---- */
+  {
+    const L=LS.lost;
+    document.getElementById('ctLostSum').innerHTML=L
+      ? `Mất <b>${L}</b> / ${T} khách liên hệ (<b>${pct(L)}</b>) · <span style="color:#dc2626">Không chốt <b style="color:inherit">${LS.none}</b></span> · <span style="color:#d97706">Hết xe <b style="color:inherit">${LS.so}</b></span>${ctRsn?` · đang lọc: <b>${ctEsc(ctRsn==='__soldout'?'Hết xe':ctRsn==='__norsn'?'chưa ghi lí do':ctReasonName(ctRsn))}</b> — bấm lại để bỏ lọc`:''}`
+      : (T?'Không mất khách nào 🎉':'Chưa có khách liên hệ.');
+    const wmx=Math.max(1,...LS.why.map(w=>w.n));
+    document.getElementById('ctLostWhy').innerHTML=LS.why.length
+      ? LS.why.map(w=>`<div class="ct-nb ct-pb ct-wb ${w.cls} ${ctRsn===w.key?'on':''}" data-rsnf="${ctEsc(w.key)}" title="${ctEsc(w.label)}: ${w.n} khách"><span>${ctEsc(w.label)}</span><div class="t"><i style="width:${w.n/wmx*100}%"></i></div><span class="c">${w.n}<small>${Math.round(w.n/L*100)}%</small></span></div>`).join('')
+      : '<div class="muted" style="font-size:13px">Chưa có khách không chốt / hết xe.</div>';
+    document.getElementById('ctLostNeed').innerHTML=LS.soNeeds.length
+      ? `<div class="ct-lneed"><span>Khách hết xe cần:</span>${LS.soNeeds.slice(0,6).map(([k,v])=>`<span class="ct-chip">${ctEsc(ctNeedName(k))} · ${v}</span>`).join('')}</div>`:'';
+    let cols='', lbl='', hmx=1;
+    for(let h=LS.hMin;h<=LS.hMax;h++) hmx=Math.max(hmx,(LS.hours[h]||{}).tot||0);
+    for(let h=LS.hMin;h<=LS.hMax;h++){
+      const o=LS.hours[h]||{tot:0,n:0,s:0}, k=x=>x/hmx*100, lo=o.n+o.s;
+      cols+=`<div class="col" title="${h}h–${h+1}h: ${o.tot} liên hệ · mất ${lo} (${o.n} không chốt, ${o.s} hết xe)"><i class="tot" style="height:${k(o.tot)}%"></i><i class="n" style="height:${k(o.n)}%"></i><i class="s" style="bottom:${k(o.n)}%;height:${k(o.s)}%;${o.n?'':'border-radius:3px 3px 0 0'}"></i>${lo?`<b style="bottom:${k(o.tot)}%">${lo}</b>`:''}</div>`;
+      lbl+=`<span>${h}h</span>`;
+    }
+    const pk=(p,n,txt,cl)=>p?`<div><span style="color:${cl};font-weight:700">●</span> ${txt} nhiều nhất lúc <b>${p.h}h–${p.h+2}h</b> (${p.v}/${n} khách)</div>`:'';
+    document.getElementById('ctLostHour').innerHTML=`<div class="ct-hr">${cols}</div><div class="ct-hrl">${lbl}</div>
+      <div class="ct-leg"><span><i style="background:#ef4444"></i>Không chốt</span><span><i style="background:#f59e0b"></i>Hết xe</span><span><i style="background:#eef2f7;border:1px solid #cbd5e1"></i>Tổng khách liên hệ trong giờ đó</span></div>
+      <div class="ct-peak">${pk(LS.peakS,LS.so,'Hết xe','#d97706')}${pk(LS.peakN,LS.none,'Không chốt','#dc2626')}${LS.noTime?`<div class="muted">${LS.noTime} khách mất chưa ghi giờ liên hệ — không có trong biểu đồ.</div>`:''}</div>`;
+  }
+
+  const miss=all.filter(r=>!r.needs.length).length, missR=LS.noR, al=document.getElementById('ctAlert');
+  al.style.display=((miss||missR)&&!viewMode)?'':'none';
+  al.innerHTML=(miss?`<span>⚠ Còn <b>${miss}</b> khách chưa chọn nhu cầu.</span> <button class="ct-btn" id="ctShowMiss" style="padding:4px 10px">Lọc ra để chọn</button>`:'')
+    +(missR?`<span>⚠ <b>${missR}</b> khách không chốt chưa ghi lí do.</span> <button class="ct-btn" id="ctShowMissR" style="padding:4px 10px">Lọc ra để ghi</button>`:'')
+    +((miss||missR)?'<span class="muted" style="font-size:12.5px">— cuối ngày chọn nốt để thống kê đủ</span>':'');
   if(miss) document.getElementById('ctShowMiss').onclick=()=>{ document.getElementById('ctFClose').value='needless'; renderContacts(); };
+  if(missR) document.getElementById('ctShowMissR').onclick=()=>{ document.getElementById('ctFClose').value='noreason'; renderContacts(); };
 
   const head='<tr><th style="width:34px">#</th>'+(multi?'<th>Ngày</th>':'')+'<th>Giờ</th><th>Nguồn</th><th>Tên khách</th><th>SĐT</th><th>Địa chỉ thường trú</th><th style="min-width:230px">Nhu cầu khách</th><th>Loại chốt</th><th></th></tr>';
   const ha=document.getElementById('ctHidAlert');
@@ -4866,9 +4971,9 @@ function renderContacts(){
       <td>${ctBadge(r.src)}</td>
       <td><div class="ct-name">${ctEsc(r.name)}</div><div class="ct-origin">${origin}</div></td>
       <td>${ph}</td>
-      <td>${r.addr?`<span class="ct-addr" title="${ctEsc(r.addr)}">${ctEsc(r.addr)}</span>`:'<span class="muted">—</span>'}</td>
+      <td>${r.addr?`<span class="ct-addr" title="${ctEsc(r.addr)}">${ctEsc(r.addr)}</span>`:(ctIsChot(r)?'<span class="muted">—</span>':'<span class="muted" style="font-size:11.5px" title="Khách không chốt / hết xe không cần ghi địa chỉ">không cần</span>')}</td>
       <td><div class="ct-needs" data-needs>${needs}</div></td>
-      <td><div class="ct-seg">${seg}</div></td>
+      <td><div class="ct-seg">${seg}</div>${r.close==='none'?`<div class="ct-rsnw">${ctReasonSel(r)}</div>`:''}</td>
       <td class="ct-act"><button data-edit title="Sửa">✎</button> ${r.auto?'<button data-hide title="Bỏ booking này khỏi thống kê (booking vẫn giữ nguyên)">🗑</button>':'<button data-del title="Xoá">🗑</button>'}</td></tr>`;
   }).join('');
   document.getElementById('ctTable').innerHTML=head+(body||(hidBody&&!T?'':`<tr class="ct-empty"><td colspan="${multi?10:9}">${T?'Không có khách nào khớp bộ lọc.':(multi?'Chưa có khách liên hệ nào trong khoảng này.':'Chưa có khách liên hệ nào trong ngày này.')}</td></tr>`))+hidBody;
@@ -4877,6 +4982,33 @@ function renderContacts(){
   const tp=document.getElementById('ctTogPhone');
   tp.classList.toggle('on',ctShowAll); tp.textContent=ctShowAll?'🙈 Ẩn SĐT':'👁 Hiện SĐT';
 }
+
+/* Ô chọn lí do không chốt (trong bảng) */
+function ctReasonSel(r){
+  const opts=ctReasons().filter(n=>!n.off||n.id===r.reason);
+  if(r.reason && !opts.some(n=>n.id===r.reason)) opts.push({id:r.reason,name:ctReasonName(r.reason)});
+  return `<select class="ct-rsn ${r.reason?'':'miss'}" data-rsn ${viewMode?'disabled':''} title="Lí do không chốt được">`
+    +`<option value="">⚠ Lí do không chốt?</option>`
+    +opts.map(n=>`<option value="${ctEsc(n.id)}" ${n.id===r.reason?'selected':''}>${ctEsc(n.name)}</option>`).join('')
+    +`<option value="__add">＋ Thêm lí do mới…</option></select>`;
+}
+document.getElementById('ctTable').addEventListener('change',e=>{
+  const sel=e.target.closest('select[data-rsn]'); if(!sel||viewMode) return;
+  const tr=sel.closest('tr[data-k]'), r=tr&&ctLast.get(tr.dataset.k); if(!r) return;
+  let v=sel.value;
+  if(v==='__add'){
+    const name=(prompt('Tên lí do không chốt mới:')||'').trim();
+    if(!name){ sel.value=r.reason||''; return; }
+    v=ctAddReason(name).id;
+  }
+  const en=ctEntry(r); if(!en) return;
+  if(v) en.reason=v; else delete en.reason;
+  ctCommit();
+});
+document.getElementById('ctLostWhy').addEventListener('click',e=>{
+  const el=e.target.closest('[data-rsnf]'); if(!el) return;
+  ctRsn=(ctRsn===el.dataset.rsnf)?'':el.dataset.rsnf; renderContacts();
+});
 
 /* ---------- THAO TÁC TRÊN BẢNG ---------- */
 document.getElementById('ctTable').addEventListener('click',e=>{
@@ -4955,25 +5087,44 @@ function ctAddNeed(name){
   if(iKhac>=0) DB.contactNeeds.splice(iKhac,0,n); else DB.contactNeeds.push(n);
   return n;
 }
+function ctAddReason(name){
+  if(!Array.isArray(DB.contactReasons)) DB.contactReasons=CT_REASONS_DEFAULT.map(x=>({...x}));
+  let n=DB.contactReasons.find(x=>x.name.trim().toLowerCase()===name.trim().toLowerCase());
+  if(n){ if(n.off) delete n.off; return n; }
+  n={id:'r'+uid(),name:name.trim()};
+  const iKhac=DB.contactReasons.findIndex(x=>x.id==='khac');
+  if(iKhac>=0) DB.contactReasons.splice(iKhac,0,n); else DB.contactReasons.push(n);
+  return n;
+}
+var ctCatMode='needs';        // 'needs' = nhu cầu khách · 'reasons' = lí do không chốt
 function ctDrawCats(){
-  const used={}; (DB.contacts||[]).forEach(c=>(c.needs||[]).forEach(n=>used[n]=(used[n]||0)+1));
-  document.getElementById('ctCatList').innerHTML=ctNeeds().filter(n=>!n.off)
+  const rs=ctCatMode==='reasons';
+  document.querySelectorAll('#ctCatTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===ctCatMode));
+  document.getElementById('ctCatNew').placeholder=rs?'Thêm lí do mới…':'Thêm nhu cầu mới…';
+  const used={}; (DB.contacts||[]).forEach(c=>{ if(rs){ if(c.reason) used[c.reason]=(used[c.reason]||0)+1; } else (c.needs||[]).forEach(n=>used[n]=(used[n]||0)+1); });
+  document.getElementById('ctCatList').innerHTML=(rs?ctReasons():ctNeeds()).filter(n=>!n.off)
     .map(n=>`<li><span>${ctEsc(n.name)}</span><em>${used[n.id]||0} lượt</em><button class="ct-btn" style="padding:4px 10px" data-rm="${ctEsc(n.id)}">Xoá</button></li>`).join('')
     || '<li class="muted">Chưa có mục nào.</li>';
 }
-document.getElementById('ctCatsBtn').onclick=()=>{ ctDrawCats(); document.getElementById('ctCatsOverlay').classList.add('open'); };
+document.getElementById('ctCatsBtn').onclick=()=>{ ctCatMode='needs'; ctDrawCats(); document.getElementById('ctCatsOverlay').classList.add('open'); };
 document.getElementById('ctCatClose').onclick=()=>document.getElementById('ctCatsOverlay').classList.remove('open');
 document.getElementById('ctCatAdd').onclick=()=>{
   const inp=document.getElementById('ctCatNew'), v=inp.value.trim(); if(!v) return;
-  ctAddNeed(v); inp.value=''; ctDrawCats(); ctCommit();
+  (ctCatMode==='reasons'?ctAddReason:ctAddNeed)(v); inp.value=''; ctDrawCats(); ctCommit();
 };
 document.getElementById('ctCatNew').onkeydown=e=>{ if(e.key==='Enter') document.getElementById('ctCatAdd').click(); };
 document.getElementById('ctCatList').onclick=e=>{
   const id=e.target.dataset&&e.target.dataset.rm; if(!id) return;
-  if(!Array.isArray(DB.contactNeeds)) DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));
-  const n=DB.contactNeeds.find(x=>x.id===id); if(n) n.off=true;
+  if(ctCatMode==='reasons'){
+    if(!Array.isArray(DB.contactReasons)) DB.contactReasons=CT_REASONS_DEFAULT.map(x=>({...x}));
+    const n=DB.contactReasons.find(x=>x.id===id); if(n) n.off=true;
+  }else{
+    if(!Array.isArray(DB.contactNeeds)) DB.contactNeeds=CT_NEEDS_DEFAULT.map(x=>({...x}));
+    const n=DB.contactNeeds.find(x=>x.id===id); if(n) n.off=true;
+  }
   ctDrawCats(); ctCommit();
 };
+document.getElementById('ctCatTabs').onclick=e=>{ const m=e.target.dataset&&e.target.dataset.m; if(!m) return; ctCatMode=m; ctDrawCats(); };
 
 /* ---------- Nguồn khách: danh sách chọn, bỏ theo dõi, thêm nhanh (＋) ---------- */
 function ctFillSrcSel(val){
@@ -5063,7 +5214,25 @@ document.getElementById('f_srcAdd').onclick=()=>openSrcQuick(n=>{
 
 /* ---------- Thêm / sửa ---------- */
 var ctEditing=null, ctEClose='none';
-function ctSetEClose(v){ ctEClose=v; document.querySelectorAll('#ctE_close button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+var ctERsn='';
+function ctSetEClose(v){
+  ctEClose=v; document.querySelectorAll('#ctE_close button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  document.getElementById('ctE_rsnRow').style.display=v==='none'?'':'none';            // lí do: chỉ khi không chốt được
+  document.getElementById('ctE_addrRow').style.display=(v==='today'||v==='advance')?'':'none';   // địa chỉ: chỉ khách đã chốt
+}
+function ctDrawERsn(){
+  const opts=ctReasons().filter(n=>!n.off||n.id===ctERsn);
+  document.getElementById('ctE_rsn').innerHTML=opts.map(n=>`<label><input type="radio" name="ctE_rsn" value="${ctEsc(n.id)}" ${n.id===ctERsn?'checked':''}>${ctEsc(n.name)}</label>`).join('')
+    +'<label style="border-style:dashed"><input type="radio" name="ctE_rsn" value="__add">＋ Lí do khác…</label>';
+}
+document.getElementById('ctE_rsn').addEventListener('change',e=>{
+  if(e.target.value==='__add'){
+    const name=(prompt('Tên lí do không chốt mới:')||'').trim();
+    if(name){ ctERsn=ctAddReason(name).id; save(); }
+    ctDrawERsn(); return;
+  }
+  ctERsn=e.target.value;
+});
 document.querySelectorAll('#ctE_close button').forEach(b=>b.onclick=()=>ctSetEClose(b.dataset.v));
 function ctOpenEdit(r){
   ctEditing=r||null;
@@ -5082,6 +5251,7 @@ function ctOpenEdit(r){
   const sel=r?r.needs:[];
   $('ctE_needs').innerHTML=ctNeeds().filter(n=>!n.off||sel.includes(n.id))
     .map(n=>`<label><input type="checkbox" value="${ctEsc(n.id)}" ${sel.includes(n.id)?'checked':''}>${ctEsc(n.name)}</label>`).join('');
+  ctERsn=r?(r.reason||''):''; ctDrawERsn();
   ctSetEClose(r?r.close:'none');
   $('ctEditOverlay').classList.add('open');
   if(!lock) setTimeout(()=>{ try{ $('ctE_name').focus(); }catch(e){} },40);
@@ -5093,14 +5263,16 @@ document.getElementById('ctE_save').onclick=()=>{
   const needs=[...document.querySelectorAll('#ctE_needs input:checked')].map(i=>i.value), note=$('ctE_note').value.trim();
   if(r&&r.auto){
     const addr=$('ctE_addr').value.trim();
-    if(addr!==(r.addr||'')) (DB.bookings||[]).forEach(b=>{ if(r.ids.indexOf(b.id)>=0) b.resaddr=addr; });   // địa chỉ thường trú thuộc về khách → lưu vào booking
+    if((ctEClose==='today'||ctEClose==='advance') && addr!==(r.addr||'')) (DB.bookings||[]).forEach(b=>{ if(r.ids.indexOf(b.id)>=0) b.resaddr=addr; });   // địa chỉ thường trú thuộc về khách → lưu vào booking
     const en=ctEntry(r); en.needs=needs; en.note=note;
     if(ctEClose!==r.close || !r.closeAuto) en.close=ctEClose;
+    if(ctEClose==='none'&&ctERsn) en.reason=ctERsn; else if(ctEClose==='none') delete en.reason;
   }else{
     const name=$('ctE_name').value.trim();
     if(!name){ alert('Nhập tên khách.'); $('ctE_name').focus(); return; }
     const date=$('ctE_date').value||todayStr();
-    const data={date, time:$('ctE_time').value||'', src:$('ctE_src').value, name, phone:$('ctE_phone').value.trim(), addr:$('ctE_addr').value.trim(), needs, close:ctEClose, note};
+    const chot=ctEClose==='today'||ctEClose==='advance';
+    const data={date, time:$('ctE_time').value||'', src:$('ctE_src').value, name, phone:$('ctE_phone').value.trim(), addr:chot?$('ctE_addr').value.trim():((r&&r.addr)||''), needs, close:ctEClose, reason:ctEClose==='none'?ctERsn:'', note};
     if(r){ const en=ctEntry(r); if(en) Object.assign(en,data); }
     else { if(!Array.isArray(DB.contacts)) DB.contacts=[]; DB.contacts.push({id:'ct_'+uid()+uid(), ...data}); }
     { const [rf,rt]=ctCurRange(); if(date<rf||date>rt) ctRange=(date===todayStr()?null:{from:date,to:date}); }   // ngày ngoài khoảng đang xem → nhảy tới ngày đó
@@ -5226,10 +5398,20 @@ function ctBuildPdfNode(from,to){
     src+=`<tr class="ctp-brk"><td class="l">${ctEsc(lbl)}</td><td><b>${rs.length}</b></td><td>${x('today')}</td><td>${x('advance')}</td><td>${x('none')}</td><td>${x('soldout')}</td><td><b>${bs?Math.round((x('today')+x('advance'))/bs*100)+'%':'—'}</b></td></tr>`;
   });
   const nc={}; all.forEach(r=>r.needs.forEach(n=>nc[n]=(nc[n]||0)+1));
-  const pc={}; all.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
+  const chotP=all.filter(ctIsChot), TC=chotP.length, pctC=x=>TC?Math.round(x/TC*100)+'%':'0%';
+  const pc={}; chotP.forEach(r=>{ const t=r.addr?ctTinh(r.addr):'(chưa ghi)'; pc[t]=(pc[t]||0)+1; });
   const noiO=Object.entries(pc).sort((x,y)=>(x[0]==='(chưa ghi)')-(y[0]==='(chưa ghi)')||y[1]-x[1])
-    .map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(k)}</td><td><b>${v}</b></td><td>${pct(v)}</td></tr>`).join('')
-    ||'<tr><td class="l" colspan="3" style="color:#64748b">Chưa có khách.</td></tr>';
+    .map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(k)}</td><td><b>${v}</b></td><td>${pctC(v)}</td></tr>`).join('')
+    ||'<tr><td class="l" colspan="3" style="color:#64748b">Chưa có khách chốt.</td></tr>';
+  const LS=ctLostStats(all);
+  const whyP=LS.why.map(w=>`<tr class="ctp-brk"><td class="l" style="${w.key==='__soldout'?'color:#d97706;font-weight:700':''}">${ctEsc(w.label)}</td><td><b>${w.n}</b></td><td>${Math.round(w.n/LS.lost*100)}%</td></tr>`).join('')
+    ||'<tr><td class="l" colspan="3" style="color:#64748b">Không có khách không chốt / hết xe.</td></tr>';
+  let hourP='';
+  for(let h=LS.hMin;h<=LS.hMax;h++){ const o=LS.hours[h]; if(!o) continue;
+    hourP+=`<tr class="ctp-brk"><td class="l">${h}h–${h+1}h</td><td>${o.tot}</td><td style="color:#dc2626">${o.n||''}</td><td style="color:#d97706">${o.s||''}</td><td><b>${o.n+o.s||''}</b></td></tr>`; }
+  hourP=hourP||'<tr><td class="l" colspan="5" style="color:#64748b">Chưa có giờ liên hệ.</td></tr>';
+  const peakTxt=(p,n,t)=>p?`${t} nhiều nhất lúc <b>${p.h}h–${p.h+2}h</b> (${p.v}/${n} khách)`:'';
+  const peakP=[peakTxt(LS.peakS,LS.so,'Hết xe'),peakTxt(LS.peakN,LS.none,'Không chốt')].filter(Boolean).join(' · ');
   const needs=Object.entries(nc).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<tr class="ctp-brk"><td class="l">${ctEsc(ctNeedName(k))}</td><td><b>${v}</b></td><td>${pct(v)}</td></tr>`).join('')
     ||'<tr><td class="l" colspan="3" style="color:#64748b">Chưa chọn nhu cầu cho khách nào.</td></tr>';
   let days='';
@@ -5247,7 +5429,7 @@ function ctBuildPdfNode(from,to){
       <td class="l">${r.phone?(ctShowAll?ctEsc(ctFmtPhone(r.phone)):ctMask(r.phone)):'—'}</td>
       <td class="l">${r.addr?ctEsc(r.addr):'—'}</td>
       <td class="l">${r.needs.map(n=>ctEsc(ctNeedName(n))).join(', ')||'<span style="color:#c2410c">chưa chọn</span>'}</td>
-      <td class="l" style="color:${col[r.close]};font-weight:700">${CT_CLOSE[r.close]}</td>
+      <td class="l" style="color:${col[r.close]};font-weight:700">${CT_CLOSE[r.close]}${r.close==='none'?`<div class="o">${r.reason?ctEsc(ctReasonName(r.reason)):'chưa ghi lí do'}</div>`:''}</td>
       <td class="l">${ctEsc(r.note)}</td></tr>`).join('')
     ||`<tr><td colspan="${multi?10:9}" style="color:#64748b;padding:16px">Không có khách liên hệ nào trong ${multi?'khoảng này':'ngày'}.</td></tr>`;
   const doanhThu=all.reduce((x,r)=>x+(r.money||0),0), soBk=all.filter(r=>r.auto).length;
@@ -5292,8 +5474,14 @@ function ctBuildPdfNode(from,to){
         <table><tr><th class="l">Nguồn</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${src}</table></div>
       <div style="flex:1"><h3 class="ctp-brk">Nhu cầu khách</h3>
         <table><tr><th class="l">Nhu cầu</th><th>Số khách</th><th>% tổng</th></tr>${needs}</table></div>
-      <div style="flex:1"><h3 class="ctp-brk">Nơi thường trú</h3>
-        <table><tr><th class="l">Tỉnh / thành</th><th>Số khách</th><th>% tổng</th></tr>${noiO}</table></div>
+      <div style="flex:1"><h3 class="ctp-brk">Nơi thường trú (khách đã chốt)</h3>
+        <table><tr><th class="l">Tỉnh / thành</th><th>Số khách</th><th>% đã chốt</th></tr>${noiO}</table></div>
+    </div>
+    <h3 class="ctp-brk">Vì sao mất khách — ${LS.lost}/${T} khách (${pct(LS.lost)}) · không chốt ${LS.none} · hết xe ${LS.so}</h3>
+    ${peakP?`<div class="ctp-brk" style="font-size:12.5px;margin:2px 0 4px">${peakP}</div>`:''}
+    <div style="display:flex;gap:18px">
+      <div style="flex:1"><table><tr><th class="l">Lí do</th><th>Số khách</th><th>% mất khách</th></tr>${whyP}</table></div>
+      <div style="flex:1"><table><tr><th class="l">Giờ liên hệ</th><th>Liên hệ</th><th>Không chốt</th><th>Hết xe</th><th>Mất</th></tr>${hourP}</table></div>
     </div>
     ${multi?`<h3 class="ctp-brk">Theo từng ngày</h3>
     <table><tr class="ctp-brk"><th class="l">Ngày</th><th>Liên hệ</th><th>Trong ngày</th><th>Đặt trước</th><th>Không chốt</th><th>Hết xe</th><th>Tỉ lệ chốt</th></tr>${days}</table>`:''}
