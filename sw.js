@@ -1,13 +1,15 @@
 // Service Worker cho GOODBIKE PWA
 // Tăng số phiên bản này mỗi khi bạn cập nhật app để buộc làm mới cache.
-const VERSION = 'goodbike-2026-10-11-lido';
+const VERSION = 'goodbike-2026-10-12-icon';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-512-maskable.png'
+  './icon-192-v2.png',
+  './icon-512-v2.png',
+  './icon-512-maskable-v2.png',
+  './apple-touch-icon-v2.png',
+  './favicon-v2.png'
 ];
 
 // Cài đặt: nạp sẵn app shell
