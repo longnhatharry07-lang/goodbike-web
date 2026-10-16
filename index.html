@@ -568,7 +568,8 @@
   @media(max-width:640px){.grid2{grid-template-columns:1fr}}
   /* ===== THỐNG KÊ KHÁCH HÀNG LIÊN HỆ (tab "Thống kê KH liên hệ") ===== */
   .ct-btn{background:#fff;border:1px solid var(--line);color:var(--text)}
-  .ws-tbl input.wsN{width:64px;text-align:center}
+  .ws-tbl input.wsU{width:64px;text-align:center}
+  .ws-tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:9px;background:#fde68a;color:#92400e;font-weight:600}
   .ws-tbl input.wsR{width:108px}
   .ws-tbl input.wsNote{width:100%;min-width:140px}
   .ws-tbl tr.ws-co td{background:#fffbeb}
@@ -1704,7 +1705,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-16-giuxe';
+const BAN_APP = '2026-10-16-dattay';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5607,19 +5608,18 @@ function webOverdue(b,T,now){
   if(st!=='danhan' && st!=='quahan') return false;
   return b.depart<T || (b.depart===T && (b.rtime||b.rplan||'12:00')<=now);
 }
-/* GIỮ LẠI XE cho booking phát sinh (chưa nhập vào sơ đồ):
-   DB.webHold['YYYY-MM-DD'][bike_id] = {n: số xe giữ lại, ready:'HH:MM' (trống từ — để trống = tự tính), note}
-   Số hiện trên web = số tự tính − n (không âm). Booking mới vẫn tự trừ tiếp.
-   Khi đã nhập booking phát sinh vào sơ đồ thì xoá phần giữ lại, nếu không sẽ bị trừ 2 lần.
-   Google Apps Script đọc dòng cfg:webHold và áp ĐÚNG công thức này. */
-function webHoldOf(gid,ds){ const d=DB.webHold&&DB.webHold[ds]; return (d&&d[gid])||null; }
+/* CHỈNH TAY — NGƯỜI QUYẾT ĐỊNH LÀ CHỦ XE:
+   DB.webSet['YYYY-MM-DD'][bike_id] = {units: số xe trống, ready:'HH:MM' (trống từ — để trống = tự tính), note}
+   Ngày/mẫu nào đã chỉnh tay thì web bán hàng hiện ĐÚNG số anh đặt, KHÔNG tự đổi theo booking.
+   Không chỉnh thì vẫn tự tính theo sơ đồ như cũ.
+   Google Apps Script đọc dòng cfg:webSet và áp ĐÚNG công thức này. */
+function webSetOf(gid,ds){ const d=DB.webSet&&DB.webSet[ds]; const s=d&&d[gid]; return (s&&s.units!=null&&s.units!=='')?s:null; }
 function webCalcDay(g,ds){
-  const r=webCalcRaw(g,ds), h=webHoldOf(g.id,ds);
-  if(!h) return r;
-  const n=Math.max(0,parseInt(h.n,10)||0);
-  const units=Math.max(0,r.units-n);
-  const ready=units?(h.ready||r.ready):null;
-  return {units, ready, auto:r.units, autoReady:r.ready, hold:n, holdReady:h.ready||'', note:h.note||''};
+  const r=webCalcRaw(g,ds), s=webSetOf(g.id,ds);
+  if(!s) return r;
+  const units=Math.max(0,parseInt(s.units,10)||0);
+  const ready=units?(s.ready||r.ready||null):null;
+  return {units, ready, manual:true, auto:r.units, autoReady:r.ready, note:s.note||''};
 }
 function webCalcRaw(g,ds){
   const T=todayStr(), now=nowHHMM();
@@ -5824,65 +5824,54 @@ function renderWebSync(){
   wsEditorBind();
 }
 
-/* ---------- Chọn ngày + chỉnh số xe trống (giữ lại xe cho booking phát sinh) ---------- */
+/* ---------- Chọn ngày giờ + chỉnh tay số xe trống ---------- */
 let wsFrom=null, wsTo=null, wsNhap=null;   // wsNhap: bản nháp đang gõ dở, giữ qua các lần vẽ lại
 function wsDays(){
-  const T=todayStr();
+  const T=todayStr(), max=addDays(T,WEB_DAYS-1);
   if(!wsFrom||wsFrom<T) wsFrom=T;
-  if(!wsTo||wsTo<wsFrom) wsTo=wsFrom;
-  const max=addDays(T,WEB_DAYS-1);
   if(wsFrom>max) wsFrom=max;
+  if(!wsTo||wsTo<wsFrom) wsTo=wsFrom;
   if(wsTo>max) wsTo=max;
   return dayListIncl(wsFrom,wsTo);
 }
 function wsEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 function wsPrune(){
-  const H=DB.webHold; if(!H||typeof H!=='object') return false;
-  const T=todayStr(); let doi=false;
-  Object.keys(H).forEach(ds=>{ if(ds<T||!H[ds]||!Object.keys(H[ds]).length){ delete H[ds]; doi=true; } });
-  return doi;
+  const H=DB.webSet; if(!H||typeof H!=='object') return;
+  const T=todayStr();
+  Object.keys(H).forEach(ds=>{ if(ds<T||!H[ds]||!Object.keys(H[ds]).length) delete H[ds]; });
 }
-/* Trước khi vẽ lại cả tab (đồng bộ 2 phút/lần cũng vẽ lại), giữ những gì anh đang gõ dở */
 function wsGiuNhap(){
   const ed=document.getElementById('wsEd');
   if(!ed||ed.dataset.dirty!=='1'){ wsNhap=null; return; }
   wsNhap={};
   ed.querySelectorAll('tr[data-g]').forEach(tr=>{
     const q=s=>tr.querySelector(s);
-    wsNhap[tr.dataset.g]={n:q('.wsN').value, ready:q('.wsR').value, note:q('.wsNote').value};
+    wsNhap[tr.dataset.g]={units:q('.wsU').value, ready:q('.wsR').value, note:q('.wsNote').value};
   });
 }
 function wsEditorHtml(){
   const ngay=wsDays(), ds=ngay[0], T=todayStr(), nhieu=ngay.length>1;
   const dong=WEB_GROUPS.map(g=>{
-    const r=webCalcDay(g,ds), raw=webCalcRaw(g,ds), h=webHoldOf(g.id,ds)||{};
-    const v=(wsNhap&&wsNhap[g.id])||{n:h.n?String(h.n):'', ready:h.ready||'', note:h.note||''};
-    const tuDien=raw.units?(raw.ready?('từ '+raw.ready):'cả ngày'):'hết xe';
-    return `<tr data-g="${g.id}"${h.n||h.ready?' class="ws-co"':''}>
-      <td class="l"><b>${g.ten}</b><div class="muted" style="font-size:11.5px">${g.xe.join(', ')}</div></td>
-      <td>${g.xe.length}</td>
-      <td><span${raw.units?'':' style="color:#dc2626"'}>${raw.units}</span><div class="muted" style="font-size:11px">${tuDien}</div></td>
-      <td><input class="wsN" type="number" min="0" max="${g.xe.length}" step="1" inputmode="numeric" placeholder="0" value="${wsEsc(v.n)}"></td>
-      <td><input class="wsR" type="time" step="1800" value="${wsEsc(v.ready)}" title="Để trống = tự tính theo giờ trả xe"></td>
+    const raw=webCalcRaw(g,ds), s=webSetOf(g.id,ds)||{};
+    const v=(wsNhap&&wsNhap[g.id])||{units:s.units!=null?String(s.units):'', ready:s.ready||'', note:s.note||''};
+    const tuDong=raw.units?(raw.ready?('từ '+raw.ready):'cả ngày'):'hết xe';
+    return `<tr data-g="${g.id}">
+      <td class="l">${g.ten}</td><td class="l">${g.xe.join(', ')}</td><td>${g.xe.length}</td>
+      <td><span${raw.units?'':' style="color:#dc2626"'}>${raw.units}</span> <span class="muted" style="font-size:11.5px">${tuDong}</span></td>
+      <td><input class="wsU" type="number" min="0" max="${g.xe.length}" step="1" inputmode="numeric" placeholder="${raw.units}" value="${wsEsc(v.units)}" title="Để trống = tự tính"></td>
+      <td><input class="wsR" type="time" value="${wsEsc(v.ready)}" title="Để trống = tự tính / cả ngày"></td>
       <td class="wsOut"></td>
-      <td class="l"><input class="wsNote" type="text" placeholder="VD: khách gọi điện, anh Nam" value="${wsEsc(v.note)}"></td>
+      <td class="l"><input class="wsNote" type="text" placeholder="Ghi chú" value="${wsEsc(v.note)}"></td>
     </tr>`;
   }).join('');
-  /* danh sách các ngày đang chỉnh tay */
-  const H=DB.webHold||{}, ds2=Object.keys(H).filter(d=>d>=T).sort(), ten=id=>{const g=webGroupOf(id);return g?g.ten:id.slice(0,8);};
+  const H=DB.webSet||{}, ten=id=>{const g=webGroupOf(id);return g?g.ten:id.slice(0,8);};
   const ds2rows=[];
-  ds2.forEach(d=>Object.keys(H[d]||{}).forEach(id=>{ const x=H[d][id]; ds2rows.push(`<tr><td class="l">${fmtDMY(d)}</td><td class="l">${ten(id)}</td><td>${x.n?('−'+x.n):''}</td><td>${x.ready?('từ '+x.ready):''}</td><td class="l">${wsEsc(x.note||'')}</td><td><button class="ct-btn wsDel" data-d="${d}" data-g="${id}" style="padding:3px 9px">Xoá</button></td></tr>`); }));
-  const dsChinh=ds2rows.length?`
-      <div style="padding:10px 14px 0"><b>Các ngày đang chỉnh tay (${ds2rows.length})</b>
-        <span class="muted" style="font-size:12px"> · Khi đã nhập booking phát sinh vào sơ đồ xe, nhớ xoá dòng tương ứng ở đây — nếu không xe sẽ bị trừ 2 lần.</span></div>
-      <div class="tbl-wrap" style="max-height:260px"><table>
-        <tr><th class="l">Ngày</th><th class="l">Mẫu xe</th><th>Giữ lại</th><th>Trống từ</th><th class="l">Ghi chú</th><th></th></tr>
-        ${ds2rows.join('')}
-      </table></div>`:'';
+  Object.keys(H).filter(d=>d>=T).sort().forEach(d=>Object.keys(H[d]||{}).forEach(id=>{ const x=H[d][id]; if(x.units==null||x.units==='') return;
+    ds2rows.push(`<tr><td class="l">${fmtDMY(d)}</td><td class="l">${ten(id)}</td><td><b>${x.units}</b></td><td>${+x.units?(x.ready?('từ '+x.ready):'tự tính'):'hết xe'}</td><td class="l">${wsEsc(x.note||'')}</td><td><button class="ct-btn wsDel" data-d="${d}" data-g="${id}" style="padding:3px 9px">Bỏ</button></td></tr>`); }));
   return `
     <div class="card" style="padding:0" id="wsEd"${wsNhap?' data-dirty="1"':''}>
-      <div style="padding:12px 14px 4px"><h2 style="margin:0">Số xe trống trên web bán hàng</h2>
-        <div class="muted" style="font-size:12px;margin-top:4px">Chọn ngày để xem con số khách thấy. Có booking phát sinh chưa nhập vào sơ đồ thì điền <b>Giữ lại</b> số xe — web bán hàng sẽ hiện ít đi bấy nhiêu xe. Booking mới về vẫn tự trừ tiếp.</div></div>
+      <div style="padding:12px 14px 4px"><h2 style="margin:0">Tình trạng sẽ hiện trên web bán hàng</h2>
+        <div class="muted" style="font-size:12px;margin-top:4px">Web tự tính số xe trống theo sơ đồ. Muốn quyết định khác thì điền <b>Số xe trống</b> và <b>Trống từ</b> rồi bấm Lưu — web bán hàng sẽ hiện <b>đúng số anh đặt</b>, không tự đổi nữa. Để trống = để web tự tính.</div></div>
       <div class="row ws-pick" style="padding:8px 14px;gap:6px;flex-wrap:wrap">
         <button class="ct-btn" id="wsPrev" title="Lùi 1 ngày">◀</button>
         <label class="muted" style="font-size:12.5px">Từ ngày</label><input type="date" id="wsFrom" value="${wsFrom}" min="${T}" max="${addDays(T,WEB_DAYS-1)}">
@@ -5891,78 +5880,88 @@ function wsEditorHtml(){
         <button class="ct-btn" id="wsToday">Hôm nay</button>
         <button class="ct-btn" id="wsTmr">Ngày mai</button>
       </div>
-      ${nhieu?`<div class="ws-note">Đang chọn <b>${ngay.length} ngày</b> (${fmtDMY(ngay[0])} → ${fmtDMY(ngay[ngay.length-1])}). Bảng hiện số của ngày đầu; bấm Lưu sẽ áp cùng số giữ lại cho <b>tất cả</b> các ngày trong khoảng.</div>`:''}
+      ${nhieu?`<div class="ws-note">Đang chọn <b>${ngay.length} ngày</b> (${fmtDMY(ngay[0])} → ${fmtDMY(ngay[ngay.length-1])}). Bảng hiện số của ngày đầu; bấm Lưu sẽ đặt cùng số cho <b>tất cả</b> các ngày trong khoảng.</div>`:''}
       <div class="tbl-wrap" style="max-height:none"><table class="ws-tbl">
-        <tr><th class="l">Mẫu xe trên web</th><th>Tổng</th><th>Tự tính<br><span class="muted" style="font-weight:400">theo sơ đồ</span></th><th>Giữ lại</th><th>Trống từ<br><span class="muted" style="font-weight:400">(sửa tay)</span></th><th>Hiện trên web</th><th class="l">Ghi chú</th></tr>
+        <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Tự tính</th><th>Số xe trống<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Trống từ<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Hiện trên web</th><th class="l">Ghi chú</th></tr>
         ${dong}
       </table></div>
       <div class="row" style="padding:10px 14px;gap:8px;flex-wrap:wrap">
-        <button class="primary" id="wsHoldSave">💾 Lưu chỉnh sửa${nhieu?(' cho '+ngay.length+' ngày'):''}</button>
-        <button class="ct-btn" id="wsHoldClr">Bỏ chỉnh tay ${nhieu?'các ngày này':'ngày này'}</button>
-        <span class="muted" id="wsHoldMsg" style="font-size:12px"></span>
+        <button class="primary" id="wsSetSave">💾 Lưu${nhieu?(' cho '+ngay.length+' ngày'):''}</button>
+        <button class="ct-btn" id="wsSetClr">Trả về tự tính ${nhieu?'các ngày này':'ngày này'}</button>
+        <span class="muted" id="wsSetMsg" style="font-size:12px"></span>
       </div>
-      ${dsChinh}
-      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Google Apps Script tự chép sang bảng <b>Lịch xe trống</b> mỗi 5 phút và ngay sau khi có đơn web mới, kể cả khi không ai mở web quản lí — có tính cả phần giữ lại. Giá thuê vẫn do anh đặt bên web bán hàng, không bị ghi đè.</div>
+      ${ds2rows.length?`
+      <div style="padding:6px 14px 0"><b>Các ngày đang đặt tay (${ds2rows.length})</b> <span class="muted" style="font-size:12px">· web bán hàng hiện đúng các số này cho tới khi anh bấm Bỏ</span></div>
+      <div class="tbl-wrap" style="max-height:260px"><table>
+        <tr><th class="l">Ngày</th><th class="l">Mẫu xe</th><th>Số xe trống</th><th>Trống từ</th><th class="l">Ghi chú</th><th></th></tr>
+        ${ds2rows.join('')}
+      </table></div>`:''}
+      <div class="muted" style="font-size:12px;padding:8px 14px 12px">Google Apps Script tự chép sang bảng <b>Lịch xe trống</b> mỗi 5 phút và ngay sau khi có đơn web mới, kể cả khi không ai mở web quản lí — ngày nào anh đã đặt tay thì chép đúng số anh đặt. Giá thuê vẫn do anh đặt bên web bán hàng, không bị ghi đè.</div>
     </div>`;
 }
 function wsTinhDong(tr){
   const g=webGroupOf(tr.dataset.g); if(!g) return;
   const raw=webCalcRaw(g,wsDays()[0]);
-  const n=Math.max(0,parseInt(tr.querySelector('.wsN').value,10)||0);
-  const r=tr.querySelector('.wsR').value;
-  const u=Math.max(0,raw.units-n), gio=u?(r||raw.ready):null;
-  tr.querySelector('.wsOut').innerHTML=u
+  const uv=tr.querySelector('.wsU').value, r=tr.querySelector('.wsR').value;
+  const tay=uv!=='';
+  const u=tay?Math.max(0,Math.min(g.xe.length,parseInt(uv,10)||0)):raw.units;
+  const gio=u?((tay&&r)||raw.ready):null;
+  tr.querySelector('.wsOut').innerHTML=(u
     ?`<b>${u}</b> <span class="muted" style="font-size:11.5px">${gio?('từ '+gio):'cả ngày'}</span>`
-    :'<b style="color:#dc2626">Hết xe</b>';
-  tr.classList.toggle('ws-co', !!(n||r));
+    :'<b style="color:#dc2626">Hết xe</b>')+(tay?' <span class="ws-tag">đặt tay</span>':'');
+  tr.classList.toggle('ws-co', tay);
 }
 function wsEditorBind(){
   const ed=document.getElementById('wsEd'); if(!ed) return;
   const g=id=>document.getElementById(id);
   const doiNgay=(f,t)=>{ wsFrom=f; wsTo=t||f; wsNhap=null; renderWebSync(); };
-  g('wsFrom').onchange=e=>{ const f=e.target.value; if(!f) return; const dai=dayListIncl(wsFrom,wsTo).length; doiNgay(f, dai>1&&wsTo>=f?wsTo:f); };
+  const dai=()=>dayListIncl(wsFrom,wsTo).length-1;
+  g('wsFrom').onchange=e=>{ const f=e.target.value; if(f) doiNgay(f,addDays(f,dai())); };
   g('wsTo').onchange=e=>{ const t=e.target.value; if(!t) return; wsTo=t<wsFrom?wsFrom:t; wsNhap=null; renderWebSync(); };
-  g('wsPrev').onclick=()=>{ const n=dayListIncl(wsFrom,wsTo).length-1; const f=addDays(wsFrom,-1); doiNgay(f,addDays(f,n)); };
-  g('wsNext').onclick=()=>{ const n=dayListIncl(wsFrom,wsTo).length-1; const f=addDays(wsFrom,1); doiNgay(f,addDays(f,n)); };
+  g('wsPrev').onclick=()=>{ const n=dai(), f=addDays(wsFrom,-1); doiNgay(f,addDays(f,n)); };
+  g('wsNext').onclick=()=>{ const n=dai(), f=addDays(wsFrom,1); doiNgay(f,addDays(f,n)); };
   g('wsToday').onclick=()=>doiNgay(todayStr());
   g('wsTmr').onclick=()=>doiNgay(addDays(todayStr(),1));
   ed.querySelectorAll('tr[data-g]').forEach(tr=>{
     wsTinhDong(tr);
     tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{ ed.dataset.dirty='1'; wsTinhDong(tr); }));
   });
-  const xong=(msg)=>{
+  const xong=msg=>{
     wsPrune(); wsNhap=null; save(); renderWebSync();
-    const m=g('wsHoldMsg'); if(m){ m.textContent=msg; m.style.color='#15803d'; }
-    if(webOn()) webSyncRun(false);    // máy này có khoá thì đẩy luôn; không thì Apps Script đẩy trong 5 phút
+    const m=g('wsSetMsg'); if(m){ m.textContent=msg; m.style.color='#15803d'; }
+    if(webOn()) webSyncRun(false);
   };
-  g('wsHoldSave').onclick=()=>{
+  g('wsSetSave').onclick=()=>{
     if(typeof viewMode!=='undefined'&&viewMode){ alert('Đang ở chế độ chỉ xem.'); return; }
     const ngay=wsDays();
-    if(!DB.webHold||typeof DB.webHold!=='object') DB.webHold={};
-    const H=DB.webHold; let co=0;
+    if(!DB.webSet||typeof DB.webSet!=='object') DB.webSet={};
+    const H=DB.webSet; let co=0, loi='';
     ed.querySelectorAll('tr[data-g]').forEach(tr=>{
       const gr=webGroupOf(tr.dataset.g); if(!gr) return;
-      let n=parseInt(tr.querySelector('.wsN').value,10)||0; n=Math.max(0,Math.min(gr.xe.length,n));
+      const uv=tr.querySelector('.wsU').value.trim();
       const ready=tr.querySelector('.wsR').value||'';
       const note=tr.querySelector('.wsNote').value.trim();
+      if(uv===''&&ready&&!loi) loi='Mẫu '+gr.ten+': có giờ "Trống từ" nhưng chưa điền Số xe trống.';
       ngay.forEach(ds=>{
-        if(n||ready){ (H[ds]||(H[ds]={}))[gr.id]=Object.assign({n},ready?{ready}:{},note?{note}:{}); co++; }
+        if(uv!==''){ const u=Math.max(0,Math.min(gr.xe.length,parseInt(uv,10)||0));
+          (H[ds]||(H[ds]={}))[gr.id]=Object.assign({units:u},ready?{ready}:{},note?{note}:{}); co++; }
         else if(H[ds]) delete H[ds][gr.id];
       });
     });
-    xong(co?('Đã lưu — '+(ngay.length>1?(ngay.length+' ngày. '):'')+'Web bán hàng cập nhật trong vòng 5 phút.'):'Đã bỏ hết chỉnh tay — trở về số tự tính.');
+    if(loi){ alert(loi); return; }
+    xong(co?('Đã lưu'+(ngay.length>1?(' cho '+ngay.length+' ngày'):'')+' — web bán hàng cập nhật trong vòng 5 phút.'):'Đã trả về tự tính.');
   };
-  g('wsHoldClr').onclick=()=>{
-    const ngay=wsDays(), H=DB.webHold||{};
-    if(!ngay.some(d=>H[d]&&Object.keys(H[d]).length)){ const m=g('wsHoldMsg'); if(m) m.textContent='Ngày đang chọn không có chỉnh tay nào.'; return; }
-    if(!confirm('Bỏ mọi chỉnh tay của '+(ngay.length>1?(ngay.length+' ngày đang chọn'):('ngày '+fmtDMY(ngay[0])))+'?')) return;
+  g('wsSetClr').onclick=()=>{
+    const ngay=wsDays(), H=DB.webSet||{};
+    if(!ngay.some(d=>H[d]&&Object.keys(H[d]).length)){ const m=g('wsSetMsg'); if(m) m.textContent='Ngày đang chọn không có số đặt tay nào.'; return; }
+    if(!confirm('Trả về tự tính cho '+(ngay.length>1?(ngay.length+' ngày đang chọn'):('ngày '+fmtDMY(ngay[0])))+'?')) return;
     ngay.forEach(d=>{ delete H[d]; });
-    xong('Đã bỏ chỉnh tay — trở về số tự tính.');
+    xong('Đã trả về tự tính.');
   };
   ed.querySelectorAll('.wsDel').forEach(b=>b.onclick=()=>{
-    const H=DB.webHold||{}, d=b.dataset.d, id=b.dataset.g;
-    if(H[d]) delete H[d][id];
-    xong('Đã xoá chỉnh tay ngày '+fmtDMY(d)+'.');
+    const H=DB.webSet||{}, d=b.dataset.d;
+    if(H[d]) delete H[d][b.dataset.g];
+    xong('Đã bỏ số đặt tay ngày '+fmtDMY(d)+'.');
   });
 }
 
