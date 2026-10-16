@@ -570,7 +570,12 @@
   .ct-btn{background:#fff;border:1px solid var(--line);color:var(--text)}
   .ws-tbl input.wsU{width:64px;text-align:center}
   .ws-tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:9px;background:#fde68a;color:#92400e;font-weight:600}
-  .ws-tbl input.wsR{width:108px}
+  .ws-tbl input.wsR{width:84px;text-align:center}
+  .ws-tbl input.wsR.bad{border-color:#dc2626;background:#fef2f2}
+  button.ws-save{background:#16a34a;color:#fff;border:1px solid #15803d;font-weight:700}
+  button.ws-save:disabled{background:#e5e7eb;color:#9ca3af;border-color:#d1d5db;cursor:default}
+  button.ws-rsave{padding:5px 10px;font-size:12.5px}
+  .ws-tbl tr.ws-dirty td{background:#ecfdf5}
   .ws-tbl input.wsNote{width:100%;min-width:140px}
   .ws-tbl tr.ws-co td{background:#fffbeb}
   .ws-pick input[type=date]{width:auto}
@@ -1705,7 +1710,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-16-dattay';
+const BAN_APP = '2026-10-16-nutluu';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5859,9 +5864,10 @@ function wsEditorHtml(){
       <td class="l">${g.ten}</td><td class="l">${g.xe.join(', ')}</td><td>${g.xe.length}</td>
       <td><span${raw.units?'':' style="color:#dc2626"'}>${raw.units}</span> <span class="muted" style="font-size:11.5px">${tuDong}</span></td>
       <td><input class="wsU" type="number" min="0" max="${g.xe.length}" step="1" inputmode="numeric" placeholder="${raw.units}" value="${wsEsc(v.units)}" title="Để trống = tự tính"></td>
-      <td><input class="wsR" type="time" value="${wsEsc(v.ready)}" title="Để trống = tự tính / cả ngày"></td>
+      <td><input class="wsR" type="text" inputmode="numeric" list="wsGioList" maxlength="5" placeholder="${raw.ready||'--:--'}" value="${wsEsc(v.ready)}" title="Gõ 8, 830, 8:30, 17h30… Để trống = tự tính / cả ngày"></td>
       <td class="wsOut"></td>
       <td class="l"><input class="wsNote" type="text" placeholder="Ghi chú" value="${wsEsc(v.note)}"></td>
+      <td><button class="ws-save ws-rsave" disabled title="Lưu riêng dòng này">💾 Lưu</button></td>
     </tr>`;
   }).join('');
   const H=DB.webSet||{}, ten=id=>{const g=webGroupOf(id);return g?g.ten:id.slice(0,8);};
@@ -5879,14 +5885,16 @@ function wsEditorHtml(){
         <button class="ct-btn" id="wsNext" title="Tới 1 ngày">▶</button>
         <button class="ct-btn" id="wsToday">Hôm nay</button>
         <button class="ct-btn" id="wsTmr">Ngày mai</button>
+        <button class="ws-save" id="wsSetSaveTop" style="margin-left:auto" disabled>💾 Lưu thay đổi</button>
       </div>
       ${nhieu?`<div class="ws-note">Đang chọn <b>${ngay.length} ngày</b> (${fmtDMY(ngay[0])} → ${fmtDMY(ngay[ngay.length-1])}). Bảng hiện số của ngày đầu; bấm Lưu sẽ đặt cùng số cho <b>tất cả</b> các ngày trong khoảng.</div>`:''}
       <div class="tbl-wrap" style="max-height:none"><table class="ws-tbl">
-        <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Tự tính</th><th>Số xe trống<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Trống từ<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Hiện trên web</th><th class="l">Ghi chú</th></tr>
+        <tr><th class="l">Mẫu xe trên web</th><th class="l">Xe thật</th><th>Tổng</th><th>Tự tính</th><th>Số xe trống<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Trống từ<br><span class="muted" style="font-weight:400">(anh đặt)</span></th><th>Hiện trên web</th><th class="l">Ghi chú</th><th></th></tr>
         ${dong}
       </table></div>
+      <datalist id="wsGioList">${Array.from({length:32},(_,i)=>{const m=360+i*30;return `<option value="${String(Math.floor(m/60)).padStart(2,'0')}:${m%60?'30':'00'}">`;}).join('')}</datalist>
       <div class="row" style="padding:10px 14px;gap:8px;flex-wrap:wrap">
-        <button class="primary" id="wsSetSave">💾 Lưu${nhieu?(' cho '+ngay.length+' ngày'):''}</button>
+        <button class="ws-save" id="wsSetSave" disabled>💾 Lưu thay đổi${nhieu?(' cho '+ngay.length+' ngày'):''}</button>
         <button class="ct-btn" id="wsSetClr">Trả về tự tính ${nhieu?'các ngày này':'ngày này'}</button>
         <span class="muted" id="wsSetMsg" style="font-size:12px"></span>
       </div>
@@ -5899,10 +5907,22 @@ function wsEditorHtml(){
       <div class="muted" style="font-size:12px;padding:8px 14px 12px">Google Apps Script tự chép sang bảng <b>Lịch xe trống</b> mỗi 5 phút và ngay sau khi có đơn web mới, kể cả khi không ai mở web quản lí — ngày nào anh đã đặt tay thì chép đúng số anh đặt. Giá thuê vẫn do anh đặt bên web bán hàng, không bị ghi đè.</div>
     </div>`;
 }
+/* Hiểu giờ gõ tay: 8 → 08:00, 830 → 08:30, 8:30 / 8h30 / 8.30 → 08:30, 1730 → 17:30. '' → ''. Sai → null */
+function wsGio(s){
+  s=String(s||'').trim().toLowerCase().replace(/\s+/g,'');
+  if(!s) return '';
+  let m=s.match(/^(\d{1,2})(?:[:h.g](\d{2})?)?$/), hh, mm;
+  if(m){ hh=+m[1]; mm=m[2]!=null?+m[2]:0; }
+  else if((m=s.match(/^(\d{3,4})$/))){ hh=+m[1].slice(0,-2); mm=+m[1].slice(-2); }
+  else return null;
+  if(hh>23||mm>59) return null;
+  return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
 function wsTinhDong(tr){
   const g=webGroupOf(tr.dataset.g); if(!g) return;
   const raw=webCalcRaw(g,wsDays()[0]);
-  const uv=tr.querySelector('.wsU').value, r=tr.querySelector('.wsR').value;
+  const uv=tr.querySelector('.wsU').value, rIn=tr.querySelector('.wsR'), r=wsGio(rIn.value)||'';
+  rIn.classList.toggle('bad', wsGio(rIn.value)===null);
   const tay=uv!=='';
   const u=tay?Math.max(0,Math.min(g.xe.length,parseInt(uv,10)||0)):raw.units;
   const gio=u?((tay&&r)||raw.ready):null;
@@ -5922,35 +5942,60 @@ function wsEditorBind(){
   g('wsNext').onclick=()=>{ const n=dai(), f=addDays(wsFrom,1); doiNgay(f,addDays(f,n)); };
   g('wsToday').onclick=()=>doiNgay(todayStr());
   g('wsTmr').onclick=()=>doiNgay(addDays(todayStr(),1));
+  const nutLuu=[g('wsSetSave'),g('wsSetSaveTop')];
+  const goc=tr=>JSON.stringify([tr.querySelector('.wsU').value.trim(),wsGio(tr.querySelector('.wsR').value),tr.querySelector('.wsNote').value.trim()]);
+  const capNhatNut=()=>{
+    let co=false;
+    ed.querySelectorAll('tr[data-g]').forEach(tr=>{ const d=goc(tr)!==tr.dataset.goc; tr.classList.toggle('ws-dirty',d); tr.querySelector('.ws-rsave').disabled=!d; if(d) co=true; });
+    nutLuu.forEach(b=>{ if(b) b.disabled=!co; });
+    ed.dataset.dirty=co?'1':'';
+  };
   ed.querySelectorAll('tr[data-g]').forEach(tr=>{
+    tr.dataset.goc=(()=>{ const s=webSetOf(tr.dataset.g,wsDays()[0])||{}; return JSON.stringify([s.units!=null?String(s.units):'',s.ready||'',s.note||'']); })();
     wsTinhDong(tr);
-    tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{ ed.dataset.dirty='1'; wsTinhDong(tr); }));
+    tr.querySelectorAll('input').forEach(i=>{
+      i.addEventListener('input',()=>{ wsTinhDong(tr); capNhatNut(); });
+      i.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); luu(tr); } });
+    });
+    const ri=tr.querySelector('.wsR');
+    ri.addEventListener('blur',()=>{ const v=wsGio(ri.value); if(v) ri.value=v; wsTinhDong(tr); capNhatNut(); });
+    tr.querySelector('.ws-rsave').onclick=()=>luu(tr);
   });
+  capNhatNut();
   const xong=msg=>{
-    wsPrune(); wsNhap=null; save(); renderWebSync();
+    ed.dataset.dirty=''; wsPrune(); wsNhap=null; save(); renderWebSync();
     const m=g('wsSetMsg'); if(m){ m.textContent=msg; m.style.color='#15803d'; }
     if(webOn()) webSyncRun(false);
   };
-  g('wsSetSave').onclick=()=>{
+  /* Lưu: chỉ một dòng (chiDong) hoặc mọi dòng có thay đổi */
+  function luu(chiDong){
     if(typeof viewMode!=='undefined'&&viewMode){ alert('Đang ở chế độ chỉ xem.'); return; }
     const ngay=wsDays();
+    const dsDong=chiDong?[chiDong]:[...ed.querySelectorAll('tr[data-g]')].filter(tr=>goc(tr)!==tr.dataset.goc);
+    if(!dsDong.length){ const m=g('wsSetMsg'); if(m){ m.textContent='Không có thay đổi nào để lưu.'; m.style.color=''; } return; }
+    for(const tr of dsDong){
+      const gr=webGroupOf(tr.dataset.g);
+      const ri=tr.querySelector('.wsR');
+      if(wsGio(ri.value)===null){ alert(gr.ten+': giờ "'+ri.value+'" không hiểu được. Gõ kiểu 8, 830, 8:30 hoặc 17h30.'); ri.focus(); return; }
+      if(tr.querySelector('.wsU').value.trim()===''&&wsGio(ri.value)){ alert(gr.ten+': có giờ "Trống từ" nhưng chưa điền Số xe trống.'); tr.querySelector('.wsU').focus(); return; }
+    }
     if(!DB.webSet||typeof DB.webSet!=='object') DB.webSet={};
-    const H=DB.webSet; let co=0, loi='';
-    ed.querySelectorAll('tr[data-g]').forEach(tr=>{
+    const H=DB.webSet; let co=0;
+    dsDong.forEach(tr=>{
       const gr=webGroupOf(tr.dataset.g); if(!gr) return;
       const uv=tr.querySelector('.wsU').value.trim();
-      const ready=tr.querySelector('.wsR').value||'';
+      const ready=wsGio(tr.querySelector('.wsR').value)||'';
       const note=tr.querySelector('.wsNote').value.trim();
-      if(uv===''&&ready&&!loi) loi='Mẫu '+gr.ten+': có giờ "Trống từ" nhưng chưa điền Số xe trống.';
       ngay.forEach(ds=>{
         if(uv!==''){ const u=Math.max(0,Math.min(gr.xe.length,parseInt(uv,10)||0));
           (H[ds]||(H[ds]={}))[gr.id]=Object.assign({units:u},ready?{ready}:{},note?{note}:{}); co++; }
         else if(H[ds]) delete H[ds][gr.id];
       });
     });
-    if(loi){ alert(loi); return; }
-    xong(co?('Đã lưu'+(ngay.length>1?(' cho '+ngay.length+' ngày'):'')+' — web bán hàng cập nhật trong vòng 5 phút.'):'Đã trả về tự tính.');
-  };
+    const ten=dsDong.length===1?(webGroupOf(dsDong[0].dataset.g)||{}).ten+' — ':'';
+    xong('✓ Đã lưu '+ten+(ngay.length>1?(ngay.length+' ngày'):fmtDMY(ngay[0]))+'. Web bán hàng cập nhật trong vòng 5 phút.');
+  }
+  nutLuu.forEach(b=>{ if(b) b.onclick=()=>luu(null); });
   g('wsSetClr').onclick=()=>{
     const ngay=wsDays(), H=DB.webSet||{};
     if(!ngay.some(d=>H[d]&&Object.keys(H[d]).length)){ const m=g('wsSetMsg'); if(m) m.textContent='Ngày đang chọn không có số đặt tay nào.'; return; }
