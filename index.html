@@ -83,6 +83,20 @@
   .kpi .lbl{font-size:12px;color:var(--muted)}
   .kpi .val{font-size:22px;font-weight:800;margin-top:4px}
   .kpi.pos .val{color:var(--ok)} .kpi.neg .val{color:var(--warn)}
+  .cash-card{padding:16px 18px}
+  .cash-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cash-top h2{margin:0;font-size:16px}
+  .cash-top .cash-per{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .cash-total{text-align:right}
+  .cash-total .v{font-size:30px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums;line-height:1.1}
+  .cash-total .v.pos{color:#15803d} .cash-total .v.neg{color:#dc2626}
+  .cash-tbl{width:100%;border-collapse:collapse;margin-top:12px;font-variant-numeric:tabular-nums}
+  .cash-tbl td{padding:9px 6px;border:0;border-top:1px solid #eef2f7;font-size:13.5px;text-align:left;white-space:normal}
+  .cash-tbl td.op{width:22px;font-weight:700;color:#64748b;text-align:center}
+  .cash-tbl td.amt{text-align:right;font-weight:600;white-space:nowrap}
+  .cash-tbl .sub{color:var(--muted);font-size:12px;margin-left:6px}
+  .cash-tbl tr.minus td.amt{color:#b91c1c}
+  .cash-tbl tr.res td{border-top:2px solid #0f172a;font-weight:800;font-size:14.5px}
   /* timeline */
   .tl-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px}
   .tl{position:relative;min-width:max-content}
@@ -1026,6 +1040,7 @@
 
   <!-- PHÂN TÍCH TÀI CHÍNH (Kế toán) -->
   <section class="view" id="view-phantich" style="display:none">
+    <div class="card cash-card" id="paCash"></div>
     <div class="card">
       <div class="pa-top">
         <h2 style="margin:0">Phân tích tài chính</h2>
@@ -1384,6 +1399,7 @@
       <div class="field"><label>Loại</label>
         <select id="e_type">
           <option value="dinhphi">Định phí</option>
+          <option value="quangcao">Định phí · Chi phí quảng cáo</option>
           <option value="bienphi">Biến phí</option>
           <option value="khauhao">Khấu hao</option>
           <option value="dautu">Đầu tư</option>
@@ -1612,6 +1628,7 @@ const PAY_LABEL = {CK:'Chuyển khoản',TM:'Tiền mặt',Vexere:'Vexere',VNA:'
 // Loại chi phí. capital:true = chi đầu tư (không trừ vào lãi vận hành hàng tháng)
 const EXP_TYPES = {
   dinhphi:{label:'Định phí',       bg:'#dbeafe',fg:'#1d4ed8'},
+  quangcao:{label:'Chi phí quảng cáo',bg:'#e0f2fe',fg:'#0369a1'},   // thuộc nhóm ĐỊNH PHÍ; trừ vào Tiền mặt có thể sử dụng
   bienphi:{label:'Biến phí',       bg:'#fef3c7',fg:'#b45309'},
   khauhao:{label:'Khấu hao',       bg:'#e0e7ff',fg:'#4338ca'},
   dautu  :{label:'Đầu tư',         bg:'#dcfce7',fg:'#15803d',capital:true},
@@ -1722,7 +1739,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-18-diachi';
+const BAN_APP = '2026-10-18-tienmat';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4037,6 +4054,7 @@ function openExp(id){
   expOv.classList.add('open');
 }
 function ef(k,v){const el=document.getElementById('e_'+k);if(v!==undefined)el.value=v;return el.value;}
+document.getElementById('e_type').addEventListener('change',e=>{ const c=document.getElementById('e_cat'); if(e.target.value==='quangcao'&&!c.value.trim()) c.value='Quảng cáo'; });
 // Chi Khấu hao → quỹ khấu hao; chi Đầu tư → quỹ lãi ròng. Tự ghi 1 giao dịch "xuất ra" ở Dòng tiền,
 // liên kết qua expRef để khi sửa/xoá khoản chi thì cập nhật/gỡ theo. Loại chi khác không ghi quỹ.
 const EXP_FUND_MAP={khauhao:'khauhao',dautu:'lairong'};
@@ -4211,8 +4229,49 @@ function paShiftRange(dir){
 function flashHint(){ const h=document.getElementById('paHint'); if(!h)return;
   h.style.color='#d93025'; h.textContent='Tối đa 3 chỉ số — hãy bỏ bớt 1 chỉ số trước khi chọn thêm.';
   setTimeout(()=>{h.style.color='';h.innerHTML='Chọn tối đa <b>3 chỉ số</b> để hiển thị trên biểu đồ.';},1900); }
+/* ===== TIỀN MẶT CÓ THỂ SỬ DỤNG =====
+   = Thực thu (Tiền mặt + Chuyển khoản ở tab Thu tiền) từ đầu tháng tới hôm nay
+   + Số dư Quỹ lãi ròng
+   − Biến phí − Chi phí hỗn hợp − Chi phí quảng cáo của tháng này (khoản chi trong tháng).
+   Công nợ phải thu chưa về nên KHÔNG tính. Định phí khác KHÔNG trừ (theo yêu cầu anh Harry). */
+function thuThucTe(from,to){
+  const s={CK:0,TM:0};
+  DB.bookings.forEach(b=>{
+    if(isRecvBk(b)) return;
+    const pls=(b.payments&&b.payments.length)?b.payments
+      :((b.prepaid||0)>0?[{date:b.arrive,amount:b.prepaid,method:b.pay||'TM'}]:[]);
+    pls.forEach(p=>{ if(p.date>=from&&p.date<=to&&(+p.amount||0)>0) s[p.method==='TM'?'TM':'CK']+=(+p.amount||0); });
+  });
+  return s;
+}
+function fundBalance(k){ return (DB.funds&&DB.funds[k]||[]).reduce((a,e)=>a+(e.dir==='in'?(+e.amt||0):-(+e.amt||0)),0); }
+function renderCash(){
+  const el=document.getElementById('paCash'); if(!el) return;
+  const T=todayStr(), ym=T.slice(0,7), from=ym+'-01', to=ym+'-'+String(daysInMonth(ym)).padStart(2,'0');
+  const thu=thuThucTe(from,T), tongThu=thu.CK+thu.TM;
+  const quy=fundBalance('lairong');
+  const c={bienphi:0,honhop:0,quangcao:0};
+  DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to&&c[e.type]!=null) c[e.type]+=(+e.amt||0); });
+  const tien=tongThu+quy-c.bienphi-c.honhop-c.quangcao;
+  const v=n=>fmtVND(n)+'đ';
+  const row=(op,lbl,sub,n,cls)=>`<tr class="${cls||''}"><td class="op">${op}</td><td>${lbl}${sub?` <span class="sub">${sub}</span>`:''}</td><td class="amt">${v(n)}</td></tr>`;
+  el.innerHTML=`
+    <div class="cash-top">
+      <div><h2>Tiền mặt có thể sử dụng</h2><div class="cash-per">${monthLabel(ym)} · thu tiền từ ${fmtDMY(from)} đến ${fmtDMY(T)}</div></div>
+      <div class="cash-total"><div class="v ${tien>=0?'pos':'neg'}">${v(tien)}</div></div>
+    </div>
+    <table class="cash-tbl">
+      ${row('','Thu tiền','tiền mặt '+fmtVND(thu.TM)+' · chuyển khoản '+fmtVND(thu.CK),tongThu)}
+      ${row('+','Quỹ lãi ròng','số dư hiện tại',quy)}
+      ${row('−','Biến phí','',c.bienphi,'minus')}
+      ${row('−','Chi phí hỗn hợp','',c.honhop,'minus')}
+      ${row('−','Chi phí quảng cáo','',c.quangcao,'minus')}
+      <tr class="res"><td class="op">=</td><td>Tiền mặt có thể sử dụng</td><td class="amt">${v(tien)}</td></tr>
+    </table>`;
+}
 function renderPhanTich(){
   if(!accUnlocked)return;
+  try{ renderCash(); }catch(e){ console.warn('renderCash',e); }
   if(!document.getElementById('paCards'))return;
   paInit();
   const pre=document.getElementById('paPreset'), fi=document.getElementById('paFrom'), ti=document.getElementById('paTo');
