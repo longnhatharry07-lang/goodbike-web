@@ -1722,7 +1722,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-18-bohd';
+const BAN_APP = '2026-10-18-diachi';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2878,7 +2878,8 @@ function renderThuChi(){
     const col=tcCol(b,p.method);sum[col]+=(+p.amount||0);
     const tiny=`<small style="display:block;font-size:9px;line-height:1.05;opacity:.85;font-weight:600">${b.src}</small>`;
     const cell=c=>col===c?(fmtVND(p.amount)+(c==='RECV'?tiny:'')):'';
-    const content=`${b.xe} (${fmtDM(b.arrive)} - ${fmtDM(b.depart)}) - ${b.src}`;
+    const dc=[(b.daddr||'').trim(),(b.raddr||'').trim()];   // địa chỉ giao - địa chỉ nhận lại xe (thay cho tên nguồn)
+    const content=`${b.xe} (${fmtDM(b.arrive)} - ${fmtDM(b.depart)})`+((dc[0]||dc[1])?` - ${escNote(dc[0]||'?')} - ${escNote(dc[1]||'?')}`:'');
     const pi=(b.payments||[]).indexOf(p);   // chỉ lệnh thật trong booking mới sửa được ghi chú
     const note=pi>=0&&sua
       ? `<input class="tcnote-in" data-b="${b.id}" data-i="${pi}" maxlength="200" value="${escNote(p.desc)}" placeholder="Thêm ghi chú">`
