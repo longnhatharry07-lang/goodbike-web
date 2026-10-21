@@ -773,11 +773,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-/* ===== Tab LỊCH TRÌNH (kế hoạch + chạy lịch kiểu tài xế) ===== */
-#view-lichtrinh{--lt-surface:#fff;--lt-text:#101828;--lt-text2:#344054;--lt-muted:#5B6472;--lt-line:#E4E7EC;--lt-line2:#EEF0F3;--lt-chip:#F2F4F7;--lt-bg:#F4F5F7;
+/* ===== Tab KẾ HOẠCH GIAO NHẬN (máy tính) + LỊCH TRÌNH (điện thoại) ===== */
+#view-lichtrinh,#view-kehoach{--lt-surface:#fff;--lt-text:#101828;--lt-text2:#344054;--lt-muted:#5B6472;--lt-line:#E4E7EC;--lt-line2:#EEF0F3;--lt-chip:#F2F4F7;--lt-bg:#F4F5F7;
   --lt-blue:#1D4ED8;--lt-blue-bg:#EEF4FF;--lt-blue-line:#C7D7FB;--lt-slate:#475467;--lt-slate-bg:#EEF0F4;--lt-orange:#C2410C;--lt-orange-bg:#FFF4ED;
   --lt-red:#B42318;--lt-red-bg:#FEF3F2;--lt-green:#067647;--lt-green-bg:#ECFDF3;--lt-dark:#101828;--lt-shop:#7A5418;--lt-shop-bg:#FBF3E4;--lt-shop-line:#EBD6AE;color:var(--lt-text)}
-.lt-wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:40px}
+.lt-wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:40px}
 .lt-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lt-title{font-size:22px;font-weight:800;letter-spacing:-.3px;flex:1;min-width:150px}
 .lt-sub{font-size:14px;color:var(--lt-muted)}
@@ -859,6 +859,31 @@
 .lt-kseg button.on{background:#fff;color:#101828;font-weight:800;box-shadow:0 1px 2px rgba(16,24,40,.12)}
 .lt-payrow{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #EEF0F3;font-size:15px}
 .lt-sheet .lt-btn{border:1px solid #E4E7EC}
+/* kế hoạch trên máy tính */
+.kh-wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:40px}
+.kh-head{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.kh-title{font-size:24px;font-weight:800;letter-spacing:-.3px}
+.kh-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.kh-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media(max-width:1000px){.kh-grid{grid-template-columns:1fr}.kh-side{position:static!important}}
+.kh-side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+.kh-box{background:#fff;border:1px solid var(--lt-line);border-radius:14px;padding:14px 16px}
+.kh-box h3{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.5px;color:var(--lt-muted)}
+.kh-stat{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:14px;border-top:1px solid var(--lt-line2)}
+.kh-box h3+.kh-stat{border-top:0}
+#view-kehoach .lt-colhead,#view-kehoach .lt-r{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)}
+#view-kehoach .lt-colhead{font-size:14px;padding-bottom:4px}
+#view-kehoach .lt-spn{width:28px;height:28px;font-size:12px}
+.kh-card{padding:10px 10px 10px 14px;gap:3px}
+.kh-card .lt-tbtn{font-size:16px}
+.kh-xe{font-size:16px}
+.kh-typ{font-size:12px;color:var(--lt-muted);white-space:nowrap}
+.kh-guest{font-size:13px;color:var(--lt-text2);min-width:0;flex:0 1 auto}
+.kh-addr{font-size:13.5px;color:var(--lt-text2);line-height:1.35}
+#view-kehoach .lt-gap{height:14px}
+#view-kehoach .lt-gap button{width:22px;height:22px;font-size:15px;opacity:.55}
+#view-kehoach .lt-gap button:hover,#view-kehoach .lt-gap button:focus-visible{opacity:1}
+#view-kehoach .lt-r:hover .lt-pc{border-color:#B9C3D3}
 </style>
 </head>
 <body>
@@ -880,7 +905,7 @@
 
 <div class="tabs" id="tabs">
   <button class="tab active" data-t="timeline">Sơ đồ xe</button>
-  <button class="tab" data-t="schedule">Lịch giao trả</button>
+  <button class="tab" data-t="kehoach">Kế hoạch giao nhận</button>
   <button class="tab" data-t="lichtrinh">Lịch trình</button>
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
@@ -939,7 +964,12 @@
     </div>
   </section>
 
-  <!-- LỊCH TRÌNH (kế hoạch + chạy lịch) -->
+  <!-- KẾ HOẠCH GIAO NHẬN (máy tính) -->
+  <section class="view" id="view-kehoach" style="display:none">
+    <div class="kh-wrap" id="khApp"></div>
+  </section>
+
+  <!-- LỊCH TRÌNH (điện thoại, nhân viên) -->
   <section class="view" id="view-lichtrinh" style="display:none">
     <div class="lt-wrap" id="ltApp"></div>
   </section>
@@ -1833,7 +1863,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-22-lichtrinh';
+const BAN_APP = '2026-10-22-kehoach';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2377,6 +2407,7 @@ function switchTab(t){
   document.getElementById('view-'+t).style.display='';
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
+  if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
   if(t==='lichtrinh'){ try{ renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); } }
   if(t==='websync'){ try{ renderWebSync(); }catch(e){ console.warn('renderWebSync',e); } }
   if(t==='thuchi'){
@@ -2421,7 +2452,7 @@ function renderAll(){
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
   renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
-  try{ if(typeof renderLichTrinh==='function') renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); }
+  try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
   save();
 }
 function monthLabel(ym){const [y,m]=ym.split('-');return `Tháng ${+m}/${y}`;}
@@ -6243,13 +6274,13 @@ try{ webSyncStart(); }catch(e){ console.warn('webSyncStart',e); }
 })();
 </script>
 <script>
-/* ===== Tab LỊCH TRÌNH =====
-   Kế hoạch (tối hôm trước): xếp thứ tự + giờ đi làm, chia 2 cột Thu hồi / Giao xe, kéo thả, chèn đơn, để sau.
-   Chạy lịch (nhân viên): 1 đơn đang làm + 2 đơn chờ, Bắt đầu → Gọi / Thanh toán / Hoàn thành.
+/* ===== Tab KẾ HOẠCH GIAO NHẬN (máy tính) + Tab LỊCH TRÌNH (điện thoại) =====
+   Kế hoạch (tối hôm trước, trên laptop): xếp thứ tự + giờ đi làm, 2 cột Thu hồi / Giao xe, kéo thả, chèn đơn, để sau.
+   Lịch trình (nhân viên, điện thoại): 1 đơn đang làm + 2 đơn chờ, Bắt đầu → Gọi / Thanh toán / Hoàn thành.
    Dữ liệu kế hoạch: DB['lt_YYYY-MM-DD'] = {order, times, done, started, extra, parked}
    → tự đồng bộ qua dòng cfg:. Giờ trong kế hoạch KHÔNG sửa giờ của booking. */
 const LT_PREP = 45;
-let ltDate = null, ltMode = 'plan', ltShowAll = false, ltShowDone = false, ltMsg = '', ltEditId = null, ltInsAt = 0, ltInsKind = 'giao';
+let ltDate = null, khDate = null, runDate = null, ltCtx = 'run', ltShowAll = false, ltShowDone = false, ltMsg = '', ltEditId = null, ltInsAt = 0, ltInsKind = 'giao';
 const ltPad = n => (n < 10 ? '0' : '') + n;
 const ltFmt = m => ltPad(Math.floor(m / 60)) + ':' + ltPad(m % 60);
 const ltEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -6280,7 +6311,7 @@ function ltPut(p){
   const han = ltAddDays(todayStr(), -30);
   Object.keys(DB).filter(k => /^lt_\d{4}-\d{2}-\d{2}$/.test(k) && k.slice(3) < han).slice(0, 3).forEach(k => { delete DB[k]; });
   save();
-  renderLichTrinh();
+  renderKeHoach(); renderLichTrinh();
 }
 
 // ----- dựng danh sách đơn của ngày -----
@@ -6294,12 +6325,12 @@ function ltBuild(){
     if (!b || !b.xe || b.status === 'huy') return;
     if (b.arrive === D) {
       const id = 'g_' + b.id, t = ltParse(planDtime(b)); const tt = t == null ? 480 : t;
-      items.push({ id, bk: b.id, kind: 'giao', xe: b.xe, typ: vehTyp(b.xe), t: tt, addr: ltGiaoAddr(b.daddr) });
+      items.push({ id, bk: b.id, kind: 'giao', xe: b.xe, typ: vehTyp(b.xe), t: tt, addr: ltGiaoAddr(b.daddr), guest: splitGuest(b.guest).name, src: b.src || '' });
       if (b.status === 'danhan' || b.status === 'datra') { const a = ltParse(b.dtime); srvDone[id] = a == null ? tt : a; }
     }
     if (b.depart === D) {
       const id = 't_' + b.id, t = ltParse(planRtime(b)); const tt = t == null ? 720 : t;
-      items.push({ id, bk: b.id, kind: 'thu', xe: b.xe, typ: vehTyp(b.xe), t: tt, addr: ltThuAddr(b.raddr) });
+      items.push({ id, bk: b.id, kind: 'thu', xe: b.xe, typ: vehTyp(b.xe), t: tt, addr: ltThuAddr(b.raddr), guest: splitGuest(b.guest).name, src: b.src || '' });
       if (b.status === 'datra') { const a = ltParse(b.rtime); srvDone[id] = a == null ? tt : a; }
     }
   });
@@ -6373,58 +6404,92 @@ const LT_SHOP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" str
 const LT_PARK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg>';
 const LT_HD = '<span class="lt-hd" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg></span>';
 
-function renderLichTrinh(){
-  const app = document.getElementById('ltApp'); if (!app) return;
-  if (!ltDate) ltDate = todayStr();
+function ltSyncAndOrder(){
   ltBuild();
   if (ltSyncParked()) { DB['lt_' + ltDate] = LT.P; setTimeout(() => { try { save(); } catch (e) {} }, 0); }
-  const all = ltOrder(), h = [];
-  const today = todayStr(), tmr = ltAddDays(today, 1);
-  h.push('<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(ltDate) + '</div></div>'
-    + '<div class="lt-nav"><button class="lt-nb" data-lt="day" data-v="' + ltAddDays(ltDate, -1) + '" aria-label="Ngày trước">◀</button>'
-    + '<button class="lt-nb' + (ltDate === today ? ' on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button>'
-    + '<button class="lt-nb' + (ltDate === tmr ? ' on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button>'
-    + '<input type="date" id="ltPick" value="' + ltDate + '" aria-label="Chọn ngày">'
-    + '<button class="lt-nb" data-lt="day" data-v="' + ltAddDays(ltDate, 1) + '" aria-label="Ngày sau">▶</button></div></div>');
-  h.push('<div class="lt-seg"><button class="' + (ltMode === 'plan' ? 'on' : '') + '" data-lt="mode" data-v="plan">Kế hoạch</button><button class="' + (ltMode === 'run' ? 'on' : '') + '" data-lt="mode" data-v="run">Chạy lịch</button></div>');
-  if (ltMsg) h.push('<div class="lt-msg"><span style="flex:1">' + ltEsc(ltMsg) + '</span><button data-lt="closemsg" aria-label="Đóng">✕</button></div>');
-  h.push(ltMode === 'plan' ? ltPlanView(all) : ltRunView(all));
-  app.innerHTML = h.join('');
+  return ltOrder();
+}
+const ltMsgHtml = () => ltMsg ? '<div class="lt-msg"><span style="flex:1">' + ltEsc(ltMsg) + '</span><button data-lt="closemsg" aria-label="Đóng">✕</button></div>' : '';
+
+// ===== Tab LỊCH TRÌNH (điện thoại) =====
+function renderLichTrinh(){
+  const app = document.getElementById('ltApp'); if (!app) return;
+  if (!runDate) runDate = todayStr();
+  ltCtx = 'run'; ltDate = runDate;
+  const all = ltSyncAndOrder(), today = todayStr(), tmr = ltAddDays(today, 1);
+  app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div></div>'
+    + '<div class="lt-seg"><button class="' + (runDate === today ? 'on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button><button class="' + (runDate === tmr ? 'on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button></div>'
+    + ltMsgHtml() + ltRunView(all);
 }
 
-function ltPlanView(all){
+// ===== Tab KẾ HOẠCH GIAO NHẬN (máy tính) =====
+function renderKeHoach(){
+  const app = document.getElementById('khApp'); if (!app) return;
+  const today = todayStr(), tmr = ltAddDays(today, 1);
+  if (!khDate) khDate = new Date().getHours() >= 15 ? tmr : today;   // chiều tối mở ra là xếp cho ngày mai
+  ltCtx = 'kh'; ltDate = khDate;
+  const all = ltSyncAndOrder();
+  app.innerHTML = '<div class="kh-head"><div><div class="kh-title">Kế hoạch giao nhận</div><div class="lt-sub">' + ltDayLabel(khDate) + (LT.P.order ? ' · đã xếp tay' : ' · đang xếp tự động') + '</div></div>'
+    + '<div class="lt-nav"><button class="lt-nb" data-lt="day" data-v="' + ltAddDays(khDate, -1) + '" aria-label="Ngày trước">◀</button>'
+    + '<button class="lt-nb' + (khDate === today ? ' on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button>'
+    + '<button class="lt-nb' + (khDate === tmr ? ' on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button>'
+    + '<input type="date" id="ltPick" value="' + khDate + '" aria-label="Chọn ngày">'
+    + '<button class="lt-nb" data-lt="day" data-v="' + ltAddDays(khDate, 1) + '" aria-label="Ngày sau">▶</button></div>'
+    + '<div class="kh-actions"><button class="lt-btn" style="height:40px" data-lt="auto">Xếp tự động</button><button class="lt-btn" style="height:40px;background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="gorun">Xem lịch trình nhân viên</button></div></div>'
+    + ltMsgHtml() + ltPlanDesk(all);
+}
+
+function ltPlanDesk(all){
   const P = LT.P, ord = all.filter(id => !P.parked[id]), parked = all.filter(id => P.parked[id]);
-  const w = ltWarn(ord), nw = Object.keys(w).length, h = [];
-  if (!ord.length && !parked.length) return '<div class="lt-list" style="padding:24px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
-    + '<button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="0">+ Thêm đơn</button>';
-  h.push('<div style="display:flex;align-items:center;gap:8px"><div class="lt-lab" style="flex:1">' + ord.length + ' ĐƠN' + (P.order ? ' · ĐÃ XẾP TAY' : '') + '</div><button class="lt-btn" style="height:40px;font-size:13px" data-lt="auto">Xếp tự động</button></div>');
-  if (nw) h.push('<div class="lt-alert">' + nw + ' lượt thu cần xem lại để kịp giao xe</div>');
-  const nT = ord.filter(id => ltById(id).kind === 'thu').length;
+  const w = ltWarn(ord), h = [];
+  if (!ord.length && !parked.length) return '<div class="kh-box" style="padding:40px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
+    + '<div><button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="0">+ Thêm đơn</button></div>';
+  const xs = ord.map(ltById), nT = xs.filter(x => x.kind === 'thu').length;
+  const nShop = xs.filter(ltIsShop).length, nNoAddr = xs.filter(x => /chưa có địa chỉ/i.test(x.addr)).length, nMoved = xs.filter(ltMoved).length, nDone = ord.filter(id => ltDone(id) != null).length;
+  h.push('<div class="kh-grid"><div class="kh-main">');
   h.push('<div class="lt-colhead"><div><i style="background:var(--lt-slate)"></i>THU HỒI · ' + nT + '</div><div></div><div><i style="background:var(--lt-blue)"></i>GIAO XE · ' + (ord.length - nT) + '</div></div>');
-  const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '">+</button></div>';
+  const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '" title="Chèn đơn vào đây">+</button></div>';
   h.push('<div class="lt-plist" id="ltList">' + gap(0));
   ord.forEach((id, i) => {
     const x = ltById(id), done = ltDone(id) != null, shop = ltIsShop(x);
     const side = x.kind === 'thu' ? 'thu' : (x.kind === 'ps' ? 'ps' : 'giao');
-    const card = '<div class="lt-pc side-' + side + (shop ? ' shop' : '') + '" style="' + (done ? 'opacity:.5' : '') + '">'
-      + '<div class="l1"><button class="lt-tbtn" data-lt="time" data-v="' + id + '" aria-label="Sửa giờ ' + ltEsc(x.xe) + '">' + ltFmt(ltT(x)) + '</button><b style="font-size:15px">' + ltEsc(x.xe) + '</b>' + LT_HD + '</div>'
-      + (ltMoved(x) ? '<div style="font-size:11.5px;font-weight:700;line-height:1.3;color:' + (ltT(x) < x.t || x.kind === 'thu' ? 'var(--lt-green)' : 'var(--lt-red)') + '">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
-      + (shop ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Trả tại CH' : 'Lấy tại CH') + '</span>'
-              : '<div class="lt-ell" style="font-size:12.5px;color:var(--lt-text2)">' + (side === 'ps' ? '<b style="color:var(--lt-orange)">Phát sinh</b> · ' : '') + ltEsc(x.addr) + '</div>')
+    const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + '" style="' + (done ? 'opacity:.5' : '') + '">'
+      + '<div class="l1"><button class="lt-tbtn" data-lt="time" data-v="' + id + '" title="Sửa giờ đi làm">' + ltFmt(ltT(x)) + '</button><b class="kh-xe">' + ltEsc(x.xe) + '</b><span class="kh-typ">' + ltEsc(x.typ || '') + '</span>'
+      + (x.guest ? '<span class="kh-guest lt-ell">' + ltEsc(x.guest) + '</span>' : '') + LT_HD + '</div>'
+      + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:' + (ltT(x) < x.t || x.kind === 'thu' ? 'var(--lt-green)' : 'var(--lt-red)') + '">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
+      + (shop ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>'
+              : '<div class="kh-addr">' + (side === 'ps' ? '<b style="color:var(--lt-orange)">Phát sinh</b> · ' : '') + ltEsc(x.addr) + '</div>')
       + (done ? '<span class="lt-note">đã xong</span>' : '')
       + (w[id] ? '<div class="lt-warn">' + ltEsc(w[id]) + '</div>' : '')
       + (!done && ltCanPark(x) ? '<div><button class="lt-mini" data-lt="park" data-v="' + id + '">' + LT_PARK + 'Để sau</button></div>' : '')
       + '</div>';
     h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? card : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : card) + '</div>' + gap(i + 1));
   });
-  h.push('</div>');
-  if (parked.length) {
-    h.push('<div class="lt-lab" style="margin-top:6px">ĐANG TREO · ' + parked.length + ' XE CHƯA CÓ KHÁCH MỚI</div><div class="lt-list" style="border-style:dashed">');
-    parked.forEach(id => { const x = ltById(id);
-      h.push('<div class="lt-pl"><span style="color:var(--lt-muted);display:flex">' + LT_PARK + '</span><span style="font-size:14px;font-weight:700;width:46px;flex-shrink:0;color:var(--lt-muted)">' + ltFmt(ltT(x)) + '</span><div style="flex:1;min-width:0"><b>Thu ' + ltEsc(x.xe) + '</b><div class="lt-ell" style="font-size:13px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div></div><button class="lt-btn" style="height:40px;font-size:13px;flex-shrink:0" data-lt="unpark" data-v="' + id + '">Đưa vào lịch</button></div>'); });
+  h.push('</div></div>');
+
+  // cột phải
+  h.push('<aside class="kh-side">');
+  h.push('<div class="kh-box"><h3>TỔNG QUAN</h3>'
+    + '<div class="kh-stat"><span>Thu hồi</span><b>' + nT + '</b></div>'
+    + '<div class="kh-stat"><span>Giao xe</span><b>' + (ord.length - nT) + '</b></div>'
+    + '<div class="kh-stat"><span>Tại cửa hàng</span><b>' + nShop + '</b></div>'
+    + '<div class="kh-stat"><span>Đổi giờ so với booking</span><b>' + nMoved + '</b></div>'
+    + '<div class="kh-stat"' + (nNoAddr ? ' style="color:var(--lt-red)"' : '') + '><span>Chưa có địa chỉ</span><b>' + nNoAddr + '</b></div>'
+    + '<div class="kh-stat"><span>Đã xong</span><b>' + nDone + '/' + ord.length + '</b></div></div>');
+  const wk = Object.keys(w);
+  if (wk.length) {
+    h.push('<div class="kh-box" style="border-color:#FECDCA"><h3 style="color:var(--lt-red)">CẦN XEM LẠI · ' + wk.length + '</h3>');
+    wk.forEach(id => { const x = ltById(id); h.push('<div class="kh-stat" style="display:block"><b>Thu ' + ltEsc(x.xe) + ' · ' + ltFmt(ltT(x)) + '</b><div style="font-size:13px;color:var(--lt-red)">' + ltEsc(w[id]) + '</div></div>'); });
     h.push('</div>');
   }
-  h.push('<button class="lt-big" style="background:var(--lt-dark);color:#fff" data-lt="mode" data-v="run">Chốt lịch, bắt đầu chạy</button>');
+  if (parked.length) {
+    h.push('<div class="kh-box" style="border-style:dashed"><h3>ĐANG TREO · ' + parked.length + '</h3>');
+    parked.forEach(id => { const x = ltById(id);
+      h.push('<div class="kh-stat" style="align-items:center;gap:8px"><div style="min-width:0"><b>Thu ' + ltEsc(x.xe) + '</b> <span class="lt-note">từ ' + ltFmt(ltT(x)) + '</span><div class="lt-ell" style="font-size:13px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div></div><button class="lt-btn" style="height:36px;font-size:13px;flex-shrink:0" data-lt="unpark" data-v="' + id + '">Đưa vào lịch</button></div>'); });
+    h.push('</div>');
+  }
+  h.push('<button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="' + ord.length + '">+ Thêm đơn vào cuối lịch</button>');
+  h.push('</aside></div>');
   return h.join('');
 }
 
@@ -6502,19 +6567,20 @@ function ltPlace(ord, id, t){
 }
 
 document.addEventListener('change', e => {
-  if (e.target && e.target.id === 'ltPick' && /^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { ltDate = e.target.value; ltMsg = ''; renderLichTrinh(); }
+  if (e.target && e.target.id === 'ltPick' && /^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { khDate = e.target.value; ltMsg = ''; renderKeHoach(); }
 });
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-lt]'); if (!b) return;
   const a = b.dataset.lt, v = b.dataset.v;
+  if (e.target.closest('#view-kehoach')) ltCtx = 'kh'; else if (e.target.closest('#view-lichtrinh')) ltCtx = 'run';
   if (a === 'bg') { if (e.target === b) ltCloseSheet(); return; }
   if (a === 'cancel') { ltCloseSheet(); return; }
-  if (a === 'day') { ltDate = v; ltMsg = ''; renderLichTrinh(); return; }
-  if (a === 'mode') { ltMode = v; renderLichTrinh(); window.scrollTo({ top: 0 }); return; }
-  if (a === 'closemsg') { ltMsg = ''; renderLichTrinh(); return; }
+  if (a === 'day') { ltMsg = ''; if (ltCtx === 'kh') { khDate = v; renderKeHoach(); } else { runDate = v; renderLichTrinh(); } return; }
+  if (a === 'gorun') { runDate = khDate; switchTab('lichtrinh'); window.scrollTo({ top: 0 }); return; }
+  if (a === 'closemsg') { ltMsg = ''; renderKeHoach(); renderLichTrinh(); return; }
   if (a === 'toggleAll') { ltShowAll = !ltShowAll; renderLichTrinh(); return; }
   if (a === 'toggleDone') { ltShowDone = !ltShowDone; renderLichTrinh(); return; }
-  if (!LT) ltBuild();
+  ltDate = ltCtx === 'kh' ? khDate : runDate; ltBuild();
   const P = LT.P;
   if (a === 'auto') { P.order = null; ltPut(P); return; }
   if (a === 'park') { P.parked[v] = true; if (P.started === v) P.started = null; P.order = ltOrder(); ltMsg = ''; ltPut(P); return; }
@@ -6600,11 +6666,12 @@ document.addEventListener('keydown', e => {
 // ----- kéo thả -----
 let ltDrag = null;
 document.addEventListener('pointerdown', e => {
-  if (ltMode !== 'plan' || e.button > 0) return;
+  if (e.button > 0) return;
   const row = e.target.closest('#ltList .lt-r[data-idx]'); if (!row) return;
   const onHandle = !!e.target.closest('.lt-hd');
   if (!onHandle && (e.pointerType !== 'mouse' || e.target.closest('button'))) return;
   e.preventDefault();
+  ltCtx = 'kh'; ltDate = khDate; ltBuild();
   const rows = Array.from(document.querySelectorAll('#ltList .lt-r[data-idx]'));
   const mids = rows.map(r => { const bb = r.getBoundingClientRect(); return bb.top + bb.height / 2 + window.scrollY; });
   const step = rows.length > 1 ? (mids[mids.length - 1] - mids[0]) / (rows.length - 1) : 0;
@@ -6635,7 +6702,7 @@ function ltDragEnd(){
   if (!ltDrag) return;
   const d = ltDrag; ltDrag = null;
   if (d.moved && d.to !== d.from) { const P = LT.P, ord = ltOrder(); const id = ord.splice(d.from, 1)[0]; ord.splice(d.to, 0, id); P.order = ord; ltPut(P); }
-  else renderLichTrinh();
+  else renderKeHoach();
 }
 document.addEventListener('pointerup', ltDragEnd);
 document.addEventListener('pointercancel', ltDragEnd);
