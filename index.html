@@ -1739,7 +1739,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-18-tienmat';
+const BAN_APP = '2026-10-21-tratruoc';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5717,23 +5717,35 @@ function webCalcDay(g,ds){
   if(!s) return r;
   const units=Math.max(0,parseInt(s.units,10)||0);
   const ready=units?(s.ready||r.ready||null):null;
-  return {units, ready, manual:true, auto:r.units, autoReady:r.ready, note:s.note||''};
+  return {units, ready, retBy:null, manual:true, auto:r.units, autoReady:r.ready, note:s.note||''};
 }
 function webCalcRaw(g,ds){
   const T=todayStr(), now=nowHHMM();
   // Đếm TẤT CẢ booking kể cả nguồn Web; chỉ bỏ những booking ĐÃ TRẢ (xe đã về, kể cả trả sớm)
   const bks=DB.bookings.filter(b=>g.xe.includes(b.xe) && b.arrive && b.depart && webStatus(b,T)!=='datra');
-  let trong=0, somNhat=null;
+  let trong=0, somNhat=null; const traTruoc=[];
+  const homTruoc=addDays(ds,-1);
   g.xe.forEach(x=>{
     const cua=bks.filter(b=>b.xe===x);
-    if(cua.some(b=>webBusyAllDay(b,ds))) return;                 // bận cả ngày
+    if(cua.some(b=>webBusyAllDay(b,ds))){                         // bận cả ngày
+      /* Xe có khách NHẬN vào ngày ds: khách khác vẫn trả xe vào ngày ds được nếu trả TRƯỚC giờ nhận đó,
+         với điều kiện xe rảnh liên tục từ ngày 'tu' tới hết hôm trước. return_by = 'HH:MM@YYYY-MM-DD,...'
+         — web bán hàng chỉ cho trả trong ngày ds khi ngày nhận của khách >= tu và giờ trả < HH:MM. */
+      const nhan=cua.filter(b=>b.arrive===ds).map(b=>String(b.dtime||b.dplan||'08:00').slice(0,5)).sort();
+      if(nhan.length){
+        let tu=null, d0=homTruoc;
+        for(let k=0;k<60;k++){ if(cua.some(b=>webBusyAllDay(b,d0))) break; tu=d0; d0=addDays(d0,-1); }
+        if(tu) traTruoc.push(nhan[0]+'@'+tu);
+      }
+      return;
+    }
     if(ds===T && cua.some(b=>webOverdue(b,T,now))) return;      // quá hạn chưa trả → hôm nay vẫn bận
     trong++;
     const tra=cua.filter(b=>b.depart===ds).map(b=>b.rtime||b.rplan||'12:00').sort();
     const gio=tra.length?tra[tra.length-1]:'00:00';              // xe này sẵn sàng từ mấy giờ
     if(somNhat===null||gio<somNhat) somNhat=gio;
   });
-  return {units:trong, ready:(somNhat&&somNhat!=='00:00')?somNhat:null};
+  return {units:trong, ready:(somNhat&&somNhat!=='00:00')?somNhat:null, retBy:(trong>0||!traTruoc.length)?null:traTruoc.join(',')};
 }
 function webBuildRows(){
   const T=todayStr(), rows=[];
@@ -5741,7 +5753,7 @@ function webBuildRows(){
     const ds=addDays(T,i);
     WEB_GROUPS.forEach(g=>{
       const r=webCalcDay(g,ds);
-      rows.push({bike_id:g.id, day:ds, available_units:r.units, ready_from:r.ready});
+      rows.push({bike_id:g.id, day:ds, available_units:r.units, ready_from:r.ready, return_by:r.retBy||null});
     });
   }
   return rows;
@@ -5749,7 +5761,7 @@ function webBuildRows(){
 async function webPushAvail(full){
   const rows=webBuildRows();
   // chỉ gửi những dòng đổi so với lần trước để đỡ tốn mạng
-  const gui=full?rows:rows.filter(r=>{const k=r.bike_id+'|'+r.day; return webPushed[k]!==r.available_units+'|'+(r.ready_from||'');});
+  const gui=full?rows:rows.filter(r=>{const k=r.bike_id+'|'+r.day; return webPushed[k]!==r.available_units+'|'+(r.ready_from||'')+'|'+(r.return_by||'');});
   if(!gui.length) return 0;
   for(let i=0;i<gui.length;i+=300){
     await webReq('bike_availability?on_conflict=bike_id,day',{
@@ -5757,7 +5769,7 @@ async function webPushAvail(full){
       body:JSON.stringify(gui.slice(i,i+300))
     });
   }
-  gui.forEach(r=>{ webPushed[r.bike_id+'|'+r.day]=r.available_units+'|'+(r.ready_from||''); });
+  gui.forEach(r=>{ webPushed[r.bike_id+'|'+r.day]=r.available_units+'|'+(r.ready_from||'')+'|'+(r.return_by||''); });
   return gui.length;
 }
 
