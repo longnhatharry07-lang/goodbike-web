@@ -1899,7 +1899,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-22-donghotg';
+const BAN_APP = '2026-10-22-ghichu2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6316,6 +6316,7 @@ try{ webSyncStart(); }catch(e){ console.warn('webSyncStart',e); }
    Dữ liệu kế hoạch: DB['lt_YYYY-MM-DD'] = {order, times, done, started, extra, parked}
    → tự đồng bộ qua dòng cfg:. Giờ trong kế hoạch KHÔNG sửa giờ của booking. */
 const LT_PREP = 45;
+let ltKhPending = false, ltNoteTimer = null;
 let ltDate = null, khDate = null, runDate = null, ltCtx = 'run', ltShowAll = false, ltShowDone = false, ltMsg = '', ltEditId = null, ltInsAt = 0, ltInsKind = 'giao';
 const ltPad = n => (n < 10 ? '0' : '') + n;
 const ltFmt = m => ltPad(Math.floor(m / 60)) + ':' + ltPad(m % 60);
@@ -6481,6 +6482,9 @@ function renderLichTrinh(){
 
 // ===== Tab KẾ HOẠCH GIAO NHẬN (máy tính) =====
 function renderKeHoach(){
+  const ae = document.activeElement;
+  if (ae && ae.dataset && ae.dataset.ltnote && document.getElementById('khApp') && document.getElementById('khApp').contains(ae)) { ltKhPending = true; return; }
+  ltKhPending = false;
   const app = document.getElementById('khApp'); if (!app) return;
   const today = todayStr(), tmr = ltAddDays(today, 1);
   if (!khDate) khDate = new Date().getHours() >= 15 ? tmr : today;   // chiều tối mở ra là xếp cho ngày mai
@@ -6681,9 +6685,25 @@ function ltPlace(ord, id, t){
   return ord;
 }
 
+// ghi chú đơn gộp: tự lưu khi đang gõ (không vẽ lại), vẽ lại sau khi rời ô
+function ltSaveNote(el){
+  const nt = el.dataset.ltnote; ltCtx = 'kh'; ltDate = khDate; ltBuild();
+  const P = LT.P; if (!P.groups[nt]) return;
+  const v = el.value.trim(); if ((P.groups[nt].note || '') === v) return;
+  P.groups[nt].note = v; DB['lt_' + khDate] = P; save();
+}
+document.addEventListener('input', e => {
+  if (!(e.target && e.target.dataset && e.target.dataset.ltnote)) return;
+  clearTimeout(ltNoteTimer); const el = e.target; ltNoteTimer = setTimeout(() => ltSaveNote(el), 700);
+});
+document.addEventListener('focusout', e => {
+  if (!(e.target && e.target.dataset && e.target.dataset.ltnote)) return;
+  clearTimeout(ltNoteTimer); ltSaveNote(e.target);
+  setTimeout(() => { if (ltKhPending) renderKeHoach(); }, 0);
+});
 document.addEventListener('change', e => {
   const nt = e.target && e.target.dataset && e.target.dataset.ltnote;
-  if (nt) { ltCtx = 'kh'; ltDate = khDate; ltBuild(); const P = LT.P; if (P.groups[nt]) { P.groups[nt].note = e.target.value.trim(); ltPut(P); } return; }
+  if (nt) { clearTimeout(ltNoteTimer); ltSaveNote(e.target); return; }
   if (e.target && e.target.id === 'ltPick' && /^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { khDate = e.target.value; ltMsg = ''; renderKeHoach(); }
 });
 document.addEventListener('click', e => {
@@ -6861,6 +6881,7 @@ let ltDrag = null;
 document.addEventListener('pointerdown', e => {
   if (e.button > 0) return;
   const row = e.target.closest('#ltList .lt-r[data-idx]'); if (!row) return;
+  if (e.target.closest('input, textarea, select, .kh-note')) return;   // để bấm vào ô ghi chú được
   const onHandle = !!e.target.closest('.lt-hd');
   if (!onHandle && (e.pointerType !== 'mouse' || e.target.closest('button'))) return;
   e.preventDefault();
