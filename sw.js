@@ -1,6 +1,6 @@
 // Service Worker cho GOODBIKE PWA
 // Tăng số phiên bản này mỗi khi bạn cập nhật app để buộc làm mới cache.
-const VERSION = 'goodbike-2026-10-22-ghichu2';
+const VERSION = 'goodbike-2026-10-22-xoadon';
 const APP_SHELL = [
   './',
   './index.html',
