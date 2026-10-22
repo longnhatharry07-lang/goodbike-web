@@ -902,6 +902,24 @@
 .lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
 .lt-gsteps{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--lt-text2);background:#F8FAFC;border-radius:10px;padding:8px 12px}
 .lt-gnote{background:var(--lt-grp-bg);color:var(--lt-grp);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
+/* vòng thời gian + cảnh báo */
+.lt-cur.timed{position:relative;border-color:var(--lt-line)}
+.lt-ring{position:absolute;left:-4px;top:-4px;width:calc(100% + 8px);height:calc(100% + 8px)!important;max-width:none!important;pointer-events:none;overflow:visible}
+.lt-ring rect{fill:none;stroke-width:4}
+.lt-ring .lt-rtrk{stroke:#EAECF0}
+.lt-ring .lt-rbar{stroke:#12B76A;stroke-linecap:round;transition:stroke-dasharray 1s linear,stroke .3s}
+.lt-cur.soon .lt-ring .lt-rbar{stroke:#F79009}
+.lt-cur.late .lt-ring .lt-rtrk{stroke:#D92D20}
+@media (prefers-reduced-motion:no-preference){.lt-cur.late .lt-ring .lt-rtrk{animation:ltPulse 1.2s ease-in-out infinite}}
+@keyframes ltPulse{50%{stroke-opacity:.35}}
+.lt-cdn{display:block;font-size:13px;font-weight:800;color:var(--lt-green);font-variant-numeric:tabular-nums}
+.lt-cur.soon .lt-cdn{color:#B54708}
+.lt-cur.late .lt-cdn{color:var(--lt-red)}
+.lt-alerts{display:flex;flex-direction:column;gap:6px}
+.lt-al{border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700}
+.lt-al.amber{background:#FFFAEB;color:#B54708}
+.lt-al.red{background:var(--lt-red-bg);color:var(--lt-red)}
+.lt-al.sm{padding:2px 8px;font-size:11px;border-radius:6px;margin-left:auto}
 </style>
 </head>
 <body>
@@ -1881,7 +1899,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-22-gopdon';
+const BAN_APP = '2026-10-22-donghotg';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6458,6 +6476,7 @@ function renderLichTrinh(){
   app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div></div>'
     + '<div class="lt-seg"><button class="' + (runDate === today ? 'on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button><button class="' + (runDate === tmr ? 'on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button></div>'
     + ltMsgHtml() + ltRunView(all);
+  ltTick();
 }
 
 // ===== Tab KẾ HOẠCH GIAO NHẬN (máy tính) =====
@@ -6548,6 +6567,31 @@ function ltPlanDesk(all){
   return h.join('');
 }
 
+// cảnh báo theo giờ cho 1 việc (chỉ tính khi đang xem hôm nay)
+function ltAlerts(c){
+  if (ltDate !== todayStr()) return [];
+  const now = ltNowMin(), out = [];
+  (c.kind === 'grp' ? c.members : [c]).forEach(x => {
+    if (ltDone(x.id) != null) return;
+    const T = ltT(x), d = T - now, lab = (c.kind === 'grp' ? x.xe + ': ' : '');
+    if (x.kind === 'thu') {
+      if (d < 0) out.push({ lv: 'red', txt: lab + 'Khách trả muộn ' + ltDur(-d) + ' (hẹn ' + ltFmt(T) + ')' });
+      else if (d <= 15) out.push({ lv: 'amber', txt: lab + 'Sắp tới giờ thu xe · còn ' + ltDur(d) });
+      const dl = ltDeadline(x);
+      if (dl) { const r = dl.at - now;
+        if (r < 0) out.push({ lv: 'red', txt: lab + 'Trễ hạn để giao lại xe ' + x.xe + ' (cần về trước ' + ltFmt(dl.at) + ')' });
+        else if (r <= 30) out.push({ lv: 'amber', txt: lab + 'Cần đưa xe về trước ' + ltFmt(dl.at) + ' để giao lại' }); }
+    } else {
+      if (d < 0) out.push({ lv: 'red', txt: lab + 'Giao muộn · quá giờ ' + ltDur(-d) + (ltMoved(x) ? '' : ' (khách hẹn ' + ltFmt(T) + ')') });
+      else if (d <= 15) out.push({ lv: 'amber', txt: lab + 'Sắp tới giờ giao · còn ' + ltDur(d) });
+    }
+  });
+  return out;
+}
+const ltDur = m => { m = Math.round(m); return m < 60 ? m + ' phút' : Math.floor(m / 60) + ' giờ' + (m % 60 ? ' ' + (m % 60) + ' phút' : ''); };
+function ltAlertHtml(list){
+  return list.length ? '<div class="lt-alerts">' + list.map(a => '<div class="lt-al ' + a.lv + '">' + ltEsc(a.txt) + '</div>').join('') + '</div>' : '';
+}
 function ltRunView(all){
   const P = LT.P, parked = all.filter(id => P.parked[id]), ord = all.filter(id => !P.parked[id] || ltDone(id) != null);
   const queue = ord.filter(id => ltDone(id) == null), h = [], doneN = ord.length - queue.length;
@@ -6566,8 +6610,12 @@ function ltRunView(all){
     let info;
     if (shop) info = '<div class="lt-addr" style="color:var(--lt-shop);display:flex;align-items:center;gap:6px">' + LT_SHOP.replace('width="14" height="14"', 'width="20" height="20"') + 'Tại cửa hàng</div><div class="lt-sub">' + ltEsc([c.kind === 'thu' ? 'Khách mang xe về trả' : (grp ? '' : 'Khách đến lấy xe'), gname].filter(Boolean).join(' · ')) + '</div>';
     else info = '<div class="lt-addr">' + ltEsc(c.addr) + '</div><div class="lt-sub">' + ltEsc([grp ? '' : c.typ, gname].filter(Boolean).join(' · ')) + '</div>';
-    h.push('<div class="lt-cur' + (started ? ' started' : '') + '">'
-      + '<div style="display:flex;align-items:center;gap:8px">' + ltTag(c) + (started ? '<span style="font-size:13px;font-weight:700;color:var(--lt-blue)">Đang làm</span>' : '') + '<span style="margin-left:auto;font-size:18px;font-weight:800">' + ltFmt(ltT(c)) + '</span></div>'
+    const timed = started && !shop && ltDate === todayStr();
+    h.push('<div class="lt-cur' + (started ? ' started' : '') + (timed ? ' timed' : '') + '"' + (timed ? ' data-t="' + ltT(c) + '" data-s="' + (P.startedAt || Date.now()) + '"' : '') + '>'
+      + (timed ? '<svg class="lt-ring" aria-hidden="true"><rect class="lt-rtrk"/><rect class="lt-rbar"/></svg>' : '')
+      + '<div style="display:flex;align-items:center;gap:8px">' + ltTag(c) + (started ? '<span style="font-size:13px;font-weight:700;color:var(--lt-blue)">Đang làm</span>' : '')
+      + '<span style="margin-left:auto;text-align:right"><span style="display:block;font-size:18px;font-weight:800">' + ltFmt(ltT(c)) + '</span>' + (timed ? '<span class="lt-cdn" id="ltCd"></span>' : '') + '</span></div>'
+      + ltAlertHtml(ltAlerts(c))
       + '<div class="lt-mid"><div class="lt-xe"' + (c.xe.length > 4 ? ' style="font-size:30px"' : '') + '>' + ltEsc(c.xe) + '</div><div>' + info + '</div></div>'
       + (grp ? '<div class="lt-gsteps">' + mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span style="color:var(--lt-green)">xong</span>' : '') + '</div>').join('') + '</div>' : '')
       + (grp && c.note ? '<div class="lt-gnote"><b>Ghi chú:</b> ' + ltEsc(c.note) + '</div>' : '')
@@ -6588,7 +6636,8 @@ function ltRunView(all){
     if (waiting.length) {
       h.push('<div class="lt-div"></div><div class="lt-lab">ĐANG CHỜ</div>');
       waiting.forEach(id => { const x = ltById(id), sh = ltIsShop(x);
-        h.push('<div class="lt-wait"><div class="tm">' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '"><div style="display:flex;align-items:center;gap:8px">' + ltTag(x, 1) + '<b style="font-size:18px">' + ltEsc(x.xe) + '</b></div>'
+        const lateW = ltDate === todayStr() && ltT(x) < ltNowMin();
+        h.push('<div class="lt-wait"><div class="tm"' + (lateW ? ' style="color:var(--lt-red)"' : '') + '>' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '"><div style="display:flex;align-items:center;gap:8px">' + ltTag(x, 1) + '<b style="font-size:18px">' + ltEsc(x.xe) + '</b>' + (lateW ? '<span class="lt-al red sm">Quá giờ</span>' : '') + '</div>'
           + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' : '<div class="lt-ell" style="font-size:14px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div>')
           + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(x)) + '</div>' : '') + '</div></div>'); });
       if (queue.length > 3) h.push('<button class="lt-link" data-lt="toggleAll">' + (ltShowAll ? 'Ẩn bớt' : 'Còn ' + (queue.length - 3) + ' đơn sau') + '</button>');
@@ -6607,7 +6656,7 @@ function ltRunView(all){
     if (ltShowDone) {
       h.push('<div class="lt-list">');
       ord.filter(id => ltDone(id) != null).sort((a, b) => ltDone(b) - ltDone(a)).forEach(id => { const x = ltById(id);
-        h.push('<div class="lt-pl"><span style="font-size:14px;font-weight:700;width:48px;color:var(--lt-muted)">' + ltFmt(ltDone(id)) + '</span><span class="lt-ell" style="flex:1;font-size:14px;color:var(--lt-muted)">' + LT_TYPE[x.kind][0] + ' <b style="color:var(--lt-text2)">' + ltEsc(x.xe) + '</b></span><button class="lt-link" style="padding:8px;font-size:13px" data-lt="undo" data-v="' + id + '">Hoàn tác</button></div>'); });
+        h.push('<div class="lt-pl"><span style="font-size:14px;font-weight:700;width:48px;color:var(--lt-muted)">' + ltFmt(ltDone(id)) + '</span><span class="lt-ell" style="flex:1;font-size:14px;color:var(--lt-muted)">' + LT_TYPE[x.kind][0] + ' <b style="color:var(--lt-text2)">' + ltEsc(x.xe) + '</b>' + (x.kind !== 'thu' && ltDone(id) > ltT(x) + 5 ? ' <span style="color:var(--lt-red);font-weight:700">· muộn ' + ltDur(ltDone(id) - ltT(x)) + '</span>' : '') + '</span><button class="lt-link" style="padding:8px;font-size:13px" data-lt="undo" data-v="' + id + '">Hoàn tác</button></div>'); });
       h.push('</div>');
     }
   }
@@ -6659,9 +6708,29 @@ document.addEventListener('click', e => {
     else ltPlace(ord, v, ltT(ltById(v)));
     P.order = ord; ltMsg = ''; ltPut(P); window.scrollTo({ top: 0 }); return;
   }
-  if (a === 'start') { P.started = v; ltPut(P); return; }
-  if (a === 'finish') { const x = ltById(v), t = ltNowMin(); (x && x.kind === 'grp' ? x.members.map(m => m.id) : [v]).forEach(id => { if (ltDone(id) == null) P.done[id] = t; }); P.started = null; ltPut(P); return; }
-  if (a === 'undo') { const x = ltById(v); (x && x.kind === 'grp' ? x.members.map(m => m.id) : [v]).forEach(id => { if (LT.srvDone[id] != null) P.done[id] = -1; else delete P.done[id]; }); ltPut(P); return; }
+  if (a === 'start') { P.started = v; P.startedAt = Date.now(); ltPut(P); return; }
+  if (a === 'finish') {
+    // đơn có booking → mở hộp Giao xe / Thu hồi của booking (ghi giờ thực tế, thanh toán, đổi trạng thái trên Sơ đồ xe)
+    const x = ltById(v); if (!x) return;
+    const pend = (x.kind === 'grp' ? x.members : [x]).filter(m => ltDone(m.id) == null);
+    ltFinQ = { date: ltDate, ids: pend.filter(m => m.bk).map(m => ({ bk: m.bk, kind: m.kind })), loc: pend.filter(m => !m.bk).map(m => m.id) };
+    ltNextFin(); return;
+  }
+  if (a === 'undo') {
+    const x = ltById(v), mem = x && x.kind === 'grp' ? x.members : [ltById(v)];
+    let changed = false;
+    mem.forEach(m => {
+      if (!m) return;
+      if (m.bk && LT.srvDone[m.id] != null) {
+        const b = (DB.bookings || []).find(z => z.id === m.bk);
+        if (b && undoConHan(b)) doUndoFor(b.id);
+        else alert('Xe ' + m.xe + ': trạng thái booking đã cập nhật quá 15 phút nên không hoàn tác ở đây được.\nMở booking trên Sơ đồ xe để sửa.');
+        if (P.done[m.id] != null) { delete P.done[m.id]; changed = true; }
+      } else if (P.done[m.id] != null) { delete P.done[m.id]; changed = true; }
+    });
+    if (changed) ltPut(P); else renderLichTrinh();
+    return;
+  }
   if (a === 'time') {
     const x = ltById(v), isExtra = !x.bk; ltEditId = v;
     ltSheet('<h2>' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + '</h2><div class="lt-sub">' + ltEsc(x.addr) + '</div>'
@@ -6737,6 +6806,55 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('ltSheet')) ltCloseSheet();
   if (e.key === 'Enter' && e.target && e.target.dataset && e.target.dataset.ltnote) e.target.blur();
 });
+
+// ----- hoàn thành → cập nhật booking -----
+let ltFinQ = null;
+function ltNextFin(){
+  const q = ltFinQ; if (!q) return;
+  while (q.ids.length) {
+    const it = q.ids[0], b = (DB.bookings || []).find(z => z.id === it.bk);
+    const ok = !b || (it.kind === 'thu' ? b.status === 'datra' : (b.status === 'danhan' || b.status === 'datra'));
+    if (ok) q.ids.shift(); else break;
+  }
+  if (q.ids.length) { const it = q.ids[0]; openSchAct(it.bk, it.kind === 'thu' ? 'Thu' : 'Giao'); return; }
+  ltFinQ = null;
+  const keep = ltDate; ltDate = q.date; ltBuild();
+  const P = LT.P, t = ltNowMin();
+  q.loc.forEach(id => { P.done[id] = t; }); P.started = null; delete P.startedAt;
+  ltPut(P); ltDate = keep;
+}
+(function(){
+  const btn = document.getElementById('schActDone'); if (!btn || !btn.onclick) return;
+  const orig = btn.onclick;
+  btn.onclick = function(e){ orig.call(this, e); setTimeout(() => { if (ltFinQ && !document.getElementById('schActOverlay').classList.contains('open')) ltNextFin(); }, 0); };
+})();
+// vòng thời gian quanh đơn đang làm: ngắn dần tới giờ hẹn
+function ltTick(){
+  const cur = document.querySelector('#ltApp .lt-cur.timed'); if (!cur) return;
+  const svg = cur.querySelector('.lt-ring'); if (!svg) return;
+  const d = new Date(), nowM = d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60;
+  const s = new Date(+cur.dataset.s), sM = s.getHours() * 60 + s.getMinutes() + s.getSeconds() / 60;
+  const T = +cur.dataset.t, total = Math.max(T - sM, 15), rem = T - nowM, frac = Math.max(0, Math.min(1, rem / total));
+  const w = cur.offsetWidth + 8, hh = cur.offsetHeight + 8;
+  svg.setAttribute('viewBox', '0 0 ' + w + ' ' + hh);
+  svg.style.width = w + 'px'; svg.style.height = hh + 'px';
+  svg.querySelectorAll('rect').forEach(r => { r.setAttribute('x', 2); r.setAttribute('y', 2); r.setAttribute('width', w - 4); r.setAttribute('height', hh - 4); r.setAttribute('rx', 22); });
+  const bar = svg.querySelector('.lt-rbar'), W = w - 4, H = hh - 4, per = 2 * (W + H) - 8 * 22 + 2 * Math.PI * 22;
+  bar.setAttribute('stroke-dasharray', (frac * per).toFixed(1) + ' ' + per.toFixed(1));
+  const st = rem <= 0 ? 'late' : (rem <= 15 ? 'soon' : 'ok');
+  cur.classList.toggle('late', st === 'late'); cur.classList.toggle('soon', st === 'soon');
+  const cd = document.getElementById('ltCd');
+  if (cd) { const sec = Math.abs(Math.round(rem * 60)), mm = Math.floor(sec / 60), ss = sec % 60;
+    const txt = mm >= 60 ? Math.floor(mm / 60) + 'g ' + ltPad(mm % 60) + 'ph' : ltPad(mm) + ':' + ltPad(ss);
+    cd.textContent = (rem > 0 ? 'còn ' : 'quá ') + txt; }
+}
+setInterval(ltTick, 1000);
+setInterval(() => {
+  const v = document.getElementById('view-lichtrinh');
+  if (!v || v.style.display === 'none' || document.getElementById('ltSheet')) return;
+  const ov = document.getElementById('schActOverlay'); if (ov && ov.classList.contains('open')) return;
+  renderLichTrinh();
+}, 30000);
 
 // ----- kéo thả -----
 let ltDrag = null;
