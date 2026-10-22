@@ -884,6 +884,24 @@
 #view-kehoach .lt-gap button{width:22px;height:22px;font-size:15px;opacity:.55}
 #view-kehoach .lt-gap button:hover,#view-kehoach .lt-gap button:focus-visible{opacity:1}
 #view-kehoach .lt-r:hover .lt-pc{border-color:#B9C3D3}
+/* đơn gộp */
+#view-lichtrinh,#view-kehoach{--lt-grp:#5B21B6;--lt-grp-bg:#F3E8FF}
+.lt-k-grp{background:var(--lt-grp-bg);color:var(--lt-grp)}
+.lt-r.grp>.kh-grp{grid-column:1/-1;position:relative;z-index:1}
+.kh-grp{border:1.5px solid var(--lt-grp);padding:10px 12px;gap:8px}
+.kh-grp .lt-hd{margin-left:0}
+.lt-spn.grp{border:2px solid var(--lt-grp);color:var(--lt-grp);flex-shrink:0}
+.kh-gbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.kh-gm{background:#F8FAFC;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.kh-gm.thu{border-left:3px solid var(--lt-slate)}
+.kh-gm.giao{border-left:3px solid var(--lt-blue)}
+.kh-note{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--lt-grp)}
+.kh-note input{flex:1;height:38px;border-radius:10px;border:1px solid #DDD6FE;padding:0 12px;font-size:14px;font-weight:500;background:#FDFBFF}
+.lt-r.dragging{pointer-events:none}
+.lt-r.mergeT .lt-pc{outline:3px solid var(--lt-grp);outline-offset:2px;background:var(--lt-grp-bg)}
+.lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
+.lt-gsteps{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--lt-text2);background:#F8FAFC;border-radius:10px;padding:8px 12px}
+.lt-gnote{background:var(--lt-grp-bg);color:var(--lt-grp);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -1863,7 +1881,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-22-kehoach';
+const BAN_APP = '2026-10-22-gopdon';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6300,9 +6318,9 @@ function ltDayLabel(s){ const d = new Date(s + 'T12:00:00'); return ['Chủ nh�
 // ----- kế hoạch lưu trên máy chủ -----
 function ltP(){
   const k = 'lt_' + ltDate;
-  if (!DB[k] || typeof DB[k] !== 'object') return { order: null, times: {}, done: {}, started: null, extra: [], parked: {} };
+  if (!DB[k] || typeof DB[k] !== 'object') return { order: null, times: {}, done: {}, started: null, extra: [], parked: {}, groups: {} };
   const p = DB[k];
-  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {};
+  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {}; p.groups = p.groups || {};
   return p;
 }
 function ltPut(p){
@@ -6315,7 +6333,7 @@ function ltPut(p){
 }
 
 // ----- dựng danh sách đơn của ngày -----
-const ltIsShop = x => /cửa hàng/i.test(String(x.addr || ''));
+const ltIsShop = x => x.kind === 'grp' ? x.members.every(m => ltIsShop(m)) : /cửa hàng/i.test(String(x.addr || ''));
 function ltGiaoAddr(a){ a = String(a || '').trim(); if (!a || /^tự lấy$/i.test(a)) return 'Khách đến cửa hàng lấy'; if (/chưa update/i.test(a)) return 'Chưa có địa chỉ'; return a; }
 function ltThuAddr(a){ a = String(a || '').trim(); if (/^tự trả$/i.test(a)) return 'Khách mang về cửa hàng'; if (!a || /chưa update/i.test(a)) return 'Chưa có địa chỉ'; return a; }
 let LT = null;   // {items, byId, srvDone, P}
@@ -6336,12 +6354,28 @@ function ltBuild(){
   });
   P.extra.forEach(x => items.push(Object.assign({}, x)));
   const byId = {}; items.forEach(x => { byId[x.id] = x; });
-  LT = { items, byId, srvDone, P };
+  // đơn gộp (cùng chỗ / cùng chuyến): 1 thẻ thay cho nhiều đơn
+  const top = {}, groups = [];
+  Object.keys(P.groups).forEach(gid => {
+    const g = P.groups[gid], mem = (g.ids || []).map(id => byId[id]).filter(x => x && !P.parked[x.id] && !top[x.id]);
+    if (mem.length < 2) return;
+    mem.sort((a, b) => (a.kind === 'thu' ? 0 : 1) - (b.kind === 'thu' ? 0 : 1));
+    const addrs = [...new Set(mem.map(x => x.addr))], xes = [...new Set(mem.map(x => x.xe))];
+    const v = { id: gid, kind: 'grp', members: mem, xe: xes.join(' + '), typ: '', addr: addrs.join(' / '), same: addrs.length === 1, note: g.note || '' };
+    v.label = v.same ? 'Giao/nhận cùng địa chỉ' : 'Gộp chuyến';
+    mem.forEach(x => { top[x.id] = gid; });
+    byId[gid] = v; groups.push(v);
+  });
+  const list = items.filter(x => !top[x.id]).concat(groups);
+  LT = { items, byId, srvDone, P, top, list };
 }
 const ltById = id => LT.byId[id];
-const ltT = x => (LT.P.times[x.id] != null ? LT.P.times[x.id] : x.t);
+const ltT = x => x.kind === 'grp' ? Math.min.apply(null, x.members.map(m => ltT(m))) : (LT.P.times[x.id] != null ? LT.P.times[x.id] : x.t);
 const ltMoved = x => LT.P.times[x.id] != null && LT.P.times[x.id] !== x.t;
-function ltDone(id){ const v = LT.P.done[id]; if (v === -1) return null; if (v != null) return v; return LT.srvDone[id] != null ? LT.srvDone[id] : null; }
+function ltDone(id){
+  const g = LT.byId[id];
+  if (g && g.kind === 'grp') { const vs = g.members.map(m => ltDone(m.id)); return vs.some(z => z == null) ? null : Math.max.apply(null, vs); }
+  const v = LT.P.done[id]; if (v === -1) return null; if (v != null) return v; return LT.srvDone[id] != null ? LT.srvDone[id] : null; }
 function ltNoteOf(x){
   if (!ltMoved(x)) return '';
   const early = ltT(x) < x.t;
@@ -6355,15 +6389,15 @@ function ltDeadline(x){
 }
 const ltCanPark = x => x.kind === 'thu' && !ltIsShop(x) && !LT.items.some(y => (y.kind === 'giao' || y.kind === 'ps') && y.xe === x.xe && y.bk !== x.bk && ltT(y) >= ltT(x));
 function ltAuto(){
-  const key = x => x.kind === 'ps' ? -1 : x.kind === 'giao' ? ltT(x) : (ltDeadline(x) ? ltT(x) - 1 : ltT(x) + 10);
-  return LT.items.slice().sort((a, b) => key(a) - key(b) || ltT(a) - ltT(b)).map(x => x.id);
+  const key = x => x.kind === 'grp' ? Math.min.apply(null, x.members.map(key)) : x.kind === 'ps' ? -1 : x.kind === 'giao' ? ltT(x) : (ltDeadline(x) ? ltT(x) - 1 : ltT(x) + 10);
+  return LT.list.slice().sort((a, b) => key(a) - key(b) || ltT(a) - ltT(b)).map(x => x.id);
 }
 // thứ tự hiện tại (đơn treo luôn ở cuối); trả về [mảng, có đổi không]
 function ltOrder(){
   const P = LT.P;
-  let ord = (P.order || ltAuto()).filter(id => LT.byId[id]);
-  // booking mới thêm sau khi xếp: chèn theo giờ
-  LT.items.forEach(x => {
+  let ord = (P.order || ltAuto()).filter(id => LT.byId[id] && !LT.top[id]);
+  // booking mới thêm sau khi xếp (hoặc đơn vừa tách khỏi nhóm): chèn theo giờ
+  LT.list.forEach(x => {
     if (ord.indexOf(x.id) >= 0) return;
     let pos = ord.findIndex(id => !P.parked[id] && ltT(ltById(id)) > ltT(x));
     if (pos < 0) pos = ord.filter(id => !P.parked[id]).length;
@@ -6374,10 +6408,14 @@ function ltOrder(){
 function ltWarn(ord){
   const w = {};
   ord.forEach((id, i) => {
-    const x = ltById(id), d = ltDeadline(x); if (!d) return;
-    const gi = ord.indexOf(d.gid);
-    if (gi >= 0 && gi < i) w[id] = 'Đang xếp sau lượt giao lại xe ' + x.xe;
-    else if (ltT(x) > d.at) w[id] = 'Cần thu trước ' + ltFmt(d.at) + ' để kịp giao lại';
+    const t = ltById(id), mem = t.kind === 'grp' ? t.members : [t];
+    mem.forEach(x => {
+      const d = ltDeadline(x); if (!d || w[id]) return;
+      const top = LT.top[d.gid] || d.gid; if (top === id) return;
+      const gi = ord.indexOf(top);
+      if (gi >= 0 && gi < i) w[id] = 'Đang xếp sau lượt giao lại xe ' + x.xe;
+      else if (ltT(x) > d.at) w[id] = 'Cần thu ' + x.xe + ' trước ' + ltFmt(d.at) + ' để kịp giao lại';
+    });
   });
   return w;
 }
@@ -6390,7 +6428,7 @@ function ltSyncParked(){
     if (ltCanPark(x)) return;
     delete P.parked[id]; changed = true;
     const d = ltDeadline(x), ord = ltOrder().filter(k => k !== id);
-    let pos = d ? ord.indexOf(d.gid) : -1; if (pos < 0) pos = ord.filter(k => !P.parked[k]).length;
+    let pos = d ? ord.indexOf(LT.top[d.gid] || d.gid) : -1; if (pos < 0) pos = ord.filter(k => !P.parked[k]).length;
     ord.splice(pos, 0, id); P.order = ord;
     const g = d ? ltById(d.gid) : null;
     ltMsg = 'Xe ' + x.xe + ' có khách mới' + (g ? ' lúc ' + ltFmt(ltT(g)) : '') + '. Lượt thu ' + x.xe + ' đã được đưa vào lịch' + (d ? ', cần về trước ' + ltFmt(d.at) : '') + '.';
@@ -6398,8 +6436,8 @@ function ltSyncParked(){
   return changed;
 }
 
-const LT_TYPE = { giao: ['Giao xe', 'lt-k-giao'], thu: ['Thu hồi', 'lt-k-thu'], ps: ['Giao phát sinh', 'lt-k-ps'] };
-const ltTag = (x, sm) => '<span class="lt-type ' + (sm ? 'sm ' : '') + LT_TYPE[x.kind][1] + '">' + LT_TYPE[x.kind][0] + '</span>';
+const LT_TYPE = { giao: ['Giao xe', 'lt-k-giao'], thu: ['Thu hồi', 'lt-k-thu'], ps: ['Giao phát sinh', 'lt-k-ps'], grp: ['Gộp chuyến', 'lt-k-grp'] };
+const ltTag = (x, sm) => '<span class="lt-type ' + (sm ? 'sm ' : '') + LT_TYPE[x.kind][1] + '">' + (x.kind === 'grp' ? x.label : LT_TYPE[x.kind][0]) + '</span>';
 const LT_SHOP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 01-6 0 3 3 0 01-6 0 3 3 0 01-6 0z"/><path d="M5 13v7h14v-7"/><path d="M10 20v-4h4v4"/></svg>';
 const LT_PARK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg>';
 const LT_HD = '<span class="lt-hd" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg></span>';
@@ -6439,18 +6477,35 @@ function renderKeHoach(){
     + ltMsgHtml() + ltPlanDesk(all);
 }
 
+function ltGrpCard(g, i, warn){
+  const done = ltDone(g.id) != null;
+  const mem = g.members.map(x => '<div class="kh-gm ' + (x.kind === 'thu' ? 'thu' : 'giao') + '">'
+    + '<div class="l1"><button class="lt-tbtn" data-lt="time" data-v="' + x.id + '" title="Sửa giờ đi làm">' + ltFmt(ltT(x)) + '</button>' + ltTag(x, 1) + '<b class="kh-xe">' + ltEsc(x.xe) + '</b>' + (x.guest ? '<span class="kh-guest lt-ell">' + ltEsc(x.guest) + '</span>' : '') + '</div>'
+    + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
+    + (g.same ? '' : '<div class="kh-addr">' + ltEsc(x.addr) + '</div>')
+    + (ltDone(x.id) != null ? '<span class="lt-note">đã xong</span>' : '') + '</div>').join('');
+  return '<div class="lt-r grp" data-idx="' + i + '"><div class="lt-pc kh-grp" style="' + (done ? 'opacity:.5' : '') + '">'
+    + '<div class="l1"><span class="lt-spn grp">' + (i + 1) + '</span><span class="lt-type sm lt-k-grp">' + ltEsc(g.label) + '</span>'
+    + (g.same ? '<b class="lt-ell" style="font-size:14px;min-width:0">' + ltEsc(g.addr) + '</b>' : '')
+    + '<button class="lt-mini" style="margin-left:auto" data-lt="split" data-v="' + g.id + '">Tách ra</button>' + LT_HD.replace('margin-left:auto', '') + '</div>'
+    + '<div class="kh-gbody">' + mem + '</div>'
+    + (warn ? '<div class="lt-warn">' + ltEsc(warn) + '</div>' : '')
+    + '<label class="kh-note">Ghi chú<input data-ltnote="' + g.id + '" value="' + ltEsc(g.note) + '" placeholder="Ghi chú cho nhân viên" autocomplete="off"></label>'
+    + '</div></div>';
+}
 function ltPlanDesk(all){
   const P = LT.P, ord = all.filter(id => !P.parked[id]), parked = all.filter(id => P.parked[id]);
   const w = ltWarn(ord), h = [];
   if (!ord.length && !parked.length) return '<div class="kh-box" style="padding:40px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
     + '<div><button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="0">+ Thêm đơn</button></div>';
-  const xs = ord.map(ltById), nT = xs.filter(x => x.kind === 'thu').length;
+  const xs = [].concat(...ord.map(id => { const x = ltById(id); return x.kind === 'grp' ? x.members : [x]; })), nT = xs.filter(x => x.kind === 'thu').length;
   const nShop = xs.filter(ltIsShop).length, nNoAddr = xs.filter(x => /chưa có địa chỉ/i.test(x.addr)).length, nMoved = xs.filter(ltMoved).length, nDone = ord.filter(id => ltDone(id) != null).length;
   h.push('<div class="kh-grid"><div class="kh-main">');
-  h.push('<div class="lt-colhead"><div><i style="background:var(--lt-slate)"></i>THU HỒI · ' + nT + '</div><div></div><div><i style="background:var(--lt-blue)"></i>GIAO XE · ' + (ord.length - nT) + '</div></div>');
+  h.push('<div class="lt-colhead"><div><i style="background:var(--lt-slate)"></i>THU HỒI · ' + nT + '</div><div></div><div><i style="background:var(--lt-blue)"></i>GIAO XE · ' + (xs.length - nT) + '</div></div>');
   const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '" title="Chèn đơn vào đây">+</button></div>';
   h.push('<div class="lt-plist" id="ltList">' + gap(0));
   ord.forEach((id, i) => {
+    if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gap(i + 1)); return; }
     const x = ltById(id), done = ltDone(id) != null, shop = ltIsShop(x);
     const side = x.kind === 'thu' ? 'thu' : (x.kind === 'ps' ? 'ps' : 'giao');
     const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + '" style="' + (done ? 'opacity:.5' : '') + '">'
@@ -6471,7 +6526,7 @@ function ltPlanDesk(all){
   h.push('<aside class="kh-side">');
   h.push('<div class="kh-box"><h3>TỔNG QUAN</h3>'
     + '<div class="kh-stat"><span>Thu hồi</span><b>' + nT + '</b></div>'
-    + '<div class="kh-stat"><span>Giao xe</span><b>' + (ord.length - nT) + '</b></div>'
+    + '<div class="kh-stat"><span>Giao xe</span><b>' + (xs.length - nT) + '</b></div>'
     + '<div class="kh-stat"><span>Tại cửa hàng</span><b>' + nShop + '</b></div>'
     + '<div class="kh-stat"><span>Đổi giờ so với booking</span><b>' + nMoved + '</b></div>'
     + '<div class="kh-stat"' + (nNoAddr ? ' style="color:var(--lt-red)"' : '') + '><span>Chưa có địa chỉ</span><b>' + nNoAddr + '</b></div>'
@@ -6500,21 +6555,32 @@ function ltRunView(all){
   if (!queue.length) {
     h.push('<div class="lt-cur" style="align-items:center;text-align:center"><div style="font-size:22px;font-weight:800">' + (ord.length ? 'Xong hết đơn trong ngày' : 'Ngày này chưa có đơn') + '</div><div class="lt-sub">' + doneN + ' đơn đã hoàn thành</div></div>');
   } else {
-    const c = ltById(queue[0]), started = P.started === c.id, shop = ltIsShop(c);
-    const b = c.bk ? (DB.bookings || []).find(z => z.id === c.bk) : null, g = b ? splitGuest(b.guest) : { name: '', phone: '' };
+    const c = ltById(queue[0]), started = P.started === c.id, shop = ltIsShop(c), grp = c.kind === 'grp';
+    const mem = grp ? c.members : [c];
+    const bkOf = x => x && x.bk ? (DB.bookings || []).find(z => z.id === x.bk) : null;
+    const payX = mem.find(x => x.kind === 'giao' && x.bk) || mem.find(x => x.bk);
+    const memG = mem.slice().sort((p, q) => (p.kind === 'thu' ? 1 : 0) - (q.kind === 'thu' ? 1 : 0));   // ưu tiên khách nhận xe
+    const phone = (memG.map(x => { const bb = bkOf(x); return bb ? splitGuest(bb.guest).phone : ''; }).find(Boolean)) || '';
+    const gname = (memG.map(x => x.guest).find(Boolean)) || '';
+    const callBtn = phone ? '<a class="lt-btn" href="tel:' + ltEsc(phone) + '">Gọi</a>' : '<button class="lt-btn" disabled style="color:var(--lt-muted)">Không có SĐT</button>';
+    let info;
+    if (shop) info = '<div class="lt-addr" style="color:var(--lt-shop);display:flex;align-items:center;gap:6px">' + LT_SHOP.replace('width="14" height="14"', 'width="20" height="20"') + 'Tại cửa hàng</div><div class="lt-sub">' + ltEsc([c.kind === 'thu' ? 'Khách mang xe về trả' : (grp ? '' : 'Khách đến lấy xe'), gname].filter(Boolean).join(' · ')) + '</div>';
+    else info = '<div class="lt-addr">' + ltEsc(c.addr) + '</div><div class="lt-sub">' + ltEsc([grp ? '' : c.typ, gname].filter(Boolean).join(' · ')) + '</div>';
     h.push('<div class="lt-cur' + (started ? ' started' : '') + '">'
       + '<div style="display:flex;align-items:center;gap:8px">' + ltTag(c) + (started ? '<span style="font-size:13px;font-weight:700;color:var(--lt-blue)">Đang làm</span>' : '') + '<span style="margin-left:auto;font-size:18px;font-weight:800">' + ltFmt(ltT(c)) + '</span></div>'
-      + '<div class="lt-mid"><div class="lt-xe">' + ltEsc(c.xe) + '</div><div>'
-      + (shop ? '<div class="lt-addr" style="color:var(--lt-shop);display:flex;align-items:center;gap:6px">' + LT_SHOP.replace('width="14" height="14"', 'width="20" height="20"') + 'Tại cửa hàng</div><div class="lt-sub">' + (c.kind === 'thu' ? 'Khách mang xe về trả' : 'Khách đến lấy xe') + '</div>'
-              : '<div class="lt-addr">' + ltEsc(c.addr) + '</div><div class="lt-sub">' + ltEsc([c.typ, g.name].filter(Boolean).join(' · ')) + '</div>')
-      + '</div></div>'
-      + (ltMoved(c) ? '<div style="background:var(--lt-green-bg);color:var(--lt-green);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700">' + ltEsc(ltNoteOf(c)) + '</div>' : ''));
-    if (!started) {
+      + '<div class="lt-mid"><div class="lt-xe"' + (c.xe.length > 4 ? ' style="font-size:30px"' : '') + '>' + ltEsc(c.xe) + '</div><div>' + info + '</div></div>'
+      + (grp ? '<div class="lt-gsteps">' + mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span style="color:var(--lt-green)">xong</span>' : '') + '</div>').join('') + '</div>' : '')
+      + (grp && c.note ? '<div class="lt-gnote"><b>Ghi chú:</b> ' + ltEsc(c.note) + '</div>' : '')
+      + (!grp && ltMoved(c) ? '<div style="background:var(--lt-green-bg);color:var(--lt-green);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700">' + ltEsc(ltNoteOf(c)) + '</div>' : ''));
+    if (shop) {
+      // tại cửa hàng: không cần Bắt đầu
+      h.push('<div class="lt-row2">' + callBtn + '<button class="lt-btn" style="background:var(--lt-green);color:#fff;border:0;font-weight:800" data-lt="finish" data-v="' + c.id + '">Hoàn thành</button></div>'
+        + (payX ? '<button class="lt-link" style="text-align:center;padding:4px 0" data-lt="pay" data-v="' + c.id + '">Xem thanh toán</button>' : ''));
+    } else if (!started) {
       h.push('<button class="lt-big" style="background:var(--lt-dark);color:#fff" data-lt="start" data-v="' + c.id + '">Bắt đầu</button>');
       if (ltCanPark(c)) h.push('<button class="lt-btn" style="color:var(--lt-text2)" data-lt="park" data-v="' + c.id + '">' + LT_PARK + 'Để sau, xe chưa có khách mới</button>');
     } else {
-      h.push('<div class="lt-row2">' + (g.phone ? '<a class="lt-btn" href="tel:' + ltEsc(g.phone) + '">Gọi</a>' : '<button class="lt-btn" disabled style="color:var(--lt-muted)">Không có SĐT</button>')
-        + '<button class="lt-btn" data-lt="pay" data-v="' + c.id + '"' + (b ? '' : ' disabled') + '>Thanh toán</button></div>'
+      h.push('<div class="lt-row2">' + callBtn + '<button class="lt-btn" data-lt="pay" data-v="' + c.id + '"' + (payX ? '' : ' disabled') + '>Thanh toán</button></div>'
         + '<button class="lt-big" style="background:var(--lt-green);color:#fff" data-lt="finish" data-v="' + c.id + '">Hoàn thành</button>');
     }
     h.push('</div>');
@@ -6567,6 +6633,8 @@ function ltPlace(ord, id, t){
 }
 
 document.addEventListener('change', e => {
+  const nt = e.target && e.target.dataset && e.target.dataset.ltnote;
+  if (nt) { ltCtx = 'kh'; ltDate = khDate; ltBuild(); const P = LT.P; if (P.groups[nt]) { P.groups[nt].note = e.target.value.trim(); ltPut(P); } return; }
   if (e.target && e.target.id === 'ltPick' && /^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { khDate = e.target.value; ltMsg = ''; renderKeHoach(); }
 });
 document.addEventListener('click', e => {
@@ -6592,8 +6660,8 @@ document.addEventListener('click', e => {
     P.order = ord; ltMsg = ''; ltPut(P); window.scrollTo({ top: 0 }); return;
   }
   if (a === 'start') { P.started = v; ltPut(P); return; }
-  if (a === 'finish') { P.done[v] = ltNowMin(); P.started = null; ltPut(P); return; }
-  if (a === 'undo') { if (LT.srvDone[v] != null) P.done[v] = -1; else delete P.done[v]; ltPut(P); return; }
+  if (a === 'finish') { const x = ltById(v), t = ltNowMin(); (x && x.kind === 'grp' ? x.members.map(m => m.id) : [v]).forEach(id => { if (ltDone(id) == null) P.done[id] = t; }); P.started = null; ltPut(P); return; }
+  if (a === 'undo') { const x = ltById(v); (x && x.kind === 'grp' ? x.members.map(m => m.id) : [v]).forEach(id => { if (LT.srvDone[id] != null) P.done[id] = -1; else delete P.done[id]; }); ltPut(P); return; }
   if (a === 'time') {
     const x = ltById(v), isExtra = !x.bk; ltEditId = v;
     ltSheet('<h2>' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + '</h2><div class="lt-sub">' + ltEsc(x.addr) + '</div>'
@@ -6614,8 +6682,13 @@ document.addEventListener('click', e => {
     if (x.bk && t === x.t) delete P.times[id]; else P.times[id] = t;
     if (!x.bk) { const e2 = P.extra.find(z => z.id === id); if (e2) { e2.t = t; delete P.times[id]; } }
     const ord = ltOrder().filter(k => k !== id);
-    if (!P.parked[id]) P.order = ltPlace(ord, id, t);
+    if (!P.parked[id] && !LT.top[id]) P.order = ltPlace(ord, id, t);
     ltCloseSheet(); ltPut(P); return;
+  }
+  if (a === 'split') {
+    const g = ltById(v); if (!g || g.kind !== 'grp') return;
+    const ord = ltOrder(), pos = ord.indexOf(v);
+    ord.splice(pos, 1, ...g.members.map(m => m.id)); delete P.groups[v]; P.order = ord; ltPut(P); return;
   }
   if (a === 'openbk') { ltCloseSheet(); try { openBooking(v); } catch (er) { console.warn(er); } return; }
   if (a === 'delitem') { P.extra = P.extra.filter(z => z.id !== v); delete P.done[v]; delete P.times[v]; if (P.order) P.order = P.order.filter(k => k !== v); ltCloseSheet(); ltPut(P); return; }
@@ -6650,7 +6723,8 @@ document.addEventListener('click', e => {
     P.order = ord; ltCloseSheet(); ltPut(P); window.scrollTo({ top: 0 }); return;
   }
   if (a === 'pay') {
-    const x = ltById(v), bk = (DB.bookings || []).find(z => z.id === x.bk); if (!bk) return;
+    const x0 = ltById(v), x = x0.kind === 'grp' ? (x0.members.find(m => m.kind === 'giao' && m.bk) || x0.members.find(m => m.bk)) : x0;
+    const bk = x ? (DB.bookings || []).find(z => z.id === x.bk) : null; if (!bk) return;
     const dep = bk.deposit && bk.deposit.amount ? moneyVN(bk.deposit.amount) + (bk.deposit.method ? ' (' + bk.deposit.method + ')' : '') : 'Chưa có';
     ltSheet('<h2>Chi tiết thanh toán · ' + ltEsc(x.xe) + '</h2><div class="lt-sub">' + LT_TYPE[x.kind][0] + ' · ' + ltEsc(splitGuest(bk.guest).name || x.addr) + '</div>'
       + '<div><div class="lt-payrow"><span>Tiền thuê</span><b>' + (moneyVN(grossTotalOf(bk)) || '0đ') + '</b></div><div class="lt-payrow"><span>Đã thanh toán</span><b>' + (moneyVN(bk.prepaid) || '0đ') + '</b></div><div class="lt-payrow"><span>Đặt cọc</span><b>' + ltEsc(dep) + '</b></div><div class="lt-payrow" style="font-size:17px"><b>Còn phải thu</b><b>' + (moneyVN(remainOf(bk)) || '0đ') + '</b></div></div>'
@@ -6661,6 +6735,7 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target && e.target.id === 'lt_time') { e.preventDefault(); const x = document.querySelector('[data-lt="savetime"],[data-lt="saveins"]'); if (x) x.click(); }
   if (e.key === 'Escape' && document.getElementById('ltSheet')) ltCloseSheet();
+  if (e.key === 'Enter' && e.target && e.target.dataset && e.target.dataset.ltnote) e.target.blur();
 });
 
 // ----- kéo thả -----
@@ -6675,7 +6750,8 @@ document.addEventListener('pointerdown', e => {
   const rows = Array.from(document.querySelectorAll('#ltList .lt-r[data-idx]'));
   const mids = rows.map(r => { const bb = r.getBoundingClientRect(); return bb.top + bb.height / 2 + window.scrollY; });
   const step = rows.length > 1 ? (mids[mids.length - 1] - mids[0]) / (rows.length - 1) : 0;
-  ltDrag = { row, rows, mids, step, from: +row.dataset.idx, to: +row.dataset.idx, y0: e.clientY, s0: window.scrollY, py: e.clientY, moved: false };
+  const rects = rows.map(r => { const bb = r.getBoundingClientRect(); return { top: bb.top + window.scrollY, bottom: bb.bottom + window.scrollY }; });
+  ltDrag = { row, rows, mids, rects, step, from: +row.dataset.idx, to: +row.dataset.idx, merge: -1, y0: e.clientY, s0: window.scrollY, py: e.clientY, moved: false };
   row.classList.add('dragging'); document.getElementById('ltList').classList.add('dragmode');
   try { row.setPointerCapture(e.pointerId); } catch (er) {}
 });
@@ -6683,6 +6759,11 @@ function ltDragUpdate(){
   const d = ltDrag; if (!d) return;
   const dy = d.py - d.y0 + (window.scrollY - d.s0);
   d.row.style.transform = 'translateY(' + dy + 'px)';
+  // con trỏ nằm giữa một đơn khác → gộp; nằm ở mép / khoảng trống → đổi chỗ
+  const py = d.py + window.scrollY;
+  d.merge = d.rects.findIndex((rc, j) => { if (j === d.from) return false; const h = rc.bottom - rc.top; return py > rc.top + h * 0.22 && py < rc.bottom - h * 0.22; });
+  d.rows.forEach((r, j) => r.classList.toggle('mergeT', j === d.merge));
+  if (d.merge >= 0) { d.rows.forEach((r, j) => { if (j !== d.from) r.style.transform = ''; }); return; }
   const pageY = d.mids[d.from] + dy; let to = 0;
   d.mids.forEach((m, j) => { if (j !== d.from && m < pageY) to++; });
   d.to = to;
@@ -6698,10 +6779,24 @@ document.addEventListener('pointermove', e => {
   ltDragUpdate();
 });
 window.addEventListener('scroll', () => { if (ltDrag) ltDragUpdate(); }, { passive: true });
+// gộp đơn a vào đơn b (b có thể đã là nhóm)
+function ltMerge(aId, bId){
+  const P = LT.P, memOf = id => P.groups[id] ? P.groups[id].ids.slice() : [id];
+  let gid;
+  if (P.groups[bId]) gid = bId;
+  else { gid = 'G' + Date.now().toString(36); P.groups[gid] = { ids: memOf(bId), note: '' }; }
+  const g = P.groups[gid];
+  g.ids = [...new Set(g.ids.concat(memOf(aId)))];
+  if (P.groups[aId] && aId !== gid) { if (P.groups[aId].note) g.note = [g.note, P.groups[aId].note].filter(Boolean).join(' · '); delete P.groups[aId]; }
+  const ord = ltOrder(); ord.splice(ord.indexOf(bId), 1, gid);
+  P.order = ord.filter(k => k !== aId);
+  ltMsg = ''; ltPut(P);
+}
 function ltDragEnd(){
   if (!ltDrag) return;
   const d = ltDrag; ltDrag = null;
-  if (d.moved && d.to !== d.from) { const P = LT.P, ord = ltOrder(); const id = ord.splice(d.from, 1)[0]; ord.splice(d.to, 0, id); P.order = ord; ltPut(P); }
+  if (d.moved && d.merge >= 0) { const ord = ltOrder(); ltMerge(ord[d.from], ord[d.merge]); }
+  else if (d.moved && d.to !== d.from) { const P = LT.P, ord = ltOrder(); const id = ord.splice(d.from, 1)[0]; ord.splice(d.to, 0, id); P.order = ord; ltPut(P); }
   else renderKeHoach();
 }
 document.addEventListener('pointerup', ltDragEnd);
