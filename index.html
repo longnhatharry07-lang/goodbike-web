@@ -1948,7 +1948,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-23-thutien';
+const BAN_APP = '2026-10-23-ghichukh';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6697,7 +6697,6 @@ function ltPlanDesk(all){
       + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:' + (ltT(x) < x.t || x.kind === 'thu' ? 'var(--lt-green)' : 'var(--lt-red)') + '">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
       + (shop ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>'
               : '<div class="kh-addr">' + (side === 'ps' ? '<b style="color:var(--lt-orange)">Phát sinh</b> · ' : '') + ltEsc(x.addr) + '</div>')
-      + (x.bnote ? '<div class="kh-bnote">Booking: ' + ltEsc(x.bnote) + '</div>' : '')
       + (LT.P.notes[id] || ltNoteOpen[id] ? '<label class="kh-note kh-note1">Ghi chú<input data-ltnote="' + id + '" value="' + ltEsc(LT.P.notes[id] || '') + '" placeholder="Ghi chú cho nhân viên" autocomplete="off"></label>'
           : (x.hidden ? '' : '<div><button class="lt-mini" data-lt="addnote" data-v="' + id + '">+ Ghi chú</button></div>'))
       + (done ? '<span class="lt-note">đã xong</span>' : '')
@@ -6755,12 +6754,11 @@ function ltAlerts(c){
   });
   return out;
 }
-// tất cả ghi chú của 1 việc: ghi chú kế hoạch (nhóm/đơn) + ghi chú trong booking
+// ghi chú của 1 việc: chỉ ghi chú trong Kế hoạch (nhóm/đơn), không lấy ghi chú booking
 function ltNotesOf(c){
   const P = LT.P, out = [], mem = c.kind === 'grp' ? c.members : [c];
   if (c.kind === 'grp' && c.note) out.push(c.note);
   mem.forEach(x => { if (P.notes && P.notes[x.id]) out.push((c.kind === 'grp' ? x.xe + ': ' : '') + P.notes[x.id]); });
-  mem.forEach(x => { if (x.bnote) out.push((c.kind === 'grp' ? x.xe + ' · ' : '') + 'Booking: ' + x.bnote); });
   return out;
 }
 const LT_NOTE_IC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>';
