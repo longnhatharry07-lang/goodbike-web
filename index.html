@@ -1914,7 +1914,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-23-boqua';
+const BAN_APP = '2026-10-23-hoantac';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6821,8 +6821,7 @@ document.addEventListener('click', e => {
       if (!m) return;
       if (m.bk && LT.srvDone[m.id] != null) {
         const b = (DB.bookings || []).find(z => z.id === m.bk);
-        if (b && undoConHan(b)) doUndoFor(b.id);
-        else alert('Xe ' + m.xe + ': trạng thái booking đã cập nhật quá 15 phút nên không hoàn tác ở đây được.\nMở booking trên Sơ đồ xe để sửa.');
+        if (b) doUndoFor(b.id);   // luôn cho hoàn tác: có ảnh chụp thì khôi phục đủ giờ/tiền, không thì lùi 1 bước trạng thái
         if (P.done[m.id] != null) { delete P.done[m.id]; changed = true; }
       } else if (P.done[m.id] != null) { delete P.done[m.id]; changed = true; }
     });
