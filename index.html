@@ -1103,6 +1103,101 @@ th{color:#5B6472}
 #bkOverlay .gb-hint{display:none}
 @media (max-width:640px){#bkOverlay .modal{padding:0 14px}#bkOverlay .modal > h3,#bkOverlay .mtabs{margin-left:-14px;margin-right:-14px;padding-left:14px}#bkOverlay .bk-actions{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}}
 </style>
+<style>
+/* ===== SƠ ĐỒ XE — BỐ CỤC MỚI ===== */
+.tlp-head{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;margin-bottom:18px}
+.tlp-title{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:10px}
+.tlp-title img{width:34px;height:auto;display:none}
+.tlp-title h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.4px;color:#101828}
+.tlp-title .d{font-size:14px;color:#5B6472;margin-top:2px}
+.tlp-sync{display:none}
+.tlp-nav{display:flex;align-items:center;border:1px solid #D0D5DD;border-radius:10px;background:#fff;height:40px;overflow:hidden}
+.tlp-nav button{height:40px;min-width:40px;border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;padding:0 12px;font-size:14px;font-weight:700;color:#101828;cursor:pointer}
+.tlp-nav button.mid{border-left:1px solid #E4E7EC;border-right:1px solid #E4E7EC}
+.tlp-nav button:hover{background:#F9FAFB}
+.tlp-search{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid #D0D5DD;border-radius:10px;background:#fff;width:250px;box-sizing:border-box}
+.tlp-search input{border:0!important;outline:none;font-size:14px;flex:1;min-width:0;background:transparent;padding:0!important;height:auto}
+.tlp-add{height:40px;padding:0 16px;border-radius:10px;border:0;background:#101828;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;cursor:pointer}
+.tlp-ic{width:44px;height:44px;border-radius:12px;padding:0;justify-content:center;display:none}
+/* thẻ đầu cũ: ẩn tiêu đề, ô chọn ngày; giữ dải số */
+#view-timeline > .card.tlp-statcard{background:transparent;border:0;padding:0;box-shadow:none;margin-bottom:18px}
+#view-timeline > .card.tlp-statcard > .row{display:none}
+#view-timeline .tlstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0;background:#fff;border:1px solid #E4E7EC;border-radius:14px}
+#view-timeline .tlstats .stat{background:transparent;border:0;border-right:1px solid #E4E7EC;border-radius:0;padding:16px 20px;gap:4px;min-width:0}
+#view-timeline .tlstats .stat:last-child{border-right:0}
+#view-timeline .tlstats .stat .sl{order:-1;font-size:13px;color:#5B6472;font-weight:600}
+#view-timeline .tlstats .stat .sv{font-size:24px;font-weight:800;letter-spacing:-.3px;color:#101828}
+#view-timeline .tlstats .stat .sv small{font-size:15px;color:#5B6472;font-weight:600;margin-left:3px}
+#view-timeline .tlstats .stat.rev .sv{color:#101828}
+#view-timeline .tlstats .stat.freebtn:hover{background:#F9FAFB}
+/* thẻ sơ đồ */
+#view-timeline > .card.tlp-tlcard{border:1px solid #E4E7EC;border-radius:14px;overflow:hidden;background:#fff}
+.tlp-bar{display:flex;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid #E4E7EC;flex-wrap:wrap}
+.tlp-range{font-size:15px;font-weight:800;color:#101828}
+.tlp-bar .legend{margin:0 0 0 auto;gap:14px;font-size:12.5px;color:#344054;font-weight:600}
+.tlp-bar .legend span{display:inline-flex;align-items:center;gap:6px}
+.tlp-bar .legend .sw{width:10px;height:10px;border-radius:3px}
+#view-timeline .tl-wrap{border:0;border-radius:0;max-height:calc(100vh - 290px)}
+#timeline .tl-monthrow{display:none}
+#timeline .tl-head{top:0;background:#FCFCFD;border-bottom:1px solid #E4E7EC}
+#timeline .tl-head .corner{background:#FCFCFD;font-size:12px;font-weight:700;color:#5B6472;border-right:1px solid #E4E7EC}
+#timeline .day{border-right:1px solid #EEF0F3;padding:8px 2px;line-height:1.25;font-size:15px;font-weight:800;color:#101828}
+#timeline .day .dow{display:block;font-size:11px;font-weight:600;color:#5B6472}
+#timeline .day.today{background:#101828;color:#fff}
+#timeline .day.today .dow{color:#D0D5DD}
+#timeline .todaytag,#timeline .nowline{display:none}
+#timeline .tl-row{border-bottom:1px solid #EEF0F3;background:#fff}
+#timeline .tl-row:nth-child(even){background:#fff}
+#timeline .veh{background:#fff;border-right:1px solid #E4E7EC;font-size:15px;font-weight:800;align-items:baseline;padding-top:0;align-self:stretch;display:flex;align-items:center}
+#timeline .veh .vehinfo-ic{display:none}
+#timeline .gridcell{border-right:1px solid #EEF0F3}
+#timeline .gridcell.tlp-today{background:#F9FAFB}
+#timeline .bar{top:8px;height:calc(var(--rowh) - 16px);border-radius:8px;box-shadow:none;font-size:12.5px;gap:8px;padding:0 10px}
+#timeline .bar .bt{font-weight:700;font-size:12px}
+#timeline .bar .nm{font-weight:600}
+#timeline .bar .ret{margin-left:auto;font-weight:700;font-size:12px;opacity:1}
+#timeline .bar.st-sapnhan{background:#DCE6FB!important;border:1px solid #9DB4EE;color:#1E3A8A!important}
+#timeline .bar.st-danhan{background:#DDF1E4!important;border:1px solid #94CDA9;color:#14532D!important}
+#timeline .bar.st-datra{background:#F2F4F7!important;border:1px solid #D0D5DD;color:#475467!important}
+#timeline .bar.st-quahan{background:#FCE3E3!important;border:1px solid #EBA3A3;color:#8A1C1C!important}
+#timeline .bar.unpaid{background-image:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(16,24,40,.06) 6px,rgba(16,24,40,.06) 12px)!important}
+#timeline .tl-row.tlp-miss{display:none}
+#timeline .bar.tlp-dim{opacity:.25}
+.gb-side-sync{margin-top:auto;padding:12px 10px 0;border-top:1px solid #1D2939;font-size:13px;color:#D0D5DD;display:flex;align-items:center;gap:8px}
+.gb-side-sync i{width:8px;height:8px;border-radius:50%;background:#32D583;flex-shrink:0}
+.gb-side-sync.bad i{background:#F97066}
+.gb-side-sync.wait i{background:#FDB022}
+body.gb-tl header{display:none}
+@media (max-width:999px){
+  .gb-side-sync{display:none}
+  .tlp-head{gap:10px;margin-bottom:12px}
+  .tlp-title img{display:block}
+  .tlp-title h1{font-size:22px}
+  .tlp-title .d{font-size:13px}
+  .tlp-title{flex:1 1 0}
+  .tlp-sync{display:inline-block;font-size:0!important;width:10px;height:10px;min-width:10px;padding:0!important;margin:0!important;border-radius:50%;overflow:hidden}
+  .tlp-ic{color:#101828!important}
+  .tlp-search{display:none}
+  .tlp-search.open{display:flex;width:100%;order:9}
+  .tlp-ic{display:flex}
+  .tlp-add .t{display:none}
+  .tlp-add{width:44px;height:44px;border-radius:12px;padding:0;justify-content:center}
+  .tlp-navrow{display:flex;align-items:center;gap:8px;width:100%;order:10}
+  #view-timeline .tlstats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #view-timeline .tlstats .stat.rev{display:none}
+  #view-timeline .tlstats .stat{padding:10px 12px}
+  #view-timeline .tlstats .stat .sl{font-size:12px}
+  #view-timeline .tlstats .stat .sv{font-size:20px}
+  .tlp-bar{padding:10px 12px;gap:8px}
+  .tlp-bar .legend{gap:8px;font-size:11px}
+  #timeline .veh{width:64px;min-width:64px;padding:0 8px;font-size:14px;flex-direction:column;align-items:flex-start;justify-content:center;gap:0}
+  #timeline .tl-head .corner{width:64px;min-width:64px}
+  #timeline .bar{font-size:11px;padding:0 7px;gap:5px}
+  #timeline .bar .ret{display:none}
+  #view-timeline .tl-wrap{max-height:calc(100vh - 330px)}
+}
+@media (min-width:1000px){ .tlp-navrow{display:contents} }
+</style>
 </head>
 <body>
 <header>
@@ -1943,7 +2038,7 @@ function isSpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.sp);}
 function isDumpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.dump);}
 const XE_THAT = VEHICLES.filter(v=>!v.dump);   // chỉ xe thật — dùng cho mọi phép đếm số xe
 const FLEET_CAPACITY = 15; // (không còn dùng để tính công suất — xem FLEET_MOC / capacityOn)
-const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
+let DAYW = 212;           // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
   'iRest':'#43A047',
   'Meta':'#A4C2F4','Walk in':'#FFE599','Zalo':'#FFE599'
@@ -2086,7 +2181,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-giaodien';
+const BAN_APP = '2026-10-24-sodoxe';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7425,6 +7520,140 @@ document.addEventListener('pointercancel', ltDragEnd);
     sec.querySelectorAll('.trip-h, .addr-box > label').forEach(el => { el.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = n.textContent.replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]/gu, '').trim(); }); });
     sec.querySelectorAll('.muted').forEach(el => { if (/^💡/.test(el.textContent.trim())) el.classList.add('gb-hint'); });
   }
+})();
+</script>
+<script>
+/* ===== SƠ ĐỒ XE — BỐ CỤC MỚI: tiêu đề trang, điều hướng theo tuần, tìm kiếm, thanh màu nhạt ===== */
+(function(){
+  const view = document.getElementById('view-timeline'); if (!view) return;
+  const LOGO = (document.querySelector('.nav-logo img') || {}).src || '';
+  const SVG = p => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+  const THU = ['Chủ nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+  const dlabel = s => { const d = new Date(s + 'T12:00:00'); return THU[d.getDay()] + ', ' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear(); };
+  const addD = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+  const cards = view.querySelectorAll(':scope > .card');
+  if (cards[0]) cards[0].classList.add('tlp-statcard'); if (cards[1]) cards[1].classList.add('tlp-tlcard');
+  // 1) tiêu đề trang
+  const head = document.createElement('div'); head.className = 'tlp-head';
+  head.innerHTML = '<div class="tlp-title">' + (LOGO ? '<img src="' + LOGO + '" alt="Logo GOODBIKE">' : '') + '<div style="min-width:0"><h1>Sơ đồ xe</h1><div class="d" id="tlpDate"></div></div></div>'
+    + '<span class="tlp-sync syncdot" id="tlpSync"></span>'
+    + '<button class="tlp-ic ghost" id="tlpSearchBtn" aria-label="Tìm kiếm" style="background:#fff;border:1px solid #E4E7EC">' + SVG('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>') + '</button>'
+    + '<div class="tlp-navrow"><div class="tlp-nav" role="group" aria-label="Chọn tuần"><button data-tlp="prev" aria-label="Tuần trước">' + SVG('<path d="M15 18l-6-6 6-6"/>') + '</button><button class="mid" data-tlp="today">Hôm nay</button><button data-tlp="next" aria-label="Tuần sau">' + SVG('<path d="M9 18l6-6-6-6"/>') + '</button></div></div>'
+    + '<label class="tlp-search" id="tlpSearch">' + SVG('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>').replace('stroke="currentColor"', 'stroke="#5B6472"') + '<input type="search" id="tlpQ" placeholder="Tìm khách, SĐT, biển xe" aria-label="Tìm booking"></label>'
+    + '<button class="tlp-add" id="tlpAdd" aria-label="Thêm booking">' + SVG('<path d="M12 5v14M5 12h14"/>').replace('stroke-width="2"', 'stroke-width="2.4"') + '<span class="t">Thêm booking</span></button>';
+  view.insertBefore(head, view.firstChild);
+  // 2) thanh trên sơ đồ: khoảng ngày + chú thích
+  const tlCard = cards[1];
+  if (tlCard) {
+    const bar = document.createElement('div'); bar.className = 'tlp-bar';
+    bar.innerHTML = '<div class="tlp-range" id="tlpRange"></div>';
+    const lg = document.getElementById('legend'); if (lg) bar.appendChild(lg);
+    tlCard.insertBefore(bar, tlCard.firstChild);
+  }
+  document.getElementById('tlpAdd').onclick = () => { const b = document.getElementById('addBk'); if (b) b.click(); };
+  document.getElementById('tlpSearchBtn').onclick = () => { const s = document.getElementById('tlpSearch'); s.classList.toggle('open'); if (s.classList.contains('open')) document.getElementById('tlpQ').focus(); };
+  // 3) trạng thái đồng bộ: cột trái (máy tính) + cạnh tiêu đề (điện thoại)
+  const tabs = document.getElementById('tabs');
+  if (tabs && !document.getElementById('gbSideSync')) tabs.insertAdjacentHTML('beforeend', '<div class="gb-side-sync" id="gbSideSync"><i></i><span></span></div>');
+  const sd = document.getElementById('syncDot');
+  const mirror = () => {
+    if (!sd) return; const t = sd.textContent.replace(/^[\s\u{1F100}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '');
+    const side = document.getElementById('gbSideSync'), cls = /bad|err|off/.test(sd.className) ? 'bad' : (/wait/.test(sd.className) ? 'wait' : '');
+    if (side) { side.className = 'gb-side-sync ' + cls; side.querySelector('span').textContent = t; }
+    const ms = document.getElementById('tlpSync'); if (ms) { ms.className = 'tlp-sync ' + sd.className; ms.textContent = sd.textContent; }
+  };
+  if (sd) { new MutationObserver(mirror).observe(sd, { childList: true, characterData: true, subtree: true, attributes: true }); mirror(); }
+  // 4) ẩn thanh đầu khi đang ở Sơ đồ xe
+  const setTl = () => document.body.classList.toggle('gb-tl', view.style.display !== 'none');
+  new MutationObserver(setTl).observe(view, { attributes: true, attributeFilter: ['style'] }); setTl();
+
+  // ---- độ rộng ô ngày: vừa 7 ngày (máy tính) / 4 ngày (điện thoại) ----
+  const wrap = view.querySelector('.tl-wrap');
+  function fitDayW(){
+    const w = wrap ? wrap.clientWidth : 0; if (!w) return;
+    const mob = window.innerWidth < 1000, vehW = mob ? 64 : 120, n = mob ? 4 : 7;
+    const dw = Math.max(mob ? 64 : 110, Math.floor((w - vehW) / n));
+    if (dw !== DAYW) { DAYW = dw; document.documentElement.style.setProperty('--dayw', dw + 'px'); }
+  }
+  let startDs = null;   // ngày đầu của tuần đang xem
+  function winDays(){ const w = tlWindow(), arr = []; Object.keys(w.map).forEach(ds => { arr[w.map[ds]] = ds; }); return arr; }
+  function showFrom(ds, smooth){
+    const w = tlWindow();
+    if (w.map[ds] == null || w.map[addD(ds, 6)] == null) { curMonth = ds.slice(0, 7); const mp = document.getElementById('monthPick'); if (mp) mp.value = curMonth; renderAll(); }
+    const w2 = tlWindow(); startDs = ds;
+    if (wrap && w2.map[ds] != null) wrap.scrollTo({ left: w2.map[ds] * DAYW, behavior: smooth ? 'smooth' : 'auto' });
+    updRange();
+  }
+  function updRange(){
+    const el = document.getElementById('tlpRange'); if (!el || !wrap) return;
+    const days = winDays(), i = Math.round(wrap.scrollLeft / DAYW), n = window.innerWidth < 1000 ? 4 : 7;
+    const a = days[Math.max(0, i)], b = days[Math.min(days.length - 1, i + n - 1)]; if (!a || !b) return;
+    const f = s => s.slice(8, 10) + '/' + s.slice(5, 7);
+    el.textContent = (a.slice(5, 7) === b.slice(5, 7) ? a.slice(8, 10) : f(a)) + ' – ' + f(b) + '/' + b.slice(0, 4);
+    startDs = a;
+  }
+  if (wrap) wrap.addEventListener('scroll', () => { clearTimeout(wrap._t); wrap._t = setTimeout(updRange, 80); }, { passive: true });
+  head.addEventListener('click', e => {
+    const b = e.target.closest('[data-tlp]'); if (!b) return;
+    const step = window.innerWidth < 1000 ? 4 : 7, base = startDs || addD(todayStr(), -1);
+    if (b.dataset.tlp === 'today') showFrom(addD(todayStr(), -1), true);
+    else showFrom(addD(base, b.dataset.tlp === 'prev' ? -step : step), true);
+  });
+  // ---- tìm kiếm ----
+  function applySearch(){
+    const q = (document.getElementById('tlpQ').value || '').trim().toLowerCase().replace(/\s+/g, '');
+    const tl = document.getElementById('timeline'); if (!tl) return;
+    tl.querySelectorAll('.tl-row').forEach(r => {
+      if (!q) { r.classList.remove('tlp-miss'); r.querySelectorAll('.bar').forEach(x => x.classList.remove('tlp-dim')); return; }
+      const xeHit = String(r.dataset.xe || '').toLowerCase().replace(/\s+/g, '').includes(q);
+      let any = false;
+      r.querySelectorAll('.bar').forEach(x => {
+        const bk = DB.bookings.find(z => z.id === x.dataset.id);
+        const hay = bk ? ((bk.guest || '') + ' ' + (bk.src || '') + ' ' + bk.xe).toLowerCase().replace(/\s+/g, '') : '';
+        const hit = xeHit || hay.includes(q); x.classList.toggle('tlp-dim', !hit); if (hit) any = true;
+      });
+      r.classList.toggle('tlp-miss', !(xeHit || any));
+    });
+  }
+  document.getElementById('tlpQ').addEventListener('input', applySearch);
+  // ---- sau mỗi lần vẽ sơ đồ ----
+  const ST = ['sapnhan', 'danhan', 'datra', 'quahan'];
+  const SOFT = { sapnhan: ['#DCE6FB', '#9DB4EE'], danhan: ['#DDF1E4', '#94CDA9'], datra: ['#F2F4F7', '#D0D5DD'], quahan: ['#FCE3E3', '#EBA3A3'] };
+  const strip = s => s.replace(/^[\s\u{1F100}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '');
+  function post(){
+    const tl = document.getElementById('timeline'); if (!tl) return;
+    const T = todayStr();
+    document.getElementById('tlpDate').textContent = dlabel(T);
+    tl.querySelectorAll('.bar').forEach(x => {
+      const bk = DB.bookings.find(z => z.id === x.dataset.id); if (!bk) return;
+      const st = computeStatus(bk); ST.forEach(k => x.classList.remove('st-' + k)); x.classList.add('st-' + st);
+      const nm = x.querySelector('.nm'); if (nm) nm.textContent = String(bk.guest || bk.src || '').split(' - ')[0];
+    });
+    tl.querySelectorAll('.day.today').forEach(d => { const dw = d.querySelector('.dow'); if (dw) dw.textContent = 'Hôm nay'; });
+    tl.querySelectorAll('.gridcell[data-ds="' + T + '"]').forEach(c => c.classList.add('tlp-today'));
+    tl.querySelectorAll('.tl-head .corner').forEach(c => { c.textContent = 'Xe'; });
+    document.querySelectorAll('#tlStats .sl').forEach(s => { s.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = strip(n.textContent).replace(' ›', ''); }); });
+    const map = { 'Đang thuê': 'Đang cho thuê', 'Đang trống': 'Xe trống' };
+    document.querySelectorAll('#tlStats .sl').forEach(s => { const t = s.textContent.trim(); if (map[t]) s.textContent = map[t]; if (/^Doanh thu/.test(t)) s.textContent = 'Doanh thu hôm nay'; });
+    const lg = document.getElementById('legend');
+    if (lg) lg.querySelectorAll('span').forEach(sp => {
+      const lab = sp.textContent.trim(), k = Object.keys(STATUS).find(z => STATUS[z].label === lab), sw = sp.querySelector('.sw');
+      if (k && sw && SOFT[k]) { sw.style.background = SOFT[k][0]; sw.style.border = '1px solid ' + SOFT[k][1]; }
+      if (lab === 'Quá hạn trả') sp.lastChild.textContent = 'Quá hạn';
+      if (/sọc/.test(lab)) sp.lastChild.textContent = 'Còn nợ tiền';
+    });
+    applySearch();
+  }
+  const orig = renderTimeline;
+  renderTimeline = function(){
+    fitDayW();
+    const keep = startDs;
+    orig.apply(this, arguments);
+    post();
+    if (wrap) { const w = tlWindow(), d = keep || addD(todayStr(), -1); if (w.map[d] != null) wrap.scrollLeft = w.map[d] * DAYW; updRange(); }
+  };
+  window.addEventListener('resize', () => { clearTimeout(window._tlpR); window._tlpR = setTimeout(() => { try { renderTimeline(); } catch (e) {} }, 200); });
+  try { renderTimeline(); } catch (e) {}
 })();
 </script>
 </body>
