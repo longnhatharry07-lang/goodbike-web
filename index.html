@@ -1198,6 +1198,26 @@ body.gb-tl header{display:none}
 }
 @media (min-width:1000px){ .tlp-navrow{display:contents} }
 </style>
+<style>
+/* ===== Điện thoại: thanh dưới chỉ 3 mục + Khác ===== */
+.tab .lbl-short{display:none}
+body.gb-shell #tabs .tab.gb-more{display:none}
+@media (max-width:999px){
+  body.gb-shell #tabs{overflow-x:visible;justify-content:space-around}
+  body.gb-shell #tabs .tab:not([data-t="timeline"]):not([data-t="lichtrinh"]):not([data-t="thuchi"]):not(.gb-more){display:none!important}
+  body.gb-shell #tabs .tab{flex:1 1 0;min-width:0}
+  body.gb-shell #tabs .tab.gb-more{display:flex}
+  .tab .lbl-short{display:inline}
+  .tab .lbl-full{display:none}
+}
+.gb-moresheet{position:fixed;inset:0;z-index:60;background:rgba(16,24,40,.45);display:flex;align-items:flex-end;justify-content:center}
+.gb-moresheet .box{background:#fff;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:2px}
+.gb-moresheet .grab{width:40px;height:4px;border-radius:2px;background:#D0D5DD;margin:4px auto 10px}
+.gb-moresheet button{display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border:0;border-radius:12px;background:transparent;font-size:16px;font-weight:600;color:#101828;text-align:left;width:100%;cursor:pointer}
+.gb-moresheet button:hover,.gb-moresheet button.on{background:#F2F4F7}
+.gb-moresheet button.on{font-weight:800}
+.gb-moresheet .tic svg{width:20px;height:20px}
+</style>
 </head>
 <body>
 <header>
@@ -2181,7 +2201,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-sodoxe';
+const BAN_APP = '2026-10-24-thanhduoi';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7654,6 +7674,37 @@ document.addEventListener('pointercancel', ltDragEnd);
   };
   window.addEventListener('resize', () => { clearTimeout(window._tlpR); window._tlpR = setTimeout(() => { try { renderTimeline(); } catch (e) {} }, 200); });
   try { renderTimeline(); } catch (e) {}
+})();
+</script>
+<script>
+/* ===== Điện thoại: thanh dưới chỉ Xe · Lịch trình · Thu tiền · Khác ===== */
+(function(){
+  const tabs = document.getElementById('tabs'); if (!tabs || document.querySelector('.gb-more')) return;
+  const MAIN = ['timeline', 'lichtrinh', 'thuchi'];
+  // nhãn ngắn "Xe" cho Sơ đồ xe
+  const tl = tabs.querySelector('.tab[data-t="timeline"]');
+  if (tl) { [...tl.childNodes].forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) { const s = document.createElement('span'); s.className = 'lbl-full'; s.textContent = n.textContent.trim(); tl.replaceChild(s, n); } }); tl.insertAdjacentHTML('beforeend', '<span class="lbl-short">Xe</span>'); }
+  const more = document.createElement('button');
+  more.type = 'button'; more.className = 'tab gb-more'; more.setAttribute('aria-label', 'Các mục khác');
+  more.innerHTML = '<span class="tic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>Khác';
+  const side = document.getElementById('gbSideSync');
+  tabs.insertBefore(more, side || null);
+  const others = () => [...tabs.querySelectorAll('.tab')].filter(t => t !== more && !MAIN.includes(t.dataset.t) && t.style.display !== 'none');
+  const sync = () => { const a = tabs.querySelector('.tab.active'); more.classList.toggle('active', !!a && a !== more && !MAIN.includes(a.dataset.t) && a.id !== 'accToggle' ? true : false); };
+  function close(){ const s = document.getElementById('gbMoreSheet'); if (s) s.remove(); }
+  more.addEventListener('click', e => {
+    e.stopPropagation(); close();
+    const d = document.createElement('div'); d.className = 'gb-moresheet'; d.id = 'gbMoreSheet';
+    const list = others().map((t, i) => '<button data-i="' + i + '" class="' + (t.classList.contains('active') ? 'on' : '') + '">' + (t.querySelector('.tic') ? t.querySelector('.tic').outerHTML : '') + '<span>' + t.textContent.trim() + '</span></button>').join('');
+    d.innerHTML = '<div class="box" role="dialog" aria-modal="true" aria-label="Các mục khác"><div class="grab"></div>' + list + '</div>';
+    const arr = others();
+    d.addEventListener('click', ev => { const b = ev.target.closest('button[data-i]'); if (ev.target === d) { close(); return; } if (!b) return; close(); arr[+b.dataset.i].click(); setTimeout(sync, 50); window.scrollTo({ top: 0 }); });
+    document.body.appendChild(d);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  tabs.addEventListener('click', () => setTimeout(sync, 50));
+  new MutationObserver(sync).observe(tabs, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  sync();
 })();
 </script>
 </body>
