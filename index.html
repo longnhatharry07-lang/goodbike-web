@@ -127,6 +127,10 @@
   .veh.vehclick.sp:hover{background:#e9d5ff}
   .veh.sp .typ{color:#9333ea}
   .veh.sp .vehinfo-ic{color:#9333ea}
+  .veh.dump{background:#e5e7eb;color:#4b5563;border-right-color:#6b7280;font-style:normal}
+  .veh.dump .typ{color:#6b7280}
+  .tl-row.dump-row{background:repeating-linear-gradient(135deg,#f3f4f6 0 8px,#fafafa 8px 16px)}
+  .tl-row.dump-first{border-top:3px solid #6b7280}
   option.sp{color:#7c3aed;font-weight:700}
   .lane{position:relative;flex:1;height:100%}
   .gridcell{position:absolute;top:0;height:100%;width:var(--dayw);border-right:1px dashed #eef2f7;cursor:pointer}
@@ -1760,16 +1764,21 @@
 const VEHICLES = [
   {id:'A1',typ:'Vision'},{id:'A2',typ:'Vision'},{id:'A3',typ:'Vision'},
   {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'A7',typ:'Vision'},{id:'A8',typ:'Vision'},{id:'A9',typ:'Vision'},
-  {id:'A10',typ:'Vision'},{id:'A11',typ:'Vision'},{id:'A12',typ:'Vision'},
+  {id:'A10',typ:'Vision'},{id:'A11',typ:'Vision'},{id:'A12',typ:'Vision'},{id:'A15',typ:'Vision'},
   {id:'OVER1',typ:'Xe số',over:true},{id:'OVER2',typ:'Xe số',over:true},
   {id:'L1',typ:'NVX/Lead'},{id:'L2',typ:'NVX/Lead'},{id:'L3',typ:'NVX/Lead'},
   {id:'B1',typ:'NVX/Lead'},
   {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},{id:'G5',typ:'Xe số'},
   {id:'E1',typ:'Xe điện'},{id:'E2',typ:'Xe điện'},{id:'E3',typ:'Xe điện'},
   // sp:true = xe dòng đặc biệt -> tô tím ở mọi nơi hiện tên xe (sơ đồ, bảng doanh thu, xe trống, ô chọn xe)
-  {id:'K1',typ:'Xe điện',sp:true},{id:'K2',typ:'Xe điện',sp:true}
+  {id:'K1',typ:'Xe điện',sp:true},{id:'K2',typ:'Xe điện',sp:true},
+  // dump:true = dòng DUMP (không phải xe thật): chỉ để tạm chứa booking khi luân chuyển xe.
+  // KHÔNG tính vào số lượng xe, xe trống, công suất; KHÔNG bán trên web (không có trong WEB_GROUPS).
+  {id:'DUMP1',typ:'Dump',dump:true},{id:'DUMP2',typ:'Dump',dump:true},{id:'DUMP3',typ:'Dump',dump:true}
 ];
 function isSpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.sp);}
+function isDumpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.dump);}
+const XE_THAT = VEHICLES.filter(v=>!v.dump);   // chỉ xe thật — dùng cho mọi phép đếm số xe
 const FLEET_CAPACITY = 15; // (không còn dùng để tính công suất — xem FLEET_MOC / capacityOn)
 const DAYW = 212;          // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
@@ -1914,7 +1923,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-23-hoantac';
+const BAN_APP = '2026-10-23-a15dump';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2555,7 +2564,8 @@ function renderTimeline(){
   // rows
   let rows='';
   VEHICLES.forEach(v=>{
-    rows+=`<div class="tl-row" data-xe="${v.id}"><div class="veh vehclick${v.sp?' sp':''}" data-veh="${v.id}" title="Bấm để xem/sửa thông tin xe ${v.id}">${v.id}<span class="typ">${vehTyp(v.id)}</span><span class="vehinfo-ic">ⓘ</span></div><div class="lane">`;
+    const _dFirst = v.dump && v===VEHICLES.find(x=>x.dump);
+    rows+=`<div class="tl-row${v.dump?' dump-row':''}${_dFirst?' dump-first':''}" data-xe="${v.id}"><div class="veh vehclick${v.sp?' sp':''}${v.dump?' dump':''}" data-veh="${v.id}" title="${v.dump?'Dòng DUMP — chỉ để tạm chứa booking khi luân chuyển xe (không tính số xe, không bán trên web)':'Bấm để xem/sửa thông tin xe '+v.id}">${v.id}<span class="typ">${vehTyp(v.id)}</span><span class="vehinfo-ic">ⓘ</span></div><div class="lane">`;
     win.monthMeta.forEach(m=>{
       for(let i=1;i<=m.days;i++){const idx=m.startIdx+i-1;const ds=`${m.ym}-${String(i).padStart(2,'0')}`;const msep=i===1&&m.startIdx>0;
         rows+=`<div class="gridcell${msep?' msep':''}" style="left:${idx*DAYW}px" data-xe="${v.id}" data-ds="${ds}"></div>`;}
@@ -2592,6 +2602,7 @@ function renderTimeline(){
 function rentedSet(T){
   const s=new Set();
   DB.bookings.forEach(b=>{
+    if(isDumpXe(b.xe)) return;                                                 // booking đang nằm ở DUMP → không phải xe thật
     if(!nightsOf(b).includes(T)) return;                                       // không có doanh thu hôm nay → bỏ
     if(b.depart>T || (b.depart===T && (b.rtime||'12:00')>='18:00')) s.add(b.xe); // trả sau 18h / còn thuê tiếp
   });
@@ -2604,7 +2615,7 @@ function renderTlStats(){
   let rev=0;
   DB.bookings.forEach(b=>{ if(nightsOf(b).includes(T)) rev+=priceOn(b,T); });   // doanh thu hôm nay theo DAY_PRICE
   const rented=rentedSet(T);
-  const tot=VEHICLES.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
+  const tot=XE_THAT.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
   el.innerHTML=`
     <div class="stat"><span class="sv">${thue}<small>/${tot}</small></span><span class="sl">🛵 Đang thuê</span></div>
     <div class="stat freebtn" id="statFree" title="Bấm để xem chi tiết xe trống & giờ có thể thuê"><span class="sv">${trong}</span><span class="sl">🅿️ Đang trống ›</span></div>
@@ -2643,10 +2654,10 @@ function showModal(title,body){
 }
 function openFreeBikes(){
   const T=todayStr();
-  const rows=VEHICLES.map(v=>({v,a:bikeAvailability(v.id,T)})).filter(x=>x.a.state!=='busy');
+  const rows=XE_THAT.map(v=>({v,a:bikeAvailability(v.id,T)})).filter(x=>x.a.state!=='busy');
   rows.sort((a,b)=>(a.a.state==='ready'?0:1)-(b.a.state==='ready'?0:1) || ((a.a.time||'')<(b.a.time||'')?-1:1));
   // PHÂN LOẠI theo loại xe (Vision / Xe số / NVX-Lead / Xe điện…), thứ tự nhóm theo thứ tự trong VEHICLES
-  const typOrder=[...new Set(VEHICLES.map(v=>vehTyp(v.id)))];
+  const typOrder=[...new Set(XE_THAT.map(v=>vehTyp(v.id)))];
   const groups={}; rows.forEach(x=>{const t=vehTyp(x.v.id)||'Khác';(groups[t]=groups[t]||[]).push(x);});
   const gKeys=Object.keys(groups).sort((a,b)=>{const ia=typOrder.indexOf(a),ib=typOrder.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
   const rowHtml=x=>`<div class="fb-row"><span class="fb-xe${x.v.sp?' sp':''}">${x.v.id}</span>${x.a.state==='ready'?'<span class="fb-rdy">Sẵn sàng</span>':`<span class="fb-time">Trống từ ${x.a.time}</span>`}</div>`;
@@ -2822,7 +2833,8 @@ const FLEET_MOC = [
   {tu:'2026-10-02', so:24},   // 2/10/2026: thêm A10 (Vision) -> mẫu số 24
   {tu:'2026-10-05', so:26},   // 5/10/2026: thêm K1, K2 (xe điện dòng đặc biệt) -> mẫu số 26
   {tu:'2026-10-07', so:27},   // 7/10/2026: thêm A11 (Vision) -> mẫu số 27
-  {tu:'2026-10-09', so:28}    // 9/10/2026: thêm A12 (Vision) -> mẫu số 28
+  {tu:'2026-10-09', so:28},   // 9/10/2026: thêm A12 (Vision) -> mẫu số 28
+  {tu:'2026-10-23', so:29}    // 23/10/2026: thêm A15 (Vision thể thao) -> mẫu số 29 (dòng DUMP không tính)
 ];
 function capacityOn(ds){
   let so=FLEET_MOC[0].so;
@@ -2838,13 +2850,14 @@ function renderRevenue(){
   let body='';let colTot={};let grand=0;
   const rowsTop=[];
   VEHICLES.forEach(v=>{
+    if(v.dump && !Object.keys(top[v.id]).length) return;   // DUMP chỉ hiện khi tháng này có booking nằm trên đó
     const ri=rowsTop.length; rowsTop.push({key:v.id,label:`${v.id} · ${v.typ}`,kind:'money'});
     let rowTot=0;let tds='';
     for(let i=1;i<=ndays;i++){const c=top[v.id][i];const val=c?c.amt:0;rowTot+=val;colTot[i]=(colTot[i]||0)+val;
       const tiny = (c&&debtGroupOf(c.src)) ? `<small style="display:block;font-size:8px;line-height:1.05;opacity:.9;font-weight:600">${c.src}</small>` : '';
       tds+=`<td class="selcell" data-tb="top" data-row="${ri}" data-r="${v.id}" data-i="${i}"${c?` data-v="${val}"`:''} ${c?cellStyle(sourceColor(c.src)):''}>${val?fmtVND(val)+'đ':''}${tiny}</td>`;}
     grand+=rowTot;
-    body+=`<tr><td class="l${v.sp?' sp':''}"><b>${v.id}</b> <span class="muted">${v.typ}</span></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
+    body+=`<tr><td class="l${v.sp?' sp':''}"${v.dump?' style="background:#e5e7eb"':''}><b>${v.id}</b> <span class="muted">${v.typ}</span></td>${tds}<td><b>${rowTot?fmtVND(rowTot):''}</b></td></tr>`;
   });
   let chiTds='';let chiTot=0;
   const riChi=rowsTop.length; rowsTop.push({key:'Chi',label:'Chi',kind:'money'});
@@ -2855,7 +2868,7 @@ function renderRevenue(){
   body+=`<tr class="total"><td class="l">Tổng Doanh Thu</td>${ttds}<td>${fmtVND(grand)}đ</td></tr>`;
   const riCap=rowsTop.length; rowsTop.push({key:'Công suất',label:'Công suất',kind:'pct'});
   let ctds='';
-  for(let i=1;i<=ndays;i++){let cnt=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);
+  for(let i=1;i<=ndays;i++){let cnt=XE_THAT.reduce((a,v)=>a+(top[v.id][i]?1:0),0);
     const cap=capacityOn(`${curMonth}-${String(i).padStart(2,'0')}`);
     const pct=cap?cnt/cap*100:0;ctds+=`<td class="selcell" data-tb="top" data-row="${riCap}" data-r="cap" data-i="${i}" data-v="${pct}">${pct?pct.toFixed(0)+'%':'0%'}</td>`;}
   body+=`<tr class="total"><td class="l">Công suất</td>${ctds}<td></td></tr>`;
@@ -2864,6 +2877,7 @@ function renderRevenue(){
   /* ---------- BẢNG DƯỚI (đã thanh toán) ---------- */
   let body2='';let colTot2={};let owedCol={};let grand2=0;let grandOwed=0;
   VEHICLES.forEach(v=>{
+    if(v.dump && !Object.keys(top[v.id]).length && !Object.keys(bottom[v.id]).length) return;
     let rowTot=0;let tds='';
     for(let i=1;i<=ndays;i++){
       const c=bottom[v.id][i], t=top[v.id][i];
@@ -2893,12 +2907,12 @@ function renderRevenue(){
     `<span><i class="sw" style="background:${debtColor('receivable')}"></i>Công nợ phải thu</span>`+
     `<span><i class="sw" style="background:#fff;border:1px solid var(--line)"></i>Tiền mặt</span>`;
   /* ---------- KPIs ---------- */
-  const activeBikes=VEHICLES.filter(v=>Object.keys(top[v.id]).length).length;
-  const rentedDays=VEHICLES.reduce((a,v)=>a+Object.keys(top[v.id]).length,0);
+  const activeBikes=XE_THAT.filter(v=>Object.keys(top[v.id]).length).length;
+  const rentedDays=XE_THAT.reduce((a,v)=>a+Object.keys(top[v.id]).length,0);
   // Công suất TB CHỈ tính đến HÔM NAY (bỏ qua các ngày tương lai chưa diễn ra). Mẫu số theo tháng: 16 đến hết tháng này, 18 từ tháng sau.
   let capDays=0,rentedDaysTD=0;
   for(let i=1;i<=ndays;i++){const ds=`${curMonth}-${String(i).padStart(2,'0')}`; if(ds>todayStr())continue;
-    capDays+=capacityOn(ds); rentedDaysTD+=VEHICLES.reduce((a,v)=>a+(top[v.id][i]?1:0),0);}
+    capDays+=capacityOn(ds); rentedDaysTD+=XE_THAT.reduce((a,v)=>a+(top[v.id][i]?1:0),0);}
   const occ=(capDays?rentedDaysTD/capDays*100:0);
   document.getElementById('revKpis').innerHTML=`
     ${kpi('Tổng doanh thu',fmtVND(grand)+'đ')}
@@ -3964,8 +3978,8 @@ function renderXeOptions(selXe){
     const busy = valid ? xeBusy(v.id,a,d,editingBk,dt,rt) : false;
     const keepOwn = (editingBk && v.id===selXe);   // khi sửa: luôn giữ xe gốc của booking
     if(busy && !keepOwn) return;
-    if(!busy) avail++;
-    opts+=`<option value="${v.id}" class="${v.sp?'sp':''}">${v.id} (${v.typ})${busy?' — đang bận':''}</option>`;
+    if(!busy && !v.dump) avail++;
+    opts+=`<option value="${v.id}" class="${v.sp?'sp':''}">${v.id} (${v.dump?'Dump — chỉ để luân chuyển':v.typ})${busy?' — đang bận':''}</option>`;
   });
   sel.innerHTML=opts;
   if(selXe && [...sel.options].some(o=>o.value===selXe)) sel.value=selXe;
@@ -3974,7 +3988,7 @@ function renderXeOptions(selXe){
   if(note){
     if(!valid){ note.className='xe-note warn'; note.textContent='Hãy nhập ngày nhận & ngày trả trước để xem xe còn trống.'; }
     else if(avail===0){ note.className='xe-note warn'; note.textContent='⚠️ Không còn xe trống cho '+fmtDMY(a)+' → '+fmtDMY(d)+'. Hãy đổi ngày thuê.'; }
-    else { note.className='xe-note'; note.textContent='✅ Còn '+avail+'/'+VEHICLES.length+' xe trống cho '+fmtDMY(a)+' → '+fmtDMY(d)+'.'; }
+    else { note.className='xe-note'; note.textContent='✅ Còn '+avail+'/'+XE_THAT.length+' xe trống cho '+fmtDMY(a)+' → '+fmtDMY(d)+'.'; }
   }
 }
 function renderStatusBadge(){
@@ -4176,7 +4190,7 @@ function openSwap(id){
   const T=todayStr();
   const free=VEHICLES.filter(v=>v.id!==b.xe && !xeBusy(v.id,T,b.depart,null,nowHHMM(),b.rtime||'12:00'));
   const list=free.length?free:VEHICLES.filter(v=>v.id!==b.xe);
-  document.getElementById('swapNewXe').innerHTML=list.map(v=>`<option value="${v.id}" class="${v.sp?'sp':''}">${v.id} (${v.typ})</option>`).join('');
+  document.getElementById('swapNewXe').innerHTML=list.map(v=>`<option value="${v.id}" class="${v.sp?'sp':''}">${v.id} (${v.dump?'Dump':v.typ})</option>`).join('');
   document.getElementById('swapInfo').innerHTML=`Khách đang thuê <b>${b.xe}</b> (${fmtDMY(b.arrive)} ${b.dtime||''} → ${fmtDMY(b.depart)} ${b.rtime||''}). Chọn xe mới + phương án, chỉnh 2 bên rồi bấm Hoàn tất.`;
   document.querySelectorAll('input[name="swapOpt"]').forEach(r=>r.checked=(r.value==='1'));
   const built=buildSwapDefaults(b,'1',document.getElementById('swapNewXe').value); swapOld=built.old; swapNew=built.neo;
@@ -5843,7 +5857,7 @@ document.getElementById('ctPdf').onclick=ctExportPdf;
 
 const WEB_GROUPS=[
   {id:'8fa69085-6e0c-41bb-9a14-6300e17b9be6', ten:'Honda Vision 110 (bản phổ thông)',    xe:['A1','A2','A4','A6']},
-  {id:'801d1cf0-2369-46eb-9d8d-dd5b7e284135', ten:'Honda Vision 110 Thể thao/Đặc biệt',  xe:['A3','A5','A7','A8','A9','A10','A11','A12']},
+  {id:'801d1cf0-2369-46eb-9d8d-dd5b7e284135', ten:'Honda Vision 110 Thể thao/Đặc biệt',  xe:['A3','A5','A7','A8','A9','A10','A11','A12','A15']},
   {id:'4ec5d5a0-a15b-40f5-ad4d-9fc6d3bdaa5f', ten:'Vinfast Evo200',                      xe:['E1','E2','E3','K2']},
   {id:'7f69e2d5-95a5-4307-ac74-58cd922d120d', ten:'Vinfast Klara S',                     xe:['K1']},
   {id:'6d511695-8d4e-473c-a724-c4f8422fd8a6', ten:'Wave 50cc',                           xe:['OVER2']},
