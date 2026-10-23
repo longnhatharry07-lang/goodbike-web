@@ -923,6 +923,18 @@
 .lt-x{width:26px;height:26px;border-radius:8px;border:0;background:transparent;color:var(--lt-muted);font-size:13px;cursor:pointer;flex-shrink:0;margin-left:auto;display:flex;align-items:center;justify-content:center;padding:0}
 .lt-x:hover,.lt-x:focus-visible{background:var(--lt-red-bg);color:var(--lt-red)}
 .kh-grp .lt-x{margin-left:0}
+.kh-hidbar{display:flex;align-items:center;gap:10px;background:#fff;border:1px dashed #D0D5DD;border-radius:12px;padding:8px 8px 8px 14px;font-size:14px;font-weight:600;color:var(--lt-text2);margin-bottom:10px}
+.lt-pc.lt-hid{opacity:.6;border-style:dashed;background:repeating-linear-gradient(135deg,#fff 0 8px,#F7F7F8 8px 16px)}
+.lt-shopact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px}
+.lt-shopact .lt-btn{height:36px;font-size:13px;padding:0 8px;background:#fff}
+.lt-shopact .lt-btn:first-child{background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)}
+.lt-skipdock{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:min(360px,calc(100vw - 24px))}
+.lt-skipbtn{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--lt-shop-line);background:var(--lt-shop-bg);color:var(--lt-shop);font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,24,40,.16);cursor:pointer}
+.lt-skippanel{background:#fff;border:1px solid var(--lt-line);border-radius:14px;box-shadow:0 12px 32px rgba(16,24,40,.2);padding:6px;width:100%;max-height:60vh;overflow:auto}
+.lt-skiprow{padding:10px;display:flex;flex-direction:column;gap:8px}
+.lt-skiprow+.lt-skiprow{border-top:1px solid var(--lt-line2)}
+.lt-skipact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.lt-skipact .lt-btn{height:38px;font-size:13px}
 </style>
 </head>
 <body>
@@ -1902,7 +1914,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-22-xoadon';
+const BAN_APP = '2026-10-23-boqua';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6320,6 +6332,7 @@ try{ webSyncStart(); }catch(e){ console.warn('webSyncStart',e); }
    → tự đồng bộ qua dòng cfg:. Giờ trong kế hoạch KHÔNG sửa giờ của booking. */
 const LT_PREP = 45;
 let ltKhPending = false, ltNoteTimer = null;
+let ltShowHidden = false, ltShowSkip = false;
 let ltDate = null, khDate = null, runDate = null, ltCtx = 'run', ltShowAll = false, ltShowDone = false, ltMsg = '', ltEditId = null, ltInsAt = 0, ltInsKind = 'giao';
 const ltPad = n => (n < 10 ? '0' : '') + n;
 const ltFmt = m => ltPad(Math.floor(m / 60)) + ':' + ltPad(m % 60);
@@ -6342,7 +6355,7 @@ function ltP(){
   const k = 'lt_' + ltDate;
   if (!DB[k] || typeof DB[k] !== 'object') return { order: null, times: {}, done: {}, started: null, extra: [], parked: {}, groups: {} };
   const p = DB[k];
-  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {}; p.hidden = p.hidden || {}; p.groups = p.groups || {};
+  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {}; p.hidden = p.hidden || {}; p.skipped = p.skipped || {}; p.groups = p.groups || {};
   return p;
 }
 function ltPut(p){
@@ -6377,7 +6390,8 @@ function ltBuild(){
   P.extra.forEach(x => items.push(Object.assign({}, x)));
   P.hidden = P.hidden || {};
   const hiddenItems = items.filter(x => P.hidden[x.id]);
-  for (let i = items.length - 1; i >= 0; i--) if (P.hidden[items[i].id]) items.splice(i, 1);
+  hiddenItems.forEach(x => { x.hidden = true; });
+  if (!(ltCtx === 'kh' && ltShowHidden)) for (let i = items.length - 1; i >= 0; i--) if (P.hidden[items[i].id]) items.splice(i, 1);
   const byId = {}; items.forEach(x => { byId[x.id] = x; });
   // đơn gộp (cùng chỗ / cùng chuyến): 1 thẻ thay cho nhiều đơn
   const top = {}, groups = [];
@@ -6464,6 +6478,9 @@ function ltSyncParked(){
 const LT_TYPE = { giao: ['Giao xe', 'lt-k-giao'], thu: ['Thu hồi', 'lt-k-thu'], ps: ['Giao phát sinh', 'lt-k-ps'], grp: ['Gộp chuyến', 'lt-k-grp'] };
 const ltTag = (x, sm) => '<span class="lt-type ' + (sm ? 'sm ' : '') + LT_TYPE[x.kind][1] + '">' + (x.kind === 'grp' ? x.label : LT_TYPE[x.kind][0]) + '</span>';
 const LT_SHOP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 01-6 0 3 3 0 01-6 0 3 3 0 01-6 0z"/><path d="M5 13v7h14v-7"/><path d="M10 20v-4h4v4"/></svg>';
+const LT_EYEOFF = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A9.8 9.8 0 0112 5c5 0 9 4.5 10 7a13 13 0 01-3.2 4.3M6.2 6.2C4.1 7.6 2.6 9.7 2 12c1 2.5 5 7 10 7 1.6 0 3.1-.4 4.4-1.1"/></svg>';
+const LT_EYE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c1-2.5 5-7 10-7s9 4.5 10 7c-1 2.5-5 7-10 7S3 14.5 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const LT_PAUSE = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>';
 const LT_PARK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg>';
 const LT_HD = '<span class="lt-hd" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></svg></span>';
 
@@ -6516,7 +6533,7 @@ function ltGrpCard(g, i, warn){
   return '<div class="lt-r grp" data-idx="' + i + '"><div class="lt-pc kh-grp" style="' + (done ? 'opacity:.5' : '') + '">'
     + '<div class="l1"><span class="lt-spn grp">' + (i + 1) + '</span><span class="lt-type sm lt-k-grp">' + ltEsc(g.label) + '</span>'
     + (g.same ? '<b class="lt-ell" style="font-size:14px;min-width:0">' + ltEsc(g.addr) + '</b>' : '')
-    + '<button class="lt-mini" style="margin-left:auto" data-lt="split" data-v="' + g.id + '">Tách ra</button><button class="lt-x" data-lt="hide" data-v="' + g.id + '" title="Xoá cả nhóm khỏi kế hoạch" aria-label="Xoá nhóm khỏi kế hoạch">✕</button>' + LT_HD.replace('margin-left:auto', '') + '</div>'
+    + '<button class="lt-mini" style="margin-left:auto" data-lt="split" data-v="' + g.id + '">Tách ra</button><button class="lt-x" data-lt="hide" data-v="' + g.id + '" title="Ẩn cả nhóm" aria-label="Ẩn cả nhóm">' + LT_EYEOFF + '</button>' + LT_HD.replace('margin-left:auto', '') + '</div>'
     + '<div class="kh-gbody">' + mem + '</div>'
     + (warn ? '<div class="lt-warn">' + ltEsc(warn) + '</div>' : '')
     + '<label class="kh-note">Ghi chú<input data-ltnote="' + g.id + '" value="' + ltEsc(g.note) + '" placeholder="Ghi chú cho nhân viên" autocomplete="off"></label>'
@@ -6525,11 +6542,13 @@ function ltGrpCard(g, i, warn){
 function ltPlanDesk(all){
   const P = LT.P, ord = all.filter(id => !P.parked[id]), parked = all.filter(id => P.parked[id]);
   const w = ltWarn(ord), h = [];
-  if (!ord.length && !parked.length) return '<div class="kh-box" style="padding:40px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
+  const nHid = LT.hiddenItems.length;
+  const hidBar = nHid ? '<div class="kh-hidbar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A9.8 9.8 0 0112 5c5 0 9 4.5 10 7a13 13 0 01-3.2 4.3M6.2 6.2C4.1 7.6 2.6 9.7 2 12c1 2.5 5 7 10 7 1.6 0 3.1-.4 4.4-1.1"/></svg><span style="flex:1">' + nHid + ' đơn đang ẩn</span><button class="lt-btn" style="height:36px;font-size:13px" data-lt="togglehid">' + (ltShowHidden ? 'Tắt hiển thị đơn ẩn' : 'Hiện đơn ẩn') + '</button></div>' : '';
+  if (!ord.length && !parked.length) return hidBar + '<div class="kh-box" style="padding:40px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
     + '<div><button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="0">+ Thêm đơn</button></div>';
-  const xs = [].concat(...ord.map(id => { const x = ltById(id); return x.kind === 'grp' ? x.members : [x]; })), nT = xs.filter(x => x.kind === 'thu').length;
+  const xs = [].concat(...ord.map(id => { const x = ltById(id); return x.kind === 'grp' ? x.members : [x]; })).filter(x => !x.hidden), nT = xs.filter(x => x.kind === 'thu').length;
   const nShop = xs.filter(ltIsShop).length, nNoAddr = xs.filter(x => /chưa có địa chỉ/i.test(x.addr)).length, nMoved = xs.filter(ltMoved).length, nDone = ord.filter(id => ltDone(id) != null).length;
-  h.push('<div class="kh-grid"><div class="kh-main">');
+  h.push('<div class="kh-grid"><div class="kh-main">' + hidBar);
   h.push('<div class="lt-colhead"><div><i style="background:var(--lt-slate)"></i>THU HỒI · ' + nT + '</div><div></div><div><i style="background:var(--lt-blue)"></i>GIAO XE · ' + (xs.length - nT) + '</div></div>');
   const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '" title="Chèn đơn vào đây">+</button></div>';
   h.push('<div class="lt-plist" id="ltList">' + gap(0));
@@ -6537,15 +6556,15 @@ function ltPlanDesk(all){
     if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gap(i + 1)); return; }
     const x = ltById(id), done = ltDone(id) != null, shop = ltIsShop(x);
     const side = x.kind === 'thu' ? 'thu' : (x.kind === 'ps' ? 'ps' : 'giao');
-    const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + '" style="' + (done ? 'opacity:.5' : '') + '">'
+    const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + (x.hidden ? ' lt-hid' : '') + '" style="' + (done && !x.hidden ? 'opacity:.5' : '') + '">'
       + '<div class="l1"><button class="lt-tbtn" data-lt="time" data-v="' + id + '" title="Sửa giờ đi làm">' + ltFmt(ltT(x)) + '</button><b class="kh-xe">' + ltEsc(x.xe) + '</b><span class="kh-typ">' + ltEsc(x.typ || '') + '</span>'
-      + (x.guest ? '<span class="kh-guest lt-ell">' + ltEsc(x.guest) + '</span>' : '') + '<button class="lt-x" data-lt="hide" data-v="' + id + '" title="Xoá đơn khỏi kế hoạch" aria-label="Xoá đơn ' + ltEsc(x.xe) + ' khỏi kế hoạch">✕</button>' + LT_HD.replace('margin-left:auto', '') + '</div>'
+      + (x.guest ? '<span class="kh-guest lt-ell">' + ltEsc(x.guest) + '</span>' : '') + (x.hidden ? '<button class="lt-mini" style="margin-left:auto;color:var(--lt-text)" data-lt="unhide" data-v="' + id + '">' + LT_EYE + 'Hiện lại</button>' : '<button class="lt-x" data-lt="hide" data-v="' + id + '" title="Ẩn đơn" aria-label="Ẩn đơn ' + ltEsc(x.xe) + '">' + LT_EYEOFF + '</button>') + LT_HD.replace('margin-left:auto', '') + '</div>'
       + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:' + (ltT(x) < x.t || x.kind === 'thu' ? 'var(--lt-green)' : 'var(--lt-red)') + '">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
       + (shop ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>'
               : '<div class="kh-addr">' + (side === 'ps' ? '<b style="color:var(--lt-orange)">Phát sinh</b> · ' : '') + ltEsc(x.addr) + '</div>')
       + (done ? '<span class="lt-note">đã xong</span>' : '')
       + (w[id] ? '<div class="lt-warn">' + ltEsc(w[id]) + '</div>' : '')
-      + (!done && ltCanPark(x) ? '<div><button class="lt-mini" data-lt="park" data-v="' + id + '">' + LT_PARK + 'Để sau</button></div>' : '')
+      + (x.hidden ? '<span class="lt-note">Đang ẩn · không có trong lịch của nhân viên</span>' : (!done && ltCanPark(x) ? '<div><button class="lt-mini" data-lt="park" data-v="' + id + '">' + LT_PARK + 'Để sau</button></div>' : ''))
       + '</div>';
     h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? card : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : card) + '</div>' + gap(i + 1));
   });
@@ -6573,11 +6592,6 @@ function ltPlanDesk(all){
     h.push('</div>');
   }
   h.push('<button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="' + ord.length + '">+ Thêm đơn vào cuối lịch</button>');
-  if (LT.hiddenItems.length) {
-    h.push('<div class="kh-box"><h3>ĐÃ XOÁ KHỎI KẾ HOẠCH · ' + LT.hiddenItems.length + '</h3>');
-    LT.hiddenItems.forEach(x => h.push('<div class="kh-stat" style="align-items:center;gap:8px;color:var(--lt-muted)"><div style="min-width:0"><b>' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + '</b> <span class="lt-note">' + ltFmt(ltT(x)) + '</span><div class="lt-ell" style="font-size:13px">' + ltEsc(x.addr) + '</div></div><button class="lt-btn" style="height:36px;font-size:13px;flex-shrink:0" data-lt="unhide" data-v="' + x.id + '">Khôi phục</button></div>'));
-    h.push('</div>');
-  }
   h.push('</aside></div>');
   return h.join('');
 }
@@ -6609,7 +6623,22 @@ function ltAlertHtml(list){
 }
 function ltRunView(all){
   const P = LT.P, parked = all.filter(id => P.parked[id]), ord = all.filter(id => !P.parked[id] || ltDone(id) != null);
-  const queue = ord.filter(id => ltDone(id) == null), h = [], doneN = ord.length - queue.length;
+  P.skipped = P.skipped || {};
+  const skipped = ord.filter(id => P.skipped[id] && ltDone(id) == null);
+  const queue = ord.filter(id => ltDone(id) == null && !P.skipped[id]), h = [], doneN = ord.filter(id => ltDone(id) != null).length;
+  // đơn tạm bỏ qua: treo ở góc trên, bấm để mở
+  if (skipped.length) {
+    h.push('<div class="lt-skipdock"><button class="lt-skipbtn" data-lt="toggleskip" aria-expanded="' + ltShowSkip + '">' + LT_PAUSE + 'Tạm bỏ qua · ' + skipped.length + '</button>');
+    if (ltShowSkip) {
+      h.push('<div class="lt-skippanel">');
+      skipped.forEach(id => { const x = ltById(id);
+        h.push('<div class="lt-skiprow"><div style="min-width:0"><div style="display:flex;align-items:center;gap:6px">' + ltTag(x, 1) + '<b style="font-size:16px">' + ltEsc(x.xe) + '</b><span class="lt-note">' + ltFmt(ltT(x)) + '</span></div>'
+          + '<div class="lt-ell" style="font-size:12.5px;color:var(--lt-shop);font-weight:700;margin-top:2px">' + (ltIsShop(x) ? (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') : ltEsc(x.addr)) + '</div></div>'
+          + '<div class="lt-skipact"><button class="lt-btn" style="background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="unskip" data-v="' + id + '">Đưa lại lịch</button></div></div>'); });
+      h.push('</div>');
+    }
+    h.push('</div>');
+  }
   h.push('<div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:6px;background:var(--lt-line);border-radius:3px;overflow:hidden"><div style="height:6px;width:' + Math.round(doneN / Math.max(1, ord.length) * 100) + '%;background:var(--lt-green)"></div></div><span style="font-size:13px;font-weight:700;color:var(--lt-muted)">' + doneN + '/' + ord.length + ' đơn</span></div>');
   if (!queue.length) {
     h.push('<div class="lt-cur" style="align-items:center;text-align:center"><div style="font-size:22px;font-weight:800">' + (ord.length ? 'Xong hết đơn trong ngày' : 'Ngày này chưa có đơn') + '</div><div class="lt-sub">' + doneN + ' đơn đã hoàn thành</div></div>');
@@ -6638,7 +6667,8 @@ function ltRunView(all){
     if (shop) {
       // tại cửa hàng: không cần Bắt đầu
       h.push('<div class="lt-row2">' + callBtn + '<button class="lt-btn" style="background:var(--lt-green);color:#fff;border:0;font-weight:800" data-lt="finish" data-v="' + c.id + '">Hoàn thành</button></div>'
-        + (payX ? '<button class="lt-link" style="text-align:center;padding:4px 0" data-lt="pay" data-v="' + c.id + '">Xem thanh toán</button>' : ''));
+        + '<div style="display:flex;justify-content:center;gap:18px">' + (payX ? '<button class="lt-link" style="padding:4px 0" data-lt="pay" data-v="' + c.id + '">Xem thanh toán</button>' : '')
+        + (queue.length > 1 ? '<button class="lt-link" style="padding:4px 0;color:var(--lt-text2)" data-lt="skip" data-v="' + c.id + '">Khách chưa tới · tạm bỏ qua</button>' : '') + '</div>');
     } else if (!started) {
       h.push('<button class="lt-big" style="background:var(--lt-dark);color:#fff" data-lt="start" data-v="' + c.id + '">Bắt đầu</button>');
       if (ltCanPark(c)) h.push('<button class="lt-btn" style="color:var(--lt-text2)" data-lt="park" data-v="' + c.id + '">' + LT_PARK + 'Để sau, xe chưa có khách mới</button>');
@@ -6655,11 +6685,11 @@ function ltRunView(all){
         const lateW = ltDate === todayStr() && ltT(x) < ltNowMin();
         h.push('<div class="lt-wait"><div class="tm"' + (lateW ? ' style="color:var(--lt-red)"' : '') + '>' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '"><div style="display:flex;align-items:center;gap:8px">' + ltTag(x, 1) + '<b style="font-size:18px">' + ltEsc(x.xe) + '</b>' + (lateW ? '<span class="lt-al red sm">Quá giờ</span>' : '') + '</div>'
           + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' : '<div class="lt-ell" style="font-size:14px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div>')
-          + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(x)) + '</div>' : '') + '</div></div>'); });
+          + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(x)) + '</div>' : '') + (sh ? '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '') + '</div></div>'); });
       if (queue.length > 3) h.push('<button class="lt-link" data-lt="toggleAll">' + (ltShowAll ? 'Ẩn bớt' : 'Còn ' + (queue.length - 3) + ' đơn sau') + '</button>');
       if (ltShowAll) queue.slice(3).forEach(id => { const x = ltById(id), sh = ltIsShop(x);
         h.push('<div class="lt-wait"' + (sh ? '' : ' style="opacity:.8"') + '><div class="tm" style="font-size:16px">' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '" style="padding:8px 12px"><div style="font-size:14px"><b>' + ltEsc(x.xe) + '</b> · ' + LT_TYPE[x.kind][0] + '</div>'
-          + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' : '<div class="lt-ell" style="font-size:13px;color:var(--lt-muted)">' + ltEsc(x.addr) + '</div>') + '</div></div>'); });
+          + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' + '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '<div class="lt-ell" style="font-size:13px;color:var(--lt-muted)">' + ltEsc(x.addr) + '</div>') + '</div></div>'); });
     }
   }
   if (parked.length) {
@@ -6728,6 +6758,7 @@ document.addEventListener('click', e => {
   if (a === 'day') { ltMsg = ''; if (ltCtx === 'kh') { khDate = v; renderKeHoach(); } else { runDate = v; renderLichTrinh(); } return; }
   if (a === 'gorun') { runDate = khDate; switchTab('lichtrinh'); window.scrollTo({ top: 0 }); return; }
   if (a === 'closemsg') { ltMsg = ''; renderKeHoach(); renderLichTrinh(); return; }
+  if (a === 'toggleskip') { ltShowSkip = !ltShowSkip; renderLichTrinh(); return; }
   if (a === 'toggleAll') { ltShowAll = !ltShowAll; renderLichTrinh(); return; }
   if (a === 'toggleDone') { ltShowDone = !ltShowDone; renderLichTrinh(); return; }
   ltDate = ltCtx === 'kh' ? khDate : runDate; ltBuild();
@@ -6743,21 +6774,39 @@ document.addEventListener('click', e => {
   }
   if (a === 'start') { P.started = v; P.startedAt = Date.now(); ltPut(P); return; }
   if (a === 'unstart') { if (P.started === v) { P.started = null; delete P.startedAt; } ltPut(P); return; }
+  if (a === 'togglehid') { ltShowHidden = !ltShowHidden; renderKeHoach(); return; }
   if (a === 'hide') {
     const x = ltById(v); if (!x) return;
     const mem = x.kind === 'grp' ? x.members : [x];
     if (x.kind === 'grp') delete P.groups[x.id];
     mem.forEach(m => {
-      if (!m.bk) { P.extra = P.extra.filter(z => z.id !== m.id); delete P.done[m.id]; delete P.times[m.id]; }   // đơn tự thêm: xoá hẳn
-      else P.hidden[m.id] = true;                                                                              // đơn từ booking: chỉ ẩn khỏi kế hoạch
+      P.hidden[m.id] = true;   // chỉ ẩn, không xoá: bật "Hiện đơn ẩn" để xem và hiện lại
       Object.keys(P.groups).forEach(gid => { const g = P.groups[gid]; g.ids = (g.ids || []).filter(k => k !== m.id); if (g.ids.length < 2) delete P.groups[gid]; });
       delete P.parked[m.id]; if (P.started === m.id || P.started === x.id) { P.started = null; delete P.startedAt; }
     });
-    if (P.order) P.order = P.order.filter(k => k !== x.id && !mem.some(m => m.id === k));
-    ltMsg = 'Đã xoá ' + (x.kind === 'grp' ? 'nhóm ' : '') + x.xe + ' khỏi kế hoạch. Booking không bị ảnh hưởng, khôi phục ở cột bên phải.';
+    if (P.order && x.kind === 'grp') { const i = P.order.indexOf(x.id); if (i >= 0) P.order.splice(i, 1, ...mem.map(m => m.id)); }
+    ltMsg = 'Đã ẩn ' + (x.kind === 'grp' ? 'nhóm ' : '') + x.xe + '. Booking không bị ảnh hưởng; bấm "Hiện đơn ẩn" để xem lại.';
     ltPut(P); return;
   }
-  if (a === 'unhide') { delete P.hidden[v]; ltMsg = ''; const x = (LT.hiddenItems || []).find(z => z.id === v); if (x && P.order) { const ord = ltOrder().filter(k => k !== v); P.order = ltPlace(ord, v, ltT(x)); } ltPut(P); return; }
+  if (a === 'unhide') {
+    delete P.hidden[v]; ltMsg = '';
+    if (P.order && P.order.indexOf(v) < 0) { const x = (LT.hiddenItems || []).find(z => z.id === v); if (x) { const ord = ltOrder().filter(k => k !== v); P.order = ltPlace(ord, v, ltT(x)); } }
+    if (!Object.keys(P.hidden).length) ltShowHidden = false;
+    ltPut(P); return;
+  }
+  if (a === 'skip') {
+    // đơn tại cửa hàng: tạm bỏ qua, treo ở góc trên để làm khi khách tới
+    P.skipped = P.skipped || {}; P.skipped[v] = true;
+    if (P.started === v) { P.started = null; delete P.startedAt; }
+    const x = ltById(v); ltMsg = 'Đã tạm bỏ qua ' + (x ? x.xe : '') + '. Đơn treo ở góc trên, bấm vào khi khách tới.';
+    ltPut(P); return;
+  }
+  if (a === 'unskip') {
+    P.skipped = P.skipped || {}; delete P.skipped[v];
+    const x = ltById(v); if (x && P.order) { const ord = ltOrder().filter(k => k !== v); P.order = ltPlace(ord, v, ltT(x)); }
+    if (!Object.keys(P.skipped).length) ltShowSkip = false;
+    ltMsg = ''; ltPut(P); return;
+  }
   if (a === 'finish') {
     // đơn có booking → mở hộp Giao xe / Thu hồi của booking (ghi giờ thực tế, thanh toán, đổi trạng thái trên Sơ đồ xe)
     const x = ltById(v); if (!x) return;
