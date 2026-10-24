@@ -20,7 +20,7 @@
    Chỉ mật khẩu Kế toán mới mở khoá được máy đó. */
 (function(){
   if(/nhanvien\.html$/i.test(location.pathname) || /[?&]xem=/.test(location.search)) return;
-  var khoa=false; try{ khoa=localStorage.getItem('gb_nvDevice')==='1'; }catch(e){}
+  var khoa=false; try{ khoa=localStorage.getItem('gb_nvDevice')==='1' && localStorage.getItem('gb_owner')!=='1'; }catch(e){}
   if(khoa || /[?&]nv=/.test(location.search)){
     document.documentElement.style.display='none';
     location.replace(location.pathname.replace(/[^/]*$/,'')+'nhanvien.html');
@@ -781,7 +781,7 @@
   @media (max-width:340px){ body.nvmode .nv-tag{display:none} }
   body.nvmode header h1{display:flex;align-items:center;gap:8px;margin:0;font-size:18px;color:#101828}
   .nv-tag{font-size:12px;font-weight:700;color:#344054;background:#F2F4F7;border-radius:999px;padding:4px 10px;white-space:nowrap}
-  .nv-out{margin-left:auto;height:36px;padding:0 14px;border-radius:10px;border:1px solid #D0D5DD;background:#fff;color:#101828;font-size:14px;font-weight:700;cursor:pointer}
+  .nv-out{white-space:nowrap;flex-shrink:0;margin-left:auto;height:36px;padding:0 14px;border-radius:10px;border:1px solid #D0D5DD;background:#fff;color:#101828;font-size:14px;font-weight:700;cursor:pointer}
   body.nvmode main{padding:16px 16px 32px !important}
   .nv-sharebox{display:flex;gap:8px}
   .nv-sharebox input{flex:1;min-width:0}
@@ -2295,7 +2295,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-nhanvien4';
+const BAN_APP = '2026-10-24-nhanvien5';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2904,6 +2904,7 @@ function openAdmin(target){
 function doAdminLogin(){
   if(document.getElementById('adminPass').value===(DB.password||'goodbike')){
     accUnlocked=true;
+    try{ localStorage.setItem('gb_owner','1'); localStorage.removeItem('gb_nvDevice'); }catch(e){}   // máy của chủ: không bao giờ bị khoá vào app nhân viên
     document.getElementById('adminOverlay').classList.remove('open');
     updateTabLocks();renderAll();
     const t=pendingTab||'revenue';pendingTab=null;switchTab(t);
@@ -6199,7 +6200,7 @@ function nvMoKhoa(){
   const p=prompt('Máy của chủ cửa hàng? Nhập mật khẩu Kế toán để mở khoá máy này về app quản lý:');
   if(p==null) return;
   if(p!==(DB.password||'goodbike')){ alert('Sai mật khẩu Kế toán.'); return; }
-  try{ localStorage.removeItem('gb_nvDevice'); localStorage.removeItem('gb_nvPass'); }catch(e){}
+  try{ localStorage.removeItem('gb_nvDevice'); localStorage.removeItem('gb_nvPass'); localStorage.setItem('gb_owner','1'); }catch(e){}
   location.replace(location.pathname.replace(/[^/]*$/,'')+'index.html');
 }
 function nvAskPass(){
@@ -6229,14 +6230,17 @@ function nvAskPass(){
 }
 function nvApply(key){
   nvMode=true;
-  try{ localStorage.setItem('gb_nvDevice','1'); }catch(e){}   // khoá máy này vào app nhân viên
+  let chu=false; try{ chu=localStorage.getItem('gb_owner')==='1'; }catch(e){}
+  if(!chu){ try{ localStorage.setItem('gb_nvDevice','1'); }catch(e){} }   // khoá máy nhân viên; máy của chủ (đã từng nhập MK Kế toán) thì không
   document.body.classList.remove('nvpending');
   document.body.classList.add('nvmode');
   const hd=document.querySelector('header');
   document.querySelectorAll('.hdr-logo').forEach(im=>{ im.src='apple-touch-icon-nv.png'; });   // logo mũ ĐỎ
   if(hd && !document.getElementById('nvOut')){
-    const h1=hd.querySelector('h1'); if(h1) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên</span>');
-    hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvOut">Thoát</button>');
+    const h1=hd.querySelector('h1'); if(h1 && !chu) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên</span>');
+    if(chu) hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvBack">Quản lý</button>');
+    hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvOut"'+(chu?' style="margin-left:0"':'')+'>Thoát</button>');
+    const bk=document.getElementById('nvBack'); if(bk) bk.onclick=()=>{ location.href=location.pathname.replace(/[^/]*$/,'')+'index.html'; };
     document.getElementById('nvOut').onclick=()=>{
       if(!confirm('Đăng xuất? Lần sau phải nhập lại mật khẩu nhân viên.')) return;
       try{ localStorage.removeItem('gb_nvPass'); }catch(e){}
