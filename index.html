@@ -13,6 +13,18 @@
 <meta name="apple-mobile-web-app-title" content="GOODBIKE">
 <link rel="apple-touch-icon" href="apple-touch-icon-v3.png">
 <link rel="icon" type="image/png" href="favicon-v3.png">
+<script>
+/* Link nhân viên (?nv=1): cài thành app riêng "GB Lịch trình" */
+if(/[?&]nv=/.test(location.search)){
+  (function(){
+    var m=document.querySelector('link[rel="manifest"]'); if(m) m.href='manifest-nv.json';
+    var t=document.querySelector('meta[name="apple-mobile-web-app-title"]'); if(t) t.content='GB Lịch trình';
+    document.title='GOODBIKE — Lịch trình nhân viên';
+    var ai=document.querySelector('link[rel="apple-touch-icon"]'); if(ai) ai.href='apple-touch-icon-nv.png';   // mũ ĐỎ cho app nhân viên
+    var fi=document.querySelector('link[rel="icon"]'); if(fi) fi.href='favicon-nv.png';
+  })();
+}
+</script>
 <style>
   :root{
     --bg:#0f172a; --panel:#ffffff; --line:#e2e8f0; --muted:#64748b; --text:#0f172a;
@@ -751,6 +763,30 @@
   .ct-mft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
   /* Link ?xem=1: che sạch nội dung cho tới khi nhập đúng mật khẩu chỉ xem */
   body.viewpending #tabs,body.viewpending main,body.viewpending header .toolbar{display:none !important}
+  /* Link NHÂN VIÊN (?nv=1): chỉ còn Lịch trình */
+  body.nvpending #tabs,body.nvpending main,body.nvpending header{display:none !important}
+  body.nvmode #tabs,body.nvmode header .toolbar,body.nvmode header .sub,body.nvmode #gbMoreSheet{display:none !important}
+  body.nvmode.gb-shell{padding-left:0 !important;padding-bottom:0 !important}
+  body.nvmode header .hdr-logo{display:inline !important;width:40px;margin:-6px 2px -6px -6px}
+  body.nvmode header .hdr-brand{display:inline !important}
+  body.nvmode [data-lt="openbk"]{display:none !important}
+  body.nvmode header{display:flex;flex-wrap:nowrap !important;align-items:center;gap:8px;padding:10px 16px !important}
+  body.nvmode header .spacer{display:none !important}
+  body.nvmode header > div:first-child{min-width:0}
+  body.nvmode header h1{flex-wrap:nowrap;white-space:nowrap}
+  body.nvmode header h1 > span{display:inline-flex;align-items:center}
+  @media (max-width:480px){ body.nvmode header .hdr-brand{display:none !important} }
+  @media (max-width:340px){ body.nvmode .nv-tag{display:none} }
+  body.nvmode header h1{display:flex;align-items:center;gap:8px;margin:0;font-size:18px;color:#101828}
+  .nv-tag{font-size:12px;font-weight:700;color:#344054;background:#F2F4F7;border-radius:999px;padding:4px 10px;white-space:nowrap}
+  .nv-out{margin-left:auto;height:36px;padding:0 14px;border-radius:10px;border:1px solid #D0D5DD;background:#fff;color:#101828;font-size:14px;font-weight:700;cursor:pointer}
+  body.nvmode main{padding:16px 16px 32px !important}
+  .nv-sharebox{display:flex;gap:8px}
+  .nv-sharebox input{flex:1;min-width:0}
+  .nv-sharebox .lt-btn{flex:0 0 auto;height:48px;padding:0 16px}
+  .nv-state{font-size:14px;font-weight:700;border-radius:12px;padding:12px 14px}
+  .nv-state.on{background:#ECFDF3;color:#067647}
+  .nv-state.off{background:#F2F4F7;color:#5B6472}
   /* Chế độ CHỈ XEM (link ?xem=1): chỉ còn tab Thống kê KH liên hệ, SĐT luôn ẩn, không sửa được gì */
   body.viewmode .ct-money{display:none !important}   /* bản chia sẻ: không cho xem doanh thu & tiền quảng cáo */
   body.viewmode #ctAdd,body.viewmode #ctCatsBtn,body.viewmode #ctTogPhone,body.viewmode #ctHidTog,
@@ -2257,7 +2293,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-lichtrinh5';
+const BAN_APP = '2026-10-24-nhanvien3';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2489,10 +2525,46 @@ function save(){
   ghiLenMayChu(rows);
 }
 
+/* Kế hoạch giao nhận (cfg:lt_YYYY-MM-DD) được sửa từ nhiều máy cùng lúc (chủ ở Kế hoạch, nhân viên ở Lịch trình).
+   Không ghi đè cả khối: lấy bản mới nhất trên máy chủ rồi chỉ áp ĐÚNG những mục máy này vừa đổi
+   (so với bản gốc lúc nhận về). Nhờ vậy giờ chủ vừa đổi không bị máy nhân viên đang cầm bản cũ xoá mất. */
+function gbMergeLt(base,mine,srv){
+  const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  const isMap=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
+  base=base||{}; const out=JSON.parse(JSON.stringify(srv||{}));
+  new Set(Object.keys(mine||{}).concat(Object.keys(base))).forEach(f=>{
+    const b=base[f], m=(mine||{})[f];
+    if(eq(b,m)) return;                                   // máy này không đổi mục này → giữ của máy chủ
+    if(isMap(m)&&(b==null||isMap(b))&&(out[f]==null||isMap(out[f]))){
+      const o=Object.assign({},out[f]||{}), bb=b||{};
+      new Set(Object.keys(m).concat(Object.keys(bb))).forEach(k=>{
+        if(eq(bb[k],m[k])) return;
+        if(k in m) o[k]=m[k]; else delete o[k];
+      });
+      out[f]=o;
+    } else if(m===undefined) delete out[f];
+    else out[f]=JSON.parse(JSON.stringify(m));
+  });
+  return out;
+}
+async function gbGopKeHoach(rows){
+  let doi=false;
+  for(const r of rows){
+    if(r.kind!=='cfg'||r.deleted||!/^cfg:lt_\d{4}-\d{2}-\d{2}$/.test(String(r.id))) continue;
+    const {data,error}=await sb.from(SB_TABLE).select('id,data,deleted').eq('id',String(r.id));
+    if(error) throw error;
+    const sv=(data||[]).find(x=>String(x.id)===String(r.id));
+    if(!sv||sv.deleted||!sv.data||!sv.data.v) continue;
+    const k=String(r.id).slice(4), gop=gbMergeLt(banGoc&&banGoc[k],r.data&&r.data.v,sv.data.v);
+    if(JSON.stringify(gop)!==JSON.stringify(r.data.v)){ r.data={v:gop}; DB[k]=JSON.parse(JSON.stringify(gop)); doi=true; }
+  }
+  return doi;
+}
 async function ghiLenMayChu(rows){
-  dangGhi=true; let xong=false;
+  dangGhi=true; let xong=false, gopKH=false;
   khoaMan('Đang lưu lên máy chủ…');
   try{
+    gopKH=await gbGopKeHoach(rows);
     for(let i=0;i<rows.length;i+=200){
       const lo=rows.slice(i,i+200).map(r=>({
         id:String(r.id), kind:r.kind,
@@ -2505,6 +2577,7 @@ async function ghiLenMayChu(rows){
     chotBanGoc();
     sbStatus('Đã lưu lúc '+gio(),'ok');
     xong=true;
+    if(gopKH) veLaiSau(100);                  // đã gộp thay đổi của máy khác vào kế hoạch → vẽ lại
   }catch(e){
     console.error('ghiLenMayChu',e);
     luuLai=false;
@@ -2594,6 +2667,7 @@ async function sbInit(){
     setTimeout(function(){ try{ scrollTimelineToToday(); }catch(e){} },80);
     try{ chayDonRacQuy(); }catch(e){ console.warn(e); }
     if(VIEW_ASK){ try{ ctAskViewPass(); }catch(e){ console.warn('view',e); } }   // link ?xem=1 → hỏi mật khẩu chỉ xem
+    else if(NV_ASK){ try{ nvAskPass(); }catch(e){ console.warn('nv',e); } }     // link ?nv=1 → app nhân viên
     sbStatus('Đã đồng bộ '+gio(),'ok');
     sb.channel('gb_items')
       .on('postgres_changes',{event:'*',schema:'public',table:SB_TABLE},()=>keoVeSoon(600))
@@ -2795,6 +2869,7 @@ const ACC_TABS=['revenue','chi','profit','funds','assets','phantich','websync'];
 const OP_TABS=[];
 const ADMIN_TABS=ACC_TABS.concat(OP_TABS);
 function switchTab(t){
+  if(typeof nvMode!=='undefined' && nvMode && t!=='lichtrinh') t='lichtrinh';   // app nhân viên: chỉ có Lịch trình
   if(ACC_TABS.includes(t) && !accUnlocked){pendingTab=t;openAdmin('acc');return;}
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
@@ -4334,6 +4409,7 @@ function wirePlaceInputs(){
   });
 }
 function openBooking(id,prefill,schedKind){
+  if(typeof nvMode!=='undefined' && nvMode) return;   // app nhân viên: không mở chi tiết booking
   editingBk=id; bkSchKind=schedKind||null;
   const del=document.getElementById('bkDelete');
   let selXe;
@@ -5324,6 +5400,9 @@ var viewMode=false;           // true = mở bằng link chỉ xem (?xem=1)
 const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
 if(VIEW_ASK) document.body.classList.add('viewpending');   // che nội dung ngay, chưa nhập mật khẩu thì không thấy gì
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
+var nvMode=false;             // true = mở bằng link nhân viên (?nv=1) và đã nhập đúng mật khẩu
+const NV_ASK=/[?&]nv=/.test(location.search);
+if(NV_ASK) document.body.classList.add('nvpending');      // che hết cho tới khi nhập đúng mật khẩu nhân viên
 var ctPop=null;
 
 function ctEsc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -6107,6 +6186,90 @@ function ctAskViewPass(){
   const go=()=>{ if(inp.value===ok){ dongMan('gbXem'); ctApplyViewMode(); } else { inp.value=''; inp.placeholder='Sai mật khẩu, thử lại'; inp.focus(); } };
   btn.onclick=go; inp.onkeydown=e=>{ if(e.key==='Enter') go(); };
   setTimeout(()=>{ try{ inp.focus(); }catch(e){} },60);
+}
+
+/* ---------- APP NHÂN VIÊN (link ?nv=1): chỉ có tab Lịch trình ----------
+   DB.nvPass  // cfg: mật khẩu chung của nhân viên; không có = tắt link
+   Máy nhân viên nhớ mật khẩu (localStorage gb_nvPass) nên chỉ nhập 1 lần.
+   Chủ đổi mật khẩu → máy nhân viên tự hỏi lại trong vòng 1 phút.        */
+function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'index.html?nv=1'; }
+function nvAskPass(){
+  const ok=String(DB.nvPass||'').trim();
+  let saved=''; try{ saved=localStorage.getItem('gb_nvPass')||''; }catch(e){}
+  if(ok && saved===ok){ nvApply(ok); return; }
+  const box=(msg,input)=>manChan('gbNv',
+    '<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.45);color:#101828">'
+    +'<div style="font-weight:800;font-size:20px">GOODBIKE · Lịch trình</div>'
+    +'<div style="color:#475569;font-size:14px;margin-top:8px;line-height:1.5">'+msg+'</div>'
+    +(input?'<input id="gbNvPass" type="password" autocomplete="current-password" placeholder="Mật khẩu nhân viên" '
+      +'style="width:100%;box-sizing:border-box;margin-top:16px;height:50px;padding:0 14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-align:center">'
+      +'<div id="gbNvErr" style="color:#B42318;font-size:13.5px;font-weight:700;min-height:18px;margin-top:8px"></div>'
+      +'<button id="gbNvOk" style="margin-top:4px;width:100%;height:52px;background:#101828;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer">Vào lịch trình</button>':'')
+    +'</div>');
+  if(!ok){ box('Link nhân viên đang tắt. Nhờ chủ cửa hàng bật ở tab Kế hoạch giao nhận, nút “Link cho nhân viên”.',false); return; }
+  box('Nhập mật khẩu nhân viên. Máy này sẽ nhớ, lần sau không phải nhập lại.',true);
+  const inp=document.getElementById('gbNvPass'), btn=document.getElementById('gbNvOk');
+  const go=()=>{
+    if(inp.value.trim()===ok){ try{ localStorage.setItem('gb_nvPass',ok); }catch(e){} dongMan('gbNv'); nvApply(ok); }
+    else { inp.value=''; document.getElementById('gbNvErr').textContent='Sai mật khẩu. Hỏi lại chủ cửa hàng.'; inp.focus(); }
+  };
+  btn.onclick=go; inp.onkeydown=e=>{ if(e.key==='Enter') go(); };
+  setTimeout(()=>{ try{ inp.focus(); }catch(e){} },60);
+}
+function nvApply(key){
+  nvMode=true;
+  document.body.classList.remove('nvpending');
+  document.body.classList.add('nvmode');
+  const hd=document.querySelector('header');
+  document.querySelectorAll('.hdr-logo').forEach(im=>{ im.src='apple-touch-icon-nv.png'; });   // logo mũ ĐỎ
+  if(hd && !document.getElementById('nvOut')){
+    const h1=hd.querySelector('h1'); if(h1) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên</span>');
+    hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvOut">Thoát</button>');
+    document.getElementById('nvOut').onclick=()=>{
+      if(!confirm('Thoát khỏi máy này? Lần sau phải nhập lại mật khẩu nhân viên.')) return;
+      try{ localStorage.removeItem('gb_nvPass'); }catch(e){}
+      location.reload();
+    };
+  }
+  runDate=todayStr();
+  try{ switchTab('lichtrinh'); }catch(e){ console.warn(e); }
+  window.scrollTo({top:0});
+  // chủ đổi hoặc tắt mật khẩu → hỏi lại
+  setInterval(()=>{ if(String(DB.nvPass||'').trim()!==key){ try{ localStorage.removeItem('gb_nvPass'); }catch(e){} location.reload(); } },60000);
+}
+function nvShareSheet(msg){
+  const on=!!String(DB.nvPass||'').trim();
+  ltSheet('<h2>Link cho nhân viên</h2>'
+    +'<div class="lt-sub">Nhân viên mở link này chỉ thấy Lịch trình: hoàn thành giao / thu hồi, đổi giờ, thu tiền, giao phát sinh. Không mở được booking và các mục khác.</div>'
+    +'<div class="nv-state '+(on?'on':'off')+'">'+(on?'Đang bật · mật khẩu hiện tại: <b>'+ltEsc(DB.nvPass)+'</b>':'Đang tắt · đặt mật khẩu để bật')+'</div>'
+    +'<label class="lt-fld">Link<div class="nv-sharebox"><input id="nv_link" readonly value="'+ltEsc(nvLink())+'"><button class="lt-btn" data-lt="nvcopy">Copy</button></div></label>'
+    +'<label class="lt-fld">'+(on?'Đổi mật khẩu':'Mật khẩu nhân viên')+'<div class="nv-sharebox"><input id="nv_pass" autocomplete="off" placeholder="Ít nhất 4 ký tự"><button class="lt-btn" data-lt="nvrand">Tạo ngẫu nhiên</button></div></label>'
+    +'<div class="lt-err" id="lt_err"'+(msg?' style="color:var(--lt-green,#067647)"':'')+'>'+(msg?ltEsc(msg):'')+'</div>'
+    +'<div class="lt-row2"><button class="lt-btn" data-lt="cancel">Đóng</button><button class="lt-btn" style="background:#101828;color:#fff;border:0" data-lt="nvsave">Lưu mật khẩu</button></div>'
+    +(on?'<button class="lt-link" style="text-align:center;color:#B42318" data-lt="nvoff">Tắt link nhân viên</button>':''));
+  setTimeout(()=>{ const p=document.getElementById('nv_pass'); if(p) p.focus(); },60);
+}
+async function nvShareAct(a){
+  if(nvMode||viewMode) return;
+  if(a==='nvshare'){ nvShareSheet(); return; }
+  if(a==='nvrand'){ const c='abcdefghjkmnpqrstuvwxyz23456789'; let v=''; for(let i=0;i<6;i++) v+=c[Math.floor(Math.random()*c.length)]; document.getElementById('nv_pass').value=v; return; }
+  if(a==='nvcopy'){
+    const el=document.getElementById('nv_link');
+    try{ await navigator.clipboard.writeText(el.value); document.getElementById('lt_err').style.color='var(--lt-green,#067647)'; document.getElementById('lt_err').textContent='Đã copy link.'; }
+    catch(e){ el.select(); document.getElementById('lt_err').textContent='Bấm giữ vào link để copy.'; }
+    return;
+  }
+  if(a==='nvsave'){
+    const v=document.getElementById('nv_pass').value.trim(), err=document.getElementById('lt_err'); err.style.color='';
+    if(v.length<4){ err.textContent='Mật khẩu cần ít nhất 4 ký tự.'; return; }
+    if(v===(DB.password||'goodbike')){ err.textContent='Không dùng trùng mật khẩu Kế toán.'; return; }
+    if(v===String(DB.viewPass||'')){ err.textContent='Không dùng trùng mật khẩu chỉ xem.'; return; }
+    DB.nvPass=v; save(); nvShareSheet('Đã lưu. Gửi nhân viên link và mật khẩu '+v+'.'); return;
+  }
+  if(a==='nvoff'){
+    if(!confirm('Tắt link nhân viên? Nhân viên đang dùng sẽ bị thoát trong vòng 1 phút.')) return;
+    delete DB.nvPass; save(); nvShareSheet('Đã tắt link nhân viên.'); return;
+  }
 }
 
 /* ---------- XUẤT PDF (khoảng ngày đang xem, không theo bộ lọc) ---------- */
@@ -6963,7 +7126,7 @@ function renderKeHoach(){
     + '<button class="lt-nb' + (khDate === tmr ? ' on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button>'
     + '<input type="date" id="ltPick" value="' + khDate + '" aria-label="Chọn ngày">'
     + '<button class="lt-nb" data-lt="day" data-v="' + ltAddDays(khDate, 1) + '" aria-label="Ngày sau">▶</button></div>'
-    + '<div class="kh-actions"><button class="lt-btn" style="height:40px" data-lt="auto">Xếp tự động</button><button class="lt-btn" style="height:40px;background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="gorun">Xem lịch trình nhân viên</button></div></div>'
+    + '<div class="kh-actions"><button class="lt-btn" style="height:40px" data-lt="nvshare">Link cho nhân viên</button><button class="lt-btn" style="height:40px" data-lt="auto">Xếp tự động</button><button class="lt-btn" style="height:40px;background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="gorun">Xem lịch trình nhân viên</button></div></div>'
     + ltMsgHtml() + ltPlanDesk(all);
 }
 
@@ -7114,7 +7277,6 @@ function ltCurCard(id){
     + (k.sub ? '<div class="lt-nowsub">' + ltEsc(k.sub) + '</div>' : '')
     + ltAlertHtml(ltAlerts(c))
     + ltGSteps(k)
-    + (!k.grp && ltMoved(c) ? '<div class="lt-nowmoved">' + ltEsc(ltNoteOf(c)) + '</div>' : '')
     + (k.notes.length ? '<div class="lt-nownote"><div class="lab">' + LT_NOTE_IC + 'GHI CHÚ</div>' + k.notes.map(n => '<div>' + ltEsc(n) + '</div>').join('') + '</div>' : '')
     + '<div class="lt-nowact">' + ltCallBtn(k, 'lt-nb2') + '<button class="lt-nb2" data-lt="pay" data-v="' + id + '"' + (k.payX ? '' : ' disabled') + '>Thanh toán</button></div>'
     + '<button class="lt-nowfin k-' + k.kc + '" data-lt="finish" data-v="' + id + '">' + k.finLab + '</button>'
@@ -7133,7 +7295,6 @@ function ltRunCard(id){
     + (k.sub ? '<div style="font-size:12.5px;color:var(--lt-muted);margin-top:1px">' + ltEsc(k.sub) + '</div>' : '') + '</div>'
     + ltCallBtn(k, 'lt-call') + '</div>'
     + ltGSteps(k)
-    + (!k.grp && ltMoved(c) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(c)) + '</div>' : '')
     + (k.notes.length ? '<div class="lt-wnote">' + LT_NOTE_IC + '<span>' + k.notes.map(ltEsc).join('<br>') + '</span></div>' : '')
     + (k.sh ? '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '')
     + '</div></div>';
@@ -7236,6 +7397,7 @@ document.addEventListener('click', e => {
   if (a === 'toggleskip') { ltShowSkip = !ltShowSkip; renderLichTrinh(); return; }
   if (a === 'toggleAll') { ltShowAll = !ltShowAll; renderLichTrinh(); return; }
   if (a === 'toggleDone') { ltShowDone = !ltShowDone; renderLichTrinh(); return; }
+  if (a === 'nvshare' || a === 'nvsave' || a === 'nvoff' || a === 'nvrand' || a === 'nvcopy') { nvShareAct(a); return; }
   ltDate = ltCtx === 'kh' ? khDate : runDate; ltBuild();
   const P = LT.P;
   if (a === 'auto') { P.order = null; ltPut(P); return; }
@@ -7304,11 +7466,11 @@ document.addEventListener('click', e => {
     return;
   }
   if (a === 'time') {
-    const x = ltById(v), isExtra = !x.bk; ltEditId = v;
+    const x = ltById(v), isExtra = !x.bk, run = ltCtx === 'run'; ltEditId = v;
     ltSheet('<h2>' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + '</h2><div class="lt-sub">' + ltEsc(x.addr) + '</div>'
-      + (isExtra ? '' : '<div style="display:flex;justify-content:space-between;background:#F2F4F7;border-radius:12px;padding:12px 14px;font-size:15px"><span>Giờ trong booking</span><b>' + ltFmt(x.t) + '</b></div>')
-      + '<label class="lt-fld">' + (isExtra ? 'Giờ' : 'Giờ đi làm theo kế hoạch') + '<input id="lt_time" inputmode="numeric" value="' + ltFmt(ltT(x)) + '" autocomplete="off"></label>' + ltBtns('savetime', 'Lưu giờ')
-      + (!isExtra && ltMoved(x) ? '<button class="lt-link" style="text-align:center" data-lt="resettime" data-v="' + v + '">Về giờ booking (' + ltFmt(x.t) + ')</button>' : '')
+      + (isExtra || run ? '' : '<div style="display:flex;justify-content:space-between;background:#F2F4F7;border-radius:12px;padding:12px 14px;font-size:15px"><span>Giờ trong booking</span><b>' + ltFmt(x.t) + '</b></div>')
+      + '<label class="lt-fld">' + (isExtra ? 'Giờ' : (run ? 'Giờ đi làm' : 'Giờ đi làm theo kế hoạch')) + '<input id="lt_time" inputmode="numeric" value="' + ltFmt(ltT(x)) + '" autocomplete="off"></label>' + ltBtns('savetime', 'Lưu giờ')
+      + (!isExtra && !run && ltMoved(x) ? '<button class="lt-link" style="text-align:center" data-lt="resettime" data-v="' + v + '">Về giờ booking (' + ltFmt(x.t) + ')</button>' : '')
       + (x.bk ? '<button class="lt-link" style="text-align:center;color:#344054" data-lt="openbk" data-v="' + x.bk + '">Mở booking</button>' : '<button class="lt-link" style="text-align:center;color:#B42318" data-lt="delitem" data-v="' + v + '">Xoá đơn này</button>'));
     return;
   }
@@ -7455,7 +7617,7 @@ function ltMoneySheet(bkId, kind, fin){
     + (fin ? (blocked ? '<button class="lt-big" disabled style="background:#E4E7EC;color:#5B6472">Thu đủ tiền để hoàn thành thu hồi</button>'
                       : '<button class="lt-big" style="background:var(--lt-dark,#101828);color:#fff" data-lt="confirmfin">' + (kind === 'thu' ? 'Xác nhận đã thu hồi xe' : 'Xác nhận đã giao xe') + '</button>' + (kind !== 'thu' && remain ? '<div class="lt-note" style="text-align:center">Khách còn ' + moneyVN(remain) + ', có thể thu khi trả xe</div>' : ''))
            + '<button class="lt-link" style="text-align:center" data-lt="finlater">Để sau</button>'
-         : '<div class="lt-row2"><button class="lt-btn" data-lt="cancel">Đóng</button><button class="lt-btn" data-lt="openbk" data-v="' + b.id + '">Mở booking</button></div>'));
+         : (nvMode ? '<button class="lt-btn" data-lt="cancel">Đóng</button>' : '<div class="lt-row2"><button class="lt-btn" data-lt="cancel">Đóng</button><button class="lt-btn" data-lt="openbk" data-v="' + b.id + '">Mở booking</button></div>')));
 }
 function ltPayDone(msg){ save(); renderAll(); if (ltPayCtx) ltMoneySheet(ltPayCtx.bk, ltPayCtx.kind, ltPayCtx.fin); const e = document.getElementById('lt_err'); if (e && msg) { e.style.color = 'var(--lt-green,#067647)'; e.textContent = msg; } }
 (function(){
