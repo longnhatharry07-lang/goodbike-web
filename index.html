@@ -14,16 +14,18 @@
 <link rel="apple-touch-icon" href="apple-touch-icon-v3.png">
 <link rel="icon" type="image/png" href="favicon-v3.png">
 <script>
-/* Link nhân viên (?nv=1): cài thành app riêng "GB Lịch trình" */
-if(/[?&]nv=/.test(location.search)){
-  (function(){
-    var m=document.querySelector('link[rel="manifest"]'); if(m) m.href='manifest-nv.json';
-    var t=document.querySelector('meta[name="apple-mobile-web-app-title"]'); if(t) t.content='GB Lịch trình';
-    document.title='GOODBIKE — Lịch trình nhân viên';
-    var ai=document.querySelector('link[rel="apple-touch-icon"]'); if(ai) ai.href='apple-touch-icon-nv.png';   // mũ ĐỎ cho app nhân viên
-    var fi=document.querySelector('link[rel="icon"]'); if(fi) fi.href='favicon-nv.png';
-  })();
-}
+/* APP NHÂN VIÊN = file nhanvien.html: bản sao của index.html, chỉ khác phần đầu (manifest, icon mũ đỏ, tên app)
+   — tạo bằng lệnh ./tao-nhanvien.sh mỗi lần sửa index.html.
+   Máy đã đăng nhập nhân viên bị KHOÁ vào app nhân viên: mở index.html (hay link ?nv=1 cũ) đều chuyển sang nhanvien.html.
+   Chỉ mật khẩu Kế toán mới mở khoá được máy đó. */
+(function(){
+  if(/nhanvien\.html$/i.test(location.pathname) || /[?&]xem=/.test(location.search)) return;
+  var khoa=false; try{ khoa=localStorage.getItem('gb_nvDevice')==='1'; }catch(e){}
+  if(khoa || /[?&]nv=/.test(location.search)){
+    document.documentElement.style.display='none';
+    location.replace(location.pathname.replace(/[^/]*$/,'')+'nhanvien.html');
+  }
+})();
 </script>
 <style>
   :root{
@@ -2293,7 +2295,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-nhanvien3';
+const BAN_APP = '2026-10-24-nhanvien4';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5401,7 +5403,7 @@ const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
 if(VIEW_ASK) document.body.classList.add('viewpending');   // che nội dung ngay, chưa nhập mật khẩu thì không thấy gì
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
 var nvMode=false;             // true = mở bằng link nhân viên (?nv=1) và đã nhập đúng mật khẩu
-const NV_ASK=/[?&]nv=/.test(location.search);
+const NV_ASK=/nhanvien\.html$/i.test(location.pathname)||/[?&]nv=/.test(location.search);
 if(NV_ASK) document.body.classList.add('nvpending');      // che hết cho tới khi nhập đúng mật khẩu nhân viên
 var ctPop=null;
 
@@ -6192,7 +6194,14 @@ function ctAskViewPass(){
    DB.nvPass  // cfg: mật khẩu chung của nhân viên; không có = tắt link
    Máy nhân viên nhớ mật khẩu (localStorage gb_nvPass) nên chỉ nhập 1 lần.
    Chủ đổi mật khẩu → máy nhân viên tự hỏi lại trong vòng 1 phút.        */
-function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'index.html?nv=1'; }
+function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'nhanvien.html'; }
+function nvMoKhoa(){
+  const p=prompt('Máy của chủ cửa hàng? Nhập mật khẩu Kế toán để mở khoá máy này về app quản lý:');
+  if(p==null) return;
+  if(p!==(DB.password||'goodbike')){ alert('Sai mật khẩu Kế toán.'); return; }
+  try{ localStorage.removeItem('gb_nvDevice'); localStorage.removeItem('gb_nvPass'); }catch(e){}
+  location.replace(location.pathname.replace(/[^/]*$/,'')+'index.html');
+}
 function nvAskPass(){
   const ok=String(DB.nvPass||'').trim();
   let saved=''; try{ saved=localStorage.getItem('gb_nvPass')||''; }catch(e){}
@@ -6205,9 +6214,11 @@ function nvAskPass(){
       +'style="width:100%;box-sizing:border-box;margin-top:16px;height:50px;padding:0 14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-align:center">'
       +'<div id="gbNvErr" style="color:#B42318;font-size:13.5px;font-weight:700;min-height:18px;margin-top:8px"></div>'
       +'<button id="gbNvOk" style="margin-top:4px;width:100%;height:52px;background:#101828;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer">Vào lịch trình</button>':'')
+    +'<button id="gbNvOwner" style="margin-top:14px;background:none;border:0;color:#5B6472;font-size:13px;text-decoration:underline;cursor:pointer">Máy của chủ cửa hàng? Mở khoá</button>'
     +'</div>');
-  if(!ok){ box('Link nhân viên đang tắt. Nhờ chủ cửa hàng bật ở tab Kế hoạch giao nhận, nút “Link cho nhân viên”.',false); return; }
-  box('Nhập mật khẩu nhân viên. Máy này sẽ nhớ, lần sau không phải nhập lại.',true);
+  const own=()=>{ const b=document.getElementById('gbNvOwner'); if(b) b.onclick=nvMoKhoa; };
+  if(!ok){ box('Link nhân viên đang tắt. Nhờ chủ cửa hàng bật ở tab Kế hoạch giao nhận, nút “Link cho nhân viên”.',false); own(); return; }
+  box('Nhập mật khẩu nhân viên. Máy này sẽ nhớ, lần sau không phải nhập lại.',true); own();
   const inp=document.getElementById('gbNvPass'), btn=document.getElementById('gbNvOk');
   const go=()=>{
     if(inp.value.trim()===ok){ try{ localStorage.setItem('gb_nvPass',ok); }catch(e){} dongMan('gbNv'); nvApply(ok); }
@@ -6218,6 +6229,7 @@ function nvAskPass(){
 }
 function nvApply(key){
   nvMode=true;
+  try{ localStorage.setItem('gb_nvDevice','1'); }catch(e){}   // khoá máy này vào app nhân viên
   document.body.classList.remove('nvpending');
   document.body.classList.add('nvmode');
   const hd=document.querySelector('header');
@@ -6226,7 +6238,7 @@ function nvApply(key){
     const h1=hd.querySelector('h1'); if(h1) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên</span>');
     hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvOut">Thoát</button>');
     document.getElementById('nvOut').onclick=()=>{
-      if(!confirm('Thoát khỏi máy này? Lần sau phải nhập lại mật khẩu nhân viên.')) return;
+      if(!confirm('Đăng xuất? Lần sau phải nhập lại mật khẩu nhân viên.')) return;
       try{ localStorage.removeItem('gb_nvPass'); }catch(e){}
       location.reload();
     };

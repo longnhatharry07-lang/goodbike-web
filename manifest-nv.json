@@ -2,8 +2,8 @@
   "name": "GOODBIKE — Lịch trình nhân viên",
   "short_name": "GB Lịch trình",
   "description": "Lịch trình giao và thu hồi xe cho nhân viên",
-  "start_url": "./index.html?nv=1",
-  "scope": "./",
+  "start_url": "./nhanvien.html",
+  "scope": "./nhanvien.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
@@ -29,5 +29,5 @@
       "purpose": "maskable"
     }
   ],
-  "id": "./index.html?nv=1"
+  "id": "./nhanvien.html"
 }

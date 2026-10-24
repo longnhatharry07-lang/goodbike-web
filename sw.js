@@ -1,9 +1,10 @@
 // Service Worker cho GOODBIKE PWA
 // Tăng số phiên bản này mỗi khi bạn cập nhật app để buộc làm mới cache.
-const VERSION = 'goodbike-2026-10-24-nhanvien3';
+const VERSION = 'goodbike-2026-10-24-nhanvien4';
 const APP_SHELL = [
   './',
   './index.html',
+  './nhanvien.html',
   './manifest.json',
   './manifest-nv.json',
   './icon-192-v3.png',
@@ -60,7 +61,7 @@ self.addEventListener('fetch', (event) => {
           caches.open(VERSION).then((c) => c.put(req, copy));
           return res;
         })
-        .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
+        .catch(() => caches.match(req).then((r) => r || caches.match(/nhanvien\.html$/i.test(new URL(req.url).pathname) ? './nhanvien.html' : './index.html')))
     );
     return;
   }
