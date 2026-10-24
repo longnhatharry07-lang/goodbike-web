@@ -951,6 +951,62 @@
 .lt-notelab{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.5px;color:#8A5A00}
 .lt-wnote{display:flex;align-items:flex-start;gap:6px;font-size:13px;font-weight:700;color:#7A4A00;background:#FFF6DB;border-radius:8px;padding:5px 8px;margin-top:4px}
 .lt-wnote svg{flex-shrink:0;margin-top:1px}
+.lt-rc{gap:6px}
+.lt-rchead{display:flex;align-items:flex-start;gap:10px}
+.lt-plate{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.3px;color:var(--lt-text);border:1.5px solid var(--lt-text);border-radius:5px;padding:0 6px;background:#fff;line-height:18px}
+.lt-call{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:76px;padding:0 12px;border-radius:12px;background:var(--lt-dark);color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+.lt-call.off{background:var(--lt-chip);color:var(--lt-muted);font-size:12px;min-width:0}
+.lt-wtm{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;color:var(--lt-text);font-family:inherit}
+.lt-wtm b{font-size:20px;font-weight:800}
+.lt-wtm b.late{color:var(--lt-red)}
+.lt-wtm span{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--lt-muted);border:1px solid var(--lt-line);border-radius:6px;padding:2px 5px;background:#fff;white-space:nowrap}
+.lt-now{background:#0B0F17;color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 28px rgba(11,15,23,.28)}
+.lt-nowtop{display:flex;align-items:center;gap:8px}
+.lt-nowk{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff}
+.lt-nowlab{font-size:11px;font-weight:800;letter-spacing:.8px;color:#98A2B3;display:inline-flex;align-items:center;gap:6px}
+.lt-nowlab::before{content:"";width:7px;height:7px;border-radius:50%;background:#32D583;box-shadow:0 0 0 3px rgba(50,213,131,.22)}
+.lt-nowtime{margin-left:auto;border:0;background:transparent;color:#fff;display:flex;flex-direction:column;align-items:flex-end;gap:3px;cursor:pointer;padding:0;font-family:inherit}
+.lt-nowtime b{font-size:22px;font-weight:800;line-height:1}
+.lt-nowtime b.late{color:#FDA29B}
+.lt-nowtime span{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:#D0D5DD;border:1px solid rgba(255,255,255,.22);border-radius:7px;padding:3px 7px}
+.lt-nowmid{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lt-nowxe{font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1}
+.lt-nowplate{font-size:15px;font-weight:800;letter-spacing:.5px;color:#0B0F17;background:#fff;border-radius:6px;padding:3px 9px;box-shadow:inset 0 0 0 2px #0B0F17,0 0 0 1.5px #fff}
+.lt-nowaddr{font-size:18px;font-weight:700;line-height:1.35;display:flex;align-items:center;gap:6px}
+.lt-nowaddr.shop{color:#FEDF89}
+.lt-nowsub{font-size:14px;color:#98A2B3;margin-top:-8px}
+.lt-now .lt-gsteps{background:rgba(255,255,255,.07);color:#E4E7EC}
+.lt-now .lt-gsteps .ok{color:#75E0A7}
+.lt-now .lt-al.amber{background:rgba(253,176,34,.16);color:#FEC84B}
+.lt-now .lt-al.red{background:rgba(240,68,56,.18);color:#FDA29B}
+.lt-nowmoved{background:rgba(50,213,131,.14);color:#75E0A7;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700}
+.lt-nownote{background:rgba(253,176,34,.12);border:1px solid rgba(253,176,34,.45);color:#FEF0C7;border-radius:12px;padding:10px 12px;font-size:15.5px;font-weight:700;line-height:1.4;display:flex;flex-direction:column;gap:4px}
+.lt-nownote .lab{display:flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.6px;color:#FDB022}
+.lt-nowact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:2px}
+.lt-nb2{height:50px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer;font-family:inherit}
+.lt-nb2.off,.lt-nb2:disabled{color:#667085;border-color:rgba(255,255,255,.1);cursor:default}
+.lt-nowfin{height:56px;border-radius:14px;border:0;background:#fff;color:#0B0F17;font-weight:800;font-size:17px;cursor:pointer;font-family:inherit}
+.lt-nowskip{border:0;background:transparent;color:#98A2B3;font-weight:700;font-size:13.5px;padding:2px 0;cursor:pointer;font-family:inherit}
+#view-lichtrinh .lt-seg button.on{background:var(--lt-dark);color:#fff}
+#view-lichtrinh{--kg:#1D5BF0;--kg-bg:#EEF3FF;--kg-ln:#B9CCFB;--kt:#C2410C;--kt-bg:#FFF3EA;--kt-ln:#F9C9A6;--kx:#344054;--kx-bg:#F2F4F7}
+.lt-kp{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:800;padding:4px 10px 4px 8px;border-radius:999px;color:#fff;letter-spacing:.2px}
+.lt-kp.k-giao{background:var(--kg)}.lt-kp.k-thu{background:var(--kt)}.lt-kp.k-grp{background:var(--kx)}
+.lt-wlab{font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#98A2B3}
+.lt-wlab.sm{margin-top:6px;color:var(--lt-muted)}
+.lt-rc.k-giao{border-left:6px solid var(--kg)}
+.lt-rc.k-thu{border-left:6px solid var(--kt);background:var(--kt-bg);border-color:var(--kt-ln);border-left-color:var(--kt)}
+.lt-rc.k-grp{border-left:6px solid var(--kx)}
+.lt-rc.k-giao .lt-wlab.sm{color:var(--kg)}.lt-rc.k-thu .lt-wlab.sm{color:var(--kt)}
+.lt-rc.shop.k-giao,.lt-rc.shop.k-thu{border-left-width:6px}
+.lt-now{position:relative;overflow:hidden;padding-top:0!important}
+.lt-nowband{margin:0 -18px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;letter-spacing:1.2px;color:#fff}
+.lt-now.k-giao .lt-nowband{background:var(--kg)}
+.lt-now.k-thu .lt-nowband{background:var(--kt)}
+.lt-now.k-grp .lt-nowband{background:#475467}
+.lt-now.k-giao{box-shadow:0 0 0 3px var(--kg),0 12px 28px rgba(11,15,23,.28)}
+.lt-now.k-thu{box-shadow:0 0 0 3px var(--kt),0 12px 28px rgba(11,15,23,.28)}
+.lt-nowfin.k-giao{background:var(--kg);color:#fff}
+.lt-nowfin.k-thu{background:var(--kt);color:#fff}
 .lt-money{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .lt-money div{background:#F2F4F7;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:#5B6472}
 .lt-money b{font-size:17px;color:#101828}
@@ -2201,7 +2257,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-thanhduoi';
+const BAN_APP = '2026-10-24-lichtrinh5';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6996,10 +7052,6 @@ function ltAlerts(c){
     if (x.kind === 'thu') {
       if (d < 0) out.push({ lv: 'red', txt: lab + 'Khách trả muộn ' + ltDur(-d) + ' (hẹn ' + ltFmt(T) + ')' });
       else if (d <= 15) out.push({ lv: 'amber', txt: lab + 'Sắp tới giờ thu xe · còn ' + ltDur(d) });
-      const dl = ltDeadline(x);
-      if (dl) { const r = dl.at - now;
-        if (r < 0) out.push({ lv: 'red', txt: lab + 'Trễ hạn để giao lại xe ' + x.xe + ' (cần về trước ' + ltFmt(dl.at) + ')' });
-        else if (r <= 30) out.push({ lv: 'amber', txt: lab + 'Cần đưa xe về trước ' + ltFmt(dl.at) + ' để giao lại' }); }
     } else {
       if (d < 0) out.push({ lv: 'red', txt: lab + 'Giao muộn · quá giờ ' + ltDur(-d) + (ltMoved(x) ? '' : ' (khách hẹn ' + ltFmt(T) + ')') });
       else if (d <= 15) out.push({ lv: 'amber', txt: lab + 'Sắp tới giờ giao · còn ' + ltDur(d) });
@@ -7018,6 +7070,73 @@ const LT_NOTE_IC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" 
 const ltDur = m => { m = Math.round(m); return m < 60 ? m + ' phút' : Math.floor(m / 60) + ' giờ' + (m % 60 ? ' ' + (m % 60) + ' phút' : ''); };
 function ltAlertHtml(list){
   return list.length ? '<div class="lt-alerts">' + list.map(a => '<div class="lt-al ' + a.lv + '">' + ltEsc(a.txt) + '</div>').join('') + '</div>' : '';
+}
+// Lịch trình: 1 đơn đang làm (thẻ đen) + các đơn chờ; biển số, ghi chú đầy đủ, Gọi · Hoàn thành · Thanh toán · Đổi giờ
+const LT_PHONE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg>';
+const LT_CLOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const ltBien = xe => String((DB.vehicleInfo && DB.vehicleInfo[xe] && DB.vehicleInfo[xe].bien) || '').trim();
+function ltCardInfo(id){
+  const c = ltById(id), grp = c.kind === 'grp', mem = grp ? c.members : [c], sh = ltIsShop(c);
+  const bkOf = x => x && x.bk ? (DB.bookings || []).find(z => z.id === x.bk) : null;
+  const memG = mem.slice().sort((p, q) => (p.kind === 'thu' ? 1 : 0) - (q.kind === 'thu' ? 1 : 0));   // ưu tiên khách nhận xe
+  const phone = (memG.map(x => { const bb = bkOf(x); return bb ? splitGuest(bb.guest).phone : ''; }).find(Boolean)) || '';
+  const gname = (memG.map(x => x.guest).find(Boolean)) || '';
+  const payX = mem.find(x => x.kind === 'giao' && x.bk) || mem.find(x => x.bk);
+  const late = ltDate === todayStr() && ltT(c) < ltNowMin();
+  const plates = [...new Set(mem.map(x => ltBien(x.xe)).filter(Boolean))];
+  const finLab = grp ? 'Hoàn thành' : (c.kind === 'thu' ? 'Hoàn thành thu hồi' : 'Hoàn thành giao');
+  const where = sh ? (c.kind === 'thu' ? 'Khách trả tại cửa hàng' : (grp ? 'Tại cửa hàng' : 'Khách lấy tại cửa hàng')) : c.addr;
+  const sub = [grp ? '' : c.typ, gname].filter(Boolean).join(' · ');
+  const tmId = grp ? (mem.find(x => ltDone(x.id) == null) || mem[0]).id : id;   // đơn gộp: đổi giờ của việc kế tiếp
+  const kc = grp ? 'grp' : (c.kind === 'thu' ? 'thu' : 'giao');   // giao + phát sinh cùng màu giao
+  const kLab = grp ? c.label : (c.kind === 'thu' ? 'Thu hồi' : (c.kind === 'ps' ? 'Giao phát sinh' : 'Giao xe'));
+  const wLab = sh ? (c.kind === 'thu' ? 'NHẬN XE TẠI' : 'GIAO XE TẠI') : (grp ? 'ĐỊA ĐIỂM' : (c.kind === 'thu' ? 'ĐI LẤY XE VỀ TỪ' : 'MANG XE ĐẾN'));
+  return { c, grp, mem, sh, phone, gname, payX, late, plates, finLab, where, sub, notes: ltNotesOf(c), tmId, kc, kLab, wLab };
+}
+const LT_KIC = {
+  giao: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+  thu: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>',
+  grp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14M14 4l4 4-4 4M20 16H6M10 12l-4 4 4 4"/></svg>' };
+const ltKPill = k => '<span class="lt-kp k-' + k.kc + '">' + LT_KIC[k.kc] + ltEsc(k.kLab) + '</span>';
+const ltCallBtn = (k, cls) => k.phone ? '<a class="' + cls + '" href="tel:' + ltEsc(k.phone) + '" aria-label="Gọi ' + ltEsc(k.gname || 'khách') + '">' + LT_PHONE + '<span>Gọi</span></a>'
+  : '<span class="' + cls + ' off" title="Booking chưa có số điện thoại">' + LT_PHONE + '<span>Không SĐT</span></span>';
+const ltGSteps = k => k.grp ? '<div class="lt-gsteps">' + k.mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (ltBien(x.xe) ? ' (' + ltEsc(ltBien(x.xe)) + ')' : '') + (k.c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span class="ok">xong</span>' : '') + '</div>').join('') + '</div>' : '';
+// thẻ đơn đang làm (nền đen)
+function ltCurCard(id){
+  const k = ltCardInfo(id), c = k.c;
+  return '<div class="lt-now k-' + k.kc + '">'
+    + '<div class="lt-nowband">' + LT_KIC[k.kc].replace(/width="16" height="16"/, 'width="22" height="22"') + '<span>' + ltEsc(k.kLab.toUpperCase()) + '</span></div>'
+    + '<div class="lt-nowtop"><span class="lt-nowlab">ĐANG LÀM</span>'
+    + '<button class="lt-nowtime" data-lt="time" data-v="' + k.tmId + '" title="Đổi giờ"><b' + (k.late ? ' class="late"' : '') + '>' + ltFmt(ltT(c)) + '</b><span>' + LT_CLOCK + 'Đổi giờ</span></button></div>'
+    + '<div class="lt-nowmid"><div class="lt-nowxe"' + (c.xe.length > 4 ? ' style="font-size:30px"' : '') + '>' + ltEsc(c.xe) + '</div>'
+    + (k.plates.length ? '<div class="lt-nowplate">' + k.plates.map(ltEsc).join(' · ') + '</div>' : '') + '</div>'
+    + '<div class="lt-nowaddr' + (k.sh ? ' shop' : '') + '">' + (k.sh ? LT_SHOP.replace('width="14" height="14"', 'width="18" height="18"') : '') + ltEsc(k.where) + '</div>'
+    + (k.sub ? '<div class="lt-nowsub">' + ltEsc(k.sub) + '</div>' : '')
+    + ltAlertHtml(ltAlerts(c))
+    + ltGSteps(k)
+    + (!k.grp && ltMoved(c) ? '<div class="lt-nowmoved">' + ltEsc(ltNoteOf(c)) + '</div>' : '')
+    + (k.notes.length ? '<div class="lt-nownote"><div class="lab">' + LT_NOTE_IC + 'GHI CHÚ</div>' + k.notes.map(n => '<div>' + ltEsc(n) + '</div>').join('') + '</div>' : '')
+    + '<div class="lt-nowact">' + ltCallBtn(k, 'lt-nb2') + '<button class="lt-nb2" data-lt="pay" data-v="' + id + '"' + (k.payX ? '' : ' disabled') + '>Thanh toán</button></div>'
+    + '<button class="lt-nowfin k-' + k.kc + '" data-lt="finish" data-v="' + id + '">' + k.finLab + '</button>'
+    + (k.sh ? '<button class="lt-nowskip" data-lt="skip" data-v="' + id + '">Khách chưa tới · tạm bỏ qua</button>' : '')
+    + '</div>';
+}
+// thẻ đơn đang chờ
+function ltRunCard(id){
+  const k = ltCardInfo(id), c = k.c;
+  return '<div class="lt-wait"><button class="tm lt-wtm" data-lt="time" data-v="' + k.tmId + '" title="Đổi giờ"><b' + (k.late ? ' class="late"' : '') + '>' + ltFmt(ltT(c)) + '</b><span>' + LT_CLOCK + 'Đổi giờ</span></button>'
+    + '<div class="lt-cd lt-rc k-' + k.kc + (k.sh ? ' shop' : '') + '">'
+    + '<div class="lt-rchead"><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' + ltKPill(k) + '<b style="font-size:18px">' + ltEsc(c.xe) + '</b>'
+    + (k.plates.length ? '<span class="lt-plate">' + k.plates.map(ltEsc).join(' · ') + '</span>' : '')
+    + (k.late ? '<span class="lt-al red sm" style="margin-left:0">Quá giờ</span>' : '') + '</div>'
+    + (k.sh ? '<span class="lt-shopchip" style="margin-top:4px">' + LT_SHOP + ltEsc(k.where) + '</span>' : '<div style="font-size:14.5px;font-weight:600;color:var(--lt-text);margin-top:4px">' + ltEsc(k.where) + '</div>')
+    + (k.sub ? '<div style="font-size:12.5px;color:var(--lt-muted);margin-top:1px">' + ltEsc(k.sub) + '</div>' : '') + '</div>'
+    + ltCallBtn(k, 'lt-call') + '</div>'
+    + ltGSteps(k)
+    + (!k.grp && ltMoved(c) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(c)) + '</div>' : '')
+    + (k.notes.length ? '<div class="lt-wnote">' + LT_NOTE_IC + '<span>' + k.notes.map(ltEsc).join('<br>') + '</span></div>' : '')
+    + (k.sh ? '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '')
+    + '</div></div>';
 }
 function ltRunView(all){
   const P = LT.P, parked = all.filter(id => P.parked[id]), ord = all.filter(id => !P.parked[id] || ltDone(id) != null);
@@ -7041,54 +7160,10 @@ function ltRunView(all){
   if (!queue.length) {
     h.push('<div class="lt-cur" style="align-items:center;text-align:center"><div style="font-size:22px;font-weight:800">' + (ord.length ? 'Xong hết đơn trong ngày' : 'Ngày này chưa có đơn') + '</div><div class="lt-sub">' + doneN + ' đơn đã hoàn thành</div></div>');
   } else {
-    const c = ltById(queue[0]), started = P.started === c.id, shop = ltIsShop(c), grp = c.kind === 'grp';
-    const mem = grp ? c.members : [c];
-    const bkOf = x => x && x.bk ? (DB.bookings || []).find(z => z.id === x.bk) : null;
-    const payX = mem.find(x => x.kind === 'giao' && x.bk) || mem.find(x => x.bk);
-    const memG = mem.slice().sort((p, q) => (p.kind === 'thu' ? 1 : 0) - (q.kind === 'thu' ? 1 : 0));   // ưu tiên khách nhận xe
-    const phone = (memG.map(x => { const bb = bkOf(x); return bb ? splitGuest(bb.guest).phone : ''; }).find(Boolean)) || '';
-    const gname = (memG.map(x => x.guest).find(Boolean)) || '';
-    const callBtn = phone ? '<a class="lt-btn" href="tel:' + ltEsc(phone) + '">Gọi</a>' : '<button class="lt-btn" disabled style="color:var(--lt-muted)">Không có SĐT</button>';
-    let info;
-    if (shop) info = '<div class="lt-addr" style="color:var(--lt-shop);display:flex;align-items:center;gap:6px">' + LT_SHOP.replace('width="14" height="14"', 'width="20" height="20"') + 'Tại cửa hàng</div><div class="lt-sub">' + ltEsc([c.kind === 'thu' ? 'Khách mang xe về trả' : (grp ? '' : 'Khách đến lấy xe'), gname].filter(Boolean).join(' · ')) + '</div>';
-    else info = '<div class="lt-addr">' + ltEsc(c.addr) + '</div><div class="lt-sub">' + ltEsc([grp ? '' : c.typ, gname].filter(Boolean).join(' · ')) + '</div>';
-    const timed = started && !shop && ltDate === todayStr();
-    h.push('<div class="lt-cur' + (started ? ' started' : '') + (timed ? ' timed' : '') + '"' + (timed ? ' data-t="' + ltT(c) + '" data-s="' + (P.startedAt || Date.now()) + '"' : '') + '>'
-      + (timed ? '<svg class="lt-ring" aria-hidden="true"><rect class="lt-rtrk"/><rect class="lt-rbar"/></svg>' : '')
-      + '<div style="display:flex;align-items:center;gap:8px">' + ltTag(c) + (started ? '<span style="font-size:13px;font-weight:700;color:var(--lt-blue)">Đang làm</span>' : '')
-      + '<span style="margin-left:auto;text-align:right"><span style="display:block;font-size:18px;font-weight:800">' + ltFmt(ltT(c)) + '</span>' + (timed ? '<span class="lt-cdn" id="ltCd"></span>' : '') + '</span></div>'
-      + ltAlertHtml(ltAlerts(c))
-      + '<div class="lt-mid"><div class="lt-xe"' + (c.xe.length > 4 ? ' style="font-size:30px"' : '') + '>' + ltEsc(c.xe) + '</div><div>' + info + '</div></div>'
-      + (grp ? '<div class="lt-gsteps">' + mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span style="color:var(--lt-green)">xong</span>' : '') + '</div>').join('') + '</div>' : '')
-      + (ltNotesOf(c).length ? '<div class="lt-notebox"><div class="lt-notelab">' + LT_NOTE_IC + 'GHI CHÚ</div>' + ltNotesOf(c).map(n => '<div>' + ltEsc(n) + '</div>').join('') + '</div>' : '')
-      + (!grp && ltMoved(c) ? '<div style="background:var(--lt-green-bg);color:var(--lt-green);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700">' + ltEsc(ltNoteOf(c)) + '</div>' : ''));
-    if (shop) {
-      // tại cửa hàng: không cần Bắt đầu
-      h.push('<div class="lt-row2">' + callBtn + '<button class="lt-btn" style="background:var(--lt-green);color:#fff;border:0;font-weight:800" data-lt="finish" data-v="' + c.id + '">Hoàn thành</button></div>'
-        + '<div style="display:flex;justify-content:center;gap:18px">' + (payX ? '<button class="lt-link" style="padding:4px 0" data-lt="pay" data-v="' + c.id + '">Xem thanh toán</button>' : '')
-        + (queue.length > 1 ? '<button class="lt-link" style="padding:4px 0;color:var(--lt-text2)" data-lt="skip" data-v="' + c.id + '">Khách chưa tới · tạm bỏ qua</button>' : '') + '</div>');
-    } else if (!started) {
-      h.push('<button class="lt-big" style="background:var(--lt-dark);color:#fff" data-lt="start" data-v="' + c.id + '">Bắt đầu</button>');
-      if (ltCanPark(c)) h.push('<button class="lt-btn" style="color:var(--lt-text2)" data-lt="park" data-v="' + c.id + '">' + LT_PARK + 'Để sau, xe chưa có khách mới</button>');
-    } else {
-      h.push('<div class="lt-row2">' + callBtn + '<button class="lt-btn" data-lt="pay" data-v="' + c.id + '"' + (payX ? '' : ' disabled') + '>Thanh toán</button></div>'
-        + '<button class="lt-big" style="background:var(--lt-green);color:#fff" data-lt="finish" data-v="' + c.id + '">Hoàn thành</button>'
-        + '<button class="lt-link" style="text-align:center;padding:6px 0;color:var(--lt-muted)" data-lt="unstart" data-v="' + c.id + '">↩ Hoàn tác bắt đầu (bấm nhầm)</button>');
-    }
-    h.push('</div>');
-    const waiting = queue.slice(1, 3);
-    if (waiting.length) {
-      h.push('<div class="lt-div"></div><div class="lt-lab">ĐANG CHỜ</div>');
-      waiting.forEach(id => { const x = ltById(id), sh = ltIsShop(x);
-        const lateW = ltDate === todayStr() && ltT(x) < ltNowMin();
-        h.push('<div class="lt-wait"><div class="tm"' + (lateW ? ' style="color:var(--lt-red)"' : '') + '>' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '"><div style="display:flex;align-items:center;gap:8px">' + ltTag(x, 1) + '<b style="font-size:18px">' + ltEsc(x.xe) + '</b>' + (lateW ? '<span class="lt-al red sm">Quá giờ</span>' : '') + '</div>'
-          + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' : '<div class="lt-ell" style="font-size:14px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div>')
-          + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:var(--lt-green)">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
-          + (ltNotesOf(x).length ? '<div class="lt-wnote">' + LT_NOTE_IC + '<span>' + ltEsc(ltNotesOf(x).join(' · ')) + '</span></div>' : '') + (sh ? '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '') + '</div></div>'); });
-      if (queue.length > 3) h.push('<button class="lt-link" data-lt="toggleAll">' + (ltShowAll ? 'Ẩn bớt' : 'Còn ' + (queue.length - 3) + ' đơn sau') + '</button>');
-      if (ltShowAll) queue.slice(3).forEach(id => { const x = ltById(id), sh = ltIsShop(x);
-        h.push('<div class="lt-wait"' + (sh ? '' : ' style="opacity:.8"') + '><div class="tm" style="font-size:16px">' + ltFmt(ltT(x)) + '</div><div class="lt-cd' + (sh ? ' shop' : '') + '" style="padding:8px 12px"><div style="font-size:14px"><b>' + ltEsc(x.xe) + '</b> · ' + LT_TYPE[x.kind][0] + '</div>'
-          + (sh ? '<span class="lt-shopchip">' + LT_SHOP + (x.kind === 'thu' ? 'Khách trả tại cửa hàng' : 'Khách lấy tại cửa hàng') + '</span>' + '<div class="lt-shopact"><button class="lt-btn" data-lt="finish" data-v="' + id + '">Hoàn thành</button><button class="lt-btn" data-lt="skip" data-v="' + id + '">Tạm bỏ qua</button></div>' : '<div class="lt-ell" style="font-size:13px;color:var(--lt-muted)">' + ltEsc(x.addr) + '</div>') + '</div></div>'); });
+    h.push(ltCurCard(queue[0]));
+    if (queue.length > 1) {
+      h.push('<div class="lt-div"></div><div class="lt-lab">ĐANG CHỜ · ' + (queue.length - 1) + ' ĐƠN</div>');
+      queue.slice(1).forEach(id => h.push(ltRunCard(id)));
     }
   }
   if (parked.length) {
@@ -7096,7 +7171,7 @@ function ltRunView(all){
     parked.forEach(id => { const x = ltById(id);
       h.push('<div class="lt-cd" style="border:1.5px dashed var(--lt-line);flex-direction:row;align-items:center;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px">' + ltTag(x, 1) + '<b style="font-size:18px">' + ltEsc(x.xe) + '</b><span class="lt-note">khách trả ' + ltFmt(ltT(x)) + '</span></div><div class="lt-ell" style="font-size:14px;color:var(--lt-text2);margin-top:3px">' + ltEsc(x.addr) + '</div></div><button class="lt-btn" style="height:44px;flex-shrink:0;background:var(--lt-dark);color:#fff;border:0" data-lt="fetch" data-v="' + id + '">Đi lấy</button></div>'); });
   }
-  h.push('<div class="lt-div"></div><button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="addps">+ Giao phát sinh</button>');
+  h.push('<div class="lt-div"></div><button class="lt-btn" style="border:1.5px dashed var(--kg);color:var(--kg);background:transparent" data-lt="addps">+ Giao phát sinh</button>');
   if (doneN) {
     h.push('<button class="lt-link" data-lt="toggleDone">' + (ltShowDone ? 'Ẩn đơn đã xong' : 'Đã xong ' + doneN + ' đơn') + '</button>');
     if (ltShowDone) {
