@@ -947,6 +947,41 @@
 .kh-note input{flex:1;height:38px;border-radius:10px;border:1px solid #DDD6FE;padding:0 12px;font-size:14px;font-weight:500;background:#FDFBFF}
 .lt-r.dragging{pointer-events:none}
 .lt-r.mergeT .lt-pc{outline:3px solid var(--lt-grp);outline-offset:2px;background:var(--lt-grp-bg)}
+/* Kế hoạch: thẻ gọn hơn + sơ đồ xe thu nhỏ + khoảng trống + vạch giờ hiện tại (bản khmini) */
+#view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) 440px;gap:20px}
+#view-kehoach .lt-colhead,#view-kehoach .lt-r{grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr)}
+#view-kehoach .lt-spn{width:24px;height:24px;font-size:11px}
+#view-kehoach .kh-card{padding:6px 8px 6px 11px;gap:1px;border-radius:10px}
+#view-kehoach .kh-card .lt-tbtn{font-size:14.5px}
+#view-kehoach .kh-xe{font-size:14.5px}
+#view-kehoach .kh-addr{font-size:12.5px;line-height:1.3}
+#view-kehoach .kh-guest{font-size:12px}
+#view-kehoach .kh-card .lt-mini{font-size:11.5px;padding-top:0;padding-bottom:0}
+#view-kehoach .kh-card .lt-warn{font-size:11.5px}
+#view-kehoach .lt-gap{height:10px}
+#view-kehoach .lt-pc{position:relative;z-index:1}
+#view-kehoach .lt-gap.kh-free{height:auto;padding:7px 0}
+#view-kehoach .lt-gap.kh-free::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed #9AD3B2}
+#view-kehoach .lt-gap.kh-free button{width:auto;height:30px;border-radius:999px;opacity:1;padding:0 4px 0 12px;gap:8px;font-size:13px;font-weight:700;color:#05603A;background:#ECFDF3;border:1.5px solid #75C69A;white-space:nowrap;box-shadow:0 0 0 4px #fff}
+#view-kehoach .lt-gap.kh-free button .pl{font-size:16px;line-height:1;font-weight:800}
+#view-kehoach .lt-gap.kh-free button .tm{font-weight:600;color:#3B7A57;font-variant-numeric:tabular-nums}
+#view-kehoach .lt-gap.kh-free button .nx{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:#fff;border:1px solid #A6DDBD;color:#05603A;font-weight:800}
+#view-kehoach .lt-gap.kh-free button:hover{background:#067647;color:#fff;border-color:#067647}
+#view-kehoach .lt-gap.kh-free button:hover .tm{color:#D1FADF}
+.kh-now{position:absolute;left:0;right:0;height:0;border-top:2px solid #D92D20;z-index:0;pointer-events:none;transition:top .6s ease}
+.kh-nowb{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;pointer-events:none;background:#D92D20;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px #fff;transition:top .6s ease}
+.lt-plist.dragmode .kh-now,.lt-plist.dragmode .kh-nowb{visibility:hidden}
+.kh-mini{padding:12px}
+.kh-mini .mh{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.kh-mini .mh h3{margin:0}
+.kh-mini .mh .sum{margin-left:auto;font-size:12px;color:var(--lt-muted);font-weight:600}
+.km-wrap{overflow:auto;height:min(560px,calc(100vh - 140px));border:1px solid #E4E7EC;border-radius:10px;background:#fff;overscroll-behavior:contain}
+#khTl{zoom:.62}
+.km-wrap.tl-wrap{max-height:none}
+#khTl .km-band{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(6,118,71,.14);border-left:2px dashed #067647;border-right:2px dashed #067647;z-index:4;display:none}
+#khTl .km-band.on{display:block}
+#khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:3px solid #D92D20;z-index:4}
+@media(max-width:1000px){.kh-side{max-height:none}}
 .lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
 .lt-gsteps{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--lt-text2);background:#F8FAFC;border-radius:10px;padding:8px 12px}
 .lt-gnote{background:var(--lt-grp-bg);color:var(--lt-grp);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
@@ -2295,7 +2330,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-nhanvien5';
+const BAN_APP = '2026-10-24-khmini';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3020,7 +3055,7 @@ function tlWireDrag(tl){
   const wrap=tl.closest('.tl-wrap');
   const rowAt=(x,y)=>{ const g=tlDrag.st&&tlDrag.st.ghost; if(g) g.style.display='none';
     const el=document.elementFromPoint(x,y); if(g) g.style.display='';
-    const r=el&&el.closest&&el.closest('#timeline .tl-row'); return r||null; };
+    const r=el&&el.closest&&el.closest('#'+tl.id+' .tl-row'); return r||null; };
   const clearHi=()=>tl.querySelectorAll('.tl-row.drop-ok,.tl-row.drop-bad').forEach(r=>r.classList.remove('drop-ok','drop-bad'));
   function begin(st){
     const b=DB.bookings.find(x=>x.id===st.id); if(!b){tlDrag.st=null;return;}
@@ -3075,15 +3110,15 @@ function tlWireDrag(tl){
     if(ev.pointerType==='touch' || ev.button!==0) return;
     const bar=ev.target.closest('.bar'); if(!bar||!tl.contains(bar)) return;
     if(typeof viewMode!=='undefined' && viewMode) return;
-    tlDrag.st={id:bar.dataset.id,bar,x0:ev.clientX,y0:ev.clientY,x0Fixed:ev.clientX,on:false};
+    tlDrag.st={id:bar.dataset.id,bar,tl,x0:ev.clientX,y0:ev.clientY,x0Fixed:ev.clientX,on:false};
   });
   window.addEventListener('pointermove',ev=>{
-    const st=tlDrag.st; if(!st||ev.pointerType==='touch') return;
+    const st=tlDrag.st; if(!st||st.tl!==tl||ev.pointerType==='touch') return;   // mỗi sơ đồ chỉ lo lần kéo bắt đầu trên nó
     if(!st.on){ if(Math.abs(ev.clientY-st.y0)<6 && Math.abs(ev.clientX-st.x0)<6) return; begin(st); if(!tlDrag.st) return; autoScroll(); }
     ev.preventDefault(); move(ev.clientX,ev.clientY);
   });
-  window.addEventListener('pointerup',ev=>{ if(ev.pointerType==='touch') return; if(tlDrag.st) end(false); });
-  window.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&tlDrag.st) end(true); });
+  window.addEventListener('pointerup',ev=>{ if(ev.pointerType==='touch') return; if(tlDrag.st&&tlDrag.st.tl===tl) end(false); });
+  window.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&tlDrag.st&&tlDrag.st.tl===tl) end(true); });
   tl.addEventListener('dragstart',ev=>{ if(ev.target.closest&&ev.target.closest('.bar')) ev.preventDefault(); });
   /* ---- cảm ứng: giữ 0,4 giây rồi kéo ---- */
   tl.addEventListener('touchstart',ev=>{
@@ -3091,7 +3126,7 @@ function tlWireDrag(tl){
     const bar=ev.target.closest('.bar'); if(!bar) return;
     if(typeof viewMode!=='undefined' && viewMode) return;
     const t=ev.touches[0];
-    const st={id:bar.dataset.id,bar,x0:t.clientX,y0:t.clientY,x0Fixed:t.clientX,on:false,touch:true};
+    const st={id:bar.dataset.id,bar,tl,x0:t.clientX,y0:t.clientY,x0Fixed:t.clientX,on:false,touch:true};
     st.hold=setTimeout(()=>{ if(tlDrag.st===st){ begin(st); if(tlDrag.st){ try{navigator.vibrate&&navigator.vibrate(30);}catch(e){} autoScroll(); } } },400);
     tlDrag.st=st;
   },{passive:true});
@@ -7144,6 +7179,7 @@ function renderKeHoach(){
     + '<button class="lt-nb" data-lt="day" data-v="' + ltAddDays(khDate, 1) + '" aria-label="Ngày sau">▶</button></div>'
     + '<div class="kh-actions"><button class="lt-btn" style="height:40px" data-lt="nvshare">Link cho nhân viên</button><button class="lt-btn" style="height:40px" data-lt="auto">Xếp tự động</button><button class="lt-btn" style="height:40px;background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="gorun">Xem lịch trình nhân viên</button></div></div>'
     + ltMsgHtml() + ltPlanDesk(all);
+  khMiniFill(); khNowLine();
 }
 
 function ltGrpCard(g, i, warn){
@@ -7175,8 +7211,16 @@ function ltPlanDesk(all){
   h.push('<div class="lt-colhead"><div><i style="background:var(--lt-slate)"></i>THU HỒI · ' + nT + '</div><div></div><div><i style="background:var(--lt-blue)"></i>GIAO XE · ' + (xs.length - nT) + '</div></div>');
   const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '" title="Chèn đơn vào đây">+</button></div>';
   h.push('<div class="lt-plist" id="ltList">' + gap(0));
+  const gapAfter = i => {   // việc i xong → việc i+1: nếu còn trống đủ lâu thì hiện ký hiệu để chèn đơn
+    if (i + 1 >= ord.length) return gap(i + 1);
+    const a = ltById(ord[i]), b = ltById(ord[i + 1]);
+    const from = khEndT(a) + KH_JOB, to = ltT(b), free = to - from;
+    if (free < KH_FREE) return gap(i + 1);
+    const nx = khFreeXe(from, to);
+    return '<div class="lt-gap kh-free"><button data-lt="ins" data-v="' + (i + 1) + '" data-t="' + ltFmt(from) + '" data-a="' + from + '" data-b="' + to + '" title="Chèn đơn vào khoảng trống này"><span class="pl">+</span>Trống ' + khDur(free) + '<span class="tm">' + ltFmt(from) + ' – ' + ltFmt(to) + '</span><span class="nx">' + nx + ' xe rảnh</span></button></div>';
+  };
   ord.forEach((id, i) => {
-    if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gap(i + 1)); return; }
+    if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gapAfter(i)); return; }
     const x = ltById(id), done = ltDone(id) != null, shop = ltIsShop(x);
     const side = x.kind === 'thu' ? 'thu' : (x.kind === 'ps' ? 'ps' : 'giao');
     const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + (x.hidden ? ' lt-hid' : '') + '" style="' + (done && !x.hidden ? 'opacity:.5' : '') + '">'
@@ -7191,35 +7235,142 @@ function ltPlanDesk(all){
       + (w[id] ? '<div class="lt-warn">' + ltEsc(w[id]) + '</div>' : '')
       + (x.hidden ? '<span class="lt-note">Đang ẩn · không có trong lịch của nhân viên</span>' : (!done && ltCanPark(x) ? '<div><button class="lt-mini" data-lt="park" data-v="' + id + '">' + LT_PARK + 'Để sau</button></div>' : ''))
       + '</div>';
-    h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? card : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : card) + '</div>' + gap(i + 1));
+    h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? card : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : card) + '</div>' + gapAfter(i));
   });
-  h.push('</div></div>');
+  h.push((ltDate === todayStr() ? '<div class="kh-now" id="khNow" style="display:none"></div><div class="kh-nowb" id="khNowB" style="display:none"></div>' : '') + '</div></div>');
 
   // cột phải
   h.push('<aside class="kh-side">');
-  h.push('<div class="kh-box"><h3>TỔNG QUAN</h3>'
-    + '<div class="kh-stat"><span>Thu hồi</span><b>' + nT + '</b></div>'
-    + '<div class="kh-stat"><span>Giao xe</span><b>' + (xs.length - nT) + '</b></div>'
-    + '<div class="kh-stat"><span>Tại cửa hàng</span><b>' + nShop + '</b></div>'
-    + '<div class="kh-stat"><span>Đổi giờ so với booking</span><b>' + nMoved + '</b></div>'
-    + '<div class="kh-stat"' + (nNoAddr ? ' style="color:var(--lt-red)"' : '') + '><span>Chưa có địa chỉ</span><b>' + nNoAddr + '</b></div>'
-    + '<div class="kh-stat"><span>Đã xong</span><b>' + nDone + '/' + ord.length + '</b></div></div>');
-  const wk = Object.keys(w);
-  if (wk.length) {
-    h.push('<div class="kh-box" style="border-color:#FECDCA"><h3 style="color:var(--lt-red)">CẦN XEM LẠI · ' + wk.length + '</h3>');
-    wk.forEach(id => { const x = ltById(id); h.push('<div class="kh-stat" style="display:block"><b>Thu ' + ltEsc(x.xe) + ' · ' + ltFmt(ltT(x)) + '</b><div style="font-size:13px;color:var(--lt-red)">' + ltEsc(w[id]) + '</div></div>'); });
-    h.push('</div>');
-  }
+  h.push(khMini());
   if (parked.length) {
     h.push('<div class="kh-box" style="border-style:dashed"><h3>ĐANG TREO · ' + parked.length + '</h3>');
     parked.forEach(id => { const x = ltById(id);
       h.push('<div class="kh-stat" style="align-items:center;gap:8px"><div style="min-width:0"><b>Thu ' + ltEsc(x.xe) + '</b> <span class="lt-note">từ ' + ltFmt(ltT(x)) + '</span><div class="lt-ell" style="font-size:13px;color:var(--lt-text2)">' + ltEsc(x.addr) + '</div></div><button class="lt-btn" style="height:36px;font-size:13px;flex-shrink:0" data-lt="unpark" data-v="' + id + '">Đưa vào lịch</button></div>'); });
     h.push('</div>');
   }
-  h.push('<button class="lt-btn" style="border:1.5px dashed var(--lt-orange);color:var(--lt-orange);background:transparent" data-lt="ins" data-v="' + ord.length + '">+ Thêm đơn vào cuối lịch</button>');
   h.push('</aside></div>');
   return h.join('');
 }
+
+// ===== Kế hoạch: sơ đồ xe thu nhỏ, khoảng trống, vạch giờ hiện tại =====
+const KH_JOB = 30;    // phút cho một lượt giao / thu (đi + làm việc)
+const KH_FREE = 30;   // còn trống từ chừng này phút trở lên thì hiện ký hiệu "Trống"
+const khEndT = x => x.kind === 'grp' ? Math.max.apply(null, x.members.map(m => ltT(m))) : ltT(x);
+const khDur = m => m < 60 ? m + ' phút' : Math.floor(m / 60) + 'h' + (m % 60 ? ltPad(m % 60) : '');
+// khoảng bận của từng xe trong ngày ltDate: [{s,e,b,cl,cr}] theo phút (−1 = từ hôm trước, 1440 = sang hôm sau)
+function khBusy(){
+  const D = ltDate, out = {};
+  XE_THAT.forEach(v => { out[v.id] = []; });
+  (DB.bookings || []).forEach(b => {
+    if (!b || !b.xe || !out[b.xe] || b.status === 'huy' || !b.arrive || !b.depart) return;
+    if (b.status === 'danhan' && b.depart < D && D >= todayStr()) { out[b.xe].push({ s: -1, e: 1440, b, cl: true, cr: true, late: true }); return; }   // quá hạn chưa trả: vẫn bận
+    if (b.arrive > D || b.depart < D) return;
+    const cl = b.arrive < D, cr = b.depart > D;
+    let s = cl ? -1 : ltParse(planDtime(b)), e = cr ? 1440 : ltParse(planRtime(b));
+    if (s == null) s = 0; if (e == null) e = 1440;
+    if (e <= s && !cl && !cr) e = s + 30;
+    out[b.xe].push({ s, e, b, cl, cr });
+  });
+  return out;
+}
+function khFreeXe(a, z){
+  const busy = khBusy();
+  return XE_THAT.filter(v => !busy[v.id].some(r => r.s < z && a < r.e)).length;
+}
+// Sơ đồ xe thu nhỏ: bản sao y hệt tab Sơ đồ xe — thêm, sửa, kéo booking như sơ đồ chính
+let khTlAt = null;   // ngày đã cuộn tới lần trước
+const KH_TLZ = 0.62; // tỉ lệ thu nhỏ (khớp với zoom của #khTl trong CSS)
+function khMini(){
+  return '<div class="kh-box kh-mini"><div class="mh"><h3>SƠ ĐỒ XE</h3></div><div id="kmSlot"></div></div>';
+}
+function khTlCss(){   // chép mọi luật CSS của #timeline sang #khTl để trông y hệt
+  if (document.getElementById('khTlCss')) return;
+  const out = [];
+  const walk = (rules, o, c) => Array.from(rules).forEach(r => {
+    if (r.media && r.cssRules) { walk(r.cssRules, '@media ' + r.media.mediaText + '{', '}'); return; }
+    if (r.selectorText && r.selectorText.indexOf('#timeline') >= 0) out.push(o + r.cssText.split('#timeline').join('#khTl') + c);
+  });
+  Array.from(document.styleSheets).forEach(sh => { try { walk(sh.cssRules, '', ''); } catch (e) {} });
+  const st = document.createElement('style'); st.id = 'khTlCss'; st.textContent = out.join('\n');
+  document.head.appendChild(st);
+}
+// khung sơ đồ nhỏ tạo 1 lần, giữ nguyên qua các lần vẽ lại Kế hoạch (để kéo thả / bấm chỉ gắn 1 lần)
+let khTlBox = null;
+function khTlInit(){
+  if (khTlBox) return khTlBox;
+  const wrap = document.createElement('div'); wrap.className = 'km-wrap tl-wrap'; wrap.id = 'kmWrap';
+  const tl = document.createElement('div'); tl.className = 'tl'; tl.id = 'khTl'; wrap.appendChild(tl);
+  document.body.appendChild(wrap); wrap.style.display = 'none';
+  tlWireDrag(tl);   // kéo thanh booking sang xe khác — y như sơ đồ chính
+  tl.addEventListener('click', ev => {
+    if (tlDrag.justEnded) return;
+    const bar = ev.target.closest('.bar'); if (bar) { ev.stopPropagation(); openBooking(bar.dataset.id); return; }
+    const veh = ev.target.closest('.vehclick'); if (veh) { openVehInfo(veh.dataset.veh); return; }
+    const c = ev.target.closest('.gridcell'); if (c) openBooking(null, { xe: c.dataset.xe, ds: c.dataset.ds });
+  });
+  khTlBox = wrap; return wrap;
+}
+function khMiniFill(){
+  const slot = document.getElementById('kmSlot'), src = document.getElementById('timeline');
+  if (!slot || !src) return;
+  khTlCss();
+  const wrap = khTlInit(), c = wrap.firstChild;
+  if (wrap.parentNode !== slot) { slot.appendChild(wrap); wrap.style.display = ''; }
+  const keep = khTlAt === khDate && c.firstChild ? [wrap.scrollLeft, wrap.scrollTop] : null;
+  c.innerHTML = src.innerHTML;
+  c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
+  c.querySelectorAll('.tlp-miss,.tlp-dim').forEach(e => e.classList.remove('tlp-miss', 'tlp-dim'));
+  const idx = tlWindow().map[khDate], veh = c.querySelector('.tl-row .veh'), vw = veh ? veh.offsetWidth : 120;
+  c.dataset.vw = vw;
+  if (idx != null) {
+    const head = c.querySelector('.tl-head');
+    const band = document.createElement('div'); band.className = 'km-band'; band.id = 'kmBand';
+    if (head) band.style.top = (head.offsetTop + head.offsetHeight) + 'px';
+    c.appendChild(band);
+    if (khDate === todayStr()) { const n = document.createElement('div'); n.className = 'km-now'; n.id = 'kmNow'; n.style.left = (vw + idx * DAYW + ltNowMin() / 1440 * DAYW) + 'px'; c.appendChild(n); }
+  }
+  if (keep) { wrap.scrollLeft = keep[0]; wrap.scrollTop = keep[1]; }
+  else if (idx != null) { wrap.scrollLeft = Math.max(0, idx * DAYW * KH_TLZ - 20); wrap.scrollTop = 0; }
+  khTlAt = khDate;
+}
+(function(){   // sơ đồ chính vẽ lại → bản nhỏ vẽ theo
+  const src = document.getElementById('timeline'); if (!src) return;
+  new MutationObserver(() => { clearTimeout(khMiniFill._t); khMiniFill._t = setTimeout(() => { const v = document.getElementById('view-kehoach'); if (v && v.style.display !== 'none') khMiniFill(); }, 0); }).observe(src, { childList: true });
+})();
+// vạch giờ hiện tại trên danh sách việc: đi qua giữa thẻ đúng lúc tới giờ của thẻ đó
+function khNowLine(){
+  const el = document.getElementById('khNow'), list = document.getElementById('ltList');
+  const kn = document.getElementById('kmNow'), kt = document.getElementById('khTl'), now = ltNowMin();
+  if (kn && kt) { const idx = tlWindow().map[khDate]; if (idx != null) kn.style.left = (+kt.dataset.vw + idx * DAYW + now / 1440 * DAYW) + 'px'; }
+  if (!el || !list || !LT) return;
+  const rows = Array.from(list.querySelectorAll('.lt-r[data-idx]')); if (!rows.length) { el.style.display = 'none'; const lb0 = document.getElementById('khNowB'); if (lb0) lb0.style.display = 'none'; return; }
+  const ord = ltOrder().filter(id => !LT.P.parked[id]);
+  const T = rows.map(r => { const x = ltById(ord[+r.dataset.idx]); return x ? ltT(x) : null; });
+  const mid = r => r.offsetTop + r.offsetHeight / 2;
+  let y, k = T.findIndex(t => t != null && t > now);
+  if (k === 0) y = Math.max(4, rows[0].offsetTop - 6);
+  else if (k < 0) { const r = rows[rows.length - 1]; y = r.offsetTop + r.offsetHeight + 6; }
+  else { const t0 = T[k - 1] == null ? now : T[k - 1], f = Math.max(0, Math.min(1, (now - t0) / Math.max(1, T[k] - t0))); y = mid(rows[k - 1]) + (mid(rows[k]) - mid(rows[k - 1])) * f; }
+  const lb = document.getElementById('khNowB');
+  el.style.top = y.toFixed(1) + 'px'; el.style.display = '';
+  if (lb) { lb.style.top = y.toFixed(1) + 'px'; lb.style.display = ''; lb.textContent = ltFmt(now); }
+}
+setInterval(() => { const v = document.getElementById('view-kehoach'); if (v && v.style.display !== 'none' && !ltDrag) khNowLine(); }, 20000);
+window.addEventListener('resize', () => { if (!ltDrag) khNowLine(); });
+// rê chuột vào ký hiệu "Trống" → tô khoảng giờ đó trên sơ đồ xe
+document.addEventListener('mouseover', e => {
+  const band = document.getElementById('kmBand'), kt = document.getElementById('khTl'); if (!band || !kt) return;
+  const b = e.target.closest && e.target.closest('#view-kehoach .kh-free button');
+  if (!b) { band.classList.remove('on'); return; }
+  const idx = tlWindow().map[khDate]; if (idx == null) return;
+  const x = m => +kt.dataset.vw + idx * DAYW + m / 1440 * DAYW;
+  band.style.left = x(+b.dataset.a) + 'px'; band.style.width = (x(+b.dataset.b) - x(+b.dataset.a)) + 'px';
+  if (!band.classList.contains('on')) {
+    band.classList.add('on');
+    const wrap = document.getElementById('kmWrap'), L = x(+b.dataset.a) * KH_TLZ, R = x(+b.dataset.b) * KH_TLZ, vw = +kt.dataset.vw * KH_TLZ;
+    if (wrap && (L < wrap.scrollLeft + vw + 10 || R > wrap.scrollLeft + wrap.clientWidth)) wrap.scrollTo({ left: Math.max(0, L - vw - 40), behavior: 'smooth' });
+  }
+});
 
 // cảnh báo theo giờ cho 1 việc (chỉ tính khi đang xem hôm nay)
 function ltAlerts(c){
@@ -7517,7 +7668,7 @@ document.addEventListener('click', e => {
     ltSheet('<h2>Chèn đơn vào vị trí ' + (i + 1) + '</h2>'
       + '<div class="lt-kseg" id="lt_kind"><button class="on" data-lt="kind" data-v="giao">Giao xe</button><button data-lt="kind" data-v="thu">Thu hồi</button><button data-lt="kind" data-v="ps">Phát sinh</button></div>'
       + '<label class="lt-fld">Xe<input id="lt_xe" placeholder="Ví dụ A3" autocomplete="off"></label>'
-      + '<label class="lt-fld">Giờ<input id="lt_time" inputmode="numeric" value="' + (near ? ltFmt(ltT(near)) : '08:00') + '" autocomplete="off"></label>'
+      + '<label class="lt-fld">Giờ<input id="lt_time" inputmode="numeric" value="' + (b.dataset.t || (near ? ltFmt(ltT(near)) : '08:00')) + '" autocomplete="off"></label>'
       + '<label class="lt-fld">Địa chỉ<input id="lt_addr" placeholder="Số nhà, đường" autocomplete="off"></label>' + ltBtns('saveins', 'Chèn đơn'));
     return;
   }
