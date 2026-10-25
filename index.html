@@ -915,6 +915,8 @@
 .kh-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
 @media(max-width:1000px){.kh-grid{grid-template-columns:1fr}.kh-side{position:static!important}}
 .kh-side{position:sticky;top:12px;display:flex;flex-direction:column;gap:12px}
+/* overflow-x:hidden ở html/body biến trang thành khung cuộn riêng → sticky không chạy; clip vẫn chặn tràn ngang mà sticky chạy được */
+html.kh-on,html.kh-on body{overflow-x:clip}
 .kh-box{background:#fff;border:1px solid var(--lt-line);border-radius:14px;padding:14px 16px}
 .kh-box h3{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.5px;color:var(--lt-muted)}
 .kh-stat{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:14px;border-top:1px solid var(--lt-line2)}
@@ -947,8 +949,33 @@
 .kh-note input{flex:1;height:38px;border-radius:10px;border:1px solid #DDD6FE;padding:0 12px;font-size:14px;font-weight:500;background:#FDFBFF}
 .lt-r.dragging{pointer-events:none}
 .lt-r.mergeT .lt-pc{outline:3px solid var(--lt-grp);outline-offset:2px;background:var(--lt-grp-bg)}
+/* ===== Menu thu gọn → dock nổi ở mép trái màn hình ===== */
+.gb-dockbtn{display:none}
+#gbDockZone{display:none}
+@media (min-width:1000px){
+  body.gb-shell .gb-dockbtn{display:flex;align-items:center;gap:10px;width:100%;height:40px;margin-top:auto;padding:0 10px;border:0;border-radius:8px;background:transparent;color:#98A2B3;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+  body.gb-shell .gb-dockbtn:hover{background:#1D2939;color:#fff}
+  .gb-dockbtn .d-out{display:none}
+  html.gb-dock .gb-dockbtn .d-in{display:none}
+  html.gb-dock .gb-dockbtn .d-out{display:inline}
+  html.gb-dock body.gb-shell{padding-left:0}
+  html.gb-dock #gbDockZone{display:block;position:fixed;left:0;top:0;bottom:0;width:10px;z-index:44}
+  html.gb-dock body.gb-shell #tabs{top:50%;left:10px;bottom:auto;width:auto;height:auto;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 8px;border-radius:20px;background:rgba(16,24,40,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:18px 0 40px rgba(16,24,40,.35);overflow:visible;transform:translate(calc(-100% - 24px),-50%);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:60}
+  html.gb-dock.dock-show body.gb-shell #tabs{transform:translate(0,-50%)}
+  html.gb-dock body.gb-shell #tabs .nav-logo,html.gb-dock body.gb-shell #tabs .nav-lab,html.gb-dock body.gb-shell #tabs .tab-group,html.gb-dock body.gb-shell #tabs .gb-side-sync{display:none!important}
+  html.gb-dock body.gb-shell #tabs .tab,html.gb-dock body.gb-shell .gb-dockbtn{position:relative;width:48px;height:48px;margin:0;padding:0;justify-content:center;font-size:0;border-radius:12px;color:#D0D5DD;background:rgba(255,255,255,.06)}
+  html.gb-dock body.gb-shell #tabs .tab.active{background:rgba(255,255,255,.18);color:#fff}
+  html.gb-dock body.gb-shell #tabs .tab.active::before{content:"";position:absolute;left:-6px;top:50%;width:4px;height:4px;margin-top:-2px;border-radius:50%;background:#fff}
+  html.gb-dock body.gb-shell .gb-dockbtn .d-txt{display:none}
+  html.gb-dock #tabs .tic{transition:transform .18s ease;transform-origin:0 50%}
+  html.gb-dock #tabs .tic svg{width:24px;height:24px}
+  html.gb-dock #tabs .tab:hover .tic,html.gb-dock #tabs .gb-dockbtn:hover .tic{transform:scale(1.45) translateX(2px)}
+  html.gb-dock #tabs .tab:hover + .tab .tic,html.gb-dock #tabs .tab:has(+ .tab:hover) .tic{transform:scale(1.18)}
+  html.gb-dock #tabs .tab::after,html.gb-dock #tabs .gb-dockbtn::after{content:attr(data-lab);position:absolute;left:calc(100% + 18px);top:50%;transform:translateY(-50%);padding:5px 10px;border-radius:8px;background:#101828;color:#fff;font-size:12.5px;font-weight:700;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s}
+  html.gb-dock #tabs .tab:hover::after,html.gb-dock #tabs .gb-dockbtn:hover::after{opacity:1}
+}
 /* Kế hoạch: thẻ gọn hơn + sơ đồ xe thu nhỏ + khoảng trống + vạch giờ hiện tại (bản khmini) */
-#view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) 440px;gap:20px}
+#view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) 480px;gap:20px}
 #view-kehoach .lt-colhead,#view-kehoach .lt-r{grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr)}
 #view-kehoach .lt-spn{width:24px;height:24px;font-size:11px}
 #view-kehoach .kh-card{padding:6px 8px 6px 11px;gap:1px;border-radius:10px}
@@ -962,12 +989,18 @@
 #view-kehoach .lt-pc{position:relative;z-index:1}
 #view-kehoach .lt-gap.kh-free{height:auto;padding:7px 0}
 #view-kehoach .lt-gap.kh-free::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1.5px dashed #9AD3B2}
-#view-kehoach .lt-gap.kh-free button{width:auto;height:30px;border-radius:999px;opacity:1;padding:0 4px 0 12px;gap:8px;font-size:13px;font-weight:700;color:#05603A;background:#ECFDF3;border:1.5px solid #75C69A;white-space:nowrap;box-shadow:0 0 0 4px #fff}
-#view-kehoach .lt-gap.kh-free button .pl{font-size:16px;line-height:1;font-weight:800}
-#view-kehoach .lt-gap.kh-free button .tm{font-weight:600;color:#3B7A57;font-variant-numeric:tabular-nums}
-#view-kehoach .lt-gap.kh-free button .nx{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:#fff;border:1px solid #A6DDBD;color:#05603A;font-weight:800}
-#view-kehoach .lt-gap.kh-free button:hover{background:#067647;color:#fff;border-color:#067647}
-#view-kehoach .lt-gap.kh-free button:hover .tm{color:#D1FADF}
+#view-kehoach .kh-pill{position:relative;display:inline-flex;align-items:center;gap:2px;height:32px;padding:0 3px;border-radius:999px;background:#ECFDF3;border:1.5px solid #75C69A;box-shadow:0 0 0 4px #fff}
+#view-kehoach .kh-pill button{width:auto;height:26px;border:0;border-radius:999px;opacity:1;background:transparent;display:inline-flex;align-items:center;gap:8px;padding:0 10px 0 0;font-size:13px;font-weight:700;color:#05603A;white-space:nowrap;cursor:pointer}
+#view-kehoach .kh-pill button .pl{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:999px;background:#067647;color:#fff;font-size:12.5px;font-weight:800;line-height:1}
+#view-kehoach .kh-pill button .tm{font-weight:600;color:#3B7A57;font-variant-numeric:tabular-nums}
+#view-kehoach .kh-pill button:hover .pl{background:#05603A}
+#view-kehoach .kh-pill button.nx{padding:0 11px;background:#fff;border:1px solid #A6DDBD;font-weight:800}
+#view-kehoach .kh-pill button.nx:hover{background:#067647;border-color:#067647;color:#fff}
+.khfx .fb-row{cursor:pointer}
+.khfx .fb-row .fb-go{display:none;font-size:12px;font-weight:800;color:#fff;background:#067647;border-radius:999px;padding:3px 10px}
+.khfx .fb-row:hover{border-color:#75C69A;background:#F6FEF9}
+.khfx .fb-row:hover .fb-go{display:inline-block}
+.khfx .fb-row:hover .fb-rdy,.khfx .fb-row:hover .fb-time{display:none}
 .kh-now{position:absolute;left:0;right:0;height:0;border-top:2px solid #D92D20;z-index:0;pointer-events:none;transition:top .6s ease}
 .kh-nowb{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:3;pointer-events:none;background:#D92D20;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px #fff;transition:top .6s ease}
 .lt-plist.dragmode .kh-now,.lt-plist.dragmode .kh-nowb{visibility:hidden}
@@ -975,11 +1008,30 @@
 .kh-mini .mh{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
 .kh-mini .mh h3{margin:0}
 .kh-mini .mh .sum{margin-left:auto;font-size:12px;color:var(--lt-muted);font-weight:600}
-.km-wrap{overflow:auto;height:min(560px,calc(100vh - 140px));border:1px solid #E4E7EC;border-radius:10px;background:#fff;overscroll-behavior:contain}
-#khTl{zoom:.62}
+.km-wrap{overflow-x:hidden;overflow-y:auto;height:min(640px,calc(100vh - 90px));border:1px solid #E4E7EC;border-radius:10px;background:#fff;overscroll-behavior:contain}
 .km-wrap.tl-wrap{max-height:none}
 #khTl .km-band{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(6,118,71,.14);border-left:2px dashed #067647;border-right:2px dashed #067647;z-index:4;display:none}
 #khTl .km-band.on{display:block}
+/* Hộp booking mở từ Kế hoạch: nằm bên trái sơ đồ xe, không che sơ đồ */
+#bkOverlay.kh-dock{right:50vw}
+#bkOverlay.kh-dock .modal{width:100%;box-shadow:none;border-right:1px solid #D0D5DD}
+html.kh-bk #view-kehoach .kh-side{position:fixed;top:0;right:0;bottom:0;width:50vw;z-index:51;background:#F4F5F7;padding:12px;box-sizing:border-box}
+html.kh-bk #view-kehoach .kh-side > :not(.kh-mini){display:none}
+html.kh-bk #view-kehoach .kh-mini{height:100%;box-sizing:border-box;display:flex;flex-direction:column}
+html.kh-bk #view-kehoach #kmSlot{flex:1;min-height:0;display:flex;flex-direction:column}
+html.kh-bk #view-kehoach .km-wrap{height:auto;flex:1;min-height:0}
+html.gb-dock #view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+html.gb-dock #view-kehoach .kh-wrap{max-width:none}
+/* sơ đồ nhỏ ở chế độ hiện đủ xe: dòng thấp hơn để chữ to hơn */
+html.gb-dock #khTl,html.kh-bk #khTl{--rowh:30px}
+html.gb-dock #khTl .bar,html.kh-bk #khTl .bar{top:4px;height:calc(var(--rowh) - 8px)}
+.kh-mini.picking{outline:3px solid #067647;outline-offset:2px}
+.kh-mini .pickhint{display:none;margin-left:auto;font-size:12px;font-weight:700;color:#067647}
+.kh-mini.picking .pickhint{display:inline}
+#khTl .tl-row.km-pick{box-shadow:inset 0 0 0 3px #067647;background:#ECFDF3}
+#khTl .tl-row.km-pick .veh{background:#067647!important;color:#fff!important}
+#khTl .tl-row.km-pick .veh *{color:#fff!important}
+#khTl .tl-row.km-bad{box-shadow:inset 0 0 0 3px #D92D20}
 #khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:3px solid #D92D20;z-index:4}
 @media(max-width:1000px){.kh-side{max-height:none}}
 .lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
@@ -2330,7 +2382,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-24-khmini';
+const BAN_APP = '2026-10-25-dock';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2911,6 +2963,7 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
   document.getElementById('view-'+t).style.display='';
+  document.documentElement.classList.toggle('kh-on', t==='kehoach');   // Kế hoạch: cho cột phải dính khi cuộn trang
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
@@ -3192,7 +3245,7 @@ function showModal(title,body){
     ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
     document.getElementById('genModalX').onclick=()=>ov.classList.remove('open');}
   document.getElementById('genModalT').innerHTML=title;
-  document.getElementById('genModalB').innerHTML=body;
+  document.getElementById('genModalB').innerHTML=body; document.getElementById('genModalB').onclick=null;
   ov.classList.add('open');
 }
 function openFreeBikes(){
@@ -4448,7 +4501,7 @@ function wirePlaceInputs(){
 }
 function openBooking(id,prefill,schedKind){
   if(typeof nvMode!=='undefined' && nvMode) return;   // app nhân viên: không mở chi tiết booking
-  editingBk=id; bkSchKind=schedKind||null;
+  editingBk=id; bkSchKind=schedKind||null; khNewAt=null;
   const del=document.getElementById('bkDelete');
   let selXe;
   document.getElementById('f_src').innerHTML=srcOptions();   // gồm cả nguồn tự thêm + công nợ
@@ -4469,7 +4522,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Thêm booking';
     // mặc định: nếu bấm từ ô sơ đồ xe (prefill.ds) → đúng ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
     const ds = (prefill&&prefill.ds) ? prefill.ds : todayStr();
-    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime','08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('bknote','');
+    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime',(prefill&&prefill.dtime)||'08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     setDeposit(null);
@@ -4684,7 +4737,8 @@ document.getElementById('bkSave').onclick=()=>{
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
     if(ex.status==='datra')rec.rtime=ex.rtime;
     Object.assign(ex,rec);}
-  else{rec.id=uid();rec.created=todayStr();rec.ctime=new Date().toTimeString().slice(0,5);DB.bookings.push(rec);}   // ctime = giờ tạo (cho Thống kê KH liên hệ)
+  else{rec.id=uid();rec.created=todayStr();rec.ctime=new Date().toTimeString().slice(0,5);DB.bookings.push(rec);   // ctime = giờ tạo (cho Thống kê KH liên hệ)
+    if(khNewAt && khNewAt.date===rec.arrive) khNewAt.id='g_'+rec.id; else khNewAt=null;}   // tạo từ nút "+ Booking" ở Kế hoạch → xếp đúng chỗ
   bkOv.classList.remove('open');renderAll();
 };
 document.getElementById('bkDelete').onclick=()=>{
@@ -7145,6 +7199,14 @@ const LT_HD = '<span class="lt-hd" aria-hidden="true"><svg width="14" height="14
 function ltSyncAndOrder(){
   ltBuild();
   if (ltSyncParked()) { DB['lt_' + ltDate] = LT.P; setTimeout(() => { try { save(); } catch (e) {} }, 0); }
+  if (khNewAt && khNewAt.id && khNewAt.date === ltDate && LT.byId[khNewAt.id]) {   // booking vừa tạo từ nút "+ Booking"
+    const P = LT.P, id = khNewAt.id, pos = khNewAt.pos || 0; khNewAt = null;
+    if (P.order) {
+      const ord = ltOrder().filter(k => k !== id), n = ord.filter(k => !P.parked[k]).length;
+      ord.splice(Math.min(n, Math.max(0, pos)), 0, id);
+      P.order = ord; DB['lt_' + ltDate] = P; setTimeout(() => { try { save(); } catch (e) {} }, 0);
+    }
+  }
   return ltOrder();
 }
 const ltMsgHtml = () => ltMsg ? '<div class="lt-msg"><span style="flex:1">' + ltEsc(ltMsg) + '</span><button data-lt="closemsg" aria-label="Đóng">✕</button></div>' : '';
@@ -7216,8 +7278,12 @@ function ltPlanDesk(all){
     const a = ltById(ord[i]), b = ltById(ord[i + 1]);
     const from = khEndT(a) + KH_JOB, to = ltT(b), free = to - from;
     if (free < KH_FREE) return gap(i + 1);
-    const nx = khFreeXe(from, to);
-    return '<div class="lt-gap kh-free"><button data-lt="ins" data-v="' + (i + 1) + '" data-t="' + ltFmt(from) + '" data-a="' + from + '" data-b="' + to + '" title="Chèn đơn vào khoảng trống này"><span class="pl">+</span>Trống ' + khDur(free) + '<span class="tm">' + ltFmt(from) + ' – ' + ltFmt(to) + '</span><span class="nx">' + nx + ' xe rảnh</span></button></div>';
+    const fx = khFreeXe(from, to), nx = fx.length;
+    const tip = fx.length ? fx.map(f => f.xe + (f.t ? ' (từ ' + f.t + ')' : '')).join(', ') : 'Không có xe rảnh';
+    const ab = '" data-a="' + from + '" data-b="' + to + '"';
+    return '<div class="lt-gap kh-free"><div class="kh-pill">'
+      + '<button data-lt="newbk" data-v="' + (i + 1) + '" data-t="' + ltFmt(from) + ab + ' title="Thêm booking vào khoảng trống này"><span class="pl">+ Booking</span>Trống ' + khDur(free) + '<span class="tm">' + ltFmt(from) + ' – ' + ltFmt(to) + '</span></button>'
+      + '<button class="nx" data-lt="freexe' + ab + ' title="' + ltEsc(tip) + '">' + nx + ' xe rảnh</button></div></div>';
   };
   ord.forEach((id, i) => {
     if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gapAfter(i)); return; }
@@ -7257,31 +7323,23 @@ const KH_JOB = 30;    // phút cho một lượt giao / thu (đi + làm việc)
 const KH_FREE = 30;   // còn trống từ chừng này phút trở lên thì hiện ký hiệu "Trống"
 const khEndT = x => x.kind === 'grp' ? Math.max.apply(null, x.members.map(m => ltT(m))) : ltT(x);
 const khDur = m => m < 60 ? m + ' phút' : Math.floor(m / 60) + 'h' + (m % 60 ? ltPad(m % 60) : '');
-// khoảng bận của từng xe trong ngày ltDate: [{s,e,b,cl,cr}] theo phút (−1 = từ hôm trước, 1440 = sang hôm sau)
-function khBusy(){
-  const D = ltDate, out = {};
-  XE_THAT.forEach(v => { out[v.id] = []; });
-  (DB.bookings || []).forEach(b => {
-    if (!b || !b.xe || !out[b.xe] || b.status === 'huy' || !b.arrive || !b.depart) return;
-    if (b.status === 'danhan' && b.depart < D && D >= todayStr()) { out[b.xe].push({ s: -1, e: 1440, b, cl: true, cr: true, late: true }); return; }   // quá hạn chưa trả: vẫn bận
-    if (b.arrive > D || b.depart < D) return;
-    const cl = b.arrive < D, cr = b.depart > D;
-    let s = cl ? -1 : ltParse(planDtime(b)), e = cr ? 1440 : ltParse(planRtime(b));
-    if (s == null) s = 0; if (e == null) e = 1440;
-    if (e <= s && !cl && !cr) e = s + 30;
-    out[b.xe].push({ s, e, b, cl, cr });
+// xe rảnh trong khoảng [a, z) — lấy đúng theo banner "Xe có thể cho thuê" (bikeAvailability):
+// Sẵn sàng → rảnh cả khoảng; "Trống từ HH:MM" → chỉ tính cho khoảng còn kéo dài quá giờ đó
+function khFreeXe(a, z){
+  const D = ltDate, out = [];
+  XE_THAT.forEach(v => {
+    const av = bikeAvailability(v.id, D);
+    if (av.state === 'ready') out.push({ xe: v.id, t: null });
+    else if (av.state === 'time') { const m = ltParse(av.time); if (m != null && m < z) out.push({ xe: v.id, t: av.time }); }
   });
   return out;
 }
-function khFreeXe(a, z){
-  const busy = khBusy();
-  return XE_THAT.filter(v => !busy[v.id].some(r => r.s < z && a < r.e)).length;
-}
 // Sơ đồ xe thu nhỏ: bản sao y hệt tab Sơ đồ xe — thêm, sửa, kéo booking như sơ đồ chính
-let khTlAt = null;   // ngày đã cuộn tới lần trước
-const KH_TLZ = 0.62; // tỉ lệ thu nhỏ (khớp với zoom của #khTl trong CSS)
+var khNewAt = null;  // {date, pos, id} — booking đang tạo từ nút "+ Booking" ở khoảng trống
+const KH_DAYS = 4;  // sơ đồ nhỏ khoá: hôm nay + 3 ngày sau
+let khTlZ = 0.62;    // tỉ lệ thu nhỏ — tính lại để vừa đúng KH_DAYS ngày
 function khMini(){
-  return '<div class="kh-box kh-mini"><div class="mh"><h3>SƠ ĐỒ XE</h3></div><div id="kmSlot"></div></div>';
+  return '<div class="kh-box kh-mini"><div class="mh"><h3>SƠ ĐỒ XE</h3><span class="pickhint">Bấm vào dòng xe để chọn xe cho booking</span></div><div id="kmSlot"></div></div>';
 }
 function khTlCss(){   // chép mọi luật CSS của #timeline sang #khTl để trông y hệt
   if (document.getElementById('khTlCss')) return;
@@ -7301,8 +7359,16 @@ function khTlInit(){
   const wrap = document.createElement('div'); wrap.className = 'km-wrap tl-wrap'; wrap.id = 'kmWrap';
   const tl = document.createElement('div'); tl.className = 'tl'; tl.id = 'khTl'; wrap.appendChild(tl);
   document.body.appendChild(wrap); wrap.style.display = 'none';
+  const bkOpen = () => { const o = document.getElementById('bkOverlay'); return o && o.classList.contains('open'); };
+  ['pointerdown', 'touchstart'].forEach(t => tl.addEventListener(t, ev => { if (bkOpen()) ev.stopPropagation(); }, { capture: true, passive: true }));
   tlWireDrag(tl);   // kéo thanh booking sang xe khác — y như sơ đồ chính
   tl.addEventListener('click', ev => {
+    if (bkOpen()) {   // đang mở hộp booking: chỉ dùng sơ đồ để chọn xe (booking mới), không mở booking khác
+      ev.stopPropagation();
+      if (editingBk) return;
+      const row = ev.target.closest('.tl-row[data-xe]'); if (row) khPickXe(row.dataset.xe);
+      return;
+    }
     if (tlDrag.justEnded) return;
     const bar = ev.target.closest('.bar'); if (bar) { ev.stopPropagation(); openBooking(bar.dataset.id); return; }
     const veh = ev.target.closest('.vehclick'); if (veh) { openVehInfo(veh.dataset.veh); return; }
@@ -7310,18 +7376,99 @@ function khTlInit(){
   });
   khTlBox = wrap; return wrap;
 }
+// danh sách xe rảnh của 1 khoảng trống — cùng kiểu banner "Xe có thể cho thuê"; bấm 1 xe → thêm booking với xe đó
+function khFreeModal(a, z){
+  const list = khFreeXe(a, z);
+  const typOrder = [...new Set(XE_THAT.map(v => vehTyp(v.id)))], groups = {};
+  list.forEach(x => { const t = vehTyp(x.xe) || 'Khác'; (groups[t] = groups[t] || []).push(x); });
+  const keys = Object.keys(groups).sort((p, q) => { const i = typOrder.indexOf(p), j = typOrder.indexOf(q); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
+  const sp = id => (VEHICLES.find(v => v.id === id) || {}).sp;
+  const row = x => '<div class="fb-row" data-khfx="' + ltEsc(x.xe) + '" data-t="' + ltFmt(Math.max(a, x.t ? ltParse(x.t) : a)) + '"><span class="fb-xe' + (sp(x.xe) ? ' sp' : '') + '">' + ltEsc(x.xe) + '</span>'
+    + (x.t ? '<span class="fb-time">Trống từ ' + ltEsc(x.t) + '</span>' : '<span class="fb-rdy">Sẵn sàng</span>') + '<span class="fb-go">+ Booking</span></div>';
+  const body = list.length
+    ? keys.map(t => { const g = groups[t], rd = g.filter(x => !x.t).length;
+        return '<div class="fb-group"><div class="fb-gh"><span>' + ltEsc(t) + '</span><span class="fb-gc">' + g.length + ' xe' + (rd ? ' · <b>' + rd + ' sẵn sàng</b>' : '') + '</span></div>' + g.map(row).join('') + '</div>'; }).join('')
+    : '<div class="muted" style="padding:10px">Không có xe rảnh trong khoảng này.</div>';
+  showModal('Xe rảnh ' + ltFmt(a) + ' – ' + ltFmt(z) + ' · ' + fmtDM(khDate),
+    '<div class="muted" style="font-size:12px;padding:0 2px 8px">Rảnh: <b>' + list.length + '</b> xe</div><div class="fb-list khfx">' + body + '</div>');
+  const bx = document.getElementById('genModalB');
+  bx.onclick = e => {
+    const r = e.target.closest('[data-khfx]'); if (!r) return;
+    document.getElementById('genModal').classList.remove('open');
+    const btn = document.querySelector('#view-kehoach .kh-pill button[data-lt="newbk"][data-a="' + a + '"]');
+    khPickMark.band = { a, b: z };
+    openBooking(null, { ds: khDate, dtime: r.dataset.t || ltFmt(a), xe: r.dataset.khfx });   // giờ nhận = lúc xe bắt đầu rảnh trong khoảng trống
+    khNewAt = { date: khDate, pos: btn ? +btn.dataset.v : 0, ts: Date.now() };
+    khDockBk(); khPickMark();
+  };
+}
+// chọn xe cho booking đang thêm bằng cách bấm dòng xe trên sơ đồ nhỏ
+function khPickXe(xe){
+  const sel = document.getElementById('f_xe'); if (!sel) return;
+  const row = document.querySelector('#khTl .tl-row[data-xe="' + xe + '"]');
+  if (![...sel.options].some(o => o.value === xe)) {   // xe bận trong khoảng ngày giờ đang nhập
+    if (row) { row.classList.add('km-bad'); setTimeout(() => row.classList.remove('km-bad'), 900); }
+    const note = document.getElementById('xeNote'); if (note) { note.className = 'xe-note warn'; note.textContent = 'Xe ' + xe + ' đang bận trong khoảng thời gian này.'; }
+    return;
+  }
+  renderXeOptions(xe); sel.dispatchEvent(new Event('change', { bubbles: true }));   // vẽ lại danh sách xe + dòng báo xe trống
+  khPickMark();
+}
+// đánh dấu xe đang chọn + khung giờ khoảng trống trên sơ đồ nhỏ khi hộp booking mở từ Kế hoạch
+function khPickMark(){
+  const ov = document.getElementById('bkOverlay'), box = document.querySelector('.kh-mini');
+  const on = !!(ov && ov.classList.contains('open') && ov.classList.contains('kh-dock'));
+  if (box) box.classList.toggle('picking', on && !editingBk);
+  document.querySelectorAll('#khTl .tl-row.km-pick').forEach(r => r.classList.remove('km-pick'));
+  const band = document.getElementById('kmBand');
+  if (!on) { if (band && khPickMark.band) band.classList.remove('on'); khPickMark.band = null; return; }
+  const sel = document.getElementById('f_xe'), xe = sel && sel.value;
+  if (xe) { const r = document.querySelector('#khTl .tl-row[data-xe="' + xe + '"]'); if (r) r.classList.add('km-pick'); }
+  const kt = document.getElementById('khTl'), g = khPickMark.band;
+  if (band && kt && g) {
+    const idx = tlWindow().map[khDate];
+    if (idx != null) { const x = m => +kt.dataset.vw + idx * DAYW + m / 1440 * DAYW; band.style.left = x(g.a) + 'px'; band.style.width = (x(g.b) - x(g.a)) + 'px'; band.classList.add('on'); }
+  }
+}
+// hộp booking: mở khi đang ở Kế hoạch → nằm bên trái sơ đồ xe; đóng → bỏ đánh dấu
+function khDockBk(){
+  const ov = document.getElementById('bkOverlay'), v = document.getElementById('view-kehoach'), side = document.querySelector('#view-kehoach .kh-side');
+  if (!ov) return;
+  const dock = !!(v && v.style.display !== 'none' && side && window.innerWidth > 1000);
+  ov.classList.toggle('kh-dock', dock);
+  const H = document.documentElement, was = H.classList.contains('kh-bk');
+  H.classList.toggle('kh-bk', dock);
+  if (dock !== was) khMiniFill();
+}
+(function(){
+  const ov = document.getElementById('bkOverlay'); if (!ov) return;
+  new MutationObserver(() => {
+    if (ov.classList.contains('open')) { if (!ov._khWas) { ov._khWas = true; khDockBk(); } }
+    else if (ov._khWas) { ov._khWas = false; ov.classList.remove('kh-dock'); if (document.documentElement.classList.contains('kh-bk')) { document.documentElement.classList.remove('kh-bk'); khMiniFill(); } }
+    khPickMark();
+  }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+  document.addEventListener('change', e => { if (e.target && (e.target.id === 'f_xe' || e.target.id === 'f_arrive' || e.target.id === 'f_depart')) khPickMark(); });
+  window.addEventListener('resize', () => { if (ov.classList.contains('open') && ov.classList.contains('kh-dock')) khDockBk(); });
+})();
 function khMiniFill(){
   const slot = document.getElementById('kmSlot'), src = document.getElementById('timeline');
   if (!slot || !src) return;
   khTlCss();
   const wrap = khTlInit(), c = wrap.firstChild;
   if (wrap.parentNode !== slot) { slot.appendChild(wrap); wrap.style.display = ''; }
-  const keep = khTlAt === khDate && c.firstChild ? [wrap.scrollLeft, wrap.scrollTop] : null;
+  const keepTop = c.firstChild ? wrap.scrollTop : 0;
   c.innerHTML = src.innerHTML;
   c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));
   c.querySelectorAll('.tlp-miss,.tlp-dim').forEach(e => e.classList.remove('tlp-miss', 'tlp-dim'));
-  const idx = tlWindow().map[khDate], veh = c.querySelector('.tl-row .veh'), vw = veh ? veh.offsetWidth : 120;
+  c.style.zoom = 1;
+  const win = tlWindow(), idx = win.map[khDate], i0 = win.map[todayStr()], veh = c.querySelector('.tl-row .veh'), vw = veh ? veh.offsetWidth : 120;
   c.dataset.vw = vw;
+  if (wrap.clientWidth > 0) {
+    khTlZ = Math.min(1, (wrap.clientWidth - 2) / (vw + KH_DAYS * DAYW));
+    const H = document.documentElement;
+    if (H.classList.contains('gb-dock') || H.classList.contains('kh-bk')) khTlZ = Math.min(khTlZ, (wrap.clientHeight - 2) / Math.max(1, c.offsetHeight));   // hiện đủ mọi xe, không cần cuộn
+  }
+  c.style.zoom = khTlZ;
   if (idx != null) {
     const head = c.querySelector('.tl-head');
     const band = document.createElement('div'); band.className = 'km-band'; band.id = 'kmBand';
@@ -7329,9 +7476,9 @@ function khMiniFill(){
     c.appendChild(band);
     if (khDate === todayStr()) { const n = document.createElement('div'); n.className = 'km-now'; n.id = 'kmNow'; n.style.left = (vw + idx * DAYW + ltNowMin() / 1440 * DAYW) + 'px'; c.appendChild(n); }
   }
-  if (keep) { wrap.scrollLeft = keep[0]; wrap.scrollTop = keep[1]; }
-  else if (idx != null) { wrap.scrollLeft = Math.max(0, idx * DAYW * KH_TLZ - 20); wrap.scrollTop = 0; }
-  khTlAt = khDate;
+  wrap.scrollLeft = i0 != null ? Math.round(i0 * DAYW * khTlZ) : 0;   // khoá ở hôm nay, không cuộn ngang
+  wrap.scrollTop = keepTop;
+  khPickMark();
 }
 (function(){   // sơ đồ chính vẽ lại → bản nhỏ vẽ theo
   const src = document.getElementById('timeline'); if (!src) return;
@@ -7356,20 +7503,19 @@ function khNowLine(){
   if (lb) { lb.style.top = y.toFixed(1) + 'px'; lb.style.display = ''; lb.textContent = ltFmt(now); }
 }
 setInterval(() => { const v = document.getElementById('view-kehoach'); if (v && v.style.display !== 'none' && !ltDrag) khNowLine(); }, 20000);
-window.addEventListener('resize', () => { if (!ltDrag) khNowLine(); });
+window.addEventListener('resize', () => { if (ltDrag) return; khNowLine(); clearTimeout(khMiniFill._r); khMiniFill._r = setTimeout(() => { const v = document.getElementById('view-kehoach'); if (v && v.style.display !== 'none') khMiniFill(); }, 150); });
+// không cho cuộn ngang sơ đồ nhỏ (bàn di chuột / Shift + lăn)
+document.addEventListener('wheel', e => { const w = e.target.closest && e.target.closest('#kmWrap'); if (w && (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY))) e.preventDefault(); }, { passive: false });
 // rê chuột vào ký hiệu "Trống" → tô khoảng giờ đó trên sơ đồ xe
 document.addEventListener('mouseover', e => {
   const band = document.getElementById('kmBand'), kt = document.getElementById('khTl'); if (!band || !kt) return;
-  const b = e.target.closest && e.target.closest('#view-kehoach .kh-free button');
-  if (!b) { band.classList.remove('on'); return; }
+  const b = e.target.closest && e.target.closest('#view-kehoach .kh-pill button');
+  if (!b) { if (!khPickMark.band) band.classList.remove('on'); return; }
+  if (khPickMark.band) return;   // đang thêm booking: giữ khung giờ của khoảng đã bấm
   const idx = tlWindow().map[khDate]; if (idx == null) return;
   const x = m => +kt.dataset.vw + idx * DAYW + m / 1440 * DAYW;
   band.style.left = x(+b.dataset.a) + 'px'; band.style.width = (x(+b.dataset.b) - x(+b.dataset.a)) + 'px';
-  if (!band.classList.contains('on')) {
-    band.classList.add('on');
-    const wrap = document.getElementById('kmWrap'), L = x(+b.dataset.a) * KH_TLZ, R = x(+b.dataset.b) * KH_TLZ, vw = +kt.dataset.vw * KH_TLZ;
-    if (wrap && (L < wrap.scrollLeft + vw + 10 || R > wrap.scrollLeft + wrap.clientWidth)) wrap.scrollTo({ left: Math.max(0, L - vw - 40), behavior: 'smooth' });
-  }
+  band.classList.add('on');
 });
 
 // cảnh báo theo giờ cho 1 việc (chỉ tính khi đang xem hôm nay)
@@ -7556,6 +7702,8 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-lt]'); if (!b) return;
   const a = b.dataset.lt, v = b.dataset.v;
   if (e.target.closest('#view-kehoach')) ltCtx = 'kh'; else if (e.target.closest('#view-lichtrinh')) ltCtx = 'run';
+  if (a === 'freexe') { khFreeModal(+b.dataset.a, +b.dataset.b); return; }
+  if (a === 'newbk') { khPickMark.band = { a: +b.dataset.a, b: +b.dataset.b }; openBooking(null, { ds: khDate, dtime: b.dataset.t }); khNewAt = { date: khDate, pos: +v, ts: Date.now() }; khDockBk(); khPickMark(); return; }
   if (a === 'bg') { if (e.target === b) ltCloseSheet(); return; }
   if (a === 'cancel') { ltCloseSheet(); return; }
   if (a === 'day') { ltMsg = ''; if (ltCtx === 'kh') { khDate = v; renderKeHoach(); } else { runDate = v; renderLichTrinh(); } return; }
@@ -7979,6 +8127,30 @@ document.addEventListener('pointercancel', ltDragEnd);
   // 3) trạng thái đồng bộ: cột trái (máy tính) + cạnh tiêu đề (điện thoại)
   const tabs = document.getElementById('tabs');
   if (tabs && !document.getElementById('gbSideSync')) tabs.insertAdjacentHTML('beforeend', '<div class="gb-side-sync" id="gbSideSync"><i></i><span></span></div>');
+  // Thu gọn menu → thanh dock nổi ở mép trái màn hình (như dock của Mac), rê chuột sát mép trái để hiện
+  if (tabs && !document.getElementById('gbDockBtn')) {
+    tabs.querySelectorAll('.tab').forEach(t => { if (!t.dataset.lab) t.dataset.lab = (t.textContent || '').trim(); });
+    tabs.insertAdjacentHTML('beforeend', '<button type="button" class="gb-dockbtn" id="gbDockBtn"><span class="tic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="d-in" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/><path class="d-out" d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></span><span class="d-txt">Thu gọn menu</span></button>');
+    document.body.insertAdjacentHTML('beforeend', '<div id="gbDockZone"></div>');
+    const H = document.documentElement, zone = document.getElementById('gbDockZone');
+    let hideT = null;
+    const show = () => { clearTimeout(hideT); H.classList.add('dock-show'); };
+    const hide = () => { clearTimeout(hideT); hideT = setTimeout(() => H.classList.remove('dock-show'), 350); };
+    const setDock = on => {
+      H.classList.toggle('gb-dock', on); H.classList.remove('dock-show');
+      const lb = document.querySelector('#gbDockBtn .d-txt'); if (lb) lb.textContent = on ? 'Mở rộng menu' : 'Thu gọn menu';
+      document.getElementById('gbDockBtn').dataset.lab = on ? 'Mở rộng menu' : 'Thu gọn menu';
+      try { localStorage.setItem('gbDock', on ? '1' : ''); } catch (e) {}
+      setTimeout(() => { try { if (typeof DAYW !== 'undefined') renderAll(); } catch (e) {} }, 0);   // độ rộng nội dung đổi → vẽ lại sơ đồ cho vừa
+    };
+    document.getElementById('gbDockBtn').onclick = () => setDock(!H.classList.contains('gb-dock'));
+    zone.addEventListener('mouseenter', show);
+    tabs.addEventListener('mouseenter', () => { if (H.classList.contains('gb-dock')) show(); });
+    tabs.addEventListener('mouseleave', () => { if (H.classList.contains('gb-dock')) hide(); });
+    tabs.addEventListener('click', e => { if (H.classList.contains('gb-dock') && e.target.closest('.tab')) H.classList.remove('dock-show'); });
+    let on0 = false; try { on0 = localStorage.getItem('gbDock') === '1'; } catch (e) {}
+    if (on0) setDock(true);
+  }
   const sd = document.getElementById('syncDot');
   const mirror = () => {
     if (!sd) return; const t = sd.textContent.replace(/^[\s\u{1F100}-\u{1FAFF}\u2600-\u27BF\uFE0F]+/u, '');
