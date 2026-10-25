@@ -1032,7 +1032,8 @@ html.gb-dock #khTl .bar,html.kh-bk #khTl .bar{top:4px;height:calc(var(--rowh) - 
 #khTl .tl-row.km-pick .veh{background:#067647!important;color:#fff!important}
 #khTl .tl-row.km-pick .veh *{color:#fff!important}
 #khTl .tl-row.km-bad{box-shadow:inset 0 0 0 3px #D92D20}
-#khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:3px solid #D92D20;z-index:4}
+#khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:4px dashed #D92D20;margin-left:-2px;z-index:6}
+#khTl .km-now b{position:absolute;left:0;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:#D92D20;color:#fff;font-size:19px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 0 0 3px #fff}
 @media(max-width:1000px){.kh-side{max-height:none}}
 .lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
 .lt-gsteps{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--lt-text2);background:#F8FAFC;border-radius:10px;padding:8px 12px}
@@ -2382,7 +2383,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-25-dock';
+const BAN_APP = '2026-10-25-vachdo';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7402,6 +7403,21 @@ function khFreeModal(a, z){
     khDockBk(); khPickMark();
   };
 }
+// vạch đỏ trên sơ đồ nhỏ: giờ hiện tại; khi đang mở hộp booking từ Kế hoạch → ngày giờ nhận xe đang chọn
+function khMiniNow(){
+  const n = document.getElementById('kmNow'), kt = document.getElementById('khTl'); if (!n || !kt) return;
+  const win = tlWindow(), ov = document.getElementById('bkOverlay');
+  let ds = todayStr(), m = ltNowMin(), lab = 'Bây giờ ' + ltFmt(m), sel = false;
+  if (ov && ov.classList.contains('open') && ov.classList.contains('kh-dock')) {
+    const a = (document.getElementById('f_arrive') || {}).value, t = ltParse((document.getElementById('f_dtime') || {}).value || '');
+    if (a && t != null && win.map[a] != null) { ds = a; m = t; lab = 'Nhận ' + ltFmt(t) + ' · ' + fmtDM(a); sel = true; }
+  }
+  const idx = win.map[ds];
+  if (idx == null) { n.style.display = 'none'; return; }
+  n.style.display = ''; n.classList.toggle('sel', sel);
+  n.style.left = (+kt.dataset.vw + idx * DAYW + m / 1440 * DAYW) + 'px';
+  n.querySelector('b').textContent = lab;
+}
 // chọn xe cho booking đang thêm bằng cách bấm dòng xe trên sơ đồ nhỏ
 function khPickXe(xe){
   const sel = document.getElementById('f_xe'); if (!sel) return;
@@ -7421,6 +7437,7 @@ function khPickMark(){
   if (box) box.classList.toggle('picking', on && !editingBk);
   document.querySelectorAll('#khTl .tl-row.km-pick').forEach(r => r.classList.remove('km-pick'));
   const band = document.getElementById('kmBand');
+  khMiniNow();
   if (!on) { if (band && khPickMark.band) band.classList.remove('on'); khPickMark.band = null; return; }
   const sel = document.getElementById('f_xe'), xe = sel && sel.value;
   if (xe) { const r = document.querySelector('#khTl .tl-row[data-xe="' + xe + '"]'); if (r) r.classList.add('km-pick'); }
@@ -7448,6 +7465,8 @@ function khDockBk(){
     khPickMark();
   }).observe(ov, { attributes: true, attributeFilter: ['class'] });
   document.addEventListener('change', e => { if (e.target && (e.target.id === 'f_xe' || e.target.id === 'f_arrive' || e.target.id === 'f_depart')) khPickMark(); });
+  document.addEventListener('input', e => { if (e.target && (e.target.id === 'f_arrive' || e.target.id === 'f_dtime')) khMiniNow(); });
+  document.addEventListener('change', e => { if (e.target && e.target.id === 'f_dtime') khMiniNow(); });
   window.addEventListener('resize', () => { if (ov.classList.contains('open') && ov.classList.contains('kh-dock')) khDockBk(); });
 })();
 function khMiniFill(){
@@ -7474,9 +7493,11 @@ function khMiniFill(){
     const band = document.createElement('div'); band.className = 'km-band'; band.id = 'kmBand';
     if (head) band.style.top = (head.offsetTop + head.offsetHeight) + 'px';
     c.appendChild(band);
-    if (khDate === todayStr()) { const n = document.createElement('div'); n.className = 'km-now'; n.id = 'kmNow'; n.style.left = (vw + idx * DAYW + ltNowMin() / 1440 * DAYW) + 'px'; c.appendChild(n); }
   }
   wrap.scrollLeft = i0 != null ? Math.round(i0 * DAYW * khTlZ) : 0;   // khoá ở hôm nay, không cuộn ngang
+  { const n = document.createElement('div'); n.className = 'km-now'; n.id = 'kmNow'; n.innerHTML = '<b></b>';
+    const head = c.querySelector('.tl-head'); n.querySelector('b').style.top = (head ? head.offsetTop + head.offsetHeight + 4 : 4) + 'px';
+    c.appendChild(n); }
   wrap.scrollTop = keepTop;
   khPickMark();
 }
@@ -7487,8 +7508,7 @@ function khMiniFill(){
 // vạch giờ hiện tại trên danh sách việc: đi qua giữa thẻ đúng lúc tới giờ của thẻ đó
 function khNowLine(){
   const el = document.getElementById('khNow'), list = document.getElementById('ltList');
-  const kn = document.getElementById('kmNow'), kt = document.getElementById('khTl'), now = ltNowMin();
-  if (kn && kt) { const idx = tlWindow().map[khDate]; if (idx != null) kn.style.left = (+kt.dataset.vw + idx * DAYW + now / 1440 * DAYW) + 'px'; }
+  const now = ltNowMin(); khMiniNow();
   if (!el || !list || !LT) return;
   const rows = Array.from(list.querySelectorAll('.lt-r[data-idx]')); if (!rows.length) { el.style.display = 'none'; const lb0 = document.getElementById('khNowB'); if (lb0) lb0.style.display = 'none'; return; }
   const ord = ltOrder().filter(id => !LT.P.parked[id]);
