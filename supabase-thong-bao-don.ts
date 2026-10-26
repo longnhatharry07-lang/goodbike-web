@@ -63,15 +63,21 @@ async function bookingMoi(id: string) {
   if (/^DUMP/i.test(d.xe || "")) return { bo_qua: "dump" };
   const { error } = await sb.from("goodbike_push_sent").insert({ id });
   if (error) return { bo_qua: "da bao roi" };   // trùng khoá → đã gửi
+  return await guiTatCa({ ...noiDung(d), tag: "gb-" + id, url: APP_URL + "nhanvien.html" });
+}
+
+// Nội dung: "Có đơn mới lúc ⏰ 13:30" (tiêu đề — chữ đậm, giờ nổi bật) · "Giao xe A5 tại 99 Kim Mã" / "Nhận xe G3 tại cửa hàng"
+function noiDung(d: Record<string, string>) {
   const gio = d.dplan || d.dtime || "";
-  const ten = String(d.guest || "").split(" - ")[0].trim();
-  const noi = /tự lấy|tai cua hang|tại cửa hàng/i.test(d.daddr || "") || !d.daddr ? "Khách lấy tại cửa hàng" : d.daddr;
-  return await guiTatCa({
-    title: "Đơn mới hôm nay · " + (d.xe || "") + (gio ? " · giao " + gio : ""),
-    body: [ten, noi].filter(Boolean).join(" — "),
-    tag: "gb-" + id,
-    url: APP_URL + "nhanvien.html",
-  });
+  const dc = String(d.daddr || "").trim();
+  const shop = !dc || /^tự lấy$/i.test(dc) || /cửa hàng/i.test(dc);   // giống ltIsShop / ltGiaoAddr trong app
+  const xe = d.xe || "";
+  return {
+    title: gio ? "Có đơn mới lúc ⏰ " + gio : "Có đơn mới hôm nay",
+    body: shop ? "Nhận xe " + xe + " tại cửa hàng"
+      : /chưa update/i.test(dc) ? "Giao xe " + xe + " · chưa có địa chỉ"
+      : "Giao xe " + xe + " tại " + dc,
+  };
 }
 
 Deno.serve(async (req) => {
@@ -89,7 +95,7 @@ Deno.serve(async (req) => {
       const k = await vapid();
       const { data: r } = await sb.from("goodbike_push_sub").select("sub").eq("endpoint", b.endpoint).maybeSingle();
       if (!r) return json({ ok: false, loi: "chua dang ky" }, 404);
-      await webpush.sendNotification(r.sub, JSON.stringify({ title: "GOODBIKE · Thử thông báo", body: "Điện thoại này đã nhận được thông báo đơn mới.", tag: "gb-test", url: APP_URL + "nhanvien.html" }),
+      await webpush.sendNotification(r.sub, JSON.stringify({ ...noiDung({ dtime: "13:30", xe: "A5", daddr: "99 Kim Mã (thông báo thử)" }), tag: "gb-test", url: APP_URL + "nhanvien.html" }),
         { vapidDetails: { subject: APP_URL, publicKey: k.publicKey, privateKey: k.privateKey }, TTL: 600, urgency: "high" });
       return json({ ok: true });
     }
