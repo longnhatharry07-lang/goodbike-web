@@ -1021,6 +1021,28 @@ html.kh-bk #view-kehoach .kh-mini{height:100%;box-sizing:border-box;display:flex
 html.kh-bk #view-kehoach #kmSlot{flex:1;min-height:0;display:flex;flex-direction:column}
 html.kh-bk #view-kehoach .km-wrap{height:auto;flex:1;min-height:0}
 html.gb-dock #view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+/* ===== Kế hoạch: chống chữ dính / tràn trên laptop & iPad ===== */
+#view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) clamp(320px,38%,480px)}
+html.gb-dock #view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+@media(max-width:1000px){#view-kehoach .kh-grid,html.gb-dock #view-kehoach .kh-grid{grid-template-columns:1fr}}
+/* giờ, mã xe, loại xe, nút: không bao giờ bị co (Safari co nút làm chữ đè nhau); tên khách co lại và cắt "…" */
+#view-kehoach .lt-pc .l1{gap:6px;min-width:0}
+#view-kehoach .lt-pc .l1 > .lt-tbtn,#view-kehoach .lt-pc .l1 > .kh-xe,#view-kehoach .lt-pc .l1 > .kh-typ,#view-kehoach .lt-pc .l1 > .lt-type,#view-kehoach .lt-pc .l1 > .lt-spn,#view-kehoach .lt-pc .l1 > .lt-x,#view-kehoach .lt-pc .l1 > .lt-hd,#view-kehoach .lt-pc .l1 > .lt-mini{flex-shrink:0;white-space:nowrap}
+#view-kehoach .lt-pc .l1 > .lt-tbtn{margin-right:2px}
+#view-kehoach .lt-pc .l1 > .kh-guest{flex:1 1 0;min-width:0}
+#view-kehoach .kh-addr,#view-kehoach .lt-warn,#view-kehoach .lt-shopchip{overflow-wrap:anywhere;min-width:0}
+/* thẻ hẹp: tên khách xuống dòng 2; hẹp nữa thì ẩn loại xe */
+#view-kehoach .kh-card,#view-kehoach .kh-gm{container-type:inline-size}
+@container (max-width:260px){
+  #view-kehoach .kh-card .l1,#view-kehoach .kh-gm .l1{flex-wrap:wrap;row-gap:0}
+  #view-kehoach .kh-card .l1 > .kh-guest,#view-kehoach .kh-gm .l1 > .kh-guest{order:9;flex:1 0 100%}
+}
+@container (max-width:200px){#view-kehoach .kh-card .l1 > .kh-typ{display:none}}
+/* thanh giờ trống: danh sách hẹp thì bỏ khung giờ, hẹp nữa thì bỏ chữ "Trống …" */
+#view-kehoach .lt-plist{container-type:inline-size;container-name:khplist}
+#view-kehoach .kh-pill{max-width:calc(100% - 8px)}
+@container khplist (max-width:480px){#view-kehoach .kh-pill button .tm{display:none}}
+@container khplist (max-width:330px){#view-kehoach .kh-pill button[data-lt="newbk"]{font-size:0;gap:0;padding:0}#view-kehoach .kh-pill button .pl{font-size:12.5px}}
 html.gb-dock #view-kehoach .kh-wrap{max-width:none}
 /* sơ đồ nhỏ ở chế độ hiện đủ xe: dòng thấp hơn để chữ to hơn */
 html.gb-dock #khTl,html.kh-bk #khTl{--rowh:30px}
@@ -2383,7 +2405,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-25-vachdo';
+const BAN_APP = '2026-10-25-chudinh';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
