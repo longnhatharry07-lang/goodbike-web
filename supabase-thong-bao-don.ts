@@ -61,16 +61,20 @@ async function bookingMoi(id: string) {
   if (d.created && d.created !== today) return { bo_qua: "tao tu truoc" };
   if (d.status === "huy" || d.status === "datra") return { bo_qua: "huy/da tra" };
   if (/^DUMP/i.test(d.xe || "")) return { bo_qua: "dump" };
+  if (taiCuaHang(d.daddr)) return { bo_qua: "khach lay tai cua hang" };   // tạm thời không báo đơn tại cửa hàng (anh Harry, 26/10/2026)
   const { error } = await sb.from("goodbike_push_sent").insert({ id });
   if (error) return { bo_qua: "da bao roi" };   // trùng khoá → đã gửi
   return await guiTatCa({ ...noiDung(d), tag: "gb-" + id, url: APP_URL + "nhanvien.html" });
 }
 
+// khách tự đến cửa hàng lấy xe — giống ltIsShop / ltGiaoAddr trong app (trống, "Tự lấy", hoặc có chữ "cửa hàng")
+const taiCuaHang = (a?: string) => { const dc = String(a || "").trim(); return !dc || /^tự lấy$/i.test(dc) || /cửa hàng/i.test(dc); };
+
 // Nội dung: "Có đơn mới lúc ⏰ 13:30" (tiêu đề — chữ đậm, giờ nổi bật) · "Giao xe A5 tại 99 Kim Mã" / "Nhận xe G3 tại cửa hàng"
 function noiDung(d: Record<string, string>) {
   const gio = d.dplan || d.dtime || "";
   const dc = String(d.daddr || "").trim();
-  const shop = !dc || /^tự lấy$/i.test(dc) || /cửa hàng/i.test(dc);   // giống ltIsShop / ltGiaoAddr trong app
+  const shop = taiCuaHang(dc);
   const xe = d.xe || "";
   return {
     title: gio ? "Có đơn mới lúc ⏰ " + gio : "Có đơn mới hôm nay",
