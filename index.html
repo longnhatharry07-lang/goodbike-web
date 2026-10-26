@@ -1057,6 +1057,13 @@ html.gb-dock #khTl .bar,html.kh-bk #khTl .bar{top:4px;height:calc(var(--rowh) - 
 #khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:4px dashed #D92D20;margin-left:-2px;z-index:6}
 #khTl .km-now b{position:absolute;left:0;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:#D92D20;color:#fff;font-size:19px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 0 0 3px #fff}
 @media(max-width:1000px){.kh-side{max-height:none}}
+/* iPad / điện thoại (màn cảm ứng hoặc hẹp): Kế hoạch chỉ hiện sơ đồ giao nhận, ẩn sơ đồ xe (map) */
+@media (max-width:1000px),(pointer:coarse){
+  #view-kehoach .kh-grid,html.gb-dock #view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr)}
+  #view-kehoach .kh-side{position:static;max-height:none}
+  #view-kehoach .kh-mini{display:none!important}
+  #view-kehoach .kh-side:not(:has(.kh-box:not(.kh-mini))){display:none}
+}
 .lt-r.mergeT .lt-pc::after{content:"Thả để gộp";display:block;font-size:12px;font-weight:800;color:var(--lt-grp);margin-top:2px}
 .lt-gsteps{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--lt-text2);background:#F8FAFC;border-radius:10px;padding:8px 12px}
 .lt-gnote{background:var(--lt-grp-bg);color:var(--lt-grp);border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
@@ -2405,7 +2412,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-26-thongbao';
+const BAN_APP = '2026-10-26-ipad';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7543,10 +7550,11 @@ function khPickMark(){
   }
 }
 // hộp booking: mở khi đang ở Kế hoạch → nằm bên trái sơ đồ xe; đóng → bỏ đánh dấu
+const khSmall = () => window.matchMedia('(max-width:1000px),(pointer:coarse)').matches;   // iPad / điện thoại: không hiện sơ đồ xe
 function khDockBk(){
   const ov = document.getElementById('bkOverlay'), v = document.getElementById('view-kehoach'), side = document.querySelector('#view-kehoach .kh-side');
   if (!ov) return;
-  const dock = !!(v && v.style.display !== 'none' && side && window.innerWidth > 1000);
+  const dock = !!(v && v.style.display !== 'none' && side && window.innerWidth > 1000 && !khSmall());
   ov.classList.toggle('kh-dock', dock);
   const H = document.documentElement, was = H.classList.contains('kh-bk');
   H.classList.toggle('kh-bk', dock);
@@ -7565,6 +7573,7 @@ function khDockBk(){
   window.addEventListener('resize', () => { if (ov.classList.contains('open') && ov.classList.contains('kh-dock')) khDockBk(); });
 })();
 function khMiniFill(){
+  if (khSmall()) return;
   const slot = document.getElementById('kmSlot'), src = document.getElementById('timeline');
   if (!slot || !src) return;
   khTlCss();
