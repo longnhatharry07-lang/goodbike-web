@@ -1057,6 +1057,34 @@ html.gb-dock #khTl .bar,html.kh-bk #khTl .bar{top:4px;height:calc(var(--rowh) - 
 #khTl .km-now{position:absolute;top:0;bottom:0;pointer-events:none;border-left:4px dashed #D92D20;margin-left:-2px;z-index:6}
 #khTl .km-now b{position:absolute;left:0;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:#D92D20;color:#fff;font-size:19px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 0 0 3px #fff}
 @media(max-width:1000px){.kh-side{max-height:none}}
+
+/* ===== Nối đơn: điểm nối trên thẻ (Kế hoạch) + mũi tên + hiển thị cho nhân viên ===== */
+#view-kehoach .kh-port{position:absolute;top:50%;width:30px;height:30px;margin-top:-15px;border-radius:50%;background:#fff;border:2px dashed var(--lt-grp);color:var(--lt-grp);display:flex;align-items:center;justify-content:center;cursor:crosshair;touch-action:none;z-index:4;opacity:.6;padding:0;transition:opacity .12s,transform .12s,background .12s}
+#view-kehoach .kh-card.side-thu .kh-port{left:-19px}
+#view-kehoach .kh-card.side-giao .kh-port,#view-kehoach .kh-card.side-ps .kh-port{right:-19px}
+#view-kehoach .kh-card:hover .kh-port{opacity:1}
+#view-kehoach .kh-port:hover{transform:scale(1.15);background:var(--lt-grp-bg)}
+#view-kehoach .kh-port.has{border-style:solid;background:var(--lt-grp);color:#fff;opacity:1}
+@media (pointer:coarse){#view-kehoach .kh-port{opacity:1;width:34px;height:34px;margin-top:-17px}}
+#view-kehoach .kh-card.lk{border-color:var(--lt-grp);background:#FBF8FF}
+#view-kehoach .kh-lkbadge{align-self:flex-start;font-size:11px;font-weight:800;color:var(--lt-grp);background:var(--lt-grp-bg);border-radius:999px;padding:1px 8px;margin-top:2px}
+#view-kehoach .lt-gap.kh-lkgap{height:40px}
+#ltList>svg.kh-ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:3}
+#ltList>svg.kh-ov .lk{fill:none;stroke:#5B21B6;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+#ltList>svg.kh-ov .tmp{fill:none;stroke:#5B21B6;stroke-width:2.5;stroke-dasharray:6 5;stroke-linecap:round}
+.kh-xbtn{position:absolute;z-index:5;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:1.5px solid var(--lt-grp);background:#fff;color:var(--lt-grp);font-size:11px;font-weight:800;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.kh-xbtn:hover{background:var(--lt-grp);color:#fff}
+body.kh-linking,body.kh-linking *{cursor:crosshair!important;user-select:none;-webkit-user-select:none}
+#view-kehoach .kh-card.lk-ok{outline:3px solid var(--lt-grp);outline-offset:2px;background:var(--lt-grp-bg)}
+#view-kehoach .kh-card.lk-bad{opacity:.4}
+#view-kehoach .kh-card.lk-src{box-shadow:0 0 0 3px #D9C2FB}
+.lt-lkto{display:flex;align-items:center;gap:10px;background:var(--lt-grp-bg);border:1.5px solid var(--lt-grp);color:var(--lt-grp);border-radius:14px;padding:10px 12px;margin-top:-6px}
+.lt-lkto svg,.lt-lkconn svg{flex-shrink:0}
+.lt-lkto .t{font-size:13px;line-height:1.35;color:#3B1A82}
+.lt-lkto .t b{color:var(--lt-grp);font-weight:800}
+.lt-lkconn{display:flex;align-items:center;gap:8px;margin-left:76px;margin-top:-6px;margin-bottom:-6px;color:var(--lt-grp);font-size:12.5px;font-weight:800}
+.lt-lktag{align-self:flex-start;font-size:11px;font-weight:800;color:var(--lt-grp);background:var(--lt-grp-bg);border-radius:999px;padding:2px 9px;margin-bottom:4px}
+.lt-rc.lk{border-color:var(--lt-grp)}
 /* iPad / điện thoại (màn cảm ứng hoặc hẹp): Kế hoạch chỉ hiện sơ đồ giao nhận, ẩn sơ đồ xe (map) */
 @media (max-width:1000px),(pointer:coarse){
   #view-kehoach .kh-grid,html.gb-dock #view-kehoach .kh-grid{grid-template-columns:minmax(0,1fr)}
@@ -2412,7 +2440,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-26-ipad';
+const BAN_APP = '2026-10-27-noidon';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7168,12 +7196,13 @@ function ltDayLabel(s){ const d = new Date(s + 'T12:00:00'); return ['Chủ nh�
 // ----- kế hoạch lưu trên máy chủ -----
 function ltP(){
   const k = 'lt_' + ltDate;
-  if (!DB[k] || typeof DB[k] !== 'object') return { order: null, times: {}, done: {}, started: null, extra: [], parked: {}, groups: {}, hidden: {}, skipped: {}, notes: {} };
+  if (!DB[k] || typeof DB[k] !== 'object') return { order: null, times: {}, done: {}, started: null, extra: [], parked: {}, groups: {}, hidden: {}, skipped: {}, notes: {}, links: {} };
   const p = DB[k];
-  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {}; p.hidden = p.hidden || {}; p.skipped = p.skipped || {}; p.groups = p.groups || {}; p.notes = p.notes || {};
+  p.times = p.times || {}; p.done = p.done || {}; p.extra = p.extra || []; p.parked = p.parked || {}; p.hidden = p.hidden || {}; p.skipped = p.skipped || {}; p.groups = p.groups || {}; p.notes = p.notes || {}; p.links = p.links || {};
   return p;
 }
 function ltPut(p){
+  ltCleanLinks(p);
   DB['lt_' + ltDate] = p;
   // dọn kế hoạch cũ hơn 30 ngày (mỗi lần tối đa 3 ngày để không đụng cầu dao xoá)
   const han = ltAddDays(todayStr(), -30);
@@ -7210,7 +7239,8 @@ function ltBuild(){
   const byId = {}; items.forEach(x => { byId[x.id] = x; });
   // đơn gộp (cùng chỗ / cùng chuyến): 1 thẻ thay cho nhiều đơn
   const top = {}, groups = [];
-  Object.keys(P.groups).forEach(gid => {
+  const LT_GROUPS = false;   // đã bỏ tính năng gộp đơn: bỏ qua mọi nhóm cũ, các đơn trong nhóm hiện lại như đơn riêng
+  (LT_GROUPS ? Object.keys(P.groups) : []).forEach(gid => {
     const g = P.groups[gid], mem = (g.ids || []).map(id => byId[id]).filter(x => x && !P.parked[x.id] && !top[x.id]);
     if (mem.length < 2) return;
     mem.sort((a, b) => (a.kind === 'thu' ? 0 : 1) - (b.kind === 'thu' ? 0 : 1));
@@ -7255,6 +7285,7 @@ function ltOrder(){
     if (ord.indexOf(x.id) >= 0) return;
     let pos = ord.findIndex(id => !P.parked[id] && ltT(ltById(id)) > ltT(x));
     if (pos < 0) pos = ord.filter(id => !P.parked[id]).length;
+    while (pos > 0 && pos < ord.length && P.links && P.links[ord[pos - 1]] === ord[pos]) pos++;   // không chen vào giữa hai đơn đã nối
     ord.splice(pos, 0, x.id);
   });
   return ord.filter(id => !P.parked[id]).concat(ord.filter(id => P.parked[id]));
@@ -7344,7 +7375,7 @@ function renderKeHoach(){
     + '<button class="lt-nb" data-lt="day" data-v="' + ltAddDays(khDate, 1) + '" aria-label="Ngày sau">▶</button></div>'
     + '<div class="kh-actions"><button class="lt-btn" style="height:40px" data-lt="nvshare">Link cho nhân viên</button><button class="lt-btn" style="height:40px" data-lt="auto">Xếp tự động</button><button class="lt-btn" style="height:40px;background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)" data-lt="gorun">Xem lịch trình nhân viên</button></div></div>'
     + ltMsgHtml() + ltPlanDesk(all);
-  khMiniFill(); khNowLine();
+  khMiniFill(); khNowLine(); khDrawLinks();
 }
 
 function ltGrpCard(g, i, warn){
@@ -7366,6 +7397,8 @@ function ltGrpCard(g, i, warn){
 function ltPlanDesk(all){
   const P = LT.P, ord = all.filter(id => !P.parked[id]), parked = all.filter(id => P.parked[id]);
   const w = ltWarn(ord), h = [];
+  const lkInfo = ltChainInfo(P, ord);
+  khLinkable = ord.filter(id => ltDone(id) == null); khLinkPairs = ord.map((id, i) => ltLkOk(P, ord, i) ? [id, ord[i + 1]] : null).filter(Boolean); khLinkMap = {}; khLinkPairs.forEach(p => { khLinkMap[p[0]] = p[1]; });
   const nHid = LT.hiddenItems.length;
   const hidBar = nHid ? '<div class="kh-hidbar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 002.8 2.8M9.9 5.1A9.8 9.8 0 0112 5c5 0 9 4.5 10 7a13 13 0 01-3.2 4.3M6.2 6.2C4.1 7.6 2.6 9.7 2 12c1 2.5 5 7 10 7 1.6 0 3.1-.4 4.4-1.1"/></svg><span style="flex:1">' + nHid + ' đơn đang ẩn</span><button class="lt-btn" style="height:36px;font-size:13px" data-lt="togglehid">' + (ltShowHidden ? 'Tắt hiển thị đơn ẩn' : 'Hiện đơn ẩn') + '</button></div>' : '';
   if (!ord.length && !parked.length) return hidBar + '<div class="kh-box" style="padding:40px;text-align:center;font-weight:600;color:var(--lt-text2)">Ngày này chưa có đơn giao hay thu hồi nào</div>'
@@ -7377,6 +7410,7 @@ function ltPlanDesk(all){
   const gap = i => '<div class="lt-gap"><button data-lt="ins" data-v="' + i + '" aria-label="Chèn đơn vào vị trí ' + (i + 1) + '" title="Chèn đơn vào đây">+</button></div>';
   h.push('<div class="lt-plist" id="ltList">' + gap(0));
   const gapAfter = i => {   // việc i xong → việc i+1: nếu còn trống đủ lâu thì hiện ký hiệu để chèn đơn
+    if (ltLkOk(P, ord, i)) return '<div class="lt-gap kh-lkgap"></div>';   // hai đơn nối nhau: chừa chỗ cho mũi tên
     if (i + 1 >= ord.length) return gap(i + 1);
     const a = ltById(ord[i]), b = ltById(ord[i + 1]);
     const from = khEndT(a) + KH_JOB, to = ltT(b), free = to - from;
@@ -7392,7 +7426,7 @@ function ltPlanDesk(all){
     if (ltById(id).kind === 'grp') { h.push(ltGrpCard(ltById(id), i, w[id]) + gapAfter(i)); return; }
     const x = ltById(id), done = ltDone(id) != null, shop = ltIsShop(x);
     const side = x.kind === 'thu' ? 'thu' : (x.kind === 'ps' ? 'ps' : 'giao');
-    const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + (x.hidden ? ' lt-hid' : '') + '" style="' + (done && !x.hidden ? 'opacity:.5' : '') + '">'
+    const card = '<div class="lt-pc kh-card side-' + side + (shop ? ' shop' : '') + (x.hidden ? ' lt-hid' : '') + (lkInfo[id] ? ' lk' : '') + '" data-id="' + id + '" style="' + (done && !x.hidden ? 'opacity:.5' : '') + '">'
       + '<div class="l1"><button class="lt-tbtn" data-lt="time" data-v="' + id + '" title="Sửa giờ đi làm">' + ltFmt(ltT(x)) + '</button><b class="kh-xe">' + ltEsc(x.xe) + '</b><span class="kh-typ">' + ltEsc(x.typ || '') + '</span>'
       + (x.guest ? '<span class="kh-guest lt-ell">' + ltEsc(x.guest) + '</span>' : '') + (x.hidden ? '<button class="lt-mini" style="margin-left:auto;color:var(--lt-text)" data-lt="unhide" data-v="' + id + '">' + LT_EYE + 'Hiện lại</button>' : '<button class="lt-x" data-lt="hide" data-v="' + id + '" title="Ẩn đơn" aria-label="Ẩn đơn ' + ltEsc(x.xe) + '">' + LT_EYEOFF + '</button>') + LT_HD.replace('margin-left:auto', '') + '</div>'
       + (ltMoved(x) ? '<div style="font-size:12px;font-weight:700;color:' + (ltT(x) < x.t || x.kind === 'thu' ? 'var(--lt-green)' : 'var(--lt-red)') + '">' + ltEsc(ltNoteOf(x)) + '</div>' : '')
@@ -7404,7 +7438,8 @@ function ltPlanDesk(all){
       + (w[id] ? '<div class="lt-warn">' + ltEsc(w[id]) + '</div>' : '')
       + (x.hidden ? '<span class="lt-note">Đang ẩn · không có trong lịch của nhân viên</span>' : (!done && ltCanPark(x) ? '<div><button class="lt-mini" data-lt="park" data-v="' + id + '">' + LT_PARK + 'Để sau</button></div>' : ''))
       + '</div>';
-    h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? card : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : card) + '</div>' + gapAfter(i));
+    const cardP = (done || x.hidden) ? card : card.replace(/<\/div>$/, ltPortHtml(id, ltLkOk(P, ord, i), lkInfo[id]) + '</div>');
+    h.push('<div class="lt-r" data-idx="' + i + '">' + (side === 'thu' ? cardP : '<div></div>') + '<span class="lt-spn ' + side + '">' + (i + 1) + '</span>' + (side === 'thu' ? '<div></div>' : cardP) + '</div>' + gapAfter(i));
   });
   h.push((ltDate === todayStr() ? '<div class="kh-now" id="khNow" style="display:none"></div><div class="kh-nowb" id="khNowB" style="display:none"></div>' : '') + '</div></div>');
 
@@ -7702,9 +7737,9 @@ const ltCallBtn = (k, cls) => k.phone ? '<a class="' + cls + '" href="tel:' + lt
   : '<span class="' + cls + ' off" title="Booking chưa có số điện thoại">' + LT_PHONE + '<span>Không SĐT</span></span>';
 const ltGSteps = k => k.grp ? '<div class="lt-gsteps">' + k.mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (ltBien(x.xe) ? ' (' + ltEsc(ltBien(x.xe)) + ')' : '') + (k.c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span class="ok">xong</span>' : '') + '</div>').join('') + '</div>' : '';
 // thẻ đơn đang làm (nền đen)
-function ltCurCard(id){
+function ltCurCard(id, lk){
   const k = ltCardInfo(id), c = k.c;
-  return '<div class="lt-now k-' + k.kc + '">'
+  return '<div class="lt-now k-' + k.kc + '">' + (lk ? '<div class="lt-lktag" style="margin:8px 0 0 12px">🔗 Nối ' + lk.n + '/' + lk.m + '</div>' : '')
     + '<div class="lt-nowband">' + LT_KIC[k.kc].replace(/width="16" height="16"/, 'width="22" height="22"') + '<span>' + ltEsc(k.kLab.toUpperCase()) + '</span></div>'
     + '<div class="lt-nowtop"><span class="lt-nowlab">ĐANG LÀM</span>'
     + '<button class="lt-nowtime" data-lt="time" data-v="' + k.tmId + '" title="Đổi giờ"><b' + (k.late ? ' class="late"' : '') + '>' + ltFmt(ltT(c)) + '</b><span>' + LT_CLOCK + 'Đổi giờ</span></button></div>'
@@ -7721,10 +7756,10 @@ function ltCurCard(id){
     + '</div>';
 }
 // thẻ đơn đang chờ
-function ltRunCard(id){
+function ltRunCard(id, lk){
   const k = ltCardInfo(id), c = k.c;
   return '<div class="lt-wait"><button class="tm lt-wtm" data-lt="time" data-v="' + k.tmId + '" title="Đổi giờ"><b' + (k.late ? ' class="late"' : '') + '>' + ltFmt(ltT(c)) + '</b><span>' + LT_CLOCK + 'Đổi giờ</span></button>'
-    + '<div class="lt-cd lt-rc k-' + k.kc + (k.sh ? ' shop' : '') + '">'
+    + '<div class="lt-cd lt-rc k-' + k.kc + (k.sh ? ' shop' : '') + (lk ? ' lk' : '') + '">' + (lk ? '<div class="lt-lktag">🔗 Nối ' + lk.n + '/' + lk.m + '</div>' : '')
     + '<div class="lt-rchead"><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' + ltKPill(k) + '<b style="font-size:18px">' + ltEsc(c.xe) + '</b>'
     + (k.plates.length ? '<span class="lt-plate">' + k.plates.map(ltEsc).join(' · ') + '</span>' : '')
     + (k.late ? '<span class="lt-al red sm" style="margin-left:0">Quá giờ</span>' : '') + '</div>'
@@ -7758,10 +7793,16 @@ function ltRunView(all){
   if (!queue.length) {
     h.push('<div class="lt-cur" style="align-items:center;text-align:center"><div style="font-size:22px;font-weight:800">' + (ord.length ? 'Xong hết đơn trong ngày' : 'Ngày này chưa có đơn') + '</div><div class="lt-sub">' + doneN + ' đơn đã hoàn thành</div></div>');
   } else {
-    h.push(ltCurCard(queue[0]));
+    const lkI = ltChainInfo(P, queue);
+    h.push(ltCurCard(queue[0], lkI[queue[0]]));
+    if (ltLkOk(P, queue, 0)) { const nk = ltCardInfo(queue[1]);
+      h.push('<div class="lt-lkto">' + LT_LKARR + '<div class="t"><b>NỐI ĐƠN · ĐI THẲNG, KHÔNG VỀ CỬA HÀNG</b><br>Xong đơn này đi luôn sang: <b>' + ltEsc(nk.kLab) + ' ' + ltEsc(nk.c.xe) + '</b> lúc ' + ltFmt(ltT(nk.c)) + '<br>' + ltEsc(nk.where) + '</div></div>'); }
     if (queue.length > 1) {
       h.push('<div class="lt-div"></div><div class="lt-lab">ĐANG CHỜ · ' + (queue.length - 1) + ' ĐƠN</div>');
-      queue.slice(1).forEach(id => h.push(ltRunCard(id)));
+      queue.slice(1).forEach((id, j) => {
+        if (j > 0 && ltLkOk(P, queue, j)) h.push('<div class="lt-lkconn">' + LT_LKARR.replace('width="22" height="26"', 'width="18" height="22"') + 'đi thẳng sang đơn tiếp, không về cửa hàng</div>');
+        h.push(ltRunCard(id, lkI[id]));
+      });
     }
   }
   if (parked.length) {
@@ -7843,7 +7884,8 @@ document.addEventListener('click', e => {
   if (a === 'nvshare' || a === 'nvsave' || a === 'nvoff' || a === 'nvrand' || a === 'nvcopy') { nvShareAct(a); return; }
   ltDate = ltCtx === 'kh' ? khDate : runDate; ltBuild();
   const P = LT.P;
-  if (a === 'auto') { P.order = null; ltPut(P); return; }
+  if (a === 'unlink') { if (P.links) delete P.links[v]; ltPut(P); return; }
+  if (a === 'auto') { P.order = null; P.links = {}; ltPut(P); return; }
   if (a === 'park') { P.parked[v] = true; if (P.started === v) P.started = null; P.order = ltOrder(); ltMsg = ''; ltPut(P); return; }
   if (a === 'unpark' || a === 'fetch') {
     delete P.parked[v];
@@ -8100,6 +8142,7 @@ setInterval(() => {
 let ltDrag = null;
 document.addEventListener('pointerdown', e => {
   if (e.button > 0) return;
+  if (e.target.closest('.kh-port, .kh-xbtn')) return;   // điểm nối đơn có xử lý riêng
   const row = e.target.closest('#ltList .lt-r[data-idx]'); if (!row) return;
   if (e.target.closest('input, textarea, select, .kh-note')) return;   // để bấm vào ô ghi chú được
   const onHandle = !!e.target.closest('.lt-hd');
@@ -8120,7 +8163,7 @@ function ltDragUpdate(){
   d.row.style.transform = 'translateY(' + dy + 'px)';
   // con trỏ nằm giữa một đơn khác → gộp; nằm ở mép / khoảng trống → đổi chỗ
   const py = d.py + window.scrollY;
-  d.merge = d.rects.findIndex((rc, j) => { if (j === d.from) return false; const h = rc.bottom - rc.top; return py > rc.top + h * 0.22 && py < rc.bottom - h * 0.22; });
+  d.merge = -1;   // đã bỏ gộp đơn: kéo thả chỉ để đổi chỗ
   d.rows.forEach((r, j) => r.classList.toggle('mergeT', j === d.merge));
   if (d.merge >= 0) { d.rows.forEach((r, j) => { if (j !== d.from) r.style.transform = ''; }); return; }
   const pageY = d.mids[d.from] + dy; let to = 0;
@@ -8155,11 +8198,122 @@ function ltDragEnd(){
   if (!ltDrag) return;
   const d = ltDrag; ltDrag = null;
   if (d.moved && d.merge >= 0) { const ord = ltOrder(); ltMerge(ord[d.from], ord[d.merge]); }
-  else if (d.moved && d.to !== d.from) { const P = LT.P, ord = ltOrder(); const id = ord.splice(d.from, 1)[0]; ord.splice(d.to, 0, id); P.order = ord; ltPut(P); }
+  else if (d.moved && d.to !== d.from) { const P = LT.P, ord = ltOrder(); const id = ord.splice(d.from, 1)[0]; ord.splice(d.to, 0, id); P.order = ltKeepChain(P, ord, id); ltPut(P); }
   else renderKeHoach();
 }
 document.addEventListener('pointerup', ltDragEnd);
 document.addEventListener('pointercancel', ltDragEnd);
+
+// ===== Nối đơn: đơn A xong thì đi thẳng sang đơn B, không về cửa hàng. Lưu ở P.links[idA] = idB; hai đơn luôn nằm sát nhau =====
+const LT_LKARR = '<svg width="22" height="26" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v18M4 14l7 8 7-8"/></svg>';
+const LT_LKPORT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const ltLkOk = (P, seq, i) => !!(P.links && seq[i] && P.links[seq[i]] && P.links[seq[i]] === seq[i + 1]);
+function ltChainInfo(P, seq){
+  const info = {};
+  for (let i = 0; i < seq.length; i++) {
+    if (ltLkOk(P, seq, i - 1) || !ltLkOk(P, seq, i)) continue;
+    let j = i; while (ltLkOk(P, seq, j)) j++;
+    for (let k = i; k <= j; k++) info[seq[k]] = { n: k - i + 1, m: j - i + 1 };
+    i = j;
+  }
+  return info;
+}
+// bỏ nối khi hai đơn không còn nằm sát nhau (đổi thứ tự, xếp tự động, chèn đơn…)
+function ltCleanLinks(P){
+  if (!P || !P.links) return;
+  const ord = P.order ? P.order.filter(k => !P.parked[k]) : null;
+  Object.keys(P.links).forEach(a => { const i = ord ? ord.indexOf(a) : -1; if (i < 0 || ord[i + 1] !== P.links[a]) delete P.links[a]; });
+}
+// kéo một đơn thì cả chuỗi nối đi theo
+function ltKeepChain(P, ord, id){
+  if (!P.links) return ord;
+  const prev = k => Object.keys(P.links).find(a => P.links[a] === k);
+  let h = id, g = 0; while (prev(h) && g++ < 50) h = prev(h);
+  const seg = [h]; while (P.links[seg[seg.length - 1]] && seg.length < 50) seg.push(P.links[seg[seg.length - 1]]);
+  if (seg.length < 2 || seg.indexOf(id) < 0) return ord;
+  const before = ord.slice(0, ord.indexOf(id)).filter(k => seg.indexOf(k) < 0).length - seg.indexOf(id);
+  const rest = ord.filter(k => seg.indexOf(k) < 0); rest.splice(Math.max(0, before), 0, ...seg);
+  return rest;
+}
+function ltLinkIds(a, b){
+  ltCtx = 'kh'; ltDate = khDate; ltBuild();
+  const P = LT.P; P.links = P.links || {};
+  const full = ltOrder(), act = full.filter(k => !P.parked[k]);
+  if (a === b || act.indexOf(a) < 0 || act.indexOf(b) < 0) return;
+  const prev = k => Object.keys(P.links).find(z => P.links[z] === k);
+  let x = a, g = 0; while (x && g++ < 50) { if (x === b) return; x = prev(x); }   // không nối vòng
+  delete P.links[a]; const p0 = prev(b); if (p0) delete P.links[p0];
+  P.links[a] = b;
+  const seg = [b]; while (P.links[seg[seg.length - 1]] && seg.length < 50) seg.push(P.links[seg[seg.length - 1]]);
+  const rest = full.filter(k => seg.indexOf(k) < 0); rest.splice(rest.indexOf(a) + 1, 0, ...seg);
+  P.order = rest; ltMsg = ''; ltPut(P);
+}
+let khLinkable = [], khLinkMap = {}, khLinkPairs = [];
+const khPrevOf = id => Object.keys(khLinkMap).find(a => khLinkMap[a] === id);
+function khCanLink(a, b){
+  if (a === b || khLinkable.indexOf(b) < 0 || khLinkMap[a] === b) return false;
+  let x = a, g = 0; while (x && g++ < 50) { if (x === b) return false; x = khPrevOf(x); }
+  return true;
+}
+const ltPortHtml = (id, has, info) => (info ? '<span class="kh-lkbadge">🔗 Nối ' + info.n + '/' + info.m + '</span>' : '')
+  + '<span class="kh-port' + (has ? ' has' : '') + '" data-port="' + id + '" role="button" aria-label="Nối đơn" title="Kéo mũi tên sang đơn kế tiếp để nối (đi thẳng, không về cửa hàng)">' + LT_LKPORT + '</span>';
+function khDrawLinks(){
+  const list = document.getElementById('ltList'); if (!list) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  let svg = list.querySelector('svg.kh-ov');
+  if (!svg) { svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'kh-ov'); list.appendChild(svg); }
+  list.querySelectorAll('.kh-xbtn').forEach(e => e.remove());
+  svg.innerHTML = '<defs><marker id="khAh" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5B21B6"/></marker></defs>';
+  const lr = list.getBoundingClientRect();
+  const R = el => { const r = el.getBoundingClientRect(); return { l: r.left - lr.left, r: r.right - lr.left, t: r.top - lr.top, b: r.bottom - lr.top }; };
+  khLinkPairs.forEach(([a, b]) => {
+    const A = list.querySelector('.kh-card[data-id="' + a + '"]'), B = list.querySelector('.kh-card[data-id="' + b + '"]'); if (!A || !B) return;
+    const ra = R(A), rb = R(B), m = 26;
+    const xa = Math.min(Math.max((rb.l + rb.r) / 2, ra.l + m), ra.r - m), xb = Math.min(Math.max((ra.l + ra.r) / 2, rb.l + m), rb.r - m);
+    const y1 = ra.b, y2 = rb.t - 2, ym = (y1 + y2) / 2, dx = xb - xa, r = Math.min(9, Math.abs(dx) / 2), s = dx > 0 ? 1 : -1;
+    const d = Math.abs(dx) < 2 ? 'M' + xa + ' ' + y1 + ' V' + y2
+      : 'M' + xa + ' ' + y1 + ' V' + (ym - r) + ' Q' + xa + ' ' + ym + ' ' + (xa + s * r) + ' ' + ym + ' H' + (xb - s * r) + ' Q' + xb + ' ' + ym + ' ' + xb + ' ' + (ym + r) + ' V' + y2;
+    svg.insertAdjacentHTML('beforeend', '<path class="lk" marker-end="url(#khAh)" d="' + d + '"/>');
+    const x = document.createElement('button'); x.className = 'kh-xbtn'; x.textContent = '✕'; x.title = 'Gỡ nối đơn'; x.setAttribute('data-lt', 'unlink'); x.setAttribute('data-v', a);
+    x.style.left = ((xa + xb) / 2) + 'px'; x.style.top = ym + 'px'; list.appendChild(x);
+  });
+}
+window.addEventListener('resize', () => { if (!ltDrag) khDrawLinks(); });
+let khLk = null;
+document.addEventListener('pointerdown', e => {
+  const p = e.target.closest && e.target.closest('.kh-port'); if (!p || e.button > 0) return;
+  const card = p.closest('.kh-card'); if (!card) return;
+  e.preventDefault(); e.stopPropagation();
+  khLk = { id: card.dataset.id, target: null };
+  document.body.classList.add('kh-linking'); card.classList.add('lk-src');
+  document.querySelectorAll('#ltList .kh-card').forEach(c => { if (c.dataset.id !== khLk.id && !khCanLink(khLk.id, c.dataset.id)) c.classList.add('lk-bad'); });
+  khLkMove(e);
+}, true);
+function khLkMove(e){
+  if (!khLk) return;
+  const list = document.getElementById('ltList'); if (!list) return;
+  const NS = 'http://www.w3.org/2000/svg', svg = list.querySelector('svg.kh-ov'); if (!svg) return;
+  const src = list.querySelector('.kh-card[data-id="' + khLk.id + '"] .kh-port'); if (!src) return;
+  const lr = list.getBoundingClientRect(), pr = src.getBoundingClientRect();
+  let t = svg.querySelector('.tmp'); if (!t) { t = document.createElementNS(NS, 'path'); t.setAttribute('class', 'tmp'); t.setAttribute('marker-end', 'url(#khAh)'); svg.appendChild(t); }
+  t.setAttribute('d', 'M' + (pr.left + pr.width / 2 - lr.left) + ' ' + (pr.top + pr.height / 2 - lr.top) + ' L' + (e.clientX - lr.left) + ' ' + (e.clientY - lr.top));
+  list.querySelectorAll('.kh-card.lk-ok').forEach(c => c.classList.remove('lk-ok'));
+  const el = document.elementFromPoint(e.clientX, e.clientY), c = el && el.closest ? el.closest('#ltList .kh-card') : null;
+  khLk.target = null;
+  if (c && khCanLink(khLk.id, c.dataset.id)) { c.classList.add('lk-ok'); khLk.target = c.dataset.id; }
+  if (e.clientY < 70) window.scrollBy(0, -14); else if (e.clientY > window.innerHeight - 70) window.scrollBy(0, 14);
+}
+document.addEventListener('pointermove', khLkMove);
+function khLkEnd(){
+  if (!khLk) return;
+  const d = khLk; khLk = null;
+  document.body.classList.remove('kh-linking');
+  document.querySelectorAll('#ltList .kh-card').forEach(c => c.classList.remove('lk-src', 'lk-ok', 'lk-bad'));
+  const t = document.querySelector('#ltList svg.kh-ov .tmp'); if (t) t.remove();
+  if (d.target) ltLinkIds(d.id, d.target);
+}
+document.addEventListener('pointerup', khLkEnd);
+document.addEventListener('pointercancel', khLkEnd);
 </script>
 
 <script>
