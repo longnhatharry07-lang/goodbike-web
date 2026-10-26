@@ -1,6 +1,6 @@
 // Service Worker cho GOODBIKE PWA
 // Tăng số phiên bản này mỗi khi bạn cập nhật app để buộc làm mới cache.
-const VERSION = 'goodbike-2026-10-25-chudinh';
+const VERSION = 'goodbike-2026-10-26-thongbao';
 const APP_SHELL = [
   './',
   './index.html',
@@ -77,4 +77,29 @@ self.addEventListener('fetch', (event) => {
       })
     )
   );
+});
+
+// ===== Thông báo đẩy "đơn mới hôm nay" (gửi từ Supabase Edge Function thong-bao-don) =====
+self.addEventListener('push', (event) => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; } catch (e) { d = { title: 'GOODBIKE', body: event.data ? event.data.text() : '' }; }
+  event.waitUntil(self.registration.showNotification(d.title || 'GOODBIKE · Đơn mới', {
+    body: d.body || '',
+    tag: d.tag || 'gb-don',
+    renotify: true,
+    requireInteraction: true,
+    silent: false,
+    vibrate: [300, 120, 300, 120, 500],
+    icon: './icon-nv-192.png',
+    badge: './icon-nv-192.png',
+    data: { url: d.url || './nhanvien.html' }
+  }));
+});
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || './nhanvien.html', self.registration.scope).href;
+  event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+    for (const c of list) { if (/nhanvien\.html/.test(c.url) && 'focus' in c) { c.navigate && c.navigate(url).catch(() => {}); return c.focus(); } }
+    return self.clients.openWindow(url);
+  }));
 });

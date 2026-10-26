@@ -2405,7 +2405,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-25-chudinh';
+const BAN_APP = '2026-10-26-thongbao';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -6361,9 +6361,82 @@ function nvApply(key){
   }
   runDate=todayStr();
   try{ switchTab('lichtrinh'); }catch(e){ console.warn(e); }
+  pushKhoiDong();
   window.scrollTo({top:0});
   // chủ đổi hoặc tắt mật khẩu → hỏi lại
   setInterval(()=>{ if(String(DB.nvPass||'').trim()!==key){ try{ localStorage.removeItem('gb_nvPass'); }catch(e){} location.reload(); } },60000);
+}
+// ===== Thông báo đẩy "đơn mới hôm nay" (app nhân viên) =====
+// Máy chủ gửi: Supabase Edge Function "thong-bao-don" (supabase-thong-bao-don.ts + supabase-thong-bao.sql)
+const PUSH_FN = SB_URL + '/functions/v1/thong-bao-don';
+let pushState = 'chua';   // chua | bat | tat | khong-ho-tro | can-cai-app | bi-chan
+const pushIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const pushStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+async function pushCall(body){
+  const r = await fetch(PUSH_FN, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY, 'apikey': SB_KEY }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.loi || ('HTTP ' + r.status));
+  return j;
+}
+function pushB64(s){ const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+async function pushKiem(){   // xác định trạng thái hiện tại của máy
+  if (!('serviceWorker' in navigator) || !('Notification' in window) || !('PushManager' in window)) { pushState = pushIOS() && !pushStandalone() ? 'can-cai-app' : 'khong-ho-tro'; return pushState; }
+  if (Notification.permission === 'denied') return (pushState = 'bi-chan');
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); pushState = sub && Notification.permission === 'granted' ? 'bat' : 'tat'; }
+  catch (e) { pushState = 'tat'; }
+  return pushState;
+}
+function pushBtnHtml(){
+  const on = pushState === 'bat';
+  return '<button class="lt-btn" data-lt="push" style="height:40px;padding:0 14px;flex-shrink:0;' + (on ? 'background:#ECFDF3;color:#067647;border-color:#A6DDBD' : 'background:#FEF3F2;color:#B42318;border-color:#FECDCA') + '">' + (on ? '🔔 Thông báo: Bật' : '🔕 Bật thông báo') + '</button>';
+}
+function pushSheet(msg, ok){
+  const st = pushState;
+  const tx = {
+    'bat': 'Máy này <b>đang nhận thông báo</b> khi có booking mới nhận xe trong hôm nay — kể cả khi tắt app, khoá màn hình.',
+    'tat': 'Máy này <b>chưa nhận thông báo</b>. Bấm nút bên dưới rồi chọn <b>Cho phép</b>.',
+    'bi-chan': 'Máy này đã <b>chặn thông báo</b> của app. Vào Cài đặt của điện thoại → Thông báo → GB Lịch trình → bật Cho phép thông báo, rồi mở lại app.',
+    'can-cai-app': 'Trên iPhone/iPad phải <b>cài app ra Màn hình chính</b> mới nhận được thông báo: trong Safari bấm nút Chia sẻ → <b>Thêm vào MH chính</b>, rồi mở app từ biểu tượng mũ đỏ và bấm lại nút này. (Cần iOS 16.4 trở lên.)',
+    'khong-ho-tro': 'Trình duyệt này không nhận được thông báo đẩy. Trên Android dùng Chrome; trên iPhone/iPad cập nhật iOS 16.4 trở lên và cài app ra Màn hình chính.'
+  }[st] || '';
+  ltSheet('<h2>Thông báo đơn mới</h2><div class="lt-sub" style="line-height:1.5">' + tx + '</div>'
+    + (msg ? '<div class="lt-err" style="' + (ok ? 'color:#067647' : '') + '">' + ltEsc(msg) + '</div>' : '')
+    + (st === 'tat' ? '<button class="lt-btn" style="height:52px;background:#067647;color:#fff;border-color:#067647" data-lt="pushon">🔔 Bật thông báo trên máy này</button>' : '')
+    + (st === 'bat' ? '<button class="lt-btn" style="height:48px" data-lt="pushtest">Gửi thử 1 thông báo</button><button class="lt-btn" style="height:44px;color:#B42318" data-lt="pushoff">Tắt thông báo trên máy này</button>' : '')
+    + '<button class="lt-btn" style="height:44px" data-lt="cancel">Đóng</button>');
+}
+async function pushDangKy(reg){   // đăng ký (hoặc lấy lại) và báo cho máy chủ
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) { const { key } = await pushCall({ action: 'pub' }); sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: pushB64(key) }); }
+  await pushCall({ action: 'sub', sub: sub.toJSON(), who: (pushIOS() ? 'iOS' : (/Android/i.test(navigator.userAgent) ? 'Android' : 'May tinh')) + ' · ' + new Date().toISOString().slice(0, 10) });
+  return sub;
+}
+async function pushBat(){
+  try {
+    const p = await Notification.requestPermission();   // phải gọi ngay khi bấm (iOS yêu cầu)
+    if (p !== 'granted') { await pushKiem(); pushSheet('Chưa được cho phép thông báo.'); renderLichTrinh(); return; }
+    await pushDangKy(await navigator.serviceWorker.ready);
+    await pushKiem(); renderLichTrinh(); pushSheet('Đã bật. Bấm "Gửi thử" để kiểm tra tiếng chuông.', true);
+  } catch (e) { console.warn(e); await pushKiem(); pushSheet('Không bật được: ' + e.message); }
+}
+async function pushTat(){
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+    if (sub) { pushCall({ action: 'unsub', endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); } } catch (e) {}
+  await pushKiem(); renderLichTrinh(); pushSheet('Đã tắt thông báo trên máy này.', true);
+}
+async function pushThu(){
+  try { const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription();
+    if (!sub) throw new Error('máy chưa đăng ký');
+    await pushCall({ action: 'test', endpoint: sub.endpoint }); pushSheet('Đã gửi. Thông báo sẽ hiện trong vài giây (thử khoá màn hình để nghe chuông).', true);
+  } catch (e) { pushSheet('Gửi thử không được: ' + e.message); }
+}
+// mở app nhân viên: đã cho phép thì tự đăng ký lại (địa chỉ nhận có thể đổi) rồi vẽ lại nút
+function pushKhoiDong(){
+  pushKiem().then(async st => {
+    if (st === 'tat' && 'Notification' in window && Notification.permission === 'granted') { try { await pushDangKy(await navigator.serviceWorker.ready); await pushKiem(); } catch (e) { console.warn(e); } }
+    else if (st === 'bat') { try { await pushDangKy(await navigator.serviceWorker.ready); } catch (e) { console.warn(e); } }
+    try { if (nvMode) renderLichTrinh(); } catch (e) {}
+  });
 }
 function nvShareSheet(msg){
   const on=!!String(DB.nvPass||'').trim();
@@ -7240,7 +7313,7 @@ function renderLichTrinh(){
   if (!runDate) runDate = todayStr();
   ltCtx = 'run'; ltDate = runDate;
   const all = ltSyncAndOrder(), today = todayStr(), tmr = ltAddDays(today, 1);
-  app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div></div>'
+  app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div>' + (nvMode ? pushBtnHtml() : '') + '</div>'
     + '<div class="lt-seg"><button class="' + (runDate === today ? 'on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button><button class="' + (runDate === tmr ? 'on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button></div>'
     + ltMsgHtml() + ltRunView(all);
   ltTick();
@@ -7748,6 +7821,10 @@ document.addEventListener('click', e => {
   if (a === 'newbk') { khPickMark.band = { a: +b.dataset.a, b: +b.dataset.b }; openBooking(null, { ds: khDate, dtime: b.dataset.t }); khNewAt = { date: khDate, pos: +v, ts: Date.now() }; khDockBk(); khPickMark(); return; }
   if (a === 'bg') { if (e.target === b) ltCloseSheet(); return; }
   if (a === 'cancel') { ltCloseSheet(); return; }
+  if (a === 'push') { pushSheet(); return; }
+  if (a === 'pushon') { pushBat(); return; }
+  if (a === 'pushoff') { pushTat(); return; }
+  if (a === 'pushtest') { pushThu(); return; }
   if (a === 'day') { ltMsg = ''; if (ltCtx === 'kh') { khDate = v; renderKeHoach(); } else { runDate = v; renderLichTrinh(); } return; }
   if (a === 'gorun') { runDate = khDate; switchTab('lichtrinh'); window.scrollTo({ top: 0 }); return; }
   if (a === 'closemsg') { ltMsg = ''; renderKeHoach(); renderLichTrinh(); return; }
