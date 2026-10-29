@@ -2541,7 +2541,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-29-baoduong';
+const BAN_APP = '2026-10-29-capnhat';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -2953,7 +2953,14 @@ async function kiemTraBanMoi(){
     const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
     if(!r.ok) return;
     const j=await r.json();
-    if(j && j.ban && String(j.ban)>String(BAN_APP)){ banMoiCo=j.ban; hienNutCapNhat(); }
+    if(j && j.ban && String(j.ban)>String(BAN_APP)){
+      banMoiCo=j.ban;
+      /* Chốt chống vòng lặp: phiên này đã bấm cập nhật lên đúng bản này mà file tải về vẫn là bản cũ
+         (vd. nhanvien.html chưa được tạo lại) → không hiện hộp chặn màn hình lần nữa, chỉ báo ở dòng trạng thái. */
+      let daThu=null; try{ daThu=sessionStorage.getItem('gb_capNhatThu'); }catch(e){}
+      if(daThu===String(j.ban)){ console.warn('Đã cập nhật lên '+j.ban+' nhưng file vẫn là '+BAN_APP); try{ sbStatus('Bản '+BAN_APP+' · chưa nhận được '+j.ban,'err'); }catch(e){} return; }
+      hienNutCapNhat();
+    }
   }catch(e){}
 }
 function hienNutCapNhat(){
@@ -2973,9 +2980,14 @@ function hienNutCapNhat(){
     this.textContent='Đang cập nhật…'; this.disabled=true;
     try{ if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); for(const x of rs) await x.unregister(); } }catch(e){}
     try{ if(window.caches){ const ks=await caches.keys(); for(const k of ks) await caches.delete(k); } }catch(e){}
-    location.reload(true);
+    try{ sessionStorage.setItem('gb_capNhatThu',String(banMoiCo||'')); }catch(e){}
+    // Thêm ?v=<bản mới> để trình duyệt bắt buộc tải file mới, không lấy bản cũ trong bộ nhớ đệm
+    const u=new URL(location.href); u.searchParams.set('v',String(banMoiCo||Date.now()));
+    location.replace(u.toString());
   };
 }
+// Bỏ ?v= khỏi thanh địa chỉ sau khi đã tải bản mới
+try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+u.search+u.hash); } }catch(e){}
 setTimeout(kiemTraBanMoi,5000);
 setInterval(kiemTraBanMoi,180000);
 window.addEventListener('focus',kiemTraBanMoi);
