@@ -445,6 +445,50 @@
   .dep-row .dep-amt{font-size:16px;font-weight:800;color:#b45309;text-align:right}
   .dep-row .dep-amt::placeholder{font-size:13px;font-weight:500;color:#9ca3af}
   .dep-row .dep-note{grid-column:1/-1}
+  /* ===== Bảo dưỡng theo ODO (bản 2026-10-29-baoduong) ===== */
+  #view-baoduong .tbl-wrap{max-height:none}
+  .bd-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;min-width:1060px;table-layout:fixed}
+  .bd-tbl th,.bd-tbl td{border:1px solid #E4E7EC;padding:6px 8px;text-align:left;vertical-align:top}
+  .bd-tbl thead th{background:#F2F4F7;font-weight:700;color:#101828;white-space:nowrap}
+  .bd-tbl thead th.bd-g{text-align:center;background:#E9ECF1;border-bottom-color:#D0D5DD}
+  .bd-tbl thead th.bd-g.cur{background:#101828;color:#fff}
+  .bd-tbl td.bd-prev{background:#FAFAFB;color:#475467}
+  .bd-tbl td.bd-fc{color:#5B6472;font-size:12px;line-height:1.55}
+  .bd-xe{display:inline-block;font-weight:800;font-size:14px;color:#101828;min-width:34px}
+  .bd-ty{display:block;font-size:11px;color:#667085;font-weight:600}
+  .bd-tbl input.bd-in{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px;border:1px solid #D0D5DD;border-radius:7px;background:#fff}
+  .bd-tbl input.bd-odo{font-weight:700;text-align:right}
+  .bd-tbl textarea.bd-note{width:100%;box-sizing:border-box;padding:6px 8px;font-size:13px;border:1px solid #D0D5DD;border-radius:7px;background:#fff;display:block;margin-top:6px;resize:vertical;min-height:52px;font-family:inherit;line-height:1.45}
+  .bd-tbl td>textarea.bd-note:first-child{margin-top:0}
+  .bd-tbl input.bd-in.err{border-color:#D92D20;background:#FEF3F2;color:#B42318}
+  .bd-err{color:#B42318;font-size:11.5px;font-weight:600;margin-top:3px}
+  .bd-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .bd-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #D0D5DD;border-radius:7px;padding:3px 8px;font-size:12.5px;font-weight:600;color:#344054;background:#fff;cursor:pointer;user-select:none}
+  .bd-chip input{margin:0;width:14px;height:14px;cursor:pointer}
+  .bd-chip small{font-weight:500;color:#667085;font-size:11.5px}
+  .bd-chip.over{background:#FEF3F2;border-color:#FDA29B;color:#912018}
+  .bd-chip.over small{color:#B42318}
+  .bd-chip.due{background:#FFFAEB;border-color:#FEC84B;color:#93370D}
+  .bd-chip.due small{color:#B54708}
+  .bd-chip.done{background:#ECFDF3;border-color:#75E0A7;color:#085D3A}
+  .bd-chip.done small{color:#067647}
+  .bd-add{font-size:12px;padding:3px 6px;border:1px dashed #D0D5DD;border-radius:7px;background:#fff;color:#475467;max-width:130px}
+  .bd-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#475467;margin-top:10px}
+  .bd-legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid}
+  .bd-legend .l-over::before{background:#FEF3F2;border-color:#FDA29B}
+  .bd-legend .l-due::before{background:#FFFAEB;border-color:#FEC84B}
+  .bd-legend .l-done::before{background:#ECFDF3;border-color:#75E0A7}
+  .bd-month{font-weight:800;font-size:15px;color:#101828;min-width:120px;text-align:center}
+  button.bd-main{background:#101828;color:#fff;border:1px solid #101828;padding:7px 14px;font-weight:700;font-size:13px}
+  button.bd-main:hover{background:#344054}
+  .bd-it-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .bd-it-tbl th,.bd-it-tbl td{border-bottom:1px solid #E4E7EC;padding:6px 5px;text-align:left;vertical-align:middle}
+  .bd-it-tbl th{font-size:12px;color:#475467;font-weight:700;white-space:nowrap}
+  .bd-it-tbl input[type=text],.bd-it-tbl input[type=number]{width:100%;box-sizing:border-box;padding:5px 7px;font-size:13px;border:1px solid #D0D5DD;border-radius:6px}
+  .bd-it-tbl td.c{text-align:center}
+  .bd-opt{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .bd-opt label{display:inline-flex;align-items:center;gap:6px;border:1px solid #D0D5DD;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer}
+  .bd-opt label.on{border-color:#101828;background:#F2F4F7}
   button.coc-btn{background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0;padding:7px 12px;font-weight:600;font-size:13px}
   button.coc-btn:hover{background:#e2e8f0}
   .coc-tbl .coc-xe{display:inline-block;background:#f5f3ff;color:#6d28d9;font-weight:700;font-size:13.5px;padding:2px 10px;border-radius:6px;border:1px solid #ddd6fe}
@@ -1482,6 +1526,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
   <button class="tab" data-t="coc">Tiền cọc</button>
+  <button class="tab" data-t="baoduong">Bảo dưỡng</button>
   <button class="tab admin-toggle" id="accToggle">🔒 Kế toán</button>
   <span class="tab-group" id="accGroupLabel" style="display:none">📊 Kế toán</span>
   <button class="tab admin acc" data-t="revenue" style="display:none">Tổng doanh thu</button>
@@ -1572,6 +1617,29 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="coc-h hold" id="cocHHold"></div>
       <div class="tbl-wrap"><table id="cocHoldTable" class="coc-tbl"></table></div>
     </div>
+  </section>
+
+  <!-- BẢO DƯỠNG (theo ODO hằng tháng) -->
+  <section class="view" id="view-baoduong" style="display:none">
+    <div class="card">
+      <div class="row" style="flex-wrap:wrap;gap:8px">
+        <h2 style="margin:0">Bảo dưỡng</h2>
+        <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button class="coc-btn" id="bdPrev">◀</button>
+          <span class="bd-month" id="bdMonthLbl"></span>
+          <button class="coc-btn" id="bdNext">▶</button>
+          <button class="coc-btn" id="bdThis">Tháng này</button>
+          <button class="coc-btn" id="bdItemsBtn">Danh mục &amp; chu kỳ</button>
+          <button class="bd-main" id="bdPrintBtn">In phiếu</button>
+        </div>
+      </div>
+      <div class="kpis" id="bdKpis" style="margin-top:12px"></div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="tbl-wrap" id="bdApp"></div>
+    </div>
+    <div class="card" style="padding:0;margin-top:16px;overflow:hidden" id="bdUsed"></div>
+    <div class="bd-legend"><span class="l-over">Quá hạn</span><span class="l-due">Đến hạn trong tháng</span><span class="l-done">Đã làm</span></div>
   </section>
 
   <!-- REVENUE -->
@@ -2208,6 +2276,39 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 </div>
 
 <!-- Admin login modal -->
+<div class="overlay" id="bdPrintOverlay">
+  <div class="modal" style="width:min(520px,100%)">
+    <button class="modal-x" data-close="bdPrintOverlay" title="Đóng">✕</button>
+    <h3 id="bdPrintTitle">In phiếu bảo dưỡng</h3>
+    <div class="field"><label>Xe in ra</label>
+      <div class="bd-opt" id="bdOptScope">
+        <label data-v="all"><input type="radio" name="bdScope" value="all"> Tất cả xe</label>
+        <label data-v="due"><input type="radio" name="bdScope" value="due"> Chỉ xe có việc</label>
+      </div></div>
+    <div class="field"><label>Nhóm xe</label>
+      <select id="bdOptGrp">
+        <option value="all">Tất cả</option><option value="ga">Vision (A)</option>
+        <option value="lead">Lead, NVX (L, B)</option><option value="so">Xe số (G)</option>
+      </select></div>
+    <div class="field"><label>Người thực hiện</label><input type="text" id="bdOptWho" placeholder="Tên nhân viên"></div>
+    <div class="actions">
+      <button class="coc-btn" id="bdPrintCancel">Hủy</button>
+      <button class="coc-btn" id="bdPdfGo">Tải PDF</button>
+      <button class="bd-main" id="bdPrintGo">In</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="bdItemsOverlay">
+  <div class="modal" style="width:min(980px,100%)">
+    <button class="modal-x" data-close="bdItemsOverlay" title="Đóng">✕</button>
+    <h3>Danh mục &amp; chu kỳ bảo dưỡng</h3>
+    <div class="tbl-wrap"><table class="bd-it-tbl" id="bdItemsTbl"></table></div>
+    <div class="actions" style="justify-content:space-between">
+      <button class="coc-btn" id="bdItemAdd">＋ Thêm việc</button>
+      <span style="display:flex;gap:8px"><button class="coc-btn" id="bdItemsCancel">Hủy</button><button class="bd-main" id="bdItemsSave">Lưu</button></span>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="adminOverlay">
   <div class="modal" style="width:min(420px,100%);text-align:center">
     <button class="modal-x" data-close="adminOverlay" title="Đóng">✕</button>
@@ -2440,7 +2541,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-27-noidon';
+const BAN_APP = '2026-10-29-baoduong';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3024,6 +3125,7 @@ function switchTab(t){
   document.documentElement.classList.toggle('kh-on', t==='kehoach');   // Kế hoạch: cho cột phải dính khi cuộn trang
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
+  if(t==='baoduong'){ try{ renderBaoDuong(true); }catch(e){ console.warn('renderBaoDuong',e); } }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
   if(t==='lichtrinh'){ try{ renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); } }
   if(t==='websync'){ try{ renderWebSync(); }catch(e){ console.warn('renderWebSync',e); } }
@@ -3063,6 +3165,401 @@ function adminLockNow(){
   renderAll();
 }
 
+/* ============ BẢO DƯỠNG THEO ODO HẰNG THÁNG (bản 2026-10-29-baoduong) ============
+   Dữ liệu:
+     DB.maintenance  (ITEM_PATHS) mỗi xe mỗi tháng 1 dòng:
+        {id:'mt_YYYY-MM_XE', xe, month:'YYYY-MM', odo, done:[idViệc], extra:'phát sinh', mat:'vật liệu tiêu tốn'}
+     DB.mtItems (cfg) danh mục việc: {id,name,km,months,kinds:['ga'|'so'|'nuoc'],mat,qty,unit,fixed?,off?}
+     fixed:true = ô tích in sẵn trên phiếu (mặc định chỉ Thay nhớt); việc khác nhân viên tự viết vào dòng trống.
+   Mốc kế tiếp = ODO lần làm gần nhất + chu kỳ km (hoặc + số tháng). Xe chưa từng ghi việc đó
+   thì lấy lần ghi ODO đầu tiên làm mốc. Tốc độ chạy = trung bình các lần ghi ODO gần nhất. */
+const MT_ITEMS_DEFAULT=[
+  {id:'dau_ga',name:'Thay nhớt',km:1500,months:2,kinds:['ga'],mat:'Nhớt xe ga',qty:1,unit:'chai',fixed:true},
+  {id:'dau_so',name:'Thay nhớt',km:1500,months:2,kinds:['so'],mat:'Nhớt xe số',qty:1,unit:'chai',fixed:true},
+  {id:'lap',name:'Dầu láp',km:6000,months:0,kinds:['ga'],mat:'Dầu láp',qty:1,unit:'lọ'},
+  {id:'bugi',name:'Bugi',km:8000,months:0,kinds:['ga','so'],mat:'Bugi',qty:1,unit:'cái'},
+  {id:'locgio',name:'Lọc gió',km:12000,months:0,kinds:['ga','so'],mat:'Lọc gió',qty:1,unit:'cái'},
+  {id:'curoa',name:'Dây curoa',km:20000,months:0,kinds:['ga'],mat:'Dây curoa',qty:1,unit:'sợi'},
+  {id:'nuoc',name:'Nước làm mát',km:0,months:24,kinds:['nuoc'],mat:'Nước làm mát',qty:1,unit:'chai'},
+  {id:'xich',name:'Chỉnh xích, tra dầu',km:1000,months:0,kinds:['so'],mat:'',qty:0,unit:''},
+  {id:'nhong',name:'Nhông xích đĩa',km:15000,months:0,kinds:['so'],mat:'Bộ nhông xích đĩa',qty:1,unit:'bộ'},
+  {id:'phanh',name:'Kiểm tra phanh, lốp',km:3000,months:0,kinds:['ga','so'],mat:'',qty:0,unit:''}
+];
+const MT_KINDS=[['ga','Xe ga'],['so','Xe số'],['nuoc','Làm mát nước']];
+const MT_DEF_RATE=1500;          // km/tháng khi xe chưa đủ 2 lần ghi ODO
+let mtMonth=null, mtC=null, mtEdit=null, mtErr={};
+let mtOpt={scope:'all',grp:'all',who:''};
+
+function mtThisMonth(){return todayStr().slice(0,7);}
+function mtAddM(m,k){let [y,mo]=m.split('-').map(Number);mo+=k;y+=Math.floor((mo-1)/12);mo=((mo-1)%12+12)%12+1;return y+'-'+String(mo).padStart(2,'0');}
+function mtDiffM(a,b){const [y1,m1]=a.split('-').map(Number),[y2,m2]=b.split('-').map(Number);return (y2-y1)*12+(m2-m1);}
+function mtLbl(m){const [y,mo]=m.split('-');return 'Tháng '+Number(mo)+'/'+y;}
+function mtShort(m){const [y,mo]=m.split('-');return 'T'+Number(mo)+(y!==mtMonth.slice(0,4)?'/'+y.slice(2):'');}
+function mtNum(n){return (n==null||n==='')?'':Number(n).toLocaleString('vi-VN');}
+function mtEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+/* Xe có lịch bảo dưỡng: xe xăng trong đội (bỏ xe điện, OVER, DUMP). Thứ tự như sheet: A → B → L → G */
+function mtXeList(){
+  const ord={A:0,B:1,L:2,G:3};
+  return XE_THAT.filter(v=>v.typ!=='Xe điện'&&!v.over).map((v,i)=>({v,i}))
+    .sort((a,b)=>((ord[a.v.id[0]]??9)-(ord[b.v.id[0]]??9))||a.i-b.i).map(x=>x.v);
+}
+function mtGrp(v){return v.typ==='Vision'?'ga':(v.typ==='NVX/Lead'?'lead':'so');}
+function mtKinds(xe){const v=VEHICLES.find(x=>x.id===xe);if(!v)return[];if(v.typ==='Xe số')return['so'];if(v.typ==='NVX/Lead')return['ga','nuoc'];return['ga'];}
+function mtItems(all){const l=(Array.isArray(DB.mtItems)&&DB.mtItems.length)?DB.mtItems:MT_ITEMS_DEFAULT;return all?l:l.filter(i=>!i.off);}
+function mtItemsFor(xe){const k=mtKinds(xe);return mtItems().filter(i=>(i.kinds||[]).some(x=>k.includes(x)));}
+function mtItemById(id){return mtItems(true).find(i=>i.id===id);}
+function mtIdx(){
+  if(mtC)return mtC;
+  const m=new Map();
+  (DB.maintenance||[]).forEach(r=>{ if(!r||!r.xe||!/^\d{4}-\d{2}$/.test(r.month||''))return; if(!m.has(r.xe))m.set(r.xe,[]); m.get(r.xe).push(r); });
+  m.forEach(a=>a.sort((x,y)=>x.month<y.month?-1:1));
+  return mtC=m;
+}
+function mtRec(xe,m){return (mtIdx().get(xe)||[]).find(r=>r.month===m);}
+function mtPts(xe,upto){return (mtIdx().get(xe)||[]).filter(r=>r.odo>0&&(!upto||r.month<=upto));}
+function mtRate(xe,upto){
+  const p=mtPts(xe,upto).slice(-4); if(p.length<2)return MT_DEF_RATE;
+  const a=p[0],b=p[p.length-1],d=mtDiffM(a.month,b.month);
+  const r=d>0?(b.odo-a.odo)/d:0; return r>0?r:MT_DEF_RATE;
+}
+function mtOdoAt(xe,m){   // ODO thật của tháng m, hoặc ước tính từ lần ghi gần nhất trước đó
+  const r=mtRec(xe,m); if(r&&r.odo>0)return {odo:r.odo,real:true};
+  const p=mtPts(xe,m); if(!p.length)return null;
+  const l=p[p.length-1]; return {odo:Math.round(l.odo+mtRate(xe,m)*mtDiffM(l.month,m)),real:false};
+}
+function mtLastDone(xe,id,upto){
+  const a=(mtIdx().get(xe)||[]).filter(r=>r.month<=upto);
+  for(let i=a.length-1;i>=0;i--){
+    const r=a[i]; if(!(r.done||[]).includes(id))continue;
+    const o=r.odo>0?r.odo:((mtOdoAt(xe,r.month)||{}).odo);
+    if(o)return {month:r.month,odo:o};
+  }
+  const p=a.filter(r=>r.odo>0); return p.length?{month:p[0].month,odo:p[0].odo,base:true}:null;
+}
+function mtCheck(it,last,odoPrev,odoEnd,M){
+  if(!last)return null;
+  const dk=it.km>0?last.odo+Number(it.km):null, dm=it.months>0?mtAddM(last.month,Number(it.months)):null;
+  const kmOver=dk&&odoPrev!=null&&odoPrev>=dk, kmDue=dk&&odoEnd!=null&&odoEnd>=dk;
+  const tOver=dm&&dm<M, tDue=dm&&dm<=M;
+  if(!(kmDue||tDue||kmOver||tOver))return null;
+  return {st:(kmOver||tOver)?'over':'due',km:dk,byKm:!!kmDue||!!kmOver,overKm:(dk&&odoEnd!=null&&odoEnd>dk)?odoEnd-dk:0};
+}
+function mtDueList(xe,M){
+  const P=mtAddM(M,-1), oP=mtOdoAt(xe,P), oE=mtOdoAt(xe,M);
+  const out=[];
+  mtItemsFor(xe).forEach(it=>{
+    const c=mtCheck(it,mtLastDone(xe,it.id,P),oP?oP.odo:null,oE?oE.odo:null,M);
+    if(c)out.push(Object.assign({it},c));
+  });
+  return out;
+}
+function mtForecast(xe,M,n){
+  const st={}, items=mtItemsFor(xe), r=mtRec(xe,M), due=mtDueList(xe,M);
+  items.forEach(it=>{
+    let last=mtLastDone(xe,it.id,M);
+    if(due.some(d=>d.it.id===it.id)&&!(r&&(r.done||[]).includes(it.id))){ const o=mtOdoAt(xe,M); if(o)last={month:M,odo:o.odo}; }
+    st[it.id]=last;
+  });
+  const out=[];
+  for(let k=1;k<=n;k++){
+    const F=mtAddM(M,k), oE=mtOdoAt(xe,F); const names=[];
+    if(oE) items.forEach(it=>{ const c=mtCheck(it,st[it.id],null,oE.odo,F); if(c){ names.push(it.name); st[it.id]={month:F,odo:oE.odo}; } });
+    out.push({m:F,names});
+  }
+  return out;
+}
+function mtUsed(M){   // vật tư đã dùng trong tháng = các việc đã tích × định mức vật tư của việc đó
+  const map={}, free=[];
+  mtXeList().forEach(v=>{ const r=mtRec(v.id,M); if(!r)return;
+    (r.done||[]).forEach(id=>{ const it=mtItemById(id); if(!it||!it.mat)return; const k=it.mat+'|'+(it.unit||'');
+      const u=map[k]=map[k]||{name:it.mat,unit:it.unit||'',qty:0,xe:[]}; u.qty+=Number(it.qty)||1; if(!u.xe.includes(v.id))u.xe.push(v.id); });
+    if(r.mat)free.push({xe:v.id,mat:r.mat}); });
+  const ord=mtItems(true).map(i=>i.mat+'|'+(i.unit||''));
+  return {list:Object.entries(map).sort((a,b)=>ord.indexOf(a[0])-ord.indexOf(b[0])).map(e=>e[1]),free};
+}
+function mtDoneTxt(r){
+  if(!r)return '';
+  const a=(r.done||[]).map(id=>(mtItemById(id)||{}).name).filter(Boolean);
+  if(r.extra)a.push(r.extra);
+  return a.join(', ');
+}
+function mtDueNote(d){
+  if(d.byKm&&d.km) return d.st==='over'?`mốc ${mtNum(d.km)}, đã quá`:`mốc ${mtNum(d.km)}`;
+  return d.st==='over'?'quá hạn theo thời gian':'đến hạn theo thời gian';
+}
+function mtLater(){ setTimeout(()=>renderBaoDuong(true),0); }   // chờ con trỏ sang ô kế tiếp rồi mới vẽ lại
+function mtUpd(xe,fn){
+  const M=mtMonth, id='mt_'+M+'_'+xe;
+  if(!Array.isArray(DB.maintenance))DB.maintenance=[];
+  let r=DB.maintenance.find(x=>x&&x.id===id);
+  if(!r){ r={id,xe,month:M,odo:null,done:[],extra:'',mat:''}; DB.maintenance.push(r); }
+  fn(r);
+  if(!(r.odo>0)&&!(r.done||[]).length&&!r.extra&&!r.mat) DB.maintenance=DB.maintenance.filter(x=>x!==r);
+  mtC=null; save(); mtLater();
+}
+
+function renderBaoDuong(force){
+  const host=document.getElementById('bdApp'); if(!host)return;
+  const ae=document.activeElement, inHost=ae&&host.contains(ae);
+  if(inHost&&!force&&ae.matches('input,select,textarea'))return;      // đang gõ dở → không vẽ lại (máy khác vừa lưu)
+  const keep=inHost?ae.getAttribute('data-k'):null;
+  mtC=null; if(!mtMonth)mtMonth=mtThisMonth();
+  const M=mtMonth, P=mtAddM(M,-1), xs=mtXeList();
+  document.getElementById('bdMonthLbl').textContent=mtLbl(M);
+  let nOver=0,nDue=0,nOdo=0,nDone=0;
+  const rows=xs.map(v=>{
+    const xe=v.id, r=mtRec(xe,M), pr=mtRec(xe,P), due=mtDueList(xe,M), done=(r&&r.done)||[];
+    if(r&&r.odo>0)nOdo++; nDone+=done.length;
+    due.forEach(d=>{ if(done.includes(d.it.id))return; if(d.st==='over')nOver++; else nDue++; });
+    const est=mtOdoAt(xe,M);
+    const chips=due.map(d=>{ const ok=done.includes(d.it.id);
+      return `<label class="bd-chip ${ok?'done':d.st}"><input type="checkbox" data-xe="${xe}" data-it="${d.it.id}" data-k="c:${xe}:${d.it.id}" ${ok?'checked':''}>${mtEsc(d.it.name)} <small>${mtDueNote(d)}</small></label>`; });
+    done.filter(id=>!due.some(d=>d.it.id===id)).forEach(id=>{ const it=mtItemById(id); if(!it)return;
+      chips.push(`<label class="bd-chip done"><input type="checkbox" checked data-xe="${xe}" data-it="${id}" data-k="c:${xe}:${id}">${mtEsc(it.name)}</label>`); });
+    const others=mtItemsFor(xe).filter(it=>!due.some(d=>d.it.id===it.id)&&!done.includes(it.id));
+    if(others.length) chips.push(`<select class="bd-add" data-xe="${xe}" data-k="a:${xe}"><option value="">＋ Việc khác</option>${others.map(it=>`<option value="${it.id}">${mtEsc(it.name)}</option>`).join('')}</select>`);
+    const fc=mtForecast(xe,M,2).map(f=>f.names.length?`<b>${mtShort(f.m)}:</b> ${f.names.map(mtEsc).join(', ')}`:'').filter(Boolean).join('<br>');
+    const er=mtErr[xe];
+    return `<tr>
+      <td><span class="bd-xe${isSpXe(xe)?' sp':''}">${xe}</span><span class="bd-ty">${mtEsc(v.typ)}</span></td>
+      <td class="bd-prev" style="text-align:right">${pr&&pr.odo>0?mtNum(pr.odo):'—'}</td>
+      <td class="bd-prev">${mtEsc(mtDoneTxt(pr))||'—'}</td>
+      <td><input class="bd-in bd-odo${er?' err':''}" data-xe="${xe}" data-k="o:${xe}" inputmode="numeric" value="${er?mtEsc(er.v):(r&&r.odo>0?mtNum(r.odo):'')}" placeholder="${est&&!est.real?'≈ '+mtNum(est.odo):''}">${er?`<div class="bd-err">${er.msg}</div>`:''}</td>
+      <td><div class="bd-chips">${chips.join('')}</div><textarea class="bd-in bd-note" rows="2" data-xe="${xe}" data-f="extra" data-k="e:${xe}" placeholder="Ghi chú công việc">${mtEsc(r&&r.extra)}</textarea></td>
+      <td><textarea class="bd-in bd-note" rows="2" data-xe="${xe}" data-f="mat" data-k="m:${xe}" placeholder="Ghi vật liệu">${mtEsc(r&&r.mat)}</textarea></td>
+      <td class="bd-fc">${fc||'<span class="muted">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  host.innerHTML=`<table class="bd-tbl">
+    <colgroup><col style="width:64px"><col style="width:84px"><col style="width:150px"><col style="width:104px"><col><col style="width:190px"><col style="width:160px"></colgroup>
+    <thead><tr><th rowspan="2">Xe</th><th class="bd-g" colspan="2">${mtLbl(P)}</th><th class="bd-g cur" colspan="3">${mtLbl(M)}</th><th rowspan="2">Dự báo</th></tr>
+    <tr><th>ODO</th><th>Nội dung bảo dưỡng</th><th>ODO</th><th>Việc cần làm</th><th>Vật liệu tiêu tốn</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  const used=mtUsed(M);
+  document.getElementById('bdUsed').innerHTML=`<div class="coc-h hold">Tổng hợp vật tư đã sử dụng ${mtLbl(M).toLowerCase()}</div>
+    <div class="tbl-wrap" style="border:0;border-radius:0"><table class="bd-tbl" style="min-width:0"><thead><tr><th>Vật tư</th><th style="width:130px;text-align:right">Số lượng</th><th>Xe</th></tr></thead><tbody>
+    ${used.list.length?used.list.map(u=>`<tr><td><b>${mtEsc(u.name)}</b></td><td style="text-align:right"><b>${mtNum(u.qty)}</b> ${mtEsc(u.unit)}</td><td>${u.xe.join(', ')}</td></tr>`).join(''):'<tr><td colspan="3" class="muted">Chưa có vật tư nào được ghi trong tháng.</td></tr>'}
+    ${used.free.length?`<tr><td colspan="3" style="background:#FAFAFB;white-space:normal;line-height:1.6"><b>Ghi thêm:</b> ${used.free.map(f=>`<b>${f.xe}</b> ${mtEsc(f.mat)}`).join(' · ')}</td></tr>`:''}
+    </tbody></table></div>`;
+  const card=(l,v,sub)=>`<div class="kpi"><div class="lbl">${l}</div><div class="val" style="font-size:19px">${v}</div>${sub?`<div class="lbl" style="margin-top:2px">${sub}</div>`:''}</div>`;
+  document.getElementById('bdKpis').innerHTML=
+    card('Quá hạn',`<span style="color:${nOver?'#B42318':'inherit'}">${nOver}</span>`,'việc chưa làm')+
+    card('Đến hạn trong tháng',`<span style="color:${nDue?'#B54708':'inherit'}">${nDue}</span>`,'việc chưa làm')+
+    card('Đã ghi ODO',`${nOdo}/${xs.length}`,'xe')+
+    card('Đã làm',nDone,'việc trong tháng');
+  if(keep){ const el=host.querySelector(`[data-k="${keep}"]`); if(el){ el.focus(); if(el.select&&el.type!=='checkbox'&&el.tagName!=='TEXTAREA')try{el.select();}catch(e){} } }
+}
+
+function mtWire(){
+  const host=document.getElementById('bdApp'); if(!host||host._wired)return; host._wired=true;
+  host.addEventListener('change',e=>{
+    const t=e.target, xe=t.dataset.xe; if(!xe)return;
+    if(t.classList.contains('bd-odo')){
+      const raw=t.value.trim(), n=raw?parseInt(raw.replace(/\D/g,''),10):null;
+      if(raw&&!(n>0)){ mtErr[xe]={v:raw,msg:'ODO không hợp lệ'}; mtLater(); return; }
+      if(n){
+        const pv=mtPts(xe,mtAddM(mtMonth,-1)).pop(), nx=(mtIdx().get(xe)||[]).find(r=>r.month>mtMonth&&r.odo>0);
+        if(pv&&n<pv.odo){ mtErr[xe]={v:raw,msg:`Nhỏ hơn ODO ${mtShort(pv.month)} (${mtNum(pv.odo)})`}; mtLater(); return; }
+        if(nx&&n>nx.odo){ mtErr[xe]={v:raw,msg:`Lớn hơn ODO ${mtShort(nx.month)} (${mtNum(nx.odo)})`}; mtLater(); return; }
+      }
+      delete mtErr[xe]; mtUpd(xe,r=>{r.odo=n||null;}); return;
+    }
+    if(t.type==='checkbox'){ const id=t.dataset.it; mtUpd(xe,r=>{ r.done=(r.done||[]).filter(x=>x!==id); if(t.checked)r.done.push(id); }); return; }
+    if(t.classList.contains('bd-add')){ const id=t.value; if(id)mtUpd(xe,r=>{ r.done=(r.done||[]).filter(x=>x!==id); r.done.push(id); }); return; }
+    if(t.dataset.f){ const f=t.dataset.f, v=t.value.trim(); mtUpd(xe,r=>{ r[f]=v; }); }
+  });
+  host.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.matches('input.bd-in')){ e.preventDefault(); e.target.blur(); } });
+  host.addEventListener('focusout',()=>{ setTimeout(()=>{ if(!host.contains(document.activeElement))renderBaoDuong(); },0); });
+  const go=k=>{ mtMonth=mtAddM(mtMonth||mtThisMonth(),k); mtErr={}; renderBaoDuong(true); };
+  document.getElementById('bdPrev').onclick=()=>go(-1);
+  document.getElementById('bdNext').onclick=()=>go(1);
+  document.getElementById('bdThis').onclick=()=>{ mtMonth=mtThisMonth(); mtErr={}; renderBaoDuong(true); };
+  document.getElementById('bdPrintBtn').onclick=mtOpenPrint;
+  document.getElementById('bdItemsBtn').onclick=mtOpenItems;
+  // hộp In phiếu
+  const ov=document.getElementById('bdPrintOverlay');
+  document.getElementById('bdOptScope').addEventListener('change',e=>{ mtOpt.scope=e.target.value; mtPaintOpt(); });
+  document.getElementById('bdOptGrp').onchange=e=>{ mtOpt.grp=e.target.value; };
+  document.getElementById('bdOptWho').oninput=e=>{ mtOpt.who=e.target.value; };
+  document.getElementById('bdPrintCancel').onclick=()=>ov.classList.remove('open');
+  document.getElementById('bdPrintGo').onclick=()=>{ ov.classList.remove('open'); mtPrint(); };
+  document.getElementById('bdPdfGo').onclick=mtPdf;
+  // hộp Danh mục
+  const io=document.getElementById('bdItemsOverlay');
+  document.getElementById('bdItemsCancel').onclick=()=>io.classList.remove('open');
+  document.getElementById('bdItemAdd').onclick=()=>{ mtEdit.push({id:'it_'+uid(),name:'',km:0,months:0,kinds:['ga','so'],mat:'',qty:1,unit:''}); mtPaintItems(); };
+  document.getElementById('bdItemsSave').onclick=mtSaveItems;
+  const tb=document.getElementById('bdItemsTbl');
+  tb.addEventListener('input',e=>{ const t=e.target, i=+t.dataset.i, f=t.dataset.f; if(isNaN(i)||!f)return;
+    if(f==='kind'){ const k=t.value, ks=new Set(mtEdit[i].kinds||[]); t.checked?ks.add(k):ks.delete(k); mtEdit[i].kinds=[...ks]; return; }
+    if(f==='fixed'){ mtEdit[i].fixed=t.checked; return; }
+    mtEdit[i][f]=(t.type==='number')?(t.value===''?0:Number(t.value)):t.value; });
+  tb.addEventListener('change',e=>{ if(e.target.dataset.f==='kind'||e.target.dataset.f==='fixed')e.target.dispatchEvent(new Event('input',{bubbles:true})); });
+  tb.addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b)return; const i=+b.dataset.del;
+    const it=mtEdit[i]; if(!confirm('Bỏ việc "'+(it.name||'(chưa đặt tên)')+'" khỏi danh mục?'))return;
+    if(MT_ITEMS_DEFAULT.some(d=>d.id===it.id)||(DB.maintenance||[]).some(r=>(r.done||[]).includes(it.id))) it.off=true; else mtEdit.splice(i,1);
+    mtPaintItems(); });
+}
+
+/* ---------- Danh mục & chu kỳ ---------- */
+function mtOpenItems(){ mtEdit=JSON.parse(JSON.stringify(mtItems(true))); mtPaintItems(); document.getElementById('bdItemsOverlay').classList.add('open'); }
+function mtPaintItems(){
+  const head=`<tr><th>Việc</th><th style="width:86px">Chu kỳ km</th><th style="width:78px">Chu kỳ tháng</th>${MT_KINDS.map(k=>`<th class="c" style="width:62px">${k[1]}</th>`).join('')}<th>Vật tư</th><th style="width:58px">SL</th><th style="width:64px">ĐVT</th><th class="c" style="width:70px">Ô tích trên phiếu</th><th style="width:40px"></th></tr>`;
+  const rows=mtEdit.map((it,i)=>it.off?'':`<tr>
+    <td><input type="text" data-i="${i}" data-f="name" value="${mtEsc(it.name)}"></td>
+    <td><input type="number" min="0" step="100" data-i="${i}" data-f="km" value="${it.km||''}"></td>
+    <td><input type="number" min="0" step="1" data-i="${i}" data-f="months" value="${it.months||''}"></td>
+    ${MT_KINDS.map(k=>`<td class="c"><input type="checkbox" data-i="${i}" data-f="kind" value="${k[0]}" ${(it.kinds||[]).includes(k[0])?'checked':''}></td>`).join('')}
+    <td><input type="text" data-i="${i}" data-f="mat" value="${mtEsc(it.mat)}"></td>
+    <td><input type="number" min="0" step="0.5" data-i="${i}" data-f="qty" value="${it.qty||''}"></td>
+    <td><input type="text" data-i="${i}" data-f="unit" value="${mtEsc(it.unit)}"></td>
+    <td class="c"><input type="checkbox" data-i="${i}" data-f="fixed" ${it.fixed?'checked':''}></td>
+    <td class="c"><button class="coc-btn" data-del="${i}" title="Bỏ" style="padding:4px 9px">✕</button></td></tr>`).join('');
+  document.getElementById('bdItemsTbl').innerHTML=head+rows;
+}
+function mtSaveItems(){
+  const live=mtEdit.filter(i=>!i.off);
+  if(live.some(i=>!String(i.name||'').trim())){ alert('Còn việc chưa có tên.'); return; }
+  if(live.some(i=>!(i.km>0)&&!(i.months>0))){ alert('Mỗi việc cần có chu kỳ km hoặc chu kỳ tháng.'); return; }
+  if(live.some(i=>!(i.kinds||[]).length)){ alert('Mỗi việc cần chọn ít nhất một loại xe.'); return; }
+  mtEdit.forEach(i=>{ i.name=String(i.name||'').trim(); i.mat=String(i.mat||'').trim(); i.unit=String(i.unit||'').trim(); });
+  DB.mtItems=mtEdit; mtC=null; save();
+  document.getElementById('bdItemsOverlay').classList.remove('open'); renderBaoDuong(true);
+}
+
+/* ---------- In phiếu / Tải PDF (A4 ngang, đen trắng) ---------- */
+const MT_PCSS=`
+.mtp{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;color:#000;-webkit-font-smoothing:antialiased}
+.mtp th,.mtp td,.mtp div,.mtp span,.mtp b,.mtp h4{color:#000;text-transform:none;letter-spacing:normal;font-style:normal;box-shadow:none}
+.mtp .pp{width:1122px;height:793px;box-sizing:border-box;padding:32px 46px 28px;background:#fff;overflow:hidden;position:relative}
+.mtp .ph{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid #000;padding-bottom:10px;margin-bottom:14px}
+.mtp .brand{font-size:20px;font-weight:700;letter-spacing:2px}
+.mtp .ttl{font-size:17px;font-weight:700;margin-top:3px}
+.mtp .meta{font-size:14px;text-align:right;line-height:2}
+.mtp table.pt{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px}
+.mtp .pt th,.mtp .pt td{border:1.2px solid #000;padding:5px 9px;vertical-align:top;text-align:left;line-height:1.3}
+.mtp .pt th{background:#ececec;font-weight:700;font-size:13.5px}
+.mtp .pt th.g{text-align:center;background:#d9d9d9;font-size:14px}
+.mtp .pt td.x{font-weight:700;font-size:19px;text-align:center;vertical-align:middle}
+.mtp .pt td.pv{color:#333;font-size:13px;vertical-align:middle}
+.mtp .pt td.r{text-align:right}
+.mtp .pt td.o{font-weight:700;text-align:right;font-size:15px;vertical-align:middle}
+.mtp .r1{display:flex;align-items:flex-end;gap:14px}
+.mtp .r1 .ln{flex:1;min-width:0}
+.mtp .ck{display:flex;align-items:center;height:27px;font-size:14.5px;font-weight:700;white-space:nowrap;flex:none}
+.mtp .b{display:inline-block;width:15px;height:15px;border:1.8px solid #000;margin-right:8px;text-align:center;font-size:13px;line-height:15px;flex:none}
+.mtp .ln{border-bottom:1.3px dashed #666;height:27px;box-sizing:border-box}
+.mtp .pf{display:grid;grid-template-columns:1.5fr 1fr;gap:40px;margin-top:6px}
+.mtp .pf h4{margin:0 0 8px;font-size:15px}
+.mtp .pf table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+.mtp .pf th,.mtp .pf td{border:1.2px solid #000;padding:0 10px;height:27px;text-align:left;vertical-align:middle}
+.mtp .pf th{background:#ececec;font-size:13.5px}
+.mtp .pf td.n{text-align:right;font-weight:700}
+.mtp .pf.big{grid-template-columns:1.6fr 1fr;margin-top:10px}
+.mtp .pf.big th,.mtp .pf.big td{height:36px;font-size:15px}
+.mtp .pf.big h4{font-size:17px;margin-bottom:12px}
+.mtp .sg{display:grid;grid-template-columns:1fr 1fr;text-align:center;font-size:15px;align-content:start;padding-top:30px}
+.mtp .sg b{display:block}.mtp .sg span{color:#444;font-size:12.5px}
+.mtp .pn{position:absolute;right:46px;bottom:14px;font-size:12px;color:#444}`;
+function mtPrintData(){
+  const M=mtMonth, P=mtAddM(M,-1); mtC=null;
+  const rows=mtXeList().filter(v=>mtOpt.grp==='all'||mtGrp(v)===mtOpt.grp).map(v=>{
+    const xe=v.id, r=mtRec(xe,M), pr=mtRec(xe,P), due=mtDueList(xe,M), done=(r&&r.done)||[];
+    const seen=new Set(), fixed=[];
+    mtItemsFor(xe).filter(it=>it.fixed).forEach(it=>{ if(seen.has(it.name))return; seen.add(it.name);
+      const d=due.find(x=>x.it.id===it.id); fixed.push({it,st:d?d.st:null,done:done.includes(it.id)}); });
+    const extra=[...done.filter(id=>!fixed.some(f=>f.it.id===id)).map(id=>(mtItemById(id)||{}).name).filter(Boolean), r&&r.extra].filter(Boolean).join(', ');
+    return {xe, prevOdo:pr&&pr.odo>0?pr.odo:null, prevTxt:mtDoneTxt(pr), curOdo:r&&r.odo>0?r.odo:null, fixed, extra, mat:r&&r.mat||''};
+  }).filter(x=>mtOpt.scope==='all'||x.fixed.some(f=>f.st));
+  // Tổng hợp vật tư: các vật tư trong danh mục của nhóm xe được in; có số liệu thì điền sẵn
+  const used=mtUsed(M), kinds=new Set(rows.flatMap(x=>mtKinds(x.xe))), mats=[], sk=new Set();
+  mtItems().filter(it=>it.mat&&(it.kinds||[]).some(k=>kinds.has(k))).forEach(it=>{ const k=it.mat+'|'+(it.unit||''); if(sk.has(k))return; sk.add(k);
+    const u=used.list.find(x=>x.name===it.mat&&x.unit===(it.unit||'')); mats.push({name:it.mat,unit:it.unit||'',qty:u?u.qty:null}); });
+  return {M,P,rows,mats};
+}
+function mtPrintHtml(){
+  const {M,P,rows,mats}=mtPrintData();
+  const grpLbl={all:'',ga:' – Vision',lead:' – Lead, NVX',so:' – Xe số'}[mtOpt.grp]||'';
+  const head=()=>`<div class="ph"><div><div class="brand">GOODBIKE</div><div class="ttl">Phiếu bảo dưỡng ${mtLbl(M).toLowerCase()}${grpLbl}</div></div>
+    <div class="meta">Người thực hiện: ${mtOpt.who?'<b>'+mtEsc(mtOpt.who)+'</b>':'.......................................'}<br>Ngày làm: ......../......../${M.slice(0,4)}</div></div>`;
+  const thead=`<colgroup><col style="width:66px"><col style="width:86px"><col style="width:190px"><col style="width:120px"><col><col style="width:230px"></colgroup>
+    <tr><th rowspan="2" style="text-align:center;vertical-align:middle">Xe</th><th class="g" colspan="2">${mtLbl(P)} (đã làm)</th><th class="g" colspan="3">${mtLbl(M)}</th></tr>
+    <tr><th>ODO</th><th>Nội dung</th><th>ODO</th><th>Việc cần làm</th><th>Vật liệu tiêu tốn</th></tr>`;
+  const rowHtml=x=>{
+    // Ô tích cố định nằm ở góc phải dòng đầu; phần còn lại là dòng trống để ghi việc khác
+    const ck=x.fixed.map(f=>`<span class="ck"><span class="b">${f.done?'✓':''}</span>${mtEsc(f.it.name)}</span>`).join('');
+    const task=`<div class="r1"><div class="ln"></div>${ck}</div><div class="ln"></div>`;   // in đầu tháng: để trống cho nhân viên viết tay
+    const mat='<div class="ln"></div><div class="ln"></div>';
+    return `<tr><td class="x">${x.xe}</td><td class="r pv">${x.prevOdo?mtNum(x.prevOdo):''}</td><td class="pv">${mtEsc(x.prevTxt)}</td>
+      <td class="o">${x.curOdo?mtNum(x.curOdo):''}</td><td>${task}</td><td>${mat}</td></tr>`;
+  };
+  const footF=blank=>`<div class="pf"><div><h4>Tổng hợp vật tư đã sử dụng ${mtLbl(M).toLowerCase()}</h4>
+    <table><colgroup><col><col style="width:80px"><col style="width:120px"><col style="width:190px"></colgroup>
+    <tr><th>Vật tư</th><th>ĐVT</th><th>Số lượng</th><th>Ghi chú</th></tr>
+    ${mats.map(m=>`<tr><td>${mtEsc(m.name)}</td><td>${mtEsc(m.unit)}</td><td class="n">${m.qty!=null?mtNum(m.qty):''}</td><td></td></tr>`).join('')}
+    ${'<tr><td></td><td></td><td></td><td></td></tr>'.repeat(blank)}</table></div>
+    <div class="sg"><div><b>Người thực hiện</b><span>(ký, ghi rõ họ tên)</span></div><div><b>Người kiểm tra</b><span>(ký, ghi rõ họ tên)</span></div></div></div>`;
+  const foot=footF(2);
+  // Đo chiều cao thật để chia trang, không cắt ngang dòng
+  const box=document.createElement('div'); box.className='mtp'; box.style.cssText='position:absolute;left:-20000px;top:0';
+  box.innerHTML=`<div class="pp" style="height:auto">${head()}<table class="pt">${thead}${rows.map(rowHtml).join('')}</table>${foot}</div>`;
+  mtEnsureCss(); document.body.appendChild(box);
+  const pp=box.firstChild, hH=pp.querySelector('.ph').offsetHeight+14, tb=pp.querySelector('table.pt');
+  const thH=[...tb.rows].slice(0,2).reduce((a,r)=>a+r.offsetHeight,0), rH=[...tb.rows].slice(2).map(r=>r.offsetHeight);
+  const fH=pp.querySelector('.pf').offsetHeight+6; box.remove();
+  const inner=793-40-34-hH-14, avail=inner-thH;
+  // chia đều số xe cho các trang để trang nào cũng cân đối
+  const tot=rH.reduce((a,b)=>a+b,0), nPg=Math.max(1,Math.ceil(tot/avail)), target=tot/nPg;
+  const pages=[]; let cur=[],h=0;
+  rows.forEach((x,i)=>{ if(cur.length&&(h+rH[i]>avail||(pages.length<nPg-1&&h+rH[i]/2>target))){ pages.push(cur); cur=[]; h=0; } cur.push(rowHtml(x)); h+=rH[i]; });
+  pages.push(cur);
+  const footOwn=h+fH+16>avail;
+  const pn=pages.length+(footOwn?1:0);
+  let html=pages.map((p,i)=>`<div class="pp">${head()}<table class="pt">${thead}${p.join('')}</table>${(!footOwn&&i===pages.length-1)?'<div style="height:16px"></div>'+foot:''}<div class="pn">Trang ${i+1}/${pn}</div></div>`).join('');
+  if(footOwn)html+=`<div class="pp">${head()}${footF(6).replace('class="pf"','class="pf big"')}<div class="pn">Trang ${pn}/${pn}</div></div>`;
+  return {html,M,count:rows.length};
+}
+function mtEnsureCss(){ if(document.getElementById('mtPrintCss'))return; const s=document.createElement('style'); s.id='mtPrintCss'; s.textContent=MT_PCSS; document.head.appendChild(s); }
+function mtOpenPrint(){
+  document.getElementById('bdPrintTitle').textContent='In phiếu bảo dưỡng '+mtLbl(mtMonth).toLowerCase();
+  document.getElementById('bdOptGrp').value=mtOpt.grp; document.getElementById('bdOptWho').value=mtOpt.who;
+  mtPaintOpt(); document.getElementById('bdPrintOverlay').classList.add('open');
+}
+function mtPaintOpt(){ document.querySelectorAll('#bdOptScope label').forEach(l=>{ const on=l.dataset.v===mtOpt.scope; l.classList.toggle('on',on); l.querySelector('input').checked=on; }); }
+function mtPrint(){
+  const {html,M,count}=mtPrintHtml(); if(!count){ alert('Không có xe nào để in.'); return; }
+  const f=document.createElement('iframe'); f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f);
+  const d=f.contentDocument; d.open();
+  d.write(`<!doctype html><html><head><meta charset="utf-8"><title>Phieu bao duong ${M}</title><style>${MT_PCSS}
+    @page{size:A4 landscape;margin:0}html,body{margin:0;padding:0}.mtp .pp{page-break-after:always;break-after:page}.mtp .pp:last-child{page-break-after:auto;break-after:auto}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}</style></head><body><div class="mtp">${html}</div></body></html>`);
+  d.close();
+  setTimeout(()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ alert('Không mở được hộp thoại in.'); } setTimeout(()=>f.remove(),60000); },400);
+}
+async function mtPdf(){
+  const btn=document.getElementById('bdPdfGo'), old=btn.textContent; btn.disabled=true; btn.textContent='Đang tạo PDF…';
+  let box=null;
+  try{
+    const {html,M,count}=mtPrintHtml(); if(!count){ alert('Không có xe nào để in.'); return; }
+    await ensurePdfLibs(); if(typeof html2canvas==='undefined'||!window.jspdf)throw new Error('libs');
+    box=document.createElement('div'); box.className='mtp'; box.style.cssText='position:absolute;left:-20000px;top:0'; box.innerHTML=html;
+    mtEnsureCss(); document.body.appendChild(box);
+    const {jsPDF}=window.jspdf, pdf=new jsPDF('l','mm','a4');
+    const pgs=[...box.querySelectorAll('.pp')];
+    for(let i=0;i<pgs.length;i++){
+      const c=await html2canvas(pgs[i],{scale:4,backgroundColor:'#ffffff'});   // ~380 dpi: chữ nét khi in
+      if(i)pdf.addPage();
+      pdf.addImage(c.toDataURL('image/png'),'PNG',0,0,297,210,undefined,'FAST');
+    }
+    const g=mtOpt.grp==='all'?'':'-'+mtOpt.grp;
+    pdf.save(`phieu-bao-duong-${M}${g}.pdf`);
+    document.getElementById('bdPrintOverlay').classList.remove('open');
+  }catch(e){ alert('Không tạo được PDF (lỗi mạng khi tải thư viện). Dùng nút In rồi chọn Lưu thành PDF.'); }
+  finally{ if(box)box.remove(); btn.disabled=false; btn.textContent=old; }
+}
+mtWire();
+
 /* ============ RENDER ALL ============ */
 function renderAll(){
   normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
@@ -3070,6 +3567,7 @@ function renderAll(){
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
   renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
+  try{ renderBaoDuong(); }catch(e){ console.warn('renderBaoDuong',e); }
   try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
   save();
 }
@@ -8328,6 +8826,7 @@ document.addEventListener('pointercancel', khLkEnd);
     thuchi: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
     contacts: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     coc: '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
+    baoduong: '<path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
     acc: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
     other: '<path d="M4 19h16M6 15l4-4 3 3 5-6"/>'
   };
