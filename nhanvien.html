@@ -97,20 +97,6 @@
   .kpi .lbl{font-size:12px;color:var(--muted)}
   .kpi .val{font-size:22px;font-weight:800;margin-top:4px}
   .kpi.pos .val{color:var(--ok)} .kpi.neg .val{color:var(--warn)}
-  .cash-card{padding:16px 18px}
-  .cash-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .cash-top h2{margin:0;font-size:16px}
-  .cash-top .cash-per{font-size:12.5px;color:var(--muted);margin-top:3px}
-  .cash-total{text-align:right}
-  .cash-total .v{font-size:30px;font-weight:800;letter-spacing:-.3px;font-variant-numeric:tabular-nums;line-height:1.1}
-  .cash-total .v.pos{color:#15803d} .cash-total .v.neg{color:#dc2626}
-  .cash-tbl{width:100%;border-collapse:collapse;margin-top:12px;font-variant-numeric:tabular-nums}
-  .cash-tbl td{padding:9px 6px;border:0;border-top:1px solid #eef2f7;font-size:13.5px;text-align:left;white-space:normal}
-  .cash-tbl td.op{width:22px;font-weight:700;color:#64748b;text-align:center}
-  .cash-tbl td.amt{text-align:right;font-weight:600;white-space:nowrap}
-  .cash-tbl .sub{color:var(--muted);font-size:12px;margin-left:6px}
-  .cash-tbl tr.minus td.amt{color:#b91c1c}
-  .cash-tbl tr.res td{border-top:2px solid #0f172a;font-weight:800;font-size:14.5px}
   /* timeline */
   .tl-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px}
   .tl{position:relative;min-width:max-content}
@@ -183,6 +169,64 @@
   tr.fund-month td{background:#eef2ff}
   tr.fund-month:hover td{background:#e0e7ff}
   tr.fund-detail td{background:#fbfdff}
+  tr.fund-cho td{color:#64748b;background:#f8fafc}
+  .chot-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .modal.chot-modal{width:min(780px,100%)}
+  .chot-rev{display:flex;align-items:center;gap:10px}
+  button.chot-main{padding:9px 18px;font-weight:700;background:#101828;color:#fff;border-radius:10px}
+  button.chot-main:hover{background:#1f2937}
+  .chot-tbl tr.hl td{background:#fff7ed}
+  .chot-tbl tr.cmdm td{background:#fef2f2}
+  .cp-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .cp-head h2{margin:0}
+  .cp-tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .cp-tbl td{padding:10px 8px;border:0;border-top:1px solid #eef2f7;font-size:13.5px;text-align:left;vertical-align:top;white-space:normal}
+  .cp-tbl td.amt{text-align:right;font-weight:700;white-space:nowrap;width:130px}
+  .cp-tbl td.act{text-align:right;width:120px}
+  .cp-ten{font-weight:700;color:#0f172a}
+  .cp-xl{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-top:4px}
+  .cp-xl.quy{background:#e0e7ff;color:#3730a3}
+  .cp-xl.ngay{background:#fee2e2;color:#b91c1c}
+  .cp-xl.khac{background:#f1f5f9;color:#475569}
+  .cp-dot{display:flex;flex-wrap:wrap;gap:6px}
+  .cp-dot button{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;padding:3px 9px;font-size:12px;border-radius:7px}
+  .cp-dot button:hover{border-color:#94a3b8}
+  .cp-none{color:#94a3b8;font-size:12.5px}
+  .cp-tbl tr.tot td{border-top:2px solid #0f172a;font-weight:800}
+  .tm-grid{display:grid;grid-template-columns:1fr 2fr 1fr 1.2fr;gap:12px;margin-top:14px}
+  @media(max-width:1000px){.tm-grid{grid-template-columns:1fr 1fr}.tm-pair{grid-column:1/-1}}
+  @media(max-width:560px){.tm-grid{grid-template-columns:1fr}}
+  .tm-card{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#fff;font-variant-numeric:tabular-nums}
+  .tm-lbl{font-size:12.5px;color:#475569;font-weight:600}
+  .tm-val{font-size:22px;font-weight:800;margin-top:4px;color:#0f172a}
+  .tm-val.neg{color:#dc2626}
+  .tm-sub{font-size:12px;color:#64748b;margin-top:4px}
+  .tm-treo{border-left:4px solid #C2410C}
+  .tm-sau{border-left:4px solid #0f766e}
+  .tm-cash{border-left:4px solid #15803d;background:#f0fdf4}
+  .tm-pair{border-left:4px solid #1D5BF0}
+  .tm-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:#e2e8f0;margin:8px 0 10px}
+  .tm-bar i{display:block;height:100%}
+  .tm-bar i.a,.tm-half.a{--c:#1D5BF0} .tm-bar i.b,.tm-half.b{--c:#7c3aed}
+  .tm-bar i{background:var(--c)}
+  .tm-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tm-half{border-radius:8px;padding:8px 10px;background:#f8fafc;border-top:3px solid var(--c)}
+  .tm-v2{font-size:17px;font-weight:800;margin-top:2px;color:var(--c)}
+  .tm-f{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px;color:#475569}
+  .tm-f td{padding:2px 0;border:0;text-align:left}
+  .tm-f td+td{text-align:right}
+  .chot-sec{margin-top:14px}
+  .chot-sec h4{margin:0 0 6px;font-size:13px;color:#334155;background:#f1f5f9;border-left:3px solid #64748b;padding:6px 10px;border-radius:4px}
+  .chot-tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  .chot-tbl td{padding:7px 8px;border:0;border-top:1px solid #eef2f7;font-size:13.5px;text-align:left;white-space:normal}
+  .chot-tbl td.amt{text-align:right;font-weight:600;white-space:nowrap}
+  .chot-tbl td.sub{padding-left:24px;color:#64748b;font-size:12.5px}
+  .chot-tbl tr.tot td{border-top:2px solid #0f172a;font-weight:800}
+  .chot-tbl tr.cmd td{background:#f0fdf4}
+  .chot-tbl tr.wait td{background:#f8fafc;color:#475569}
+  .chot-tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;margin-left:6px;background:#e2e8f0;color:#475569}
+  .chot-tag.ok{background:#dcfce7;color:#15803d}
+  .chot-btn{background:#f1f5f9;color:#0f172a;border:1px solid #cbd5e1;padding:4px 10px;font-size:12.5px}
   /* Vận hành — kiểm kê */
   .inv-rounds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media(max-width:780px){.inv-rounds{grid-template-columns:1fr}}
@@ -1645,7 +1689,10 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <!-- REVENUE -->
   <section class="view" id="view-revenue" style="display:none">
     <div class="card">
-      <h2>Bảng tổng doanh thu (xe × ngày) — <span class="revMonthLabel"></span></h2>
+      <div class="chot-head">
+        <h2>Bảng tổng doanh thu (xe × ngày) — <span class="revMonthLabel"></span></h2>
+        <div class="chot-rev"><span id="chotRevSt"></span><button class="chot-main" id="chotBtn">Chốt tháng</button></div>
+      </div>
       <div class="kpis" id="revKpis"></div>
     </div>
     <div class="card">
@@ -1680,6 +1727,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </div>
       </div>
       <div class="kpis" id="tcKpis" style="margin-top:12px"></div>
+      <div id="tcThang"></div>
       <div class="legend muted" style="margin-top:8px">3 cột: Chuyển khoản · Tiền mặt · Công nợ phải thu (ô phải thu kèm tên công ty). Tổng thực thu = tiền mặt + chuyển khoản.</div>
     </div>
     <div class="card" style="padding:0">
@@ -1726,6 +1774,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </div>
         <div class="kpis" id="chiKpis" style="margin-top:12px"></div>
       </div>
+      <div class="card" id="cpFixed"></div>
       <div class="card" style="padding:0">
         <div class="tbl-wrap"><table id="chiTable"></table></div>
       </div>
@@ -1758,8 +1807,16 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <!-- FUNDS (dòng tiền) -->
   <section class="view" id="view-funds" style="display:none">
     <div class="card">
-      <h2 style="margin:0 0 6px">Tổng kiểm dòng tiền — 2 quỹ</h2>
-      <p class="muted" style="margin:0">Quỹ khấu hao: nạp từ khấu hao hàng tháng (theo bảng Tài sản), chi cho sửa chữa – bảo dưỡng. Quỹ lãi ròng: nạp từ lãi ròng hàng tháng, dùng để đầu tư (nhập xe, thiết bị…).</p>
+      <div class="chot-head">
+        <div>
+          <h2 style="margin:0 0 6px">Tổng kiểm dòng tiền — 3 quỹ</h2>
+          <p class="muted" style="margin:0">Quỹ khấu hao: nạp từ khấu hao hàng tháng (theo bảng Tài sản), chi cho sửa chữa – bảo dưỡng. Quỹ lãi ròng: nạp từ lãi ròng hàng tháng, dùng để đầu tư (nhập xe, thiết bị…). Quỹ tiền nhà: nạp từ chi phí mặt bằng hàng tháng, luỹ kế để đóng tiền nhà.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="fund-head"><h2 class="fund-title">Các tháng đã chốt</h2></div>
+      <div class="tbl-wrap" style="border:none"><table id="chotTable"></table></div>
     </div>
     <div class="fund-stack">
       <div class="card" style="padding:0">
@@ -1772,6 +1829,16 @@ body.gb-shell #tabs .tab.gb-more{display:none}
           <span class="kpi fund-bal"><span class="lbl">Tổng quỹ</span><b id="fundKhBal" class="val"></b></span>
         </div>
         <div class="tbl-wrap" style="border:none"><table id="fundKhTable"></table></div>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="fund-head">
+          <h2 class="fund-title">🏠 Quỹ tiền nhà luỹ kế</h2>
+          <div class="fund-actions">
+            <button class="primary" id="addFundNha">+ Giao dịch</button>
+          </div>
+          <span class="kpi fund-bal"><span class="lbl">Tổng quỹ</span><b id="fundNhaBal" class="val"></b></span>
+        </div>
+        <div class="tbl-wrap" style="border:none"><table id="fundNhaTable"></table></div>
       </div>
       <div class="card" style="padding:0">
         <div class="fund-head">
@@ -1804,7 +1871,6 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 
   <!-- PHÂN TÍCH TÀI CHÍNH (Kế toán) -->
   <section class="view" id="view-phantich" style="display:none">
-    <div class="card cash-card" id="paCash"></div>
     <div class="card">
       <div class="pa-top">
         <h2 style="margin:0">Phân tích tài chính</h2>
@@ -2162,8 +2228,8 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="field"><label>Ngày</label><input type="date" id="e_date"></div>
       <div class="field"><label>Loại</label>
         <select id="e_type">
-          <option value="dinhphi">Định phí</option>
-          <option value="quangcao">Định phí · Chi phí quảng cáo</option>
+          <option value="dinhphi">Chi phí cố định</option>
+          <option value="quangcao" hidden>Chi phí cố định</option>
           <option value="bienphi">Biến phí</option>
           <option value="khauhao">Khấu hao</option>
           <option value="dautu">Đầu tư</option>
@@ -2172,7 +2238,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="field"><label>Hạng mục</label>
         <input type="text" id="e_cat" list="catList" placeholder="VD: Mặt bằng">
         <datalist id="catList">
-          <option>Mặt bằng</option><option>Khấu hao xe</option><option>Marketing</option>
+          <option>Tiền nhà</option><option>Tiền điện</option><option>Tiền nước</option><option>Quảng cáo</option><option>Mặt bằng</option><option>Khấu hao xe</option><option>Marketing</option>
           <option>Điện nước</option><option>Lương nhân viên</option><option>Sửa chữa - bảo dưỡng</option>
           <option>Xăng</option><option>Khác</option>
         </datalist></div>
@@ -2188,6 +2254,15 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 </div>
 
 <!-- Fund entry modal -->
+<div class="overlay" id="chotOverlay">
+  <div class="modal chot-modal">
+    <button class="modal-x" data-close="chotOverlay" title="Đóng">✕</button>
+    <h3 id="chotTitle">Chốt tháng</h3>
+    <div class="field" style="max-width:220px"><label>Tháng</label><input type="month" id="chotMonth"></div>
+    <div id="chotBody"></div>
+    <div class="actions" id="chotActions"></div>
+  </div>
+</div>
 <div class="overlay" id="fundOverlay">
   <div class="modal">
     <button class="modal-x" data-close="fundOverlay" title="Đóng">✕</button>
@@ -2202,7 +2277,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </select></div>
       <div class="field"><label>Số tiền (đ)</label><input type="number" id="fd_amt" min="0" step="10000"></div>
       <div class="field"><label>Quỹ</label>
-        <select id="fd_fund"><option value="khauhao">Quỹ khấu hao</option><option value="lairong">Quỹ lãi ròng</option></select></div>
+        <select id="fd_fund"><option value="khauhao">Quỹ khấu hao</option><option value="lairong">Quỹ lãi ròng</option><option value="tiennha">Quỹ tiền nhà</option></select></div>
     </div>
     <div class="field"><label>Nội dung</label><input type="text" id="fd_note" placeholder="VD: Thay dầu xe A1 / Nhập xe E"></div>
     <div class="actions">
@@ -2389,7 +2464,7 @@ const VEHICLES = [
   {id:'G1',typ:'Xe số'},{id:'G2',typ:'Xe số'},{id:'G3',typ:'Xe số'},{id:'G4',typ:'Xe số'},{id:'G5',typ:'Xe số'},
   {id:'E1',typ:'Xe điện'},{id:'E2',typ:'Xe điện'},{id:'E3',typ:'Xe điện'},
   // sp:true = xe dòng đặc biệt -> tô tím ở mọi nơi hiện tên xe (sơ đồ, bảng doanh thu, xe trống, ô chọn xe)
-  {id:'K1',typ:'Xe điện',sp:true},{id:'K2',typ:'Xe điện',sp:true},
+  {id:'K1',typ:'Xe điện',sp:true},{id:'K2',typ:'Xe điện',sp:true},{id:'K3',typ:'Xe điện',sp:true},
   // dump:true = dòng DUMP (không phải xe thật): chỉ để tạm chứa booking khi luân chuyển xe.
   // KHÔNG tính vào số lượng xe, xe trống, công suất; KHÔNG bán trên web (không có trong WEB_GROUPS).
   {id:'DUMP1',typ:'Dump',dump:true},{id:'DUMP2',typ:'Dump',dump:true},{id:'DUMP3',typ:'Dump',dump:true}
@@ -2429,8 +2504,8 @@ const STATUS = {
 const PAY_LABEL = {CK:'Chuyển khoản',TM:'Tiền mặt',Vexere:'Vexere',VNA:'Công nợ VNA'};
 // Loại chi phí. capital:true = chi đầu tư (không trừ vào lãi vận hành hàng tháng)
 const EXP_TYPES = {
-  dinhphi:{label:'Định phí',       bg:'#dbeafe',fg:'#1d4ed8'},
-  quangcao:{label:'Chi phí quảng cáo',bg:'#e0f2fe',fg:'#0369a1'},   // thuộc nhóm ĐỊNH PHÍ; trừ vào Tiền mặt có thể sử dụng
+  dinhphi:{label:'Chi phí cố định',bg:'#dbeafe',fg:'#1d4ed8'},   // gồm tiền nhà, quảng cáo, khấu hao, điện, nước…
+  quangcao:{label:'Chi phí cố định',bg:'#dbeafe',fg:'#1d4ed8',gop:'dinhphi'},   // khoản quảng cáo cũ: gộp vào Chi phí cố định   // thuộc nhóm ĐỊNH PHÍ; trừ vào Tiền mặt có thể sử dụng
   bienphi:{label:'Biến phí',       bg:'#fef3c7',fg:'#b45309'},
   khauhao:{label:'Khấu hao',       bg:'#e0e7ff',fg:'#4338ca'},
   dautu  :{label:'Đầu tư',         bg:'#dcfce7',fg:'#15803d',capital:true},
@@ -2458,6 +2533,7 @@ function normalizeDB(){
   if(!DB.funds)DB.funds={khauhao:[],lairong:[]};
   if(!DB.funds.khauhao)DB.funds.khauhao=[];
   if(!DB.funds.lairong)DB.funds.lairong=[];
+  if(!DB.funds.tiennha)DB.funds.tiennha=[];
   if(!DB.assets)DB.assets=[];
   if(!DB.vehicleInfo)DB.vehicleInfo={};   // {xeId:{typ,doi,bien,mau}}
   if(!DB.inventoryList)DB.inventoryList=[];     // [{id,name,type,qty}] bản cứng tài sản kiểm kê
@@ -2541,14 +2617,14 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-10-29-capnhat';
+const BAN_APP = '2026-11-03-boklara';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
 
 /* Mảng mà mỗi phần tử là một mục có id riêng -> mỗi phần tử một dòng trên máy chủ */
 const ITEM_PATHS = ['bookings','expenses','assets','maintenance','assetMoves',
-                    'inventoryList','funds.khauhao','funds.lairong',
+                    'inventoryList','funds.khauhao','funds.lairong','funds.tiennha',
                     'contacts'];   // contacts = Thống kê khách hàng liên hệ (mỗi khách 1 dòng)
 const ITEM_TOP = new Set(ITEM_PATHS.map(p=>p.split('.')[0]));
 /* Nhãn kỹ thuật của cơ chế cũ — không bao giờ đồng bộ, không bao giờ so sánh */
@@ -2642,6 +2718,7 @@ function sbNormalize(db){
   if(!db.funds)db.funds={khauhao:[],lairong:[]};
   if(!db.funds.khauhao)db.funds.khauhao=[];
   if(!db.funds.lairong)db.funds.lairong=[];
+  if(!db.funds.tiennha)db.funds.tiennha=[];
   if(!db.assets)db.assets=[];
   return db;
 }
@@ -3998,7 +4075,8 @@ const FLEET_MOC = [
   {tu:'2026-10-05', so:26},   // 5/10/2026: thêm K1, K2 (xe điện dòng đặc biệt) -> mẫu số 26
   {tu:'2026-10-07', so:27},   // 7/10/2026: thêm A11 (Vision) -> mẫu số 27
   {tu:'2026-10-09', so:28},   // 9/10/2026: thêm A12 (Vision) -> mẫu số 28
-  {tu:'2026-10-23', so:29}    // 23/10/2026: thêm A15 (Vision thể thao) -> mẫu số 29 (dòng DUMP không tính)
+  {tu:'2026-10-23', so:29},   // 23/10/2026: thêm A15 (Vision thể thao) -> mẫu số 29 (dòng DUMP không tính)
+  {tu:'2026-11-01', so:30}    // 1/11/2026: thêm K3 (xe điện Evomax) -> mẫu số 30
 ];
 function capacityOn(ds){
   let so=FLEET_MOC[0].so;
@@ -4282,6 +4360,7 @@ function renderThuChi(){
     ${kpi('Tiền mặt',fmtVND(sum.TM)+'đ')}
     ${kpi('Công nợ phải thu',fmtVND(sum.RECV)+'đ')}
     ${kpi('Tổng',fmtVND(totalThu)+'đ')}`;
+  try{ renderTcThang(to.slice(0,7)); }catch(e){ console.warn('renderTcThang',e); }
   window._thuTotal=sum.CK+sum.TM;   // thực thu = tiền mặt + chuyển khoản (công nợ phải thu chưa về)
 }
 
@@ -4320,10 +4399,11 @@ function renderChi(){
     : 'đang xem cả tháng — chọn ngày để xem khoảng khác';
   const all=expInRange().sort((a,b)=>a.date<b.date?-1:1);
   const byType={};Object.keys(EXP_TYPES).forEach(k=>byType[k]=0);
-  all.forEach(e=>byType[e.type]=(byType[e.type]||0)+e.amt);
+  const nhomChi=t=>(EXP_TYPES[t]&&EXP_TYPES[t].gop)||t;   // quảng cáo → Chi phí cố định
+  all.forEach(e=>byType[nhomChi(e.type)]=(byType[nhomChi(e.type)]||0)+e.amt);
   const tot=all.reduce((a,e)=>a+e.amt,0);
   // danh sách hiển thị: lọc theo banner đang chọn
-  const list = chiFilter? all.filter(e=>e.type===chiFilter): all;
+  const list = chiFilter? all.filter(e=>nhomChi(e.type)===chiFilter): all;
   const listTot=list.reduce((a,e)=>a+e.amt,0);
   let th=`<tr><th class="l">Ngày</th><th class="l">Loại</th><th class="l">Hạng mục</th><th>Số tiền</th><th class="l">Ghi chú</th><th></th></tr>`;
   let body=list.map(e=>{
@@ -4340,12 +4420,13 @@ function renderChi(){
   const kpiC=(lbl,val,key,active)=>`<div class="kpi clickable ${active?'active':''}" data-ft="${key}"><div class="lbl">${lbl} ▾</div><div class="val">${val}</div></div>`;
   document.getElementById('chiKpis').innerHTML=
     kpiC('Tổng chi',fmtVND(tot)+'đ','',chiFilter===null)
-    + Object.keys(EXP_TYPES).map(k=>kpiC(EXP_TYPES[k].label,fmtVND(byType[k]||0)+'đ',k,chiFilter===k)).join('');
+    + Object.keys(EXP_TYPES).filter(k=>!EXP_TYPES[k].gop).map(k=>kpiC(EXP_TYPES[k].label,fmtVND(byType[k]||0)+'đ',k,chiFilter===k)).join('');
   // chip "đang lọc" có nút ✕ để thoát
   document.getElementById('chiFilterChip').innerHTML = chiFilter
     ? `<span class="chip-clear">Đang lọc: ${EXP_TYPES[chiFilter].label}<button id="chiClearBtn" title="Bỏ lọc">✕</button></span>` : '';
   const cb=document.getElementById('chiClearBtn'); if(cb)cb.onclick=()=>{chiFilter=null;renderChi();};
   window._chiTotal=tot;
+  try{ renderCpFixed(); }catch(e){ console.warn('renderCpFixed',e); }
 }
 document.getElementById('chiKpis').addEventListener('click',e=>{
   const card=e.target.closest('[data-ft]');if(!card)return;
@@ -4448,14 +4529,14 @@ function monthNet(month){
 /* ============ FUNDS (2 quỹ) ============ */
 function assetDep(a){return Math.round(((a.price||0)-(a.salvage||0))/(a.months||1));}
 function monthlyDep(){return DB.assets.reduce((s,a)=>s+assetDep(a),0);}
-let fundExpanded={khauhao:new Set(),lairong:new Set()};   // tháng đã hết đang được mở xem chi tiết
+let fundExpanded={khauhao:new Set(),lairong:new Set(),tiennha:new Set()};   // tháng đã hết đang được mở xem chi tiết
 function fundDetailRow(e,rb,hasLoss,fundKey){
   const inC=e.dir==='in'?fmtVND(e.amt)+'đ':'', outC=e.dir==='out'?fmtVND(e.amt)+'đ':'', lossC=e.dir==='loss'?fmtVND(e.amt)+'đ':'';
   return `<tr class="fund-detail"><td class="l">${fmtDMY(e.date)}</td><td class="l">${e.note||''}</td><td style="color:#16a34a">${inC}</td><td style="color:#dc2626">${outC}</td>${hasLoss?`<td style="color:#b45309">${lossC}</td>`:''}<td><b>${fmtVND(rb)}đ</b></td><td><button class="ghost" onclick="openFund('${fundKey}','${e.id}')">✎</button></td></tr>`;
 }
 function renderFundOne(fundKey,tableId,balId){
   const hasLoss=fundKey==='khauhao';
-  const fundName=fundKey==='khauhao'?'khấu hao':'lãi ròng';
+  const fundName=fundKey==='khauhao'?'khấu hao':fundKey==='tiennha'?'tiền nhà':'lãi ròng';
   const curM=todayStr().slice(0,7);
   const list=[...DB.funds[fundKey]].sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
   let th=`<tr><th class="l">Ngày</th><th class="l">Nội dung</th><th>Nhập vào</th><th>Xuất ra</th>${hasLoss?'<th>Thất thoát</th>':''}<th>Số dư</th><th></th></tr>`;
@@ -4467,12 +4548,12 @@ function renderFundOne(fundKey,tableId,balId){
     const entries=byMonth[m];
     // số dư chạy cho từng giao dịch trong tháng
     const rbs=[]; let b2=bal;
-    entries.forEach(e=>{ b2+=e.dir==='in'?e.amt:-e.amt; rbs.push(b2); });
+    entries.forEach(e=>{ if(e.dir!=='cho') b2+=e.dir==='in'?e.amt:-e.amt; rbs.push(b2); });
     const endBal=b2;
     const closed = m<curM;   // tháng đã hết → gộp 1 dòng
     if(closed){
       let inSum=0,outSum=0,lossSum=0;
-      entries.forEach(e=>{ if(e.dir==='in')inSum+=e.amt; else if(e.dir==='out')outSum+=e.amt; else lossSum+=e.amt; });
+      entries.forEach(e=>{ if(e.dir==='cho')return; if(e.dir==='in')inSum+=e.amt; else if(e.dir==='out')outSum+=e.amt; else lossSum+=e.amt; });
       const expanded=fundExpanded[fundKey].has(m);
       const [yy,mm]=m.split('-');
       body+=`<tr class="fund-month" data-fk="${fundKey}" data-m="${m}">
@@ -4496,7 +4577,7 @@ function renderFundOne(fundKey,tableId,balId){
     renderFunds();
   });
 }
-function renderFunds(){renderFundOne('khauhao','fundKhTable','fundKhBal');renderFundOne('lairong','fundLrTable','fundLrBal');}
+function renderFunds(){renderFundOne('khauhao','fundKhTable','fundKhBal');renderFundOne('lairong','fundLrTable','fundLrBal');renderFundOne('tiennha','fundNhaTable','fundNhaBal');renderChotTable();}
 let editingFund=null,editingFundKey=null;
 function ff(k,v){const el=document.getElementById('fd_'+k);if(v!==undefined)el.value=v;return el.value;}
 function openFund(fundKey,id){
@@ -4510,6 +4591,7 @@ function openFund(fundKey,id){
 }
 document.getElementById('addFundKh').onclick=()=>openFund('khauhao',null);
 document.getElementById('addFundLr').onclick=()=>openFund('lairong',null);
+document.getElementById('addFundNha').onclick=()=>openFund('tiennha',null);
 document.getElementById('fundCancel').onclick=()=>document.getElementById('fundOverlay').classList.remove('open');
 document.getElementById('fundSave').onclick=()=>{
   const fund=ff('fund');
@@ -5512,6 +5594,220 @@ document.getElementById('expDelete').onclick=()=>{
   expOv.classList.remove('open');renderAll();
 };
 
+
+/* ============ CHỐT THÁNG & 4 LOẠI TIỀN ============
+   Doanh thu thuộc tháng nào = ô ngày (đêm thuê) nằm ở tháng đó (31/10→2/11: ô 31/10 là T10, ô 1/11 là T11).
+   Tiền khách trả đổ lần lượt vào từng ô theo thứ tự ngày, mỗi ô tối đa = ô giá tiền ngày đó;
+   mỗi phần tiền mang theo NGÀY THU của lệnh thanh toán. Công nợ phải thu / VNA không tính (chưa về tiền).
+   Với tháng X:
+     Doanh thu luân chuyển   = tiền của ô tháng X, thu TRƯỚC ngày 1 tháng X
+     Doanh thu tháng này đã thu = tiền của ô tháng X, thu TRONG tháng X
+     Lãi treo tháng X        = ô tháng X chưa thu tới hết tháng X
+     Doanh thu tháng sau đã thu = tiền của ô tháng X+1 đã thu tới hết tháng X (= luân chuyển của X+1)
+   Chốt tháng M → Quỹ lãi ròng: + Lãi ròng M (chưa gồm công nợ) − Lãi treo M + Lãi treo M−1
+                  Quỹ khấu hao: + chi phí khấu hao M (anh nhập ở Chi phí cố định) · Quỹ tiền nhà: + chi phí tiền nhà M
+   Tiền mặt = Doanh thu luân chuyển + Doanh thu tháng này đã thu + Quỹ lãi ròng − Quảng cáo − Tiền điện − Tiền nước − Chi phí hỗn hợp
+   Lãi ròng = Doanh thu − Biến phí − Chi phí cố định (gồm khấu hao nhập tay) − Chi phí hỗn hợp
+   Mọi lệnh có mã cố định theo tháng → bấm lại / máy khác không sinh bản sao. */
+const TIEN_NHA_RE=/mặt\s*bằng|tiền\s*nhà|thuê\s*nhà/i;
+/* Nhận diện theo tên hạng mục (dữ liệu cũ ghi nhiều kiểu: "Chi qc gg map", "Chạy mkt", "Marketing", "Điện & nước"…) */
+const QC_RE=/qu[ảa]ng\s*c[áa]o|(^|[^a-zà-ỹ])qc([^a-zà-ỹ]|$)|mkt|marketing/i;
+function isQuangCao(e){ return e.type==='quangcao' || (costGroup(e.type)==='dinh' && QC_RE.test(e.cat||'')); }
+function isTienNha(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && TIEN_NHA_RE.test(e.cat||''); }
+function isTienDien(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /điện/i.test(e.cat||''); }   // "Điện nước" gộp tính vào tiền điện
+function isKhauHaoCp(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /khấu\s*hao/i.test(e.cat||''); }
+function isTienNuoc(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && !/điện/i.test(e.cat||'') && /nước/i.test(e.cat||''); }
+function isLuong(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /lương/i.test(e.cat||''); }
+function isCpKhac(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && !isTienNha(e) && !isTienDien(e) && !isTienNuoc(e) && !isKhauHaoCp(e) && !isLuong(e); }
+/* Chi phí cố định: tiền nhà & khấu hao (anh tự nhập từng tháng) cuối tháng vào quỹ; quảng cáo, điện, nước chi ngay → trừ tiền mặt */
+const CP_ITEMS=[
+  {k:'nha', ten:'Tiền nhà',          quy:true,  xl:'Cuối tháng vào Quỹ tiền nhà', m:isTienNha, add:{type:'dinhphi',cat:'Tiền nhà'}},
+  {k:'qc',  ten:'Chi phí quảng cáo', quy:false, xl:'Chi ngay · trừ tiền mặt', m:isQuangCao, add:{type:'quangcao',cat:'Quảng cáo'}, nhieu:true},
+  {k:'kh',  ten:'Khấu hao',          quy:true,  xl:'Cuối tháng vào Quỹ khấu hao', m:isKhauHaoCp, add:{type:'dinhphi',cat:'Khấu hao'}},
+  {k:'dien',ten:'Tiền điện',         quy:false, xl:'Chi ngay · trừ tiền mặt', m:isTienDien, add:{type:'dinhphi',cat:'Tiền điện'}},
+  {k:'nuoc',ten:'Tiền nước',         quy:false, xl:'Chi ngay · trừ tiền mặt', m:isTienNuoc, add:{type:'dinhphi',cat:'Tiền nước'}},
+  {k:'luong',ten:'Lương nhân viên',  quy:null,  xl:'Trừ vào lãi ròng', m:isLuong, add:{type:'dinhphi',cat:'Lương nhân viên'}},
+  {k:'khac',ten:'Chi phí cố định khác',quy:null,xl:'Trừ vào lãi ròng', m:isCpKhac, add:{type:'dinhphi',cat:''}, an:true}
+];
+function cpThem(k){
+  const it=CP_ITEMS.find(x=>x.k===k); if(!it||!it.add) return;
+  openExp(null);
+  const T=todayStr(); ef('date',T.slice(0,7)===curMonth?T:curMonth+'-01'); ef('type',it.add.type); ef('cat',it.add.cat);
+  setTimeout(()=>{try{document.getElementById('e_amt').focus();}catch(e){}},40);
+}
+function renderCpFixed(){
+  const el=document.getElementById('cpFixed'); if(!el) return;
+  const X=curMonth, ex=DB.expenses.filter(e=>(e.date||'').slice(0,7)===X).sort((a,b)=>a.date<b.date?-1:1);
+  let tong=0, ngay=0;
+  const rows=CP_ITEMS.filter(it=>!it.an||ex.some(it.m)).map(it=>{
+    let amt=0, dots='';
+    if(it.auto){ amt=monthlyDep(); dots=`<span class="cp-none">Tự lấy từ bảng Tài sản</span>`; }
+    else{ const ds=ex.filter(it.m); amt=ds.reduce((a,e)=>a+(+e.amt||0),0);
+      dots=ds.length?`<div class="cp-dot">${ds.map(e=>`<button onclick="openExp('${e.id}')" title="${escNote(e.note||'')}">${fmtDM(e.date)} · ${fmtVND(e.amt)}</button>`).join('')}</div>`:`<span class="cp-none">Chưa nhập</span>`; }
+    tong+=amt; if(it.quy===false) ngay+=amt;
+    const btn=it.add?`<button class="chot-btn" onclick="cpThem('${it.k}')">${it.nhieu?'+ Thêm đợt':'+ Nhập'}</button>`:'';
+    return `<tr><td style="width:210px"><div class="cp-ten">${it.ten}</div><span class="cp-xl ${it.quy?'quy':it.quy===false?'ngay':'khac'}">${it.xl}</span></td><td>${dots}</td><td class="amt">${fmtVND(amt)}đ</td><td class="act">${btn}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<div class="cp-head"><h2>Chi phí cố định — ${monthLabel(X)}</h2><span class="muted">Chi ngay (trừ tiền mặt): <b>${fmtVND(ngay)}đ</b></span></div>
+    <table class="cp-tbl">${rows}<tr class="tot"><td colspan="2">Tổng chi phí cố định</td><td class="amt">${fmtVND(tong)}đ</td><td></td></tr></table>`;
+}
+function ymNext(ym){ return addDays(ym+'-28',7).slice(0,7); }
+function ymPrev(ym){ return addDays(ym+'-01',-1).slice(0,7); }
+function ymEnd(ym){ return ym+'-'+String(daysInMonth(ym)).padStart(2,'0'); }
+function ymShort(ym){ const [y,m]=ym.split('-'); return 'T'+(+m)+'/'+y; }
+function chotLaCongNo(b){ return isRecvBk(b)||b.pay==='VNA'; }
+// Các phần tiền đã thu của booking: [{ds: ô ngày, date: ngày thu, amt}]
+function chotPhan(b){
+  const out=[]; if(chotLaCongNo(b)) return out;
+  const pls=((b.payments&&b.payments.length)?b.payments.slice()
+    :((b.prepaid||0)>0?[{date:b.arrive,time:'',amount:b.prepaid}]:[]))
+    .filter(p=>(+p.amount||0)>0)
+    .sort((x,y)=>((x.date||'')+(x.time||'')).localeCompare((y.date||'')+(y.time||'')));
+  const ns=nightsOf(b).map(ds=>({ds,cap:Math.max(0,priceOn(b,ds))})); let i=0;
+  pls.forEach(p=>{ let rem=+p.amount;
+    while(rem>0&&i<ns.length){ const n=ns[i], g=Math.min(n.cap,rem); n.cap-=g; rem-=g; if(n.cap<=0) i++; if(g>0) out.push({ds:n.ds,date:p.date||b.arrive,amt:g}); }
+  });
+  return out;
+}
+// Số liệu tiền của tháng X (tính trực tiếp, không cần chốt)
+function tienThang(X){
+  const d1=X+'-01', dE=ymEnd(X), P=ymPrev(X), N=ymNext(X), pE=ymEnd(P);
+  const r={X,rev:0,congno:0,lc:0,thuNay:0,treo:0,thuSau:0,treoPrev:0,treoPrevThu:0,treoList:[]};
+  DB.bookings.forEach(b=>{
+    const ns=nightsOf(b), mo=ds=>ds.slice(0,7);
+    if(!ns.some(ds=>{const m=mo(ds);return m===X||m===N||m===P;})) return;
+    let cX=0,cP=0; ns.forEach(ds=>{ if(mo(ds)===X) cX+=priceOn(b,ds); else if(mo(ds)===P) cP+=priceOn(b,ds); });
+    if(chotLaCongNo(b)){ r.congno+=cX; return; }
+    r.rev+=cX;
+    let lc=0,nay=0,pDen=0,pThu=0;
+    chotPhan(b).forEach(p=>{
+      const m=mo(p.ds);
+      if(m===X){ if(p.date<d1) lc+=p.amt; else if(p.date<=dE) nay+=p.amt; }
+      else if(m===N){ if(p.date<=dE) r.thuSau+=p.amt; }
+      else if(m===P){ if(p.date<=pE) pDen+=p.amt; else if(p.date<=dE) pThu+=p.amt; }
+    });
+    r.lc+=lc; r.thuNay+=nay;
+    const t=cX-lc-nay; if(t>0){ r.treo+=t; r.treoList.push({bk:b.id,amt:t,xe:b.xe||'',guest:String(b.guest||'').trim(),arrive:b.arrive,depart:b.depart}); }
+    const tp=cP-pDen; if(tp>0){ r.treoPrev+=tp; r.treoPrevThu+=Math.min(tp,pThu); }
+  });
+  return r;
+}
+function chiThang(X){
+  const g={bien:0,dinh:0,honhop:0,qc:0,nha:0,dien:0,nuoc:0,kh:0,luong:0};
+  DB.expenses.forEach(e=>{ if((e.date||'').slice(0,7)!==X) return; const a=+e.amt||0, k=costGroup(e.type);
+    if(g[k]!=null) g[k]+=a; if(isQuangCao(e)) g.qc+=a; if(isTienNha(e)) g.nha+=a; if(isTienDien(e)) g.dien+=a; if(isTienNuoc(e)) g.nuoc+=a; if(isKhauHaoCp(e)) g.kh+=a; if(isLuong(e)) g.luong+=a; });
+  g.dinhKhac=g.dinh-g.qc-g.nha-g.dien-g.nuoc-g.kh-g.luong;
+  g.chiNgay=g.qc+g.dien+g.nuoc;                     // chi ngay → trừ tiền mặt
+  g.tong=g.bien+g.dinh+g.honhop; return g;          // khấu hao (nhập tay, nằm trong định phí) đã trừ vào lãi ròng
+}
+function chotTinh(M){
+  const t=tienThang(M), c=chiThang(M), P=ymPrev(M), sp=DB.chotThang&&DB.chotThang[P];
+  const treoTruoc=sp?(+sp.treo||0):t.treoPrev;
+  const lai=t.rev-c.tong;
+  return {ym:M,rev:t.rev,congno:t.congno,bien:c.bien,dinh:c.dinh,honhop:c.honhop,qc:c.qc,nha:c.nha,dien:c.dien,nuoc:c.nuoc,luong:c.luong,dinhKhac:c.dinhKhac,chi:c.tong,
+    lai,treo:t.treo,treoTruoc,treoTruocChot:!!sp,thuSau:t.thuSau,treoList:t.treoList,kh:c.kh,
+    vaoQuy:lai-t.treo+treoTruoc};
+}
+function chotFundPut(fk,rec){ const arr=DB.funds[fk]=DB.funds[fk]||[]; const i=arr.findIndex(x=>x&&x.id===rec.id); if(i>=0) arr[i]=rec; else arr.push(rec); }
+function chotThucHien(M){
+  const r=chotTinh(M), ten=ymShort(M), d=ymEnd(M);
+  if(!DB.chotThang||typeof DB.chotThang!=='object') DB.chotThang={};
+  DB.chotThang[M]=Object.assign({},r,{at:todayStr()});
+  const put=(fk,k,amt,note)=>{ if(!amt) return; chotFundPut(fk,{id:'chot:'+M+':'+k,date:d,dir:amt>=0?'in':'out',amt:Math.abs(amt),note}); };
+  put('lairong','lr',r.lai,`Lãi ròng ${ten} (chưa gồm công nợ)`);
+  put('lairong','treo',-r.treo,`Lãi treo ${ten} — chưa thu`);
+  put('lairong','treotruoc',r.treoTruoc,`Lãi treo ${ymShort(ymPrev(M))} chuyển vào`);
+  put('khauhao','kh',r.kh,`Khấu hao ${ten}`);
+  put('tiennha','nha',r.nha,`Tiền nhà ${ten}`);
+  renderAll(); chotRender();
+}
+function chotHuy(M){
+  if(!confirm(`Huỷ chốt ${ymShort(M)}? Các lệnh của tháng này trong 3 quỹ sẽ bị xoá để chốt lại.`)) return;
+  ['khauhao','lairong','tiennha'].forEach(fk=>{ DB.funds[fk]=(DB.funds[fk]||[]).filter(x=>!(x&&String(x.id).startsWith('chot:'+M+':'))); });
+  delete DB.chotThang[M];
+  dangDonRac=true; try{ renderAll(); }finally{ setTimeout(()=>{dangDonRac=false;},3000); }
+  chotRender();
+}
+function chotRender(){
+  const M=document.getElementById('chotMonth').value; if(!M) return;
+  const s=DB.chotThang&&DB.chotThang[M], r=s||chotTinh(M), ten=ymShort(M), tenP=ymShort(ymPrev(M)), tenN=ymShort(ymNext(M));
+  const v=n=>fmtVND(n)+'đ', sg=n=>(n>=0?'+ ':'− ')+fmtVND(Math.abs(n))+'đ';
+  const row=(l,n,cls,sub,txt)=>`<tr class="${cls||''}"><td${sub?' class="sub"':''}>${l}</td><td class="amt">${txt!=null?txt:v(n)}</td></tr>`;
+  document.getElementById('chotTitle').textContent=s?`Đã chốt ${ten} · ngày ${fmtDMY(s.at)}`:`Chốt tháng ${ten}`;
+  let h=`<div class="chot-sec"><h4>Xác định ${ten}</h4><table class="chot-tbl">
+    ${row(`Doanh thu ${ten} (chưa gồm công nợ)`,r.rev)}
+    ${r.congno?row(`Công nợ ${ten} — không tính`,r.congno,'',1):''}
+    ${row(`Chi phí ${ten}`,r.chi,'',0,'− '+v(r.chi))}
+    ${row('Biến phí',r.bien,'',1)}
+    ${row('Chi phí cố định',r.dinh,'',1)}
+    ${[['Tiền nhà',r.nha],['Chi phí quảng cáo',r.qc],['Khấu hao',r.kh],['Tiền điện',r.dien],['Tiền nước',r.nuoc],['Lương nhân viên',r.luong],['Chi phí cố định khác',r.dinhKhac]].filter(x=>x[1]).map(x=>`<tr><td class="sub" style="padding-left:44px">${x[0]}</td><td class="amt" style="font-weight:500;color:#64748b">${v(x[1])}</td></tr>`).join('')}
+    ${row('Chi phí hỗn hợp',r.honhop,'',1)}
+    ${row('1. Lãi ròng',r.lai,'tot')}
+    ${row(`2. Lãi treo ${ten} — chưa thu · ${r.treoList.length} booking`,r.treo,'hl')}
+    ${row(`3. Doanh thu ${tenN} đã thu — luân chuyển sang ${tenN}`,r.thuSau,'hl')}
+  </table></div>
+  <div class="chot-sec"><h4>${s?'Lệnh đã ghi vào quỹ':'Lệnh sẽ ghi vào quỹ'}</h4><table class="chot-tbl">
+    <tr><td colspan="2"><b>Quỹ lãi ròng</b></td></tr>
+    ${row(`Lãi ròng ${ten} (chưa gồm công nợ)`,0,r.lai>=0?'cmd':'cmdm',1,sg(r.lai))}
+    ${row(`Lãi treo ${ten}`,0,'cmdm',1,sg(-r.treo))}
+    ${row(`Lãi treo ${tenP}${r.treoTruocChot?'':' (tháng trước chưa chốt, tính theo sổ)'}`,0,'cmd',1,sg(r.treoTruoc))}
+    ${row('Cộng vào quỹ lãi ròng',0,'tot',0,sg(r.vaoQuy))}
+    <tr><td colspan="2"><b>Quỹ khấu hao</b></td></tr>${row('Khấu hao '+ten,0,'cmd',1,sg(r.kh))}
+    <tr><td colspan="2"><b>Quỹ tiền nhà</b></td></tr>${row('Tiền nhà '+ten,0,'cmd',1,sg(r.nha))}
+  </table></div>`;
+  if((r.treoList||[]).length) h+=`<div class="chot-sec"><h4>Lãi treo ${ten} — từng booking</h4><table class="chot-tbl">${r.treoList.map(it=>
+    `<tr><td>${it.xe} · ${escNote(it.guest||'—')} · ${fmtDM(it.arrive)} - ${fmtDM(it.depart)}</td><td class="amt">${v(it.amt)}</td></tr>`).join('')}</table></div>`;
+  document.getElementById('chotBody').innerHTML=h;
+  document.getElementById('chotActions').innerHTML=s
+    ? `<button class="danger" style="margin-right:auto" onclick="chotHuy('${M}')">Huỷ chốt</button><button class="primary" onclick="document.getElementById('chotOverlay').classList.remove('open')">Đóng</button>`
+    : `<button class="chot-btn" onclick="document.getElementById('chotOverlay').classList.remove('open')">Hủy</button><button class="primary" onclick="chotThucHien('${M}')">Chốt tháng ${ten}</button>`;
+}
+function openChot(M){
+  const inp=document.getElementById('chotMonth');
+  inp.value=M||curMonth; inp.onchange=chotRender;
+  chotRender(); document.getElementById('chotOverlay').classList.add('open');
+}
+document.getElementById('chotBtn').onclick=()=>openChot(curMonth);
+function renderChotTable(){
+  const st=document.getElementById('chotRevSt'), bt=document.getElementById('chotBtn');
+  if(bt){ const s=DB.chotThang&&DB.chotThang[curMonth];
+    bt.textContent=s?`Xem chốt ${ymShort(curMonth)}`:`Chốt ${ymShort(curMonth)}`;
+    if(st) st.innerHTML=s?`<span class="chot-tag ok">Đã chốt ${fmtDMY(s.at)}</span>`:''; }
+  const el=document.getElementById('chotTable'); if(!el) return;
+  const ct=DB.chotThang||{}, yms=Object.keys(ct).sort().reverse();
+  let h=`<tr><th class="l">Tháng</th><th>Lãi ròng</th><th>− Lãi treo tháng này</th><th>+ Lãi treo tháng trước</th><th>Vào quỹ lãi ròng</th><th>DT tháng sau đã thu</th><th>Khấu hao</th><th>Tiền nhà</th><th></th></tr>`;
+  h+=yms.length?yms.map(ym=>{const s=ct[ym];
+    return `<tr><td class="l"><b>${monthLabel(ym)}</b></td><td>${fmtVND(s.lai)}đ</td><td>${fmtVND(s.treo)}đ</td><td>${fmtVND(s.treoTruoc)}đ</td><td><b>${fmtVND(s.vaoQuy)}đ</b></td><td>${fmtVND(s.thuSau)}đ</td><td>${fmtVND(s.kh)}đ</td><td>${fmtVND(s.nha)}đ</td><td><button class="chot-btn" onclick="openChot('${ym}')">Xem</button></td></tr>`;}).join('')
+    :`<tr><td colspan="9" class="muted l" style="padding:14px">Chưa chốt tháng nào.</td></tr>`;
+  el.innerHTML=h;
+}
+/* Tab Thu tiền: 4 loại tiền của tháng (tháng của ngày cuối khoảng đang lọc) + Tiền mặt */
+function renderTcThang(X){
+  const el=document.getElementById('tcThang'); if(!el) return;
+  const t=tienThang(X), c=chiThang(X), P=ymPrev(X), N=ymNext(X), sp=DB.chotThang&&DB.chotThang[P];
+  const treoP=sp?(+sp.treo||0):t.treoPrev, quy=fundBalance('lairong');
+  const tong=t.lc+t.thuNay, pLc=tong>0?Math.round(t.lc/tong*100):0;
+  const tien=t.lc+t.thuNay+quy-c.chiNgay-c.honhop;
+  const v=n=>fmtVND(n)+'đ';
+  el.innerHTML=`<div class="tm-grid">
+    <div class="tm-card tm-treo"><div class="tm-lbl">Lãi treo ${ymShort(P)}</div><div class="tm-val">${v(treoP)}</div>
+      <div class="tm-sub">Đã thu trong ${ymShort(X)}: ${v(t.treoPrevThu)}</div></div>
+    <div class="tm-card tm-pair">
+      <div class="tm-lbl">Doanh thu ${ymShort(X)} đã nhận</div><div class="tm-val">${v(tong)}</div>
+      <div class="tm-bar"><i class="a" style="width:${100-pLc}%"></i><i class="b" style="width:${pLc}%"></i></div>
+      <div class="tm-two">
+        <div class="tm-half a"><div class="tm-lbl">Doanh thu tháng này đã thu</div><div class="tm-v2">${v(t.thuNay)}</div><div class="tm-sub">thu trong ${ymShort(X)}</div></div>
+        <div class="tm-half b"><div class="tm-lbl">Doanh thu luân chuyển</div><div class="tm-v2">${v(t.lc)}</div><div class="tm-sub">thu từ ${ymShort(P)} trở về trước</div></div>
+      </div></div>
+    <div class="tm-card tm-sau"><div class="tm-lbl">Doanh thu ${ymShort(N)} đã thu</div><div class="tm-val">${v(t.thuSau)}</div></div>
+    <div class="tm-card tm-cash"><div class="tm-lbl">Tiền mặt hiện có</div><div class="tm-val ${tien>=0?'':'neg'}">${v(tien)}</div>
+      <table class="tm-f">
+        <tr><td>Luân chuyển</td><td>${v(t.lc)}</td></tr><tr><td>+ Đã thu tháng này</td><td>${v(t.thuNay)}</td></tr>
+        <tr><td>+ Quỹ lãi ròng</td><td>${v(quy)}</td></tr><tr><td>− Quảng cáo</td><td>${v(c.qc)}</td></tr><tr><td>− Tiền điện</td><td>${v(c.dien)}</td></tr><tr><td>− Tiền nước</td><td>${v(c.nuoc)}</td></tr><tr><td>− Chi phí hỗn hợp</td><td>${v(c.honhop)}</td></tr>
+      </table></div>
+  </div>`;
+}
+
 /* ============ PHÂN TÍCH TÀI CHÍNH ============ */
 function paIso(d){return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
 function paShift(ds,n){const d=new Date(ds+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return paIso(d);}
@@ -5602,34 +5898,9 @@ function thuThucTe(from,to){
   });
   return s;
 }
-function fundBalance(k){ return (DB.funds&&DB.funds[k]||[]).reduce((a,e)=>a+(e.dir==='in'?(+e.amt||0):-(+e.amt||0)),0); }
-function renderCash(){
-  const el=document.getElementById('paCash'); if(!el) return;
-  const T=todayStr(), ym=T.slice(0,7), from=ym+'-01', to=ym+'-'+String(daysInMonth(ym)).padStart(2,'0');
-  const thu=thuThucTe(from,T), tongThu=thu.CK+thu.TM;
-  const quy=fundBalance('lairong');
-  const c={bienphi:0,honhop:0,quangcao:0};
-  DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to&&c[e.type]!=null) c[e.type]+=(+e.amt||0); });
-  const tien=tongThu+quy-c.bienphi-c.honhop-c.quangcao;
-  const v=n=>fmtVND(n)+'đ';
-  const row=(op,lbl,sub,n,cls)=>`<tr class="${cls||''}"><td class="op">${op}</td><td>${lbl}${sub?` <span class="sub">${sub}</span>`:''}</td><td class="amt">${v(n)}</td></tr>`;
-  el.innerHTML=`
-    <div class="cash-top">
-      <div><h2>Tiền mặt có thể sử dụng</h2><div class="cash-per">${monthLabel(ym)} · thu tiền từ ${fmtDMY(from)} đến ${fmtDMY(T)}</div></div>
-      <div class="cash-total"><div class="v ${tien>=0?'pos':'neg'}">${v(tien)}</div></div>
-    </div>
-    <table class="cash-tbl">
-      ${row('','Thu tiền','tiền mặt '+fmtVND(thu.TM)+' · chuyển khoản '+fmtVND(thu.CK),tongThu)}
-      ${row('+','Quỹ lãi ròng','số dư hiện tại',quy)}
-      ${row('−','Biến phí','',c.bienphi,'minus')}
-      ${row('−','Chi phí hỗn hợp','',c.honhop,'minus')}
-      ${row('−','Chi phí quảng cáo','',c.quangcao,'minus')}
-      <tr class="res"><td class="op">=</td><td>Tiền mặt có thể sử dụng</td><td class="amt">${v(tien)}</td></tr>
-    </table>`;
-}
+function fundBalance(k){ return (DB.funds&&DB.funds[k]||[]).reduce((a,e)=>a+(e.dir==='cho'?0:e.dir==='in'?(+e.amt||0):-(+e.amt||0)),0); }
 function renderPhanTich(){
   if(!accUnlocked)return;
-  try{ renderCash(); }catch(e){ console.warn('renderCash',e); }
   if(!document.getElementById('paCards'))return;
   paInit();
   const pre=document.getElementById('paPreset'), fi=document.getElementById('paFrom'), ti=document.getElementById('paTo');
@@ -7198,7 +7469,7 @@ const WEB_GROUPS=[
   {id:'8fa69085-6e0c-41bb-9a14-6300e17b9be6', ten:'Honda Vision 110 (bản phổ thông)',    xe:['A1','A2','A4','A6']},
   {id:'801d1cf0-2369-46eb-9d8d-dd5b7e284135', ten:'Honda Vision 110 Thể thao/Đặc biệt',  xe:['A3','A5','A7','A8','A9','A10','A11','A12','A15']},
   {id:'4ec5d5a0-a15b-40f5-ad4d-9fc6d3bdaa5f', ten:'Vinfast Evo200',                      xe:['E1','E2','E3','K2']},
-  {id:'7f69e2d5-95a5-4307-ac74-58cd922d120d', ten:'Vinfast Klara S',                     xe:['K1']},
+  {id:'e3addf9c-15a8-4b51-a36d-e053fb9e3e45', ten:'Vinfast EVO MAX Lite',                xe:['K1','K3']},   // 3/11/2026: K1 đổi từ Klara S sang Evomax
   {id:'6d511695-8d4e-473c-a724-c4f8422fd8a6', ten:'Wave 50cc',                           xe:['OVER2']},
   {id:'ffe5e332-f38a-44c4-85e1-683d81402238', ten:'Honda Wave Alpha 110',                xe:['G1','G2','G3','G4','G5']},
   {id:'3be512b8-3137-4a73-a628-ddf82aeb0941', ten:'Honda Lead 125',                      xe:['L1','L2','L3']},
