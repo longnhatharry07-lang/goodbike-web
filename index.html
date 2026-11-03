@@ -187,6 +187,7 @@
   .cp-xl{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-top:4px}
   .cp-xl.quy{background:#e0e7ff;color:#3730a3}
   .cp-xl.ngay{background:#fee2e2;color:#b91c1c}
+  .cp-xl.khac{background:#f1f5f9;color:#475569}
   .cp-dot{display:flex;flex-wrap:wrap;gap:6px}
   .cp-dot button{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;padding:3px 9px;font-size:12px;border-radius:7px}
   .cp-dot button:hover{border-color:#94a3b8}
@@ -2227,8 +2228,8 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="field"><label>Ngày</label><input type="date" id="e_date"></div>
       <div class="field"><label>Loại</label>
         <select id="e_type">
-          <option value="dinhphi">Định phí</option>
-          <option value="quangcao">Định phí · Chi phí quảng cáo</option>
+          <option value="dinhphi">Chi phí cố định</option>
+          <option value="quangcao" hidden>Chi phí cố định</option>
           <option value="bienphi">Biến phí</option>
           <option value="khauhao">Khấu hao</option>
           <option value="dautu">Đầu tư</option>
@@ -2503,8 +2504,8 @@ const STATUS = {
 const PAY_LABEL = {CK:'Chuyển khoản',TM:'Tiền mặt',Vexere:'Vexere',VNA:'Công nợ VNA'};
 // Loại chi phí. capital:true = chi đầu tư (không trừ vào lãi vận hành hàng tháng)
 const EXP_TYPES = {
-  dinhphi:{label:'Định phí',       bg:'#dbeafe',fg:'#1d4ed8'},
-  quangcao:{label:'Chi phí quảng cáo',bg:'#e0f2fe',fg:'#0369a1'},   // thuộc nhóm ĐỊNH PHÍ; trừ vào Tiền mặt có thể sử dụng
+  dinhphi:{label:'Chi phí cố định',bg:'#dbeafe',fg:'#1d4ed8'},   // gồm tiền nhà, quảng cáo, khấu hao, điện, nước…
+  quangcao:{label:'Chi phí cố định',bg:'#dbeafe',fg:'#1d4ed8',gop:'dinhphi'},   // khoản quảng cáo cũ: gộp vào Chi phí cố định   // thuộc nhóm ĐỊNH PHÍ; trừ vào Tiền mặt có thể sử dụng
   bienphi:{label:'Biến phí',       bg:'#fef3c7',fg:'#b45309'},
   khauhao:{label:'Khấu hao',       bg:'#e0e7ff',fg:'#4338ca'},
   dautu  :{label:'Đầu tư',         bg:'#dcfce7',fg:'#15803d',capital:true},
@@ -2616,7 +2617,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-03-khauhao';
+const BAN_APP = '2026-11-03-luong';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4398,10 +4399,11 @@ function renderChi(){
     : 'đang xem cả tháng — chọn ngày để xem khoảng khác';
   const all=expInRange().sort((a,b)=>a.date<b.date?-1:1);
   const byType={};Object.keys(EXP_TYPES).forEach(k=>byType[k]=0);
-  all.forEach(e=>byType[e.type]=(byType[e.type]||0)+e.amt);
+  const nhomChi=t=>(EXP_TYPES[t]&&EXP_TYPES[t].gop)||t;   // quảng cáo → Chi phí cố định
+  all.forEach(e=>byType[nhomChi(e.type)]=(byType[nhomChi(e.type)]||0)+e.amt);
   const tot=all.reduce((a,e)=>a+e.amt,0);
   // danh sách hiển thị: lọc theo banner đang chọn
-  const list = chiFilter? all.filter(e=>e.type===chiFilter): all;
+  const list = chiFilter? all.filter(e=>nhomChi(e.type)===chiFilter): all;
   const listTot=list.reduce((a,e)=>a+e.amt,0);
   let th=`<tr><th class="l">Ngày</th><th class="l">Loại</th><th class="l">Hạng mục</th><th>Số tiền</th><th class="l">Ghi chú</th><th></th></tr>`;
   let body=list.map(e=>{
@@ -4418,7 +4420,7 @@ function renderChi(){
   const kpiC=(lbl,val,key,active)=>`<div class="kpi clickable ${active?'active':''}" data-ft="${key}"><div class="lbl">${lbl} ▾</div><div class="val">${val}</div></div>`;
   document.getElementById('chiKpis').innerHTML=
     kpiC('Tổng chi',fmtVND(tot)+'đ','',chiFilter===null)
-    + Object.keys(EXP_TYPES).map(k=>kpiC(EXP_TYPES[k].label,fmtVND(byType[k]||0)+'đ',k,chiFilter===k)).join('');
+    + Object.keys(EXP_TYPES).filter(k=>!EXP_TYPES[k].gop).map(k=>kpiC(EXP_TYPES[k].label,fmtVND(byType[k]||0)+'đ',k,chiFilter===k)).join('');
   // chip "đang lọc" có nút ✕ để thoát
   document.getElementById('chiFilterChip').innerHTML = chiFilter
     ? `<span class="chip-clear">Đang lọc: ${EXP_TYPES[chiFilter].label}<button id="chiClearBtn" title="Bỏ lọc">✕</button></span>` : '';
@@ -5608,17 +5610,24 @@ document.getElementById('expDelete').onclick=()=>{
    Lãi ròng = Doanh thu − Biến phí − Chi phí cố định (gồm khấu hao nhập tay) − Chi phí hỗn hợp
    Mọi lệnh có mã cố định theo tháng → bấm lại / máy khác không sinh bản sao. */
 const TIEN_NHA_RE=/mặt\s*bằng|tiền\s*nhà|thuê\s*nhà/i;
-function isTienNha(e){ return costGroup(e.type)==='dinh' && e.type!=='quangcao' && TIEN_NHA_RE.test(e.cat||''); }
-function isTienDien(e){ return costGroup(e.type)==='dinh' && e.type!=='quangcao' && /điện/i.test(e.cat||''); }
-function isKhauHaoCp(e){ return costGroup(e.type)==='dinh' && e.type!=='quangcao' && /khấu\s*hao/i.test(e.cat||''); }
-function isTienNuoc(e){ return costGroup(e.type)==='dinh' && e.type!=='quangcao' && !/điện/i.test(e.cat||'') && /nước/i.test(e.cat||''); }
+/* Nhận diện theo tên hạng mục (dữ liệu cũ ghi nhiều kiểu: "Chi qc gg map", "Chạy mkt", "Marketing", "Điện & nước"…) */
+const QC_RE=/qu[ảa]ng\s*c[áa]o|(^|[^a-zà-ỹ])qc([^a-zà-ỹ]|$)|mkt|marketing/i;
+function isQuangCao(e){ return e.type==='quangcao' || (costGroup(e.type)==='dinh' && QC_RE.test(e.cat||'')); }
+function isTienNha(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && TIEN_NHA_RE.test(e.cat||''); }
+function isTienDien(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /điện/i.test(e.cat||''); }   // "Điện nước" gộp tính vào tiền điện
+function isKhauHaoCp(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /khấu\s*hao/i.test(e.cat||''); }
+function isTienNuoc(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && !/điện/i.test(e.cat||'') && /nước/i.test(e.cat||''); }
+function isLuong(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && /lương/i.test(e.cat||''); }
+function isCpKhac(e){ return costGroup(e.type)==='dinh' && !isQuangCao(e) && !isTienNha(e) && !isTienDien(e) && !isTienNuoc(e) && !isKhauHaoCp(e) && !isLuong(e); }
 /* Chi phí cố định: tiền nhà & khấu hao (anh tự nhập từng tháng) cuối tháng vào quỹ; quảng cáo, điện, nước chi ngay → trừ tiền mặt */
 const CP_ITEMS=[
   {k:'nha', ten:'Tiền nhà',          quy:true,  xl:'Cuối tháng vào Quỹ tiền nhà', m:isTienNha, add:{type:'dinhphi',cat:'Tiền nhà'}},
-  {k:'qc',  ten:'Chi phí quảng cáo', quy:false, xl:'Chi ngay · trừ tiền mặt', m:e=>e.type==='quangcao', add:{type:'quangcao',cat:'Quảng cáo'}, nhieu:true},
+  {k:'qc',  ten:'Chi phí quảng cáo', quy:false, xl:'Chi ngay · trừ tiền mặt', m:isQuangCao, add:{type:'quangcao',cat:'Quảng cáo'}, nhieu:true},
   {k:'kh',  ten:'Khấu hao',          quy:true,  xl:'Cuối tháng vào Quỹ khấu hao', m:isKhauHaoCp, add:{type:'dinhphi',cat:'Khấu hao'}},
   {k:'dien',ten:'Tiền điện',         quy:false, xl:'Chi ngay · trừ tiền mặt', m:isTienDien, add:{type:'dinhphi',cat:'Tiền điện'}},
-  {k:'nuoc',ten:'Tiền nước',         quy:false, xl:'Chi ngay · trừ tiền mặt', m:isTienNuoc, add:{type:'dinhphi',cat:'Tiền nước'}}
+  {k:'nuoc',ten:'Tiền nước',         quy:false, xl:'Chi ngay · trừ tiền mặt', m:isTienNuoc, add:{type:'dinhphi',cat:'Tiền nước'}},
+  {k:'luong',ten:'Lương nhân viên',  quy:null,  xl:'Trừ vào lãi ròng', m:isLuong, add:{type:'dinhphi',cat:'Lương nhân viên'}},
+  {k:'khac',ten:'Chi phí cố định khác',quy:null,xl:'Trừ vào lãi ròng', m:isCpKhac, add:{type:'dinhphi',cat:''}, an:true}
 ];
 function cpThem(k){
   const it=CP_ITEMS.find(x=>x.k===k); if(!it||!it.add) return;
@@ -5630,14 +5639,14 @@ function renderCpFixed(){
   const el=document.getElementById('cpFixed'); if(!el) return;
   const X=curMonth, ex=DB.expenses.filter(e=>(e.date||'').slice(0,7)===X).sort((a,b)=>a.date<b.date?-1:1);
   let tong=0, ngay=0;
-  const rows=CP_ITEMS.map(it=>{
+  const rows=CP_ITEMS.filter(it=>!it.an||ex.some(it.m)).map(it=>{
     let amt=0, dots='';
     if(it.auto){ amt=monthlyDep(); dots=`<span class="cp-none">Tự lấy từ bảng Tài sản</span>`; }
     else{ const ds=ex.filter(it.m); amt=ds.reduce((a,e)=>a+(+e.amt||0),0);
       dots=ds.length?`<div class="cp-dot">${ds.map(e=>`<button onclick="openExp('${e.id}')" title="${escNote(e.note||'')}">${fmtDM(e.date)} · ${fmtVND(e.amt)}</button>`).join('')}</div>`:`<span class="cp-none">Chưa nhập</span>`; }
-    tong+=amt; if(!it.quy) ngay+=amt;
+    tong+=amt; if(it.quy===false) ngay+=amt;
     const btn=it.add?`<button class="chot-btn" onclick="cpThem('${it.k}')">${it.nhieu?'+ Thêm đợt':'+ Nhập'}</button>`:'';
-    return `<tr><td style="width:210px"><div class="cp-ten">${it.ten}</div><span class="cp-xl ${it.quy?'quy':'ngay'}">${it.xl}</span></td><td>${dots}</td><td class="amt">${fmtVND(amt)}đ</td><td class="act">${btn}</td></tr>`;
+    return `<tr><td style="width:210px"><div class="cp-ten">${it.ten}</div><span class="cp-xl ${it.quy?'quy':it.quy===false?'ngay':'khac'}">${it.xl}</span></td><td>${dots}</td><td class="amt">${fmtVND(amt)}đ</td><td class="act">${btn}</td></tr>`;
   }).join('');
   el.innerHTML=`<div class="cp-head"><h2>Chi phí cố định — ${monthLabel(X)}</h2><span class="muted">Chi ngay (trừ tiền mặt): <b>${fmtVND(ngay)}đ</b></span></div>
     <table class="cp-tbl">${rows}<tr class="tot"><td colspan="2">Tổng chi phí cố định</td><td class="amt">${fmtVND(tong)}đ</td><td></td></tr></table>`;
@@ -5684,10 +5693,10 @@ function tienThang(X){
   return r;
 }
 function chiThang(X){
-  const g={bien:0,dinh:0,honhop:0,qc:0,nha:0,dien:0,nuoc:0,kh:0};
+  const g={bien:0,dinh:0,honhop:0,qc:0,nha:0,dien:0,nuoc:0,kh:0,luong:0};
   DB.expenses.forEach(e=>{ if((e.date||'').slice(0,7)!==X) return; const a=+e.amt||0, k=costGroup(e.type);
-    if(g[k]!=null) g[k]+=a; if(e.type==='quangcao') g.qc+=a; if(isTienNha(e)) g.nha+=a; if(isTienDien(e)) g.dien+=a; if(isTienNuoc(e)) g.nuoc+=a; if(isKhauHaoCp(e)) g.kh+=a; });
-  g.dinhKhac=g.dinh-g.qc-g.nha-g.dien-g.nuoc-g.kh;
+    if(g[k]!=null) g[k]+=a; if(isQuangCao(e)) g.qc+=a; if(isTienNha(e)) g.nha+=a; if(isTienDien(e)) g.dien+=a; if(isTienNuoc(e)) g.nuoc+=a; if(isKhauHaoCp(e)) g.kh+=a; if(isLuong(e)) g.luong+=a; });
+  g.dinhKhac=g.dinh-g.qc-g.nha-g.dien-g.nuoc-g.kh-g.luong;
   g.chiNgay=g.qc+g.dien+g.nuoc;                     // chi ngay → trừ tiền mặt
   g.tong=g.bien+g.dinh+g.honhop; return g;          // khấu hao (nhập tay, nằm trong định phí) đã trừ vào lãi ròng
 }
@@ -5695,7 +5704,7 @@ function chotTinh(M){
   const t=tienThang(M), c=chiThang(M), P=ymPrev(M), sp=DB.chotThang&&DB.chotThang[P];
   const treoTruoc=sp?(+sp.treo||0):t.treoPrev;
   const lai=t.rev-c.tong;
-  return {ym:M,rev:t.rev,congno:t.congno,bien:c.bien,dinh:c.dinh,honhop:c.honhop,qc:c.qc,nha:c.nha,dien:c.dien,nuoc:c.nuoc,dinhKhac:c.dinhKhac,chi:c.tong,
+  return {ym:M,rev:t.rev,congno:t.congno,bien:c.bien,dinh:c.dinh,honhop:c.honhop,qc:c.qc,nha:c.nha,dien:c.dien,nuoc:c.nuoc,luong:c.luong,dinhKhac:c.dinhKhac,chi:c.tong,
     lai,treo:t.treo,treoTruoc,treoTruocChot:!!sp,thuSau:t.thuSau,treoList:t.treoList,kh:c.kh,
     vaoQuy:lai-t.treo+treoTruoc};
 }
@@ -5731,7 +5740,7 @@ function chotRender(){
     ${row(`Chi phí ${ten}`,r.chi,'',0,'− '+v(r.chi))}
     ${row('Biến phí',r.bien,'',1)}
     ${row('Chi phí cố định',r.dinh,'',1)}
-    ${[['Tiền nhà',r.nha],['Chi phí quảng cáo',r.qc],['Khấu hao',r.kh],['Tiền điện',r.dien],['Tiền nước',r.nuoc],['Định phí khác',r.dinhKhac]].filter(x=>x[1]).map(x=>`<tr><td class="sub" style="padding-left:44px">${x[0]}</td><td class="amt" style="font-weight:500;color:#64748b">${v(x[1])}</td></tr>`).join('')}
+    ${[['Tiền nhà',r.nha],['Chi phí quảng cáo',r.qc],['Khấu hao',r.kh],['Tiền điện',r.dien],['Tiền nước',r.nuoc],['Lương nhân viên',r.luong],['Chi phí cố định khác',r.dinhKhac]].filter(x=>x[1]).map(x=>`<tr><td class="sub" style="padding-left:44px">${x[0]}</td><td class="amt" style="font-weight:500;color:#64748b">${v(x[1])}</td></tr>`).join('')}
     ${row('Chi phí hỗn hợp',r.honhop,'',1)}
     ${row('1. Lãi ròng',r.lai,'tot')}
     ${row(`2. Lãi treo ${ten} — chưa thu · ${r.treoList.length} booking`,r.treo,'hl')}
