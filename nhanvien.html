@@ -616,9 +616,18 @@
   .addr-inline .km-wrap input:focus{outline:none}
   .addr-inline .km-wrap span{font-size:12px;font-weight:700;color:#b45309}
   /* Tiền ship (chiều đi / chiều về) trong form booking */
-  .ship-line{display:flex;align-items:center;gap:8px;margin-top:7px}
-  .ship-line .ship-lb{font-size:12.5px;font-weight:700;color:#0f766e;white-space:nowrap}
-  .ship-line input{flex:0 1 150px;min-width:0;text-align:right;font-weight:700}
+  /* Địa chỉ giao/trả gọn: hàng 1 địa chỉ, hàng 2 = km + tiền ship */
+  #bkOverlay .addr-box{padding:10px 12px !important}
+  #bkOverlay .addr-box > label{margin-bottom:6px}
+  .addr-inline input.addr-main{height:40px}
+  .addr-sub{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;margin-top:8px}
+  .addr-sub .km-wrap,.addr-sub .ship-wrap{display:flex;align-items:center;gap:4px;height:38px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px;overflow:hidden;box-sizing:border-box}
+  .addr-sub .km-wrap{height:38px !important;overflow:hidden !important;border-color:var(--line) !important}
+  .addr-sub input{border:none !important;background:transparent !important;padding:0 !important;height:100%;min-width:0;width:100%;text-align:right;font-weight:700;box-shadow:none !important}
+  .addr-sub input:focus{outline:none}
+  .addr-sub .km-wrap span{font-size:12px;font-weight:700;color:#b45309}
+  .addr-sub .ship-lb{font-size:12px;font-weight:800;color:#0f766e;white-space:nowrap}
+  .addr-sub .km-wrap:focus-within,.addr-sub .ship-wrap:focus-within{border-color:#94a3b8}
   /* Tab Tiền ship */
   .sh-h{padding:12px 16px;font-weight:700;font-size:14px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;border-left:4px solid #0f766e}
   .sh-h .sh-sum{font-size:13px;font-weight:700;color:#334155}
@@ -632,7 +641,8 @@
   .sh-kind.ve{background:#ffedd5;color:#c2410c}
   .sh-xe{display:inline-block;background:#f5f3ff;color:#6d28d9;font-weight:700;font-size:13px;padding:1px 8px;border-radius:6px;border:1px solid #ddd6fe}
   .sh-amt{font-weight:800;font-size:15px;color:#0f172a;min-width:96px;text-align:right}
-  .sh-nv{flex:0 1 220px;min-width:150px;display:flex;flex-direction:column;gap:2px}
+  .sh-nv{flex:0 1 180px;min-width:140px;display:flex;flex-direction:column;gap:2px}
+  .sh-half{flex:1 1 100%;text-align:right;font-size:12px;color:#0f766e;font-weight:700;margin-top:-4px}
   .sh-nv label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
   .sh-nv select{height:38px;padding:0 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;font-weight:600;background:#fff;width:100%}
   .sh-nv select.empty{border-color:#fca5a5;background:#fff7f7;color:#b91c1c;font-weight:500}
@@ -646,7 +656,7 @@
   #shBack{display:none}
   body.nvmode #shBack{display:inline-flex}
   body.nvmode #view-ship .card{margin-left:0;margin-right:0}
-  @media (max-width:640px){ .sh-amt{min-width:0;text-align:left} .sh-nv{flex:1 1 100%} }
+  @media (max-width:640px){ .sh-amt{min-width:0;text-align:left;flex:1 1 100%} .sh-nv{flex:1 1 calc(50% - 7px);min-width:0} .sh-half{text-align:left} }
   @media(max-width:640px){.cust-row3{grid-template-columns:1fr}.trip-row{flex-direction:column}.trip-arrow{transform:rotate(90deg)}.addr-row{grid-template-columns:1fr}}
   /* Thanh nút chi tiết booking */
   .bk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
@@ -1688,7 +1698,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </div>
       </div>
       <div class="kpis" id="shKpis" style="margin-top:12px"></div>
-      <div class="muted" style="margin-top:8px">Chiều đi tính vào ngày giao xe, chiều về tính vào ngày thu hồi. Chọn nhân viên được lãnh ở ô bên phải mỗi chuyến — tự lưu ngay.</div>
+      <div class="muted" style="margin-top:8px">Chiều đi tính vào ngày giao xe, chiều về tính vào ngày thu hồi. Mỗi chuyến ship có 2 nhân viên — chọn ở 2 ô bên phải, tiền chuyến chia đôi cho 2 người. Tự lưu ngay.</div>
     </div>
     <div class="card" style="padding:0">
       <div class="sh-h"><span>Theo nhân viên</span><span style="display:flex;align-items:center;gap:10px"><span class="sh-sum" id="shWhoSum"></span><button type="button" class="sh-add" id="shAddNv" title="Thêm nhân viên mới">＋ Thêm nhân viên</button></span></div>
@@ -2229,15 +2239,19 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <div class="addr-box"><label>📍 Địa chỉ giao xe</label>
           <div class="addr-inline">
             <input type="text" class="addr-main" id="f_daddr" list="placeList" placeholder="VD: Sân bay Nội Bài / 123 Mã Mây" autocomplete="off" data-lpignore="true" data-form-type="other">
-            <span class="km-wrap"><input type="number" id="f_dkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
           </div>
-          <div class="ship-line"><span class="ship-lb">🚚 Tiền ship chiều đi</span><input type="text" inputmode="numeric" id="f_shipD" class="ship-amt" placeholder="0đ" autocomplete="off"></div></div>
+          <div class="addr-sub">
+            <span class="km-wrap"><input type="number" id="f_dkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
+            <span class="ship-wrap" title="Tiền ship chiều đi"><span class="ship-lb">Ship đi</span><input type="text" inputmode="numeric" id="f_shipD" class="ship-amt" placeholder="0đ" autocomplete="off"></span>
+          </div></div>
         <div class="addr-box"><label>🏁 Địa chỉ trả xe</label>
           <div class="addr-inline">
             <input type="text" class="addr-main" id="f_raddr" list="placeList" placeholder="VD: Cửa hàng / Khách sạn ..." autocomplete="off" data-lpignore="true" data-form-type="other">
-            <span class="km-wrap"><input type="number" id="f_rkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
           </div>
-          <div class="ship-line"><span class="ship-lb">🚚 Tiền ship chiều về</span><input type="text" inputmode="numeric" id="f_shipR" class="ship-amt" placeholder="0đ" autocomplete="off"></div></div>
+          <div class="addr-sub">
+            <span class="km-wrap"><input type="number" id="f_rkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
+            <span class="ship-wrap" title="Tiền ship chiều về"><span class="ship-lb">Ship về</span><input type="text" inputmode="numeric" id="f_shipR" class="ship-amt" placeholder="0đ" autocomplete="off"></span>
+          </div></div>
       </div>
       <datalist id="placeList"></datalist>
       <div class="muted" style="font-size:12px;margin-top:6px">💡 Nhập địa chỉ kèm số km một lần, hệ thống sẽ tự nhớ và gợi ý km cho những lần sau.</div>
@@ -2684,7 +2698,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-03-tienship2';
+const BAN_APP = '2026-11-03-ship2nv';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4788,8 +4802,8 @@ function shipTrips(F,T){
   const out=[];
   (DB.bookings||[]).forEach(b=>{
     if(!b.ship) return;
-    if(shipAmt(b,'d')>0 && b.arrive>=F && b.arrive<=T) out.push({b,k:'d',date:b.arrive,time:planDtime(b)||b.dtime||'08:00',addr:b.daddr||'',amt:shipAmt(b,'d'),nv:(b.ship.dn||'').trim()});
-    if(shipAmt(b,'r')>0 && b.depart>=F && b.depart<=T) out.push({b,k:'r',date:b.depart,time:planRtime(b)||b.rtime||'12:00',addr:b.raddr||'',amt:shipAmt(b,'r'),nv:(b.ship.rn||'').trim()});
+    if(shipAmt(b,'d')>0 && b.arrive>=F && b.arrive<=T) out.push({b,k:'d',date:b.arrive,time:planDtime(b)||b.dtime||'08:00',addr:b.daddr||'',amt:shipAmt(b,'d'),nv:(b.ship.dn||'').trim(),nv2:(b.ship.dn2||'').trim()});
+    if(shipAmt(b,'r')>0 && b.depart>=F && b.depart<=T) out.push({b,k:'r',date:b.depart,time:planRtime(b)||b.rtime||'12:00',addr:b.raddr||'',amt:shipAmt(b,'r'),nv:(b.ship.rn||'').trim(),nv2:(b.ship.rn2||'').trim()});
   });
   return out.sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)||String(x.b.xe).localeCompare(String(y.b.xe)));
 }
@@ -4801,14 +4815,15 @@ function renderShip(){
   const tr=shipTrips(F,T);
   const sum=a=>a.reduce((s,x)=>s+x.amt,0);
   const tot=sum(tr), totD=sum(tr.filter(x=>x.k==='d')), totR=sum(tr.filter(x=>x.k==='r'));
-  const noName=tr.filter(x=>!x.nv);
+  const noName=tr.filter(x=>!x.nv||!x.nv2);   // ship luôn 2 người → thiếu 1 ô là chưa đủ
   document.getElementById('shKpis').innerHTML=`
     ${kpi('Tổng tiền ship',money(tot)+' <small class="muted">· '+tr.length+' chuyến</small>')}
     ${kpi('Chiều đi (giao xe)',money(totD))}
     ${kpi('Chiều về (thu hồi)',money(totR))}
-    ${kpi('Chưa ghi nhân viên',money(sum(noName))+' <small class="muted">· '+noName.length+' chuyến</small>',noName.length?'neg':'')}`;
+    ${kpi('Chưa đủ 2 nhân viên',money(sum(noName))+' <small class="muted">· '+noName.length+' chuyến</small>',noName.length?'neg':'')}`;
   // theo nhân viên
-  const staff=shipStaff(), by={}; staff.forEach(n=>by[n]={n:0,d:0,r:0}); tr.forEach(x=>{ const key=x.nv||''; const o=by[key]||(by[key]={n:0,d:0,r:0}); o.n++; o[x.k]+=x.amt; });
+  const staff=shipStaff(), by={}; staff.forEach(n=>by[n]={n:0,d:0,r:0}); tr.forEach(x=>{ const ns=[x.nv,x.nv2].filter(Boolean); const ks=ns.length?ns:[''];
+    ks.forEach(key=>{ const o=by[key]||(by[key]={n:0,d:0,r:0}); o.n++; o[x.k]+=x.amt/ks.length; }); });   // 2 người → mỗi người 1/2 tiền chuyến
   const keys=Object.keys(by).filter(k=>k||by[k].n).sort((a,b)=>(a===''?1:0)-(b===''?1:0)||((by[b].d+by[b].r)-(by[a].d+by[a].r))||(staff.indexOf(a)-staff.indexOf(b)));
   document.getElementById('shWho').innerHTML=keys.length?keys.map(k=>{const o=by[k];
     return `<div class="w${k?(o.n?'':' zero'):' none'}">${k?esc(k):'Chưa ghi tên'}<b>${money(o.d+o.r)}</b><span class="muted">${o.n} chuyến · đi ${money(o.d)} · về ${money(o.r)}</span></div>`;}).join('')
@@ -4823,7 +4838,9 @@ function renderShip(){
     h+=`<div class="sh-row"><div class="sh-info" data-id="${x.b.id}"><div class="sh-l1"><b>${x.time}</b><span class="sh-kind ${x.k==='d'?'di':'ve'}">${x.k==='d'?'CHIỀU ĐI · GIAO':'CHIỀU VỀ · THU HỒI'}</span><span class="sh-xe">${esc(x.b.xe)}</span>${g.name?'<span>'+esc(g.name)+'</span>':''}</div>`
       +`<div class="sh-l2">${x.addr?esc(x.addr):'—'}</div></div>`
       +`<div class="sh-amt">${money(x.amt)}</div>`
-      +`<div class="sh-nv"><label>Nhân viên lãnh</label><select class="sh-nvin${x.nv?'':' empty'}" data-id="${x.b.id}" data-k="${x.k}"><option value="">— Chọn nhân viên —</option>${(staff.includes(x.nv)||!x.nv?staff:staff.concat([x.nv])).map(n=>`<option${n===x.nv?' selected':''}>${esc(n)}</option>`).join('')}<option value="__add">＋ Thêm nhân viên mới…</option></select></div></div>`;
+      +[['nv','1'],['nv2','2']].map(([f,s])=>{ const cur=x[f];
+        return `<div class="sh-nv"><label>Nhân viên ${s}</label><select class="sh-nvin${cur?'':' empty'}" data-id="${x.b.id}" data-k="${x.k}" data-s="${s}"><option value="">— Chọn nhân viên —</option>${(staff.includes(cur)||!cur?staff:staff.concat([cur])).map(n=>`<option${n===cur?' selected':''}>${esc(n)}</option>`).join('')}<option value="__add">＋ Thêm nhân viên mới…</option></select></div>`; }).join('')
+      +(x.nv&&x.nv2?`<div class="sh-half">mỗi người ${money(x.amt/2)}</div>`:'')+`</div>`;
   });
   document.getElementById('shList').innerHTML=h||'<div class="sh-empty">Không có chuyến nào có tiền ship trong khoảng này. Nhập tiền ship ở mục “Địa chỉ giao &amp; trả” trong booking.</div>';
   const isNv=typeof nvMode!=='undefined'&&nvMode;
@@ -4831,12 +4848,13 @@ function renderShip(){
   document.querySelectorAll('#shList .sh-nvin').forEach(inp=>{
     inp.onchange=()=>{
       const b=(DB.bookings||[]).find(z=>z.id===inp.dataset.id); if(!b||!b.ship) return;
-      let v=inp.value.trim(); const key=inp.dataset.k==='d'?'dn':'rn';
+      let v=inp.value.trim(); const key=(inp.dataset.k==='d'?'dn':'rn')+(inp.dataset.s==='2'?'2':''), other=(inp.dataset.k==='d'?'dn':'rn')+(inp.dataset.s==='2'?'':'2');
       if(v==='__add'){
         const n0=shipStaff().length; shipAddStaff();
         const l=shipStaff(); if(l.length===n0){ renderShip(); return; }
         v=l[l.length-1];
       }
+      if(v && b.ship[other]===v){ alert('“'+v+'” đã được chọn ở ô nhân viên còn lại.'); renderShip(); return; }
       if(v) b.ship[key]=v; else delete b.ship[key];
       try{ save(); }catch(e){ console.warn(e); }
       setTimeout(()=>{ try{ renderShip(); }catch(e){} },0);
@@ -5435,8 +5453,8 @@ function readShip(old){ old=old||{};
   const n=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''))||0;
   const d=n('f_shipD'), r=n('f_shipR'), o={};
   if(d) o.d=d; if(r) o.r=r;
-  if(old.dn) o.dn=old.dn; if(old.rn) o.rn=old.rn;   // giữ tên nhân viên đã ghi ở tab Tiền ship
-  return (d||r||o.dn||o.rn)?o:undefined; }
+  ['dn','dn2','rn','rn2'].forEach(k=>{ if(old[k]) o[k]=old[k]; });   // giữ tên nhân viên đã ghi ở tab Tiền ship
+  return (d||r||o.dn||o.dn2||o.rn||o.rn2)?o:undefined; }
 ['f_shipD','f_shipR'].forEach(id=>document.getElementById(id).addEventListener('input',function(){const n=parseInt(this.value.replace(/[^\d]/g,''))||0;this.value=n?n.toLocaleString('en-US')+'đ':'';}));
 document.getElementById('f_depAmt').addEventListener('input',function(){const n=parseInt(this.value.replace(/[^\d]/g,''))||0;this.value=n?n.toLocaleString('en-US')+'đ':'';});
 function escNote(t){return String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
