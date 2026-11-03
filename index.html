@@ -611,10 +611,42 @@
   .guest-hint.dup{background:#fef3c7;border:1px solid #fcd34d;color:#b45309}
   .addr-inline{display:flex;gap:8px;align-items:center}
   .addr-inline input.addr-main{flex:1 1 auto;min-width:0}
-  .addr-inline .km-wrap{flex:0 0 108px;display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px}
+  .addr-inline .km-wrap{flex:0 0 108px;display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px;height:auto;overflow:visible}
   .addr-inline .km-wrap input{border:none;padding:6px 0;text-align:right;width:100%}
   .addr-inline .km-wrap input:focus{outline:none}
   .addr-inline .km-wrap span{font-size:12px;font-weight:700;color:#b45309}
+  /* Tiền ship (chiều đi / chiều về) trong form booking */
+  .ship-line{display:flex;align-items:center;gap:8px;margin-top:7px}
+  .ship-line .ship-lb{font-size:12.5px;font-weight:700;color:#0f766e;white-space:nowrap}
+  .ship-line input{flex:0 1 150px;min-width:0;text-align:right;font-weight:700}
+  /* Tab Tiền ship */
+  .sh-h{padding:12px 16px;font-weight:700;font-size:14px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:#f8fafc;border-left:4px solid #0f766e}
+  .sh-h .sh-sum{font-size:13px;font-weight:700;color:#334155}
+  .sh-day{padding:7px 16px;background:#f1f5f9;font-size:12.5px;font-weight:700;color:#475569;border-bottom:1px solid #e2e8f0}
+  .sh-row{display:flex;align-items:center;gap:10px 14px;padding:10px 16px;border-bottom:1px solid #eef2f7;flex-wrap:wrap}
+  .sh-row .sh-info{flex:1 1 260px;min-width:0;cursor:pointer}
+  .sh-row .sh-l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+  .sh-row .sh-l2{font-size:12.5px;color:#64748b;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sh-kind{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.02em}
+  .sh-kind.di{background:#dbeafe;color:#1d4ed8}
+  .sh-kind.ve{background:#ffedd5;color:#c2410c}
+  .sh-xe{display:inline-block;background:#f5f3ff;color:#6d28d9;font-weight:700;font-size:13px;padding:1px 8px;border-radius:6px;border:1px solid #ddd6fe}
+  .sh-amt{font-weight:800;font-size:15px;color:#0f172a;min-width:96px;text-align:right}
+  .sh-nv{flex:0 1 220px;min-width:150px;display:flex;flex-direction:column;gap:2px}
+  .sh-nv label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+  .sh-nv select{height:38px;padding:0 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;font-weight:600;background:#fff;width:100%}
+  .sh-nv select.empty{border-color:#fca5a5;background:#fff7f7;color:#b91c1c;font-weight:500}
+  button.sh-add{height:32px;padding:0 12px;border-radius:8px;border:1px solid #0f766e;background:#f0fdfa;color:#0f766e;font-weight:800;font-size:13px;cursor:pointer}
+  .sh-who .w.zero{opacity:.55}
+  .sh-empty{padding:16px;color:#64748b}
+  .sh-who{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
+  .sh-who .w{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;font-size:13px}
+  .sh-who .w b{display:block;font-size:15px;color:#0f172a}
+  .sh-who .w.none{border-color:#fecaca;background:#fff7f7}
+  #shBack{display:none}
+  body.nvmode #shBack{display:inline-flex}
+  body.nvmode #view-ship .card{margin-left:0;margin-right:0}
+  @media (max-width:640px){ .sh-amt{min-width:0;text-align:left} .sh-nv{flex:1 1 100%} }
   @media(max-width:640px){.cust-row3{grid-template-columns:1fr}.trip-row{flex-direction:column}.trip-arrow{transform:rotate(90deg)}.addr-row{grid-template-columns:1fr}}
   /* Thanh nút chi tiết booking */
   .bk-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
@@ -921,6 +953,9 @@
 .lt-nb{height:40px;min-width:40px;padding:0 12px;border-radius:10px;border:1px solid var(--lt-line);background:#fff;font-weight:700;font-size:14px;color:var(--lt-text2);cursor:pointer}
 .lt-nb.on{background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)}
 .lt-nav input[type=date]{height:40px;border-radius:10px;border:1px solid var(--lt-line);padding:0 8px;font-size:14px}
+.lt-ship{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 10px;border-radius:8px;background:#ccfbf1;color:#115e59;font-weight:800;font-size:13.5px}
+.lt-now .lt-ship{margin:10px 0 0;align-self:flex-start;background:#134e4a;color:#99f6e4}
+.lt-shipbtn{margin-left:auto;height:36px;padding:0 12px;border:1px solid var(--lt-line,#e4e7ec);border-radius:10px;background:#fff;font-weight:700;font-size:13.5px;color:#115e59;cursor:pointer}
 .lt-seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;background:var(--lt-chip);padding:4px;border-radius:12px}
 .lt-seg button{height:42px;border:0;border-radius:9px;background:transparent;font-weight:600;color:var(--lt-text2);font-size:15px;cursor:pointer}
 .lt-seg button.on{background:#fff;color:var(--lt-text);font-weight:800;box-shadow:0 1px 2px rgba(16,24,40,.12)}
@@ -1570,6 +1605,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
   <button class="tab" data-t="coc">Tiền cọc</button>
+  <button class="tab" data-t="ship">Tiền ship</button>
   <button class="tab" data-t="baoduong">Bảo dưỡng</button>
   <button class="tab admin-toggle" id="accToggle">🔒 Kế toán</button>
   <span class="tab-group" id="accGroupLabel" style="display:none">📊 Kế toán</span>
@@ -1633,6 +1669,35 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <!-- LỊCH TRÌNH (điện thoại, nhân viên) -->
   <section class="view" id="view-lichtrinh" style="display:none">
     <div class="lt-wrap" id="ltApp"></div>
+  </section>
+
+  <!-- TIỀN SHIP -->
+  <section class="view" id="view-ship" style="display:none">
+    <div class="card">
+      <div class="row">
+        <button class="coc-btn" id="shBack">← Lịch trình</button>
+        <h2 style="margin:0">Tiền ship</h2>
+        <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button class="coc-btn" id="shPrev">◀</button>
+          <span class="muted">Từ</span><input type="date" id="shFrom">
+          <span class="muted">đến</span><input type="date" id="shTo">
+          <button class="coc-btn" id="shNext">▶</button>
+          <button class="coc-btn" id="shToday">Hôm nay</button>
+          <button class="coc-btn" id="shWeek">7 ngày qua</button>
+          <button class="coc-btn" id="shMonth">Tháng này</button>
+        </div>
+      </div>
+      <div class="kpis" id="shKpis" style="margin-top:12px"></div>
+      <div class="muted" style="margin-top:8px">Chiều đi tính vào ngày giao xe, chiều về tính vào ngày thu hồi. Chọn nhân viên được lãnh ở ô bên phải mỗi chuyến — tự lưu ngay.</div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="sh-h"><span>Theo nhân viên</span><span style="display:flex;align-items:center;gap:10px"><span class="sh-sum" id="shWhoSum"></span><button type="button" class="sh-add" id="shAddNv" title="Thêm nhân viên mới">＋ Thêm nhân viên</button></span></div>
+      <div class="sh-who" id="shWho"></div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="sh-h" id="shHList"></div>
+      <div id="shList"></div>
+    </div>
   </section>
 
   <!-- TIỀN CỌC -->
@@ -2165,12 +2230,14 @@ body.gb-shell #tabs .tab.gb-more{display:none}
           <div class="addr-inline">
             <input type="text" class="addr-main" id="f_daddr" list="placeList" placeholder="VD: Sân bay Nội Bài / 123 Mã Mây" autocomplete="off" data-lpignore="true" data-form-type="other">
             <span class="km-wrap"><input type="number" id="f_dkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
-          </div></div>
+          </div>
+          <div class="ship-line"><span class="ship-lb">🚚 Tiền ship chiều đi</span><input type="text" inputmode="numeric" id="f_shipD" class="ship-amt" placeholder="0đ" autocomplete="off"></div></div>
         <div class="addr-box"><label>🏁 Địa chỉ trả xe</label>
           <div class="addr-inline">
             <input type="text" class="addr-main" id="f_raddr" list="placeList" placeholder="VD: Cửa hàng / Khách sạn ..." autocomplete="off" data-lpignore="true" data-form-type="other">
             <span class="km-wrap"><input type="number" id="f_rkm" min="0" step="0.5" placeholder="0"><span>km</span></span>
-          </div></div>
+          </div>
+          <div class="ship-line"><span class="ship-lb">🚚 Tiền ship chiều về</span><input type="text" inputmode="numeric" id="f_shipR" class="ship-amt" placeholder="0đ" autocomplete="off"></div></div>
       </div>
       <datalist id="placeList"></datalist>
       <div class="muted" style="font-size:12px;margin-top:6px">💡 Nhập địa chỉ kèm số km một lần, hệ thống sẽ tự nhớ và gợi ý km cho những lần sau.</div>
@@ -2617,7 +2684,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-03-boklara';
+const BAN_APP = '2026-11-03-tienship2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3206,7 +3273,7 @@ const ACC_TABS=['revenue','chi','profit','funds','assets','phantich','websync'];
 const OP_TABS=[];
 const ADMIN_TABS=ACC_TABS.concat(OP_TABS);
 function switchTab(t){
-  if(typeof nvMode!=='undefined' && nvMode && t!=='lichtrinh') t='lichtrinh';   // app nhân viên: chỉ có Lịch trình
+  if(typeof nvMode!=='undefined' && nvMode && t!=='lichtrinh' && t!=='ship') t='lichtrinh';   // app nhân viên: chỉ có Lịch trình + Tiền ship
   if(ACC_TABS.includes(t) && !accUnlocked){pendingTab=t;openAdmin('acc');return;}
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
   document.querySelectorAll('.view').forEach(v=>v.style.display='none');
@@ -3214,6 +3281,7 @@ function switchTab(t){
   document.documentElement.classList.toggle('kh-on', t==='kehoach');   // Kế hoạch: cho cột phải dính khi cuộn trang
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
+  if(t==='ship'){ shipFrom=todayStr(); shipTo=todayStr(); renderShip(); }
   if(t==='baoduong'){ try{ renderBaoDuong(true); }catch(e){ console.warn('renderBaoDuong',e); } }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
   if(t==='lichtrinh'){ try{ renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); } }
@@ -3654,7 +3722,7 @@ function renderAll(){
   normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
   const label=monthLabel(curMonth);
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
-  renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
+  renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}try{renderShip();}catch(e){console.warn('renderShip',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
   try{ renderBaoDuong(); }catch(e){ console.warn('renderBaoDuong',e); }
   try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
@@ -4703,6 +4771,88 @@ document.getElementById('cocNext').onclick=()=>{const n=Math.round((new Date(coc
 document.getElementById('cocToday').onclick=()=>cocSet(todayStr(),todayStr());
 document.getElementById('cocTomorrow').onclick=()=>{const d=addDays(todayStr(),1);cocSet(d,d);};
 document.getElementById('cocWeek').onclick=()=>cocSet(todayStr(),addDays(todayStr(),6));
+/* ====== TIỀN SHIP: thống kê theo chuyến + theo nhân viên ====== */
+let shipFrom=todayStr(), shipTo=todayStr();
+const SHIP_NV_MAC_DINH=['Lâm','Tuấn Anh','Tùng'];
+function shipStaff(){ const l=Array.isArray(DB.shipStaff)&&DB.shipStaff.length?DB.shipStaff:SHIP_NV_MAC_DINH; return l.map(x=>String(x).trim()).filter(Boolean); }
+function shipAddStaff(){
+  const v=(prompt('Tên nhân viên mới:')||'').trim().replace(/\s+/g,' ');
+  if(!v) return;
+  const l=shipStaff();
+  if(l.some(x=>x.toLowerCase()===v.toLowerCase())){ alert('Đã có nhân viên “'+v+'” trong danh sách.'); return; }
+  DB.shipStaff=l.concat([v]);
+  try{ save(); }catch(e){ console.warn(e); }
+  renderShip();
+}
+function shipTrips(F,T){
+  const out=[];
+  (DB.bookings||[]).forEach(b=>{
+    if(!b.ship) return;
+    if(shipAmt(b,'d')>0 && b.arrive>=F && b.arrive<=T) out.push({b,k:'d',date:b.arrive,time:planDtime(b)||b.dtime||'08:00',addr:b.daddr||'',amt:shipAmt(b,'d'),nv:(b.ship.dn||'').trim()});
+    if(shipAmt(b,'r')>0 && b.depart>=F && b.depart<=T) out.push({b,k:'r',date:b.depart,time:planRtime(b)||b.rtime||'12:00',addr:b.raddr||'',amt:shipAmt(b,'r'),nv:(b.ship.rn||'').trim()});
+  });
+  return out.sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)||String(x.b.xe).localeCompare(String(y.b.xe)));
+}
+function renderShip(){
+  const F=shipFrom, T=shipTo<shipFrom?shipFrom:shipTo;
+  const ae=document.activeElement;
+  document.getElementById('shFrom').value=F; document.getElementById('shTo').value=T;
+  const money=n=>fmtVND(n)+'đ', esc=escNote;
+  const tr=shipTrips(F,T);
+  const sum=a=>a.reduce((s,x)=>s+x.amt,0);
+  const tot=sum(tr), totD=sum(tr.filter(x=>x.k==='d')), totR=sum(tr.filter(x=>x.k==='r'));
+  const noName=tr.filter(x=>!x.nv);
+  document.getElementById('shKpis').innerHTML=`
+    ${kpi('Tổng tiền ship',money(tot)+' <small class="muted">· '+tr.length+' chuyến</small>')}
+    ${kpi('Chiều đi (giao xe)',money(totD))}
+    ${kpi('Chiều về (thu hồi)',money(totR))}
+    ${kpi('Chưa ghi nhân viên',money(sum(noName))+' <small class="muted">· '+noName.length+' chuyến</small>',noName.length?'neg':'')}`;
+  // theo nhân viên
+  const staff=shipStaff(), by={}; staff.forEach(n=>by[n]={n:0,d:0,r:0}); tr.forEach(x=>{ const key=x.nv||''; const o=by[key]||(by[key]={n:0,d:0,r:0}); o.n++; o[x.k]+=x.amt; });
+  const keys=Object.keys(by).filter(k=>k||by[k].n).sort((a,b)=>(a===''?1:0)-(b===''?1:0)||((by[b].d+by[b].r)-(by[a].d+by[a].r))||(staff.indexOf(a)-staff.indexOf(b)));
+  document.getElementById('shWho').innerHTML=keys.length?keys.map(k=>{const o=by[k];
+    return `<div class="w${k?(o.n?'':' zero'):' none'}">${k?esc(k):'Chưa ghi tên'}<b>${money(o.d+o.r)}</b><span class="muted">${o.n} chuyến · đi ${money(o.d)} · về ${money(o.r)}</span></div>`;}).join('')
+    :'<div class="muted">Chưa có tiền ship trong khoảng này.</div>';
+  document.getElementById('shWhoSum').textContent=keys.filter(k=>k&&by[k].n).length+'/'+keys.filter(Boolean).length+' nhân viên có chuyến';
+  // danh sách chuyến
+  document.getElementById('shHList').innerHTML=`<span>Các chuyến có tiền ship · ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}</span><span class="sh-sum">${tr.length} chuyến · ${money(tot)}</span>`;
+  let last='', h='';
+  tr.forEach((x,i)=>{
+    if(x.date!==last){ last=x.date; h+=`<div class="sh-day">${dow(x.date)}, ${fmtDMY(x.date)}</div>`; }
+    const g=splitGuest(x.b.guest||'');
+    h+=`<div class="sh-row"><div class="sh-info" data-id="${x.b.id}"><div class="sh-l1"><b>${x.time}</b><span class="sh-kind ${x.k==='d'?'di':'ve'}">${x.k==='d'?'CHIỀU ĐI · GIAO':'CHIỀU VỀ · THU HỒI'}</span><span class="sh-xe">${esc(x.b.xe)}</span>${g.name?'<span>'+esc(g.name)+'</span>':''}</div>`
+      +`<div class="sh-l2">${x.addr?esc(x.addr):'—'}</div></div>`
+      +`<div class="sh-amt">${money(x.amt)}</div>`
+      +`<div class="sh-nv"><label>Nhân viên lãnh</label><select class="sh-nvin${x.nv?'':' empty'}" data-id="${x.b.id}" data-k="${x.k}"><option value="">— Chọn nhân viên —</option>${(staff.includes(x.nv)||!x.nv?staff:staff.concat([x.nv])).map(n=>`<option${n===x.nv?' selected':''}>${esc(n)}</option>`).join('')}<option value="__add">＋ Thêm nhân viên mới…</option></select></div></div>`;
+  });
+  document.getElementById('shList').innerHTML=h||'<div class="sh-empty">Không có chuyến nào có tiền ship trong khoảng này. Nhập tiền ship ở mục “Địa chỉ giao &amp; trả” trong booking.</div>';
+  const isNv=typeof nvMode!=='undefined'&&nvMode;
+  document.querySelectorAll('#shList .sh-info').forEach(r=>r.onclick=()=>{ if(!isNv) openBooking(r.dataset.id); });
+  document.querySelectorAll('#shList .sh-nvin').forEach(inp=>{
+    inp.onchange=()=>{
+      const b=(DB.bookings||[]).find(z=>z.id===inp.dataset.id); if(!b||!b.ship) return;
+      let v=inp.value.trim(); const key=inp.dataset.k==='d'?'dn':'rn';
+      if(v==='__add'){
+        const n0=shipStaff().length; shipAddStaff();
+        const l=shipStaff(); if(l.length===n0){ renderShip(); return; }
+        v=l[l.length-1];
+      }
+      if(v) b.ship[key]=v; else delete b.ship[key];
+      try{ save(); }catch(e){ console.warn(e); }
+      setTimeout(()=>{ try{ renderShip(); }catch(e){} },0);
+    };
+  });
+}
+function shipSet(f,t){shipFrom=f;shipTo=t<f?f:t;renderShip();}
+document.getElementById('shFrom').onchange=e=>{if(e.target.value)shipSet(e.target.value,shipTo<e.target.value?e.target.value:shipTo);};
+document.getElementById('shTo').onchange=e=>{if(e.target.value)shipSet(shipFrom>e.target.value?e.target.value:shipFrom,e.target.value);};
+document.getElementById('shPrev').onclick=()=>{const n=Math.round((new Date(shipTo)-new Date(shipFrom))/864e5)+1;shipSet(addDays(shipFrom,-n),addDays(shipTo,-n));};
+document.getElementById('shNext').onclick=()=>{const n=Math.round((new Date(shipTo)-new Date(shipFrom))/864e5)+1;shipSet(addDays(shipFrom,n),addDays(shipTo,n));};
+document.getElementById('shToday').onclick=()=>shipSet(todayStr(),todayStr());
+document.getElementById('shWeek').onclick=()=>shipSet(addDays(todayStr(),-6),todayStr());
+document.getElementById('shMonth').onclick=()=>{const t=todayStr();shipSet(t.slice(0,8)+'01',t);};
+document.getElementById('shBack').onclick=()=>switchTab('lichtrinh');
+document.getElementById('shAddNv').onclick=shipAddStaff;
 function renderSchedule(){
   const picker=document.getElementById('schDate');
   if(picker.value!==schDate)picker.value=schDate;
@@ -5163,7 +5313,7 @@ function openBooking(id,prefill,schedKind){
     f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}f('resaddr',b.resaddr||'');
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
-    setDeposit(b.deposit);
+    setDeposit(b.deposit); setShip(b.ship);
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
     if(grp){ document.getElementById('f_debtCo').value=b.src; }
     renderDayPrices(b.prices||null, b.commissions||null);
@@ -5175,7 +5325,7 @@ function openBooking(id,prefill,schedKind){
     f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime',(prefill&&prefill.dtime)||'08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
-    setDeposit(null);
+    setDeposit(null); setShip(null);
     onSrcChange();
     renderDayPrices(null);
     del.style.display='none';
@@ -5277,6 +5427,17 @@ function readDeposit(){ const a=parseInt((document.getElementById('f_depAmt').va
   const note=(document.getElementById('f_depNote').value||'').trim();
   if(!a && !note) return undefined;
   return {amount:a, method:document.getElementById('f_depMethod').value, note}; }
+/* ===== Tiền ship: booking.ship = {d: chiều đi, r: chiều về, dn/rn: tên nhân viên lãnh} ===== */
+function shipAmt(b,k){ return (b&&b.ship&&(+b.ship[k]||0))||0; }
+function setShip(s){ s=s||{};
+  ['d','r'].forEach(k=>{ const a=+s[k]||0; document.getElementById(k==='d'?'f_shipD':'f_shipR').value=a?a.toLocaleString('en-US')+'đ':''; }); }
+function readShip(old){ old=old||{};
+  const n=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''))||0;
+  const d=n('f_shipD'), r=n('f_shipR'), o={};
+  if(d) o.d=d; if(r) o.r=r;
+  if(old.dn) o.dn=old.dn; if(old.rn) o.rn=old.rn;   // giữ tên nhân viên đã ghi ở tab Tiền ship
+  return (d||r||o.dn||o.rn)?o:undefined; }
+['f_shipD','f_shipR'].forEach(id=>document.getElementById(id).addEventListener('input',function(){const n=parseInt(this.value.replace(/[^\d]/g,''))||0;this.value=n?n.toLocaleString('en-US')+'đ':'';}));
 document.getElementById('f_depAmt').addEventListener('input',function(){const n=parseInt(this.value.replace(/[^\d]/g,''))||0;this.value=n?n.toLocaleString('en-US')+'đ':'';});
 function escNote(t){return String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderBkPayments(){
@@ -5381,7 +5542,7 @@ document.getElementById('bkSave').onclick=()=>{
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
   rememberPlace(f('daddr'),f('dkm')); rememberPlace(f('raddr'),f('rkm'));   // tự nhớ địa điểm + km cho lần sau
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote'),deposit:readDeposit()};
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote'),deposit:readDeposit(),ship:readShip(editingBk?((DB.bookings.find(x=>x.id===editingBk)||{}).ship):null)};
   if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
     // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
@@ -8132,7 +8293,7 @@ function renderLichTrinh(){
   if (!runDate) runDate = todayStr();
   ltCtx = 'run'; ltDate = runDate;
   const all = ltSyncAndOrder(), today = todayStr(), tmr = ltAddDays(today, 1);
-  app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div>' + (nvMode ? pushBtnHtml() : '') + '</div>'
+  app.innerHTML = '<div class="lt-top"><div class="lt-title">Lịch trình<div class="lt-sub" style="font-weight:500;letter-spacing:0">' + ltDayLabel(runDate) + '</div></div>' + (nvMode ? pushBtnHtml() : '') + '<button class="lt-shipbtn" onclick="switchTab(\'ship\')">🚚 Tiền ship</button></div>'
     + '<div class="lt-seg"><button class="' + (runDate === today ? 'on' : '') + '" data-lt="day" data-v="' + today + '">Hôm nay</button><button class="' + (runDate === tmr ? 'on' : '') + '" data-lt="day" data-v="' + tmr + '">Ngày mai</button></div>'
     + ltMsgHtml() + ltRunView(all);
   ltTick();
@@ -8507,7 +8668,8 @@ function ltCardInfo(id){
   const kc = grp ? 'grp' : (c.kind === 'thu' ? 'thu' : 'giao');   // giao + phát sinh cùng màu giao
   const kLab = grp ? c.label : (c.kind === 'thu' ? 'Thu hồi' : (c.kind === 'ps' ? 'Giao phát sinh' : 'Giao xe'));
   const wLab = sh ? (c.kind === 'thu' ? 'NHẬN XE TẠI' : 'GIAO XE TẠI') : (grp ? 'ĐỊA ĐIỂM' : (c.kind === 'thu' ? 'ĐI LẤY XE VỀ TỪ' : 'MANG XE ĐẾN'));
-  return { c, grp, mem, sh, phone, gname, payX, late, plates, finLab, where, sub, notes: ltNotesOf(c), tmId, kc, kLab, wLab };
+  const ship = mem.reduce((s, x) => { const bb = bkOf(x); return s + (bb ? shipAmt(bb, x.kind === 'thu' ? 'r' : 'd') : 0); }, 0);
+  return { c, grp, mem, sh, phone, gname, payX, late, plates, finLab, where, sub, notes: ltNotesOf(c), tmId, kc, kLab, wLab, ship };
 }
 const LT_KIC = {
   giao: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
@@ -8516,6 +8678,7 @@ const LT_KIC = {
 const ltKPill = k => '<span class="lt-kp k-' + k.kc + '">' + LT_KIC[k.kc] + ltEsc(k.kLab) + '</span>';
 const ltCallBtn = (k, cls) => k.phone ? '<a class="' + cls + '" href="tel:' + ltEsc(k.phone) + '" aria-label="Gọi ' + ltEsc(k.gname || 'khách') + '">' + LT_PHONE + '<span>Gọi</span></a>'
   : '<span class="' + cls + ' off" title="Booking chưa có số điện thoại">' + LT_PHONE + '<span>Không SĐT</span></span>';
+const ltShipHtml = k => k.ship > 0 ? '<div class="lt-ship">🚚 Tiền ship ' + (k.c.kind === 'thu' ? 'chiều về' : (k.grp ? '' : 'chiều đi')) + ': ' + fmtVND(k.ship) + 'đ</div>' : '';
 const ltGSteps = k => k.grp ? '<div class="lt-gsteps">' + k.mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (ltBien(x.xe) ? ' (' + ltEsc(ltBien(x.xe)) + ')' : '') + (k.c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span class="ok">xong</span>' : '') + '</div>').join('') + '</div>' : '';
 // thẻ đơn đang làm (nền đen)
 function ltCurCard(id, lk){
@@ -8528,6 +8691,7 @@ function ltCurCard(id, lk){
     + (k.plates.length ? '<div class="lt-nowplate">' + k.plates.map(ltEsc).join(' · ') + '</div>' : '') + '</div>'
     + '<div class="lt-nowaddr' + (k.sh ? ' shop' : '') + '">' + (k.sh ? LT_SHOP.replace('width="14" height="14"', 'width="18" height="18"') : '') + ltEsc(k.where) + '</div>'
     + (k.sub ? '<div class="lt-nowsub">' + ltEsc(k.sub) + '</div>' : '')
+    + ltShipHtml(k)
     + ltAlertHtml(ltAlerts(c))
     + ltGSteps(k)
     + (k.notes.length ? '<div class="lt-nownote"><div class="lab">' + LT_NOTE_IC + 'GHI CHÚ</div>' + k.notes.map(n => '<div>' + ltEsc(n) + '</div>').join('') + '</div>' : '')
@@ -8545,7 +8709,7 @@ function ltRunCard(id, lk){
     + (k.plates.length ? '<span class="lt-plate">' + k.plates.map(ltEsc).join(' · ') + '</span>' : '')
     + (k.late ? '<span class="lt-al red sm" style="margin-left:0">Quá giờ</span>' : '') + '</div>'
     + (k.sh ? '<span class="lt-shopchip" style="margin-top:4px">' + LT_SHOP + ltEsc(k.where) + '</span>' : '<div style="font-size:14.5px;font-weight:600;color:var(--lt-text);margin-top:4px">' + ltEsc(k.where) + '</div>')
-    + (k.sub ? '<div style="font-size:12.5px;color:var(--lt-muted);margin-top:1px">' + ltEsc(k.sub) + '</div>' : '') + '</div>'
+    + (k.sub ? '<div style="font-size:12.5px;color:var(--lt-muted);margin-top:1px">' + ltEsc(k.sub) + '</div>' : '') + ltShipHtml(k) + '</div>'
     + ltCallBtn(k, 'lt-call') + '</div>'
     + ltGSteps(k)
     + (k.notes.length ? '<div class="lt-wnote">' + LT_NOTE_IC + '<span>' + k.notes.map(ltEsc).join('<br>') + '</span></div>' : '')
