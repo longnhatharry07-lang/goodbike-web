@@ -551,15 +551,16 @@
   .coc-tbl tr.coc-day td{background:#f8fafc;font-weight:700;color:#475569;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
   .coc-pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
   .pay-block-h{background:linear-gradient(90deg,#f8fafc,#F9FAFB);font-weight:800;font-size:13px;color:#0f172a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-  .donggia{margin:4px 14px 8px;padding:10px 12px;border:1px dashed #F58B41;border-radius:10px;background:#FFF8F2}
+  .donggia{margin:4px 14px 8px;padding:10px 12px;border:1px solid #E4E7EC;border-radius:10px;background:#F9FAFB}
   .donggia .dg-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .donggia .dg-lb{font-weight:800;font-size:13.5px;color:#C4320A;white-space:nowrap}
-  .donggia #f_dgVal{flex:1 1 120px;min-width:0;height:36px;padding:0 10px;border:1px solid #F7B27A;border-radius:8px;font-size:15px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
-  .donggia .dg-apply{height:36px;padding:0 12px;border:0;border-radius:8px;background:#F58B41;color:#fff;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
-  .donggia .dg-apply:hover{background:#E57A2E}
-  .donggia .dg-chips{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;font-size:12px;color:#7A2E0E}
-  .donggia .dg-chips button{height:28px;padding:0 10px;border:1px solid #F7B27A;border-radius:999px;background:#fff;color:#C4320A;font-weight:800;font-size:12.5px;cursor:pointer}
-  .donggia .dg-chips button:hover{background:#FFE6D5}
+  .donggia .dg-lb{font-weight:800;font-size:13.5px;color:#101828;white-space:nowrap}
+  .donggia #f_dgVal{flex:1 1 120px;min-width:0;height:36px;padding:0 10px;border:1px solid #D0D5DD;border-radius:8px;font-size:15px;font-weight:700;color:#101828;text-align:right;font-variant-numeric:tabular-nums;background:#fff}
+  .donggia #f_dgVal:focus{outline:none;border-color:#101828;box-shadow:0 0 0 3px rgba(16,24,40,.08)}
+  .donggia .dg-apply{height:36px;padding:0 14px;border:0;border-radius:8px;background:#101828;color:#fff;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+  .donggia .dg-apply:hover{background:#1D2939}
+  .donggia .dg-chips{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;font-size:12px;color:#667085}
+  .donggia .dg-chips button{height:28px;padding:0 12px;border:1px solid #D0D5DD;border-radius:999px;background:#fff;color:#344054;font-weight:700;font-size:12.5px;cursor:pointer}
+  .donggia .dg-chips button:hover{background:#101828;border-color:#101828;color:#fff}
   .donggia .dg-msg{margin-top:6px;font-size:12.5px;font-weight:700;color:#027A48;display:none}
   .donggia .dg-msg.on{display:block}
   .dayprice-wrap{max-height:210px;overflow-y:auto;overflow-x:hidden;padding:2px 14px}
@@ -2279,7 +2280,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <div class="pay-block-h">📅 Giá tiền từng ngày</div>
         <div class="donggia" id="f_dongGia">
           <div class="dg-row">
-            <span class="dg-lb">⚡ Đồng giá</span>
+            <span class="dg-lb">Đồng giá</span>
             <input type="text" inputmode="numeric" id="f_dgVal" placeholder="VD: 100000 hoặc 100k" autocomplete="off" data-lpignore="true">
             <button type="button" class="dg-apply" id="f_dgApply">Áp cho tất cả <b id="f_dgN">0</b> ngày</button>
           </div>
@@ -2718,7 +2719,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-04-donggia';
+const BAN_APP = '2026-11-04-donggia2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
