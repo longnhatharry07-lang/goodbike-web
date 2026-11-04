@@ -1624,6 +1624,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <button class="tab active" data-t="timeline">Sơ đồ xe</button>
   <button class="tab" data-t="kehoach">Kế hoạch giao nhận</button>
   <button class="tab" data-t="lichtrinh">Lịch trình</button>
+  <button class="tab" data-t="chatluong">Chất lượng vận hành</button>
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
   <button class="tab" data-t="coc">Tiền cọc</button>
@@ -1691,6 +1692,11 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <!-- LỊCH TRÌNH (điện thoại, nhân viên) -->
   <section class="view" id="view-lichtrinh" style="display:none">
     <div class="lt-wrap" id="ltApp"></div>
+  </section>
+
+  <!-- CHẤT LƯỢNG VẬN HÀNH (thống kê từ Kế hoạch giao nhận) -->
+  <section class="view" id="view-chatluong" style="display:none">
+    <div class="cl-wrap" id="clApp"></div>
   </section>
 
   <!-- TIỀN SHIP -->
@@ -2719,7 +2725,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-04-donggia2';
+const BAN_APP = '2026-11-05-chatluong2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3320,6 +3326,7 @@ function switchTab(t){
   if(t==='baoduong'){ try{ renderBaoDuong(true); }catch(e){ console.warn('renderBaoDuong',e); } }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
   if(t==='lichtrinh'){ try{ renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); } }
+  if(t==='chatluong'){ try{ renderChatLuong(); }catch(e){ console.warn('renderChatLuong',e); } }
   if(t==='websync'){ try{ renderWebSync(); }catch(e){ console.warn('renderWebSync',e); } }
   if(t==='thuchi'){
     document.getElementById('tcFrom').value=todayStr();
@@ -3351,7 +3358,7 @@ function doAdminLogin(){
   }else alert('Sai mật khẩu');
 }
 function adminLockNow(){
-  accUnlocked=false;opUnlocked=false;updateTabLocks();
+  accUnlocked=false;opUnlocked=false;try{ clUnlocked=false; }catch(e){}updateTabLocks();
   const active=document.querySelector('.tab.active');
   if(!active||ADMIN_TABS.includes(active.dataset.t))switchTab('timeline');
   renderAll();
@@ -3761,6 +3768,7 @@ function renderAll(){
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
   try{ renderBaoDuong(); }catch(e){ console.warn('renderBaoDuong',e); }
   try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
+  try{ const v=document.getElementById('view-chatluong'); if(v && v.style.display!=='none' && typeof renderChatLuong==='function') renderChatLuong(); }catch(e){ console.warn('renderChatLuong',e); }
   save();
 }
 function monthLabel(ym){const [y,m]=ym.split('-');return `Tháng ${+m}/${y}`;}
@@ -9325,6 +9333,331 @@ document.addEventListener('pointerup', khLkEnd);
 document.addEventListener('pointercancel', khLkEnd);
 </script>
 
+<style>
+#view-chatluong{--cl-text:#101828;--cl-text2:#344054;--cl-muted:#5B6472;--cl-line:#E4E7EC;--cl-bg:#F4F5F7;--cl-giao:#2E5BDA;--cl-thu:#E08A2E;--cl-free:#067647;--cl-free-bg:#ECFDF3;color:var(--cl-text)}
+.cl-wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-bottom:40px}
+.cl-head{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.cl-title{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.cl-sub{font-size:13.5px;color:var(--cl-muted);margin-top:2px}
+.cl-ctrl{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cl-ctrl button{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--cl-line);background:#fff;font-weight:700;font-size:13px;color:var(--cl-text2);cursor:pointer}
+.cl-ctrl button.on{background:#101828;border-color:#101828;color:#fff}
+.cl-ctrl input[type=date]{height:36px;border:1px solid var(--cl-line);border-radius:10px;padding:0 8px;font-size:13px;background:#fff}
+.cl-ctrl label{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--cl-text2);font-weight:600;cursor:pointer}
+.cl-box{background:#fff;border:1px solid var(--cl-line);border-radius:16px;padding:16px}
+.cl-box h3{margin:0 0 4px;font-size:15px;font-weight:800}
+.cl-box .cl-note{font-size:12.5px;color:var(--cl-muted);margin:0 0 12px}
+.cl-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.cl-grid2{grid-template-columns:1fr}}
+.cl-ca{display:flex;flex-direction:column;gap:12px}
+.cl-ca-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-ca-top b{font-size:17px}
+.cl-ca-top span.t{color:var(--cl-muted);font-size:13px;font-weight:600}
+.cl-verd{margin-left:auto;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;display:inline-flex;gap:5px;align-items:center}
+.cl-verd.v0{background:#FEF3F2;color:#B42318}.cl-verd.v1{background:#FFFAEB;color:#B54708}.cl-verd.v2{background:#EFF8FF;color:#175CD3}.cl-verd.v3{background:#ECFDF3;color:#067647}
+.cl-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cl-kpi{background:var(--cl-bg);border-radius:12px;padding:10px 12px;min-width:0}
+.cl-kpi .l{font-size:12px;color:var(--cl-muted);font-weight:600}
+.cl-kpi .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+.cl-kpi .s{font-size:12px;color:var(--cl-text2);margin-top:2px}
+.cl-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:0}
+.cl-meter{height:10px;border-radius:999px;background:#EAECF0;overflow:hidden;display:flex;gap:2px}
+.cl-meter i{display:block;height:100%}
+.cl-meter-l{display:flex;justify-content:space-between;font-size:12px;color:var(--cl-muted);margin-top:4px}
+/* biểu đồ giờ */
+.cl-chart{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end;height:190px;padding:18px 0 0;border-bottom:1px solid #D0D5DD}
+.cl-col{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:default}
+.cl-col .stk{width:min(34px,80%);display:flex;flex-direction:column-reverse;gap:2px}
+.cl-col .stk i{display:block;width:100%}
+.cl-col .stk i:last-child{border-radius:4px 4px 0 0}
+.cl-col .val{font-size:11.5px;font-weight:700;color:var(--cl-text2);margin-bottom:3px;font-variant-numeric:tabular-nums}
+.cl-col.peak .val{color:#101828;font-weight:800}
+.cl-col:hover{background:#F9FAFB;border-radius:6px}
+.cl-col.ca2{}
+.cl-xl{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;font-size:11.5px;color:var(--cl-muted);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums}
+.cl-sep{position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #98A2B3;pointer-events:none}
+.cl-sep span{position:absolute;top:0;left:6px;font-size:11px;color:var(--cl-muted);white-space:nowrap}
+.cl-leg{display:flex;gap:14px;font-size:12.5px;color:var(--cl-text2);margin:10px 0 0;flex-wrap:wrap}
+/* dải trống */
+.cl-heat{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:2px}
+.cl-heat i{display:block;height:34px;border-radius:4px;position:relative}
+.cl-heat i:nth-child(12){margin-right:6px}
+.cl-hx{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));font-size:11.5px;color:var(--cl-muted);margin-top:4px}
+.cl-scale{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--cl-muted);margin-top:10px}
+.cl-scale i{display:inline-block;width:22px;height:10px;border-radius:3px}
+.cl-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.cl-tag{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--cl-free-bg);color:var(--cl-free)}
+.cl-tag.busy{background:#FEF3F2;color:#B42318}
+/* gợi ý */
+.cl-rec{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:860px){.cl-rec{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cl-advice{margin-top:12px;font-size:14px;line-height:1.55;color:var(--cl-text2);background:#F9FAFB;border-left:3px solid #101828;border-radius:8px;padding:10px 14px}
+.cl-advice b{color:#101828}
+/* bảng ngày */
+.cl-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.cl-tbl th{font-size:12px;color:var(--cl-muted);text-align:left;font-weight:700;padding:6px 8px;border-bottom:1px solid var(--cl-line);white-space:nowrap}
+.cl-tbl td{padding:7px 8px;border-bottom:1px solid #F2F4F7;vertical-align:middle;font-variant-numeric:tabular-nums}
+.cl-tbl tr.r{cursor:pointer}.cl-tbl tr.r:hover td{background:#F9FAFB}
+.cl-tbl td.num{text-align:right;white-space:nowrap}
+.cl-tbl .day{font-weight:700;white-space:nowrap}
+.cl-tbl .day small{display:block;font-weight:500;color:var(--cl-muted)}
+.cl-strip{position:relative;height:22px;border-radius:6px;background:var(--cl-free-bg);min-width:260px;overflow:hidden}
+.cl-strip i{position:absolute;top:3px;bottom:3px;border-radius:3px}
+.cl-strip .mid{position:absolute;top:0;bottom:0;left:50%;border-left:1.5px dashed #98A2B3}
+.cl-tbl td.cl-gaps{font-size:12px;color:var(--cl-free);font-weight:600;min-width:180px;max-width:280px;white-space:normal !important;text-align:left !important;line-height:1.4}
+.cl-tbl td,.cl-tbl th{text-align:left}
+.cl-tw{overflow-x:auto}
+.cl-empty{padding:40px;text-align:center;color:var(--cl-text2);font-weight:600}
+#clTip{position:fixed;z-index:9500;pointer-events:none;background:#101828;color:#fff;font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:8px;box-shadow:0 6px 18px rgba(16,24,40,.25);display:none;max-width:260px}
+</style>
+<script>
+/* ===== CHẤT LƯỢNG VẬN HÀNH (bản 2026-11-05-chatluong2) =====
+   Lấy đúng danh sách đơn của tab "Kế hoạch giao nhận" (ltBuild: giao/thu theo booking + giờ xếp tay + đơn phát sinh,
+   bỏ đơn đang ẩn và đơn "để sau") cho từng ngày trong khoảng, rồi thống kê theo 2 ca:
+     Ca sáng 8h–14h · Ca chiều 14h–20h.
+   Mỗi lượt giao/nhận chiếm KH_JOB phút (30') tính từ giờ đi làm — giống cách Kế hoạch hiện "Trống …".
+   Khoảng trống = phần còn lại của ca không có lượt nào. "Trống dùng được" = khoảng liền ≥ KH_FREE phút.
+   Chỉ đọc dữ liệu, không ghi gì vào DB. */
+const CL_CA = [{ k: 's', ten: 'Ca sáng', a: 480, b: 840, lab: '8h – 14h' }, { k: 'c', ten: 'Ca chiều', a: 840, b: 1200, lab: '14h – 20h' }];
+const CL_SLOT = 30;   // dải "khoảng trống" chia ô 30 phút
+let clFrom = null, clTo = null, clPreset = '30', clEmpty = false;
+// Khoá riêng cho mục này — chỉ lưu MÃ BĂM SHA-256 của mật khẩu, không để mật khẩu thật trong code.
+// Đổi mật khẩu: chạy  echo -n "matkhaumoi" | sha256sum  rồi dán vào CL_PASS_HASH.
+const CL_PASS_HASH = 'e5729c334407919cba6e4d542760d85879b5be862bef85ec472bcc03ae862489';
+let clUnlocked = false;   // chỉ mở trong phiên này; tải lại trang hoặc bấm "Khoá" là phải nhập lại
+async function clHash(t){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+function clLockHtml(err){
+  return '<div class="cl-box" style="max-width:420px;margin:40px auto;text-align:center;padding:28px 24px">'
+    + '<div style="font-size:34px">🔒</div><h3 style="font-size:18px;margin:8px 0 4px">Chất lượng vận hành</h3>'
+    + '<p class="cl-note">Khu vực bảo mật — nhập mật khẩu để xem.</p>'
+    + '<form id="clLockF" autocomplete="off" style="display:flex;gap:8px;justify-content:center"><input type="password" id="clPw" placeholder="Mật khẩu" style="height:40px;border:1px solid #D0D5DD;border-radius:10px;padding:0 12px;font-size:15px;flex:1;min-width:0">'
+    + '<button type="submit" style="height:40px;padding:0 16px;border:0;border-radius:10px;background:#101828;color:#fff;font-weight:700;cursor:pointer">Mở</button></form>'
+    + (err ? '<div style="color:#B42318;font-size:13px;font-weight:600;margin-top:10px">' + err + '</div>' : '') + '</div>';
+}
+
+function clDays(a, b){ const out = []; let d = a; while (d <= b && out.length < 400) { out.push(d); d = ltAddDays(d, 1); } return out; }
+// danh sách lượt của 1 ngày, đúng như Kế hoạch giao nhận
+function clDayJobs(D){
+  const sv = { LT: LT, d: ltDate, c: ltCtx }, out = [];
+  try {
+    ltCtx = 'cl'; ltDate = D; ltBuild();
+    const P = LT.P;
+    LT.items.forEach(x => {
+      if (x.hidden || P.parked[x.id]) return;
+      out.push({ kind: x.kind === 'thu' ? 'thu' : 'giao', ps: x.kind === 'ps', t: ltT(x), xe: x.xe, shop: ltIsShop(x) });
+    });
+  } finally { LT = sv.LT; ltDate = sv.d; ltCtx = sv.c; }
+  return out.sort((p, q) => p.t - q.t);
+}
+// khoảng bận đã gộp, cắt trong [a,b)
+function clBusy(jobs, a, b){
+  const iv = [];
+  jobs.forEach(j => { const s = Math.max(a, j.t), e = Math.min(b, j.t + KH_JOB); if (e > s) iv.push([s, e]); });
+  iv.sort((p, q) => p[0] - q[0]);
+  const m = [];
+  iv.forEach(v => { const l = m[m.length - 1]; if (l && v[0] <= l[1]) l[1] = Math.max(l[1], v[1]); else m.push(v.slice()); });
+  return m;
+}
+function clShift(jobs, ca){
+  const js = jobs.filter(j => j.t >= ca.a && j.t < ca.b);
+  const busy = clBusy(jobs, ca.a, ca.b), gaps = [];
+  let cur = ca.a;
+  busy.forEach(v => { if (v[0] > cur) gaps.push([cur, v[0]]); cur = Math.max(cur, v[1]); });
+  if (cur < ca.b) gaps.push([cur, ca.b]);
+  const free = gaps.reduce((s, g) => s + g[1] - g[0], 0);
+  const use = gaps.filter(g => g[1] - g[0] >= KH_FREE);
+  return {
+    giao: js.filter(j => j.kind === 'giao').length, thu: js.filter(j => j.kind === 'thu').length, n: js.length,
+    free, useFree: use.reduce((s, g) => s + g[1] - g[0], 0), gaps, use,
+    longest: gaps.reduce((s, g) => Math.max(s, g[1] - g[0]), 0),
+    cap: use.reduce((s, g) => s + Math.floor((g[1] - g[0]) / KH_JOB), 0)   // còn chen thêm được bao nhiêu lượt
+  };
+}
+function clRentedOn(D){
+  const set = new Set();
+  (DB.bookings || []).forEach(b => { if (!b || !b.xe || b.status === 'huy') return; if ((b.arrive <= D && b.depart > D) || (b.arrive === D && b.depart === D)) set.add(b.xe); });
+  return XE_THAT.filter(v => set.has(v.id)).length;
+}
+function clDiff(a, b){ return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5); }
+
+function clCompute(){
+  const days = clDays(clFrom, clTo), rows = [];
+  const hour = []; for (let h = 8; h < 20; h++) hour.push({ h, giao: 0, thu: 0 });
+  const nSlot = (1200 - 480) / CL_SLOT, slotFree = new Array(nSlot).fill(0);
+  let outside = 0, occ = 0;
+  days.forEach(D => {
+    const jobs = clDayJobs(D);
+    if (!jobs.length && !clEmpty) return;
+    const sh = CL_CA.map(ca => clShift(jobs, ca));
+    jobs.forEach(j => { const h = Math.floor(j.t / 60); if (h >= 8 && h < 20) hour[h - 8][j.kind]++; else outside++; });
+    const busy = clBusy(jobs, 480, 1200);
+    for (let i = 0; i < nSlot; i++) { const a = 480 + i * CL_SLOT, b = a + CL_SLOT; if (!busy.some(v => v[0] < b && v[1] > a)) slotFree[i]++; }
+    occ += XE_THAT.length ? clRentedOn(D) / XE_THAT.length : 0;
+    rows.push({ D, jobs, sh });
+  });
+  const n = rows.length;
+  // thời gian thuê trung bình (booking nhận xe trong khoảng)
+  const lens = (DB.bookings || []).filter(b => b && b.xe && b.status !== 'huy' && b.arrive >= clFrom && b.arrive <= clTo).map(b => Math.max(1, clDiff(b.arrive, b.depart)));
+  const avgLen = lens.length ? lens.reduce((s, x) => s + x, 0) / lens.length : 0;
+  return { rows, n, nDays: days.length, hour, slotFree, outside, occ: n ? occ / n : 0, avgLen };
+}
+
+const clAvg = (rows, f) => rows.length ? rows.reduce((s, r) => s + f(r), 0) / rows.length : 0;
+const clR1 = x => (Math.round(x * 10) / 10).toLocaleString('vi-VN');
+const clDur = m => { m = Math.round(m); if (m < 60) return m + ' phút'; return Math.floor(m / 60) + 'h' + (m % 60 ? ltPad(m % 60) : ''); };
+function clVerdict(pct){
+  if (pct >= 60) return ['v3', 'Còn rất rảnh'];
+  if (pct >= 35) return ['v2', 'Còn dư sức'];
+  if (pct >= 15) return ['v1', 'Khá kín'];
+  return ['v0', 'Quá tải'];
+}
+function clSetPreset(p){
+  const T = todayStr(); clPreset = p;
+  if (p === '7') { clFrom = ltAddDays(T, -6); clTo = T; }
+  else if (p === '30') { clFrom = ltAddDays(T, -29); clTo = T; }
+  else if (p === 'm') { clFrom = T.slice(0, 8) + '01'; clTo = T; }
+  else if (p === 'pm') { const d = new Date(T.slice(0, 8) + '01T12:00:00'); d.setDate(0); const e = d.getFullYear() + '-' + ltPad(d.getMonth() + 1) + '-' + ltPad(d.getDate()); clFrom = e.slice(0, 8) + '01'; clTo = e; }
+}
+const clDM = D => D.slice(8, 10) + '/' + D.slice(5, 7);
+
+function renderChatLuong(){
+  const app = document.getElementById('clApp'); if (!app) return;
+  if (!clUnlocked) { if (!document.getElementById('clLockF')) { app.innerHTML = clLockHtml(''); setTimeout(() => { const i = document.getElementById('clPw'); if (i) i.focus(); }, 30); } return; }
+  if (!clFrom) clSetPreset('30');
+  const C = clCompute(), rows = C.rows, n = C.n;
+  const pre = (k, t) => '<button data-cl="pre" data-v="' + k + '" class="' + (clPreset === k ? 'on' : '') + '">' + t + '</button>';
+  const h = [];
+  h.push('<div class="cl-head"><div><div class="cl-title">Chất lượng vận hành</div><div class="cl-sub">Lấy từ Kế hoạch giao nhận · ' + n + ' ngày có lịch / ' + C.nDays + ' ngày (' + clDM(clFrom) + ' – ' + clDM(clTo) + ') · mỗi lượt giao/nhận tính ' + KH_JOB + ' phút</div></div>'
+    + '<div class="cl-ctrl"><button data-cl="lock" title="Khoá lại mục này">🔒 Khoá</button>' + pre('7', '7 ngày') + pre('30', '30 ngày') + pre('m', 'Tháng này') + pre('pm', 'Tháng trước')
+    + '<input type="date" id="clF" value="' + clFrom + '" aria-label="Từ ngày"><span style="color:var(--cl-muted)">→</span><input type="date" id="clT" value="' + clTo + '" aria-label="Đến ngày">'
+    + '<label><input type="checkbox" id="clE"' + (clEmpty ? ' checked' : '') + '>Tính cả ngày không có đơn</label></div></div>');
+  if (!n) { app.innerHTML = h.join('') + '<div class="cl-box cl-empty">Khoảng ngày này chưa có lượt giao/nhận nào.</div>'; return; }
+
+  // ---- 2 ca ----
+  const caStat = CL_CA.map((ca, i) => {
+    const len = ca.b - ca.a, g = clAvg(rows, r => r.sh[i].giao), t = clAvg(rows, r => r.sh[i].thu);
+    const free = clAvg(rows, r => r.sh[i].free), use = clAvg(rows, r => r.sh[i].useFree), lon = clAvg(rows, r => r.sh[i].longest), cap = clAvg(rows, r => r.sh[i].cap);
+    const busy = len - free, pct = Math.round(free / len * 100);
+    const totG = rows.reduce((s, r) => s + r.sh[i].giao, 0), totT = rows.reduce((s, r) => s + r.sh[i].thu, 0);
+    return { ca, len, g, t, free, use, lon, cap, busy, pct, totG, totT };
+  });
+  h.push('<div class="cl-grid2">');
+  caStat.forEach(s => {
+    const v = clVerdict(s.pct), frag = s.free - s.use;
+    h.push('<div class="cl-box cl-ca"><div class="cl-ca-top"><b>' + s.ca.ten + '</b><span class="t">' + s.ca.lab + '</span><span class="cl-verd ' + v[0] + '">' + v[1] + '</span></div>'
+      + '<div class="cl-kpis">'
+      + '<div class="cl-kpi"><div class="l">Lượt / ca</div><div class="v">' + clR1(s.g + s.t) + '</div><div class="s"><span class="cl-dot" style="background:var(--cl-giao)"></span>Giao ' + clR1(s.g) + ' · <span class="cl-dot" style="background:var(--cl-thu)"></span>Nhận ' + clR1(s.t) + '</div></div>'
+      + '<div class="cl-kpi"><div class="l">Trống trung bình</div><div class="v">' + clDur(s.free) + '</div><div class="s">' + s.pct + '% thời gian ca</div></div>'
+      + '<div class="cl-kpi"><div class="l">Trống liền dài nhất</div><div class="v">' + clDur(s.lon) + '</div><div class="s">trung bình mỗi ca</div></div>'
+      + '</div>'
+      + '<div><div class="cl-meter" title="Bận ' + clDur(s.busy) + ' · trống dùng được ' + clDur(s.use) + ' · trống lẻ ' + clDur(frag) + '">'
+      + '<i style="width:' + (s.busy / s.len * 100) + '%;background:#475467"></i><i style="width:' + (s.use / s.len * 100) + '%;background:#32D583"></i><i style="width:' + (frag / s.len * 100) + '%;background:#A6F4C5"></i></div>'
+      + '<div class="cl-meter-l"><span><span class="cl-dot" style="background:#475467"></span>Bận ' + clDur(s.busy) + '</span><span><span class="cl-dot" style="background:#32D583"></span>Trống ≥' + KH_FREE + '\' ' + clDur(s.use) + '</span><span><span class="cl-dot" style="background:#A6F4C5"></span>Trống lẻ ' + clDur(frag) + '</span></div></div>'
+      + '<div class="s" style="font-size:13px;color:var(--cl-text2)">Tổng ' + n + ' ca: <b>' + s.totG + '</b> lượt giao · <b>' + s.totT + '</b> lượt nhận · còn chen được thêm khoảng <b>' + clR1(s.cap) + ' lượt/ca</b></div>'
+      + '</div>');
+  });
+  h.push('</div>');
+
+  // ---- giờ cao điểm ----
+  const hr = C.hour.map(x => ({ h: x.h, g: x.giao / n, t: x.thu / n, tot: (x.giao + x.thu) / n, raw: x.giao + x.thu }));
+  const mx = Math.max.apply(null, hr.map(x => x.tot)) || 1;
+  const rank = hr.slice().filter(x => x.raw > 0).sort((a, b) => b.tot - a.tot);
+  const peakSet = new Set(rank.slice(0, 2).map(x => x.h));
+  const pkCa = CL_CA.map(ca => hr.filter(x => x.h * 60 >= ca.a && x.h * 60 < ca.b).sort((a, b) => b.tot - a.tot)[0]);
+  h.push('<div class="cl-box"><h3>Khung giờ cao điểm</h3><p class="cl-note">Số lượt trung bình mỗi ngày theo giờ đi làm trong Kế hoạch (giờ xếp tay nếu có, không thì giờ hẹn của booking).'
+    + (C.outside ? ' Có ' + C.outside + ' lượt nằm ngoài 8h–20h, không tính vào biểu đồ.' : '') + '</p>');
+  h.push('<div class="cl-chart"><div class="cl-sep"><span>Ca chiều →</span></div>');
+  hr.forEach(x => {
+    const tip = ltPad(x.h) + ':00 – ' + ltPad(x.h + 1) + ':00<br>Trung bình ' + clR1(x.tot) + ' lượt/ngày<br>Giao ' + clR1(x.g) + ' · Nhận ' + clR1(x.t) + '<br>Tổng ' + x.raw + ' lượt / ' + n + ' ngày';
+    const H = 150;
+    h.push('<div class="cl-col' + (peakSet.has(x.h) ? ' peak' : '') + '" data-tip="' + ltEsc(tip) + '"><span class="val">' + (x.tot ? clR1(x.tot) : '') + '</span><div class="stk">'
+      + (x.g ? '<i style="height:' + Math.max(2, x.g / mx * H) + 'px;background:var(--cl-giao)"></i>' : '')
+      + (x.t ? '<i style="height:' + Math.max(2, x.t / mx * H) + 'px;background:var(--cl-thu)"></i>' : '') + '</div></div>');
+  });
+  h.push('</div><div class="cl-xl">' + hr.map(x => '<span>' + x.h + 'h</span>').join('') + '</div>');
+  h.push('<div class="cl-leg"><span><span class="cl-dot" style="background:var(--cl-giao)"></span>Giao xe</span><span><span class="cl-dot" style="background:var(--cl-thu)"></span>Nhận (thu hồi) xe</span></div>');
+  h.push('<div class="cl-tags">' + rank.slice(0, 3).map((x, i) => '<span class="cl-tag busy">' + (i === 0 ? 'Cao điểm nhất ' : 'Cao điểm ') + x.h + 'h–' + (x.h + 1) + 'h · ' + clR1(x.tot) + ' lượt/ngày</span>').join('')
+    + pkCa.map((x, i) => x && x.raw ? '<span class="cl-tag" style="background:#F2F4F7;color:#344054">' + CL_CA[i].ten + ': đông nhất ' + x.h + 'h–' + (x.h + 1) + 'h</span>' : '').join('') + '</div></div>');
+
+  // ---- khoảng trống theo ô 30 phút ----
+  const sf = C.slotFree.map(c => c / n);
+  const shade = p => p >= .8 ? '#039855' : p >= .6 ? '#32D583' : p >= .4 ? '#A6F4C5' : p >= .2 ? '#FEF0C7' : '#FDA29B';
+  // khung trống liền nhau ≥ 1 tiếng mà ≥ 60% số ngày đều trống
+  const runs = []; let st = -1;
+  sf.forEach((p, i) => { if (p >= .6) { if (st < 0) st = i; } else { if (st >= 0 && i - st >= 2) runs.push([st, i]); st = -1; } });
+  if (st >= 0 && sf.length - st >= 2) runs.push([st, sf.length]);
+  const tight = sf.map((p, i) => [p, i]).filter(z => z[0] < .3).map(z => z[1]);
+  h.push('<div class="cl-box"><h3>Khoảng trống của các ca</h3><p class="cl-note">Mỗi ô là 30 phút. Màu càng xanh = càng nhiều ngày ô đó không có lượt nào (nhân viên rảnh). Rê chuột để xem số ngày.</p>');
+  h.push('<div class="cl-heat">' + sf.map((p, i) => { const a = 480 + i * CL_SLOT; return '<i style="background:' + shade(p) + '" data-tip="' + ltFmt(a) + ' – ' + ltFmt(a + CL_SLOT) + '<br>Trống ' + C.slotFree[i] + '/' + n + ' ngày (' + Math.round(p * 100) + '%)"></i>'; }).join('') + '</div>');
+  h.push('<div class="cl-hx">' + hr.map(x => '<span>' + x.h + 'h</span>').join('') + '</div>');
+  h.push('<div class="cl-scale">Trống ít <i style="background:#FDA29B"></i><i style="background:#FEF0C7"></i><i style="background:#A6F4C5"></i><i style="background:#32D583"></i><i style="background:#039855"></i> Trống nhiều</div>');
+  h.push('<div class="cl-tags">' + (runs.length ? runs.map(r => '<span class="cl-tag">Thường trống ' + ltFmt(480 + r[0] * CL_SLOT) + ' – ' + ltFmt(480 + r[1] * CL_SLOT) + '</span>').join('') : '<span class="cl-tag" style="background:#F2F4F7;color:#344054">Không có khung ≥ 1 tiếng trống đều đặn</span>')
+    + (tight.length ? '<span class="cl-tag busy">Hay kín: ' + tight.map(i => ltFmt(480 + i * CL_SLOT)).join(', ') + '</span>' : '') + '</div></div>');
+
+  // ---- gợi ý nhập xe ----
+  const capDay = caStat.reduce((s, x) => s + x.cap, 0), L = C.avgLen || 1;
+  const moreBk = capDay / 2, moreXe = capDay * L / 2, occPct = Math.round(C.occ * 100);
+  let adv;
+  if (occPct < 60) adv = 'Xe hiện có mới được thuê trung bình <b>' + occPct + '%</b> số ngày — còn nhiều xe nằm trống. Nhân viên còn sức, nhưng <b>nút thắt đang là lượng khách chứ chưa phải số xe</b>: nên đẩy bán cho kín xe hiện có trước rồi mới nhập thêm.';
+  else if (capDay < 2) adv = 'Lịch giao/nhận đã <b>gần kín</b> (chỉ còn chen được ~' + clR1(capDay) + ' lượt/ngày). Nếu nhập thêm xe thì <b>cần thêm người giao nhận</b> hoặc dồn lượt vào khung trống.';
+  else adv = 'Xe đang được thuê <b>' + occPct + '%</b> số ngày và nhân viên còn chen được khoảng <b>' + clR1(capDay) + ' lượt/ngày</b> (≈ ' + clR1(moreBk) + ' booking giao + nhận). Với thời gian thuê trung bình <b>' + clR1(L) + ' ngày</b>, đội hiện tại gánh thêm được tối đa khoảng <b>' + Math.floor(moreXe) + ' xe</b> chạy kín. Nên nhắm khách nhận/trả xe vào các khung <b>thường trống</b> ở trên.';
+  h.push('<div class="cl-box"><h3>Gợi ý nhập thêm xe</h3><p class="cl-note">Ước tính sức chứa của nhân viên giao nhận — chỉ tính các khoảng trống liền ≥ ' + KH_FREE + ' phút, mỗi lượt ' + KH_JOB + ' phút.</p>'
+    + '<div class="cl-rec">'
+    + '<div class="cl-kpi"><div class="l">Còn chen thêm</div><div class="v">' + clR1(capDay) + '</div><div class="s">lượt / ngày (2 ca)</div></div>'
+    + '<div class="cl-kpi"><div class="l">Tỉ lệ xe được thuê</div><div class="v">' + occPct + '%</div><div class="s">' + XE_THAT.length + ' xe · trung bình các ngày</div></div>'
+    + '<div class="cl-kpi"><div class="l">Thời gian thuê TB</div><div class="v">' + clR1(L) + '</div><div class="s">ngày / booking</div></div>'
+    + '<div class="cl-kpi"><div class="l">Gánh thêm tối đa</div><div class="v">~' + Math.floor(moreXe) + '</div><div class="s">xe (nếu xe mới chạy kín)</div></div>'
+    + '</div><div class="cl-advice">' + adv + '</div></div>');
+
+  // ---- từng ngày ----
+  const strip = r => '<div class="cl-strip"><span class="mid"></span>' + r.jobs.filter(j => j.t < 1200 && j.t + KH_JOB > 480).map(j => { const a = Math.max(480, j.t), b = Math.min(1200, j.t + KH_JOB); return '<i style="left:' + ((a - 480) / 720 * 100) + '%;width:' + ((b - a) / 720 * 100) + '%;background:' + (j.kind === 'giao' ? 'var(--cl-giao)' : 'var(--cl-thu)') + ';opacity:.9" title="' + ltFmt(j.t) + ' ' + (j.kind === 'giao' ? 'Giao ' : 'Nhận ') + ltEsc(j.xe) + '"></i>'; }).join('') + '</div>';
+  const gl = s => s.use.length ? s.use.map(g => ltFmt(g[0]) + '–' + ltFmt(g[1])).join(', ') : '<span style="color:var(--cl-muted)">—</span>';
+  const DOW = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  h.push('<div class="cl-box"><h3>Chi tiết từng ngày</h3><p class="cl-note">Dải màu 8h → 20h (vạch giữa là 14h): <span class="cl-dot" style="background:var(--cl-giao)"></span>giao · <span class="cl-dot" style="background:var(--cl-thu)"></span>nhận · nền xanh nhạt là thời gian trống. Bấm một ngày để mở Kế hoạch ngày đó.</p><div class="cl-tw"><table class="cl-tbl"><thead><tr><th>Ngày</th><th>8h → 20h</th>'
+    + '<th class="num">Sáng G/N</th><th class="num">Trống</th><th>Khoảng trống sáng</th><th class="num">Chiều G/N</th><th class="num">Trống</th><th>Khoảng trống chiều</th></tr></thead><tbody>');
+  rows.slice().reverse().forEach(r => {
+    const s = r.sh[0], c = r.sh[1], wd = DOW[new Date(r.D + 'T12:00:00').getDay()];
+    h.push('<tr class="r" data-cl="day" data-v="' + r.D + '"><td class="day">' + clDM(r.D) + '<small>' + wd + '</small></td><td>' + strip(r) + '</td>'
+      + '<td class="num">' + s.giao + ' / ' + s.thu + '</td><td class="num">' + clDur(s.free) + '</td><td class="cl-gaps">' + gl(s) + '</td>'
+      + '<td class="num">' + c.giao + ' / ' + c.thu + '</td><td class="num">' + clDur(c.free) + '</td><td class="cl-gaps">' + gl(c) + '</td></tr>');
+  });
+  h.push('</tbody></table></div></div>');
+  app.innerHTML = h.join('');
+}
+
+(function(){
+  const app = document.getElementById('clApp'); if (!app) return;
+  app.addEventListener('click', e => {
+    const b = e.target.closest('[data-cl]'); if (!b) return;
+    if (b.dataset.cl === 'pre') { clSetPreset(b.dataset.v); renderChatLuong(); }
+    else if (b.dataset.cl === 'lock') { clUnlocked = false; app.innerHTML = ''; renderChatLuong(); }
+    else if (b.dataset.cl === 'day') { khDate = b.dataset.v; switchTab('kehoach'); window.scrollTo({ top: 0 }); }
+  });
+  app.addEventListener('submit', async e => {
+    if (e.target.id !== 'clLockF') return; e.preventDefault();
+    const v = document.getElementById('clPw').value;
+    let ok = false; try { ok = (await clHash(v)) === CL_PASS_HASH; } catch (er) { ok = false; }
+    if (ok) { clUnlocked = true; renderChatLuong(); }
+    else { app.innerHTML = clLockHtml('Sai mật khẩu'); const i = document.getElementById('clPw'); if (i) i.focus(); }
+  });
+  app.addEventListener('change', e => {
+    if (e.target.id === 'clF' || e.target.id === 'clT') {
+      const f = document.getElementById('clF').value, t = document.getElementById('clT').value;
+      if (!f || !t) return; clFrom = f <= t ? f : t; clTo = f <= t ? t : f; clPreset = ''; renderChatLuong();
+    } else if (e.target.id === 'clE') { clEmpty = e.target.checked; renderChatLuong(); }
+  });
+  const tip = document.createElement('div'); tip.id = 'clTip'; document.body.appendChild(tip);
+  app.addEventListener('mousemove', e => {
+    const el = e.target.closest('[data-tip]');
+    if (!el) { tip.style.display = 'none'; return; }
+    tip.innerHTML = el.dataset.tip; tip.style.display = 'block';
+    const w = tip.offsetWidth, x = Math.min(window.innerWidth - w - 8, e.clientX + 14);
+    tip.style.left = x + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+  });
+  app.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+})();
+</script>
+
 <script>
 /* ===== KHUNG MỚI: logo, nhóm điều hướng, biểu tượng tab, khung màu cho Chi tiết booking ===== */
 (function(){
@@ -9334,6 +9667,7 @@ document.addEventListener('pointercancel', khLkEnd);
     timeline: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
     kehoach: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
     lichtrinh: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    chatluong: '<path d="M3.5 18a9 9 0 1117 0"/><path d="M12 14l4-5"/>',
     thuchi: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
     contacts: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     coc: '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
