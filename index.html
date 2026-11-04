@@ -2698,7 +2698,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-04-tenkhach';
+const BAN_APP = '2026-11-04-lichsu';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -9528,6 +9528,282 @@ document.addEventListener('pointercancel', khLkEnd);
   tabs.addEventListener('click', () => setTimeout(sync, 50));
   new MutationObserver(sync).observe(tabs, { subtree: true, attributes: true, attributeFilter: ['class'] });
   sync();
+})();
+</script>
+<script>
+/* ===== LỊCH SỬ THAO TÁC + KHÔI PHỤC (nút 🕘 góc phải dưới) =====
+   · Tab "Đã xoá": đọc thẳng goodbike_items (deleted=true). Dòng bị xoá vẫn giữ nguyên dữ liệu
+     trên máy chủ nên khôi phục được ngay, không cần cài thêm gì.
+   · Tab "Lịch sử": đọc goodbike_history do trigger máy chủ ghi (file lich-su-thao-tac.sql).
+   Khôi phục = đặt lại mục vào DB rồi save() như một thao tác bình thường → mọi máy nhận được. */
+(function(){
+  if (document.getElementById('lsFab')) return;
+  const HIST = 'goodbike_history';
+  const KIND_LB = {bookings:'Booking',expenses:'Chi phí',assets:'Tài sản',maintenance:'Bảo dưỡng',assetMoves:'Biến động TS',
+    inventoryList:'Kiểm kê','funds.khauhao':'Quỹ khấu hao','funds.lairong':'Quỹ lợi nhuận','funds.tiennha':'Quỹ tiền nhà',contacts:'KH liên hệ',cfg:'Cấu hình'};
+  const ACT = {them:['Thêm','#027A48','#ECFDF3'],sua:['Sửa','#175CD3','#EFF8FF'],xoa:['Xoá','#B42318','#FEF3F2'],khoiphuc:['Khôi phục','#6941C6','#F4F3FF']};
+  const FLB = {xe:'Xe',guest:'Khách',arrive:'Ngày giao',depart:'Ngày trả',dtime:'Giờ giao',rtime:'Giờ trả',dplan:'Giờ giao dự kiến',rplan:'Giờ trả dự kiến',
+    daddr:'Nơi giao',raddr:'Nơi trả',status:'Trạng thái',src:'Nguồn',prices:'Giá',price:'Giá',payments:'Thanh toán',prepaid:'Đã trả',pay:'Hình thức TT',
+    note:'Ghi chú',deposit:'Cọc',ship:'Ship',resaddr:'Nơi ở',debt:'Công nợ',commissions:'Hoa hồng',dkm:'Km giao',rkm:'Km trả',date:'Ngày',amt:'Số tiền',type:'Loại',cat:'Hạng mục',name:'Tên'};
+
+  const css = document.createElement('style');
+  css.textContent = `
+  #lsFab{position:fixed;right:16px;bottom:16px;z-index:46;display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid #D0D5DD;border-radius:999px;background:#fff;color:#101828;font:700 13px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;box-shadow:0 6px 18px rgba(16,24,40,.16);cursor:pointer}
+  #lsFab:hover{background:#F9FAFB}
+  @media (max-width:999px){ body.gb-shell #lsFab{bottom:calc(78px + env(safe-area-inset-bottom,0px));right:12px;height:38px;padding:0 12px} }
+  body.viewmode #lsFab, body.nvmode #lsFab{display:none!important}
+  @media print{ #lsFab,#lsPanel{display:none!important} }
+  #lsPanel{position:fixed;inset:0;z-index:9400;background:rgba(16,24,40,.45);display:flex;justify-content:flex-end;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  #lsPanel .ls-box{width:min(560px,100vw);height:100%;background:#fff;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(16,24,40,.25)}
+  #lsPanel .ls-hd{padding:14px 16px 10px;border-bottom:1px solid #EAECF0}
+  #lsPanel .ls-hd h3{margin:0;font-size:17px;display:flex;align-items:center;justify-content:space-between;color:#101828}
+  #lsPanel .ls-x{border:0;background:#F2F4F7;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer}
+  #lsPanel .ls-tabs{display:flex;gap:6px;margin-top:10px}
+  #lsPanel .ls-tabs button{flex:1;height:34px;border:1px solid #D0D5DD;background:#fff;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;color:#344054}
+  #lsPanel .ls-tabs button.on{background:#101828;color:#fff;border-color:#101828}
+  #lsPanel .ls-flt{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  #lsPanel .ls-flt select,#lsPanel .ls-flt input{height:34px;border:1px solid #D0D5DD;border-radius:8px;padding:0 8px;font-size:13px;background:#fff;min-width:0}
+  #lsPanel .ls-flt input{flex:1 1 140px}
+  #lsPanel .ls-item-bar{margin-top:8px;font-size:12.5px;background:#FFFAEB;color:#93370D;border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  #lsPanel .ls-item-bar button{border:0;background:#fff;border-radius:6px;padding:3px 8px;font-weight:700;cursor:pointer}
+  #lsPanel .ls-body{flex:1;overflow:auto;padding:8px 12px 24px;background:#F9FAFB}
+  #lsPanel .ls-msg{padding:24px 10px;text-align:center;color:#475467;font-size:14px;line-height:1.55}
+  #lsPanel .ls-day{font-size:12px;font-weight:800;color:#667085;margin:12px 4px 6px;text-transform:uppercase;letter-spacing:.03em}
+  #lsPanel .ls-row{background:#fff;border:1px solid #EAECF0;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  #lsPanel .ls-top{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#475467}
+  #lsPanel .ls-badge{font-weight:800;font-size:11.5px;padding:2px 8px;border-radius:999px}
+  #lsPanel .ls-kind{font-weight:700;color:#344054}
+  #lsPanel .ls-time{margin-left:auto;font-variant-numeric:tabular-nums}
+  #lsPanel .ls-sum{margin-top:5px;font-size:14px;color:#101828;font-weight:600;line-height:1.4;word-break:break-word}
+  #lsPanel .ls-sub{font-size:12.5px;color:#475467;font-weight:500}
+  #lsPanel .ls-diff{margin:8px 0 0;padding:0;list-style:none;font-size:12.5px;color:#344054}
+  #lsPanel .ls-diff li{padding:3px 0;border-top:1px dashed #EAECF0;word-break:break-word}
+  #lsPanel .ls-diff b{color:#101828}
+  #lsPanel .ls-diff s{color:#B42318}
+  #lsPanel .ls-diff ins{color:#027A48;text-decoration:none}
+  #lsPanel .ls-act{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  #lsPanel .ls-act button{height:30px;padding:0 10px;border-radius:7px;border:1px solid #D0D5DD;background:#fff;font-weight:700;font-size:12.5px;cursor:pointer;color:#344054}
+  #lsPanel .ls-act button.main{background:#F58B41;border-color:#F58B41;color:#fff}
+  #lsPanel .ls-act button:disabled{opacity:.5;cursor:default}
+  #lsPanel .ls-more{display:block;margin:10px auto;height:34px;padding:0 16px;border:1px solid #D0D5DD;border-radius:8px;background:#fff;font-weight:700;cursor:pointer}
+  #lsPanel pre{white-space:pre-wrap;font-size:12px;background:#F2F4F7;border-radius:8px;padding:8px;max-height:260px;overflow:auto;margin:8px 0 0}
+  #lsPanel code{background:#F2F4F7;padding:1px 5px;border-radius:4px}`;
+  document.head.appendChild(css);
+
+  const fab = document.createElement('button');
+  fab.id = 'lsFab'; fab.type = 'button'; fab.title = 'Lịch sử thao tác — xem lại và khôi phục';
+  fab.innerHTML = '<span style="font-size:15px">🕘</span><span>Lịch sử</span>';
+  fab.onclick = () => lsOpen();
+  document.body.appendChild(fab);
+
+  const st = {tab:'xoa', kind:'bookings', days:'30', q:'', item:null, rows:[], limit:150, loading:false, err:null, noTable:false};
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pad = n => String(n).padStart(2,'0');
+  const dmy = s => { if(!s) return ''; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m? (m[3]+'/'+m[2]) : String(s); };
+  const sumP = b => Object.values((b&&b.prices)||{}).reduce((a,p)=>a+(+p||0),0) || (+((b||{}).price)||0);
+  const money = n => n ? Number(n).toLocaleString('en-US')+'đ' : '';
+  const stLabel = s => (typeof STATUS!=='undefined' && STATUS[s] && STATUS[s].label) || s || '';
+
+  function tom(kind, id, d){
+    d = d || {};
+    if (kind === 'bookings') {
+      let bien = ''; try{ bien = (DB.vehicleInfo && DB.vehicleInfo[d.xe] && DB.vehicleInfo[d.xe].bien) || ''; }catch(e){}
+      return {t: (d.guest || '(không tên khách)'),
+              s: ['Xe '+(d.xe||'?')+(bien?' ('+bien+')':''), dmy(d.arrive)+(d.dtime?' '+d.dtime:'')+' → '+dmy(d.depart)+(d.rtime?' '+d.rtime:''),
+                  money(sumP(d)), d.src||'', stLabel(d.status)].filter(Boolean).join(' · ')};
+    }
+    if (kind === 'cfg') return {t: 'Cấu hình: '+String(id).slice(4), s: ''};
+    const t = d.name || d.note || d.cat || d.desc || d.guest || d.title || ('Mã '+id);
+    const s = [d.date?dmy(d.date):'', d.amt?money(d.amt):'', d.type||'', d.cat&&d.cat!==t?d.cat:''].filter(Boolean).join(' · ');
+    return {t, s};
+  }
+  function ngan(v){
+    if (v === undefined || v === null || v === '') return '—';
+    if (typeof v === 'number') return v>=1000 ? v.toLocaleString('en-US') : String(v);
+    if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v.slice(8,10)+'/'+v.slice(5,7)+'/'+v.slice(0,4);
+    if (typeof v === 'string') return v.length>80 ? v.slice(0,80)+'…' : v;
+    let s = ''; try{ s = JSON.stringify(v); }catch(e){ s = String(v); }
+    return s.length>80 ? s.slice(0,80)+'…' : s;
+  }
+  function khac(a, b){
+    a = a || {}; b = b || {};
+    if (typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a)) return [];
+    const out = [];
+    new Set(Object.keys(a).concat(Object.keys(b))).forEach(k => {
+      if (k === 'id') return;
+      if (JSON.stringify(a[k]) === JSON.stringify(b[k])) return;
+      let va = a[k], vb = b[k];
+      if (k === 'status') { va = stLabel(va); vb = stLabel(vb); }
+      if (k === 'prices') { va = money(sumP({prices:a[k]})) || va; vb = money(sumP({prices:b[k]})) || vb; }
+      out.push('<li><b>'+esc(FLB[k]||k)+'</b>: <s>'+esc(ngan(va))+'</s> → <ins>'+esc(ngan(vb))+'</ins></li>');
+    });
+    return out;
+  }
+  function dangCo(kind, id){
+    if (kind === 'cfg') return Object.prototype.hasOwnProperty.call(DB, String(id).slice(4));
+    try{ return gbArr(DB, kind, true).some(x => x && String(x.id) === String(id)); }catch(e){ return false; }
+  }
+  function canEdit(){
+    if (typeof viewMode !== 'undefined' && viewMode) return false;
+    if (typeof nvMode !== 'undefined' && nvMode) return false;
+    return true;
+  }
+
+  /* ---------- tải dữ liệu ---------- */
+  function sinceIso(){ if (st.days === 'all') return null; const d = new Date(); d.setDate(d.getDate() - (+st.days)); return d.toISOString(); }
+  async function tai(){
+    if (typeof sb === 'undefined' || !sb) { st.err = 'Chưa kết nối máy chủ.'; ve(); return; }
+    st.loading = true; st.err = null; st.noTable = false; ve();
+    try{
+      let q;
+      if (st.tab === 'xoa') {
+        q = sb.from(SB_TABLE).select('id,kind,data,updated_at,ban').eq('deleted', true).order('updated_at', {ascending:false}).limit(st.limit);
+        if (st.kind !== '*') q = q.eq('kind', st.kind); else q = q.neq('kind', 'cfg');
+        if (st.item) q = q.eq('id', st.item);
+        const s = sinceIso(); if (s) q = q.gte('updated_at', s);
+        const {data, error} = await q; if (error) throw error;
+        st.rows = (data||[]).map(r => ({hid:'x'+r.id, at:r.updated_at, item_id:r.id, kind:r.kind, hanh_dong:'xoa', data_cu:r.data, data_moi:r.data, ban:r.ban}));
+      } else {
+        q = sb.from(HIST).select('hid,at,item_id,kind,hanh_dong,data_cu,data_moi,ban').order('at', {ascending:false}).limit(st.limit);
+        if (st.item) q = q.eq('item_id', st.item);
+        else if (st.kind !== '*') q = q.eq('kind', st.kind);
+        const s = sinceIso(); if (s && !st.item) q = q.gte('at', s);
+        const {data, error} = await q;
+        if (error) { if (/goodbike_history|does not exist|PGRST205|42P01|schema cache/i.test((error.message||'')+' '+(error.code||''))) { st.noTable = true; st.rows = []; } else throw error; }
+        else st.rows = data || [];
+      }
+    }catch(e){ console.warn('lichSu', e); st.err = (e && e.message) || String(e); st.rows = []; }
+    st.loading = false; ve();
+  }
+
+  /* ---------- khôi phục ---------- */
+  async function khoiPhuc(r, ban){
+    if (!canEdit()) return;
+    if (!ban || typeof ban !== 'object') { alert('Phiên bản này không có dữ liệu để khôi phục.'); return; }
+    const tt = tom(r.kind, r.item_id, ban);
+    const coRoi = dangCo(r.kind, r.item_id);
+    if (!confirm('↩ KHÔI PHỤC ' + (KIND_LB[r.kind]||r.kind).toUpperCase() + '\n\n' + tt.t + (tt.s ? '\n' + tt.s : '') + '\n\n'
+      + (coRoi ? 'Mục này đang có trên web — bản hiện tại sẽ được THAY bằng phiên bản này.' : 'Mục này sẽ được đưa trở lại web.')
+      + '\n\nThay đổi sẽ được lưu lên máy chủ và mọi máy đều thấy. Tiếp tục?')) return;
+    const copy = JSON.parse(JSON.stringify(ban));
+    if (r.kind === 'cfg') {
+      DB[String(r.item_id).slice(4)] = copy && Object.prototype.hasOwnProperty.call(copy, 'v') ? copy.v : copy;
+    } else {
+      if (ITEM_PATHS.indexOf(r.kind) < 0) { alert('Không khôi phục được loại mục này: ' + r.kind); return; }
+      if (copy.id == null) copy.id = r.item_id;
+      const arr = gbArr(DB, r.kind);
+      const i = arr.findIndex(x => x && String(x.id) === String(r.item_id));
+      if (i >= 0) arr[i] = copy; else arr.push(copy);
+      try{ gbSapXep(arr); }catch(e){}
+    }
+    try{ renderAll(); }catch(e){ console.warn(e); try{ save(); }catch(_){} }
+    // chờ ghi xong rồi tải lại danh sách
+    let n = 0; const cho = setInterval(() => { n++; if ((typeof dangGhi !== 'undefined' && !dangGhi) || n > 40) { clearInterval(cho); tai(); } }, 300);
+  }
+
+  /* ---------- vẽ ---------- */
+  function ve(){
+    const p = document.getElementById('lsPanel'); if (!p) return;
+    const body = p.querySelector('.ls-body');
+    p.querySelectorAll('.ls-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === st.tab));
+    const bar = p.querySelector('.ls-item-bar');
+    if (st.item) { bar.style.display = 'flex'; bar.querySelector('span').textContent = 'Đang xem các phiên bản của 1 mục (mã ' + st.item + ')'; }
+    else bar.style.display = 'none';
+    if (st.loading) { body.innerHTML = '<div class="ls-msg">⏳ Đang tải…</div>'; return; }
+    if (st.err) { body.innerHTML = '<div class="ls-msg">❌ Không tải được.<br><small>' + esc(st.err) + '</small></div>'; return; }
+    if (st.noTable) {
+      body.innerHTML = '<div class="ls-msg" style="text-align:left"><b>Lịch sử thao tác chưa được bật trên máy chủ.</b><br><br>'
+        + 'Cần chạy 1 lần file <code>lich-su-thao-tac.sql</code> trong Supabase → SQL Editor → New query → dán → RUN.<br><br>'
+        + 'Từ lúc đó mọi lần thêm / sửa / xoá (mọi máy) đều được ghi lại và khôi phục được.<br><br>'
+        + 'Trong lúc chờ, tab <b>🗑 Đã xoá</b> vẫn dùng được ngay để lấy lại booking bị xoá nhầm.</div>';
+      return;
+    }
+    const q = st.q.trim().toLowerCase();
+    const list = st.rows.map(r => {
+      const d = r.hanh_dong === 'xoa' ? (r.data_cu || r.data_moi) : (r.data_moi || r.data_cu);
+      return {r, d, tt: tom(r.kind, r.item_id, d)};
+    }).filter(x => !q || (x.tt.t + ' ' + x.tt.s + ' ' + x.r.item_id).toLowerCase().includes(q));
+    if (!list.length) {
+      body.innerHTML = '<div class="ls-msg">' + (st.tab === 'xoa' ? 'Không có mục nào bị xoá trong khoảng này.' : 'Chưa có thao tác nào trong khoảng này.') + '</div>';
+      return;
+    }
+    const ok = canEdit();
+    let h = '', ngay = '';
+    list.forEach((x, idx) => {
+      const r = x.r, t = new Date(r.at);
+      const nd = pad(t.getDate()) + '/' + pad(t.getMonth()+1) + '/' + t.getFullYear();
+      if (nd !== ngay) { ngay = nd; h += '<div class="ls-day">' + nd + '</div>'; }
+      const a = ACT[r.hanh_dong] || [r.hanh_dong, '#344054', '#F2F4F7'];
+      const co = dangCo(r.kind, r.item_id);
+      let diff = '';
+      if (r.hanh_dong === 'sua') { const l = khac(r.data_cu, r.data_moi); diff = l.length ? '<ul class="ls-diff">' + l.slice(0, 12).join('') + (l.length > 12 ? '<li>… và ' + (l.length-12) + ' mục khác</li>' : '') + '</ul>' : ''; }
+      let nut = '';
+      if (ok) {
+        if (r.hanh_dong === 'xoa') {
+          nut += co && st.tab === 'xoa' ? '<button disabled>✓ Đã có lại trên web</button>'
+                                         : '<button class="main" data-k="cu" data-i="' + idx + '">↩ Khôi phục mục đã xoá</button>';
+        } else if (r.hanh_dong === 'sua' && r.data_cu) {
+          nut += '<button class="main" data-k="cu" data-i="' + idx + '">↩ Về bản TRƯỚC khi sửa</button>';
+        } else if (r.hanh_dong === 'khoiphuc' && r.data_cu && JSON.stringify(r.data_cu) !== JSON.stringify(r.data_moi)) {
+          nut += '<button data-k="cu" data-i="' + idx + '">↩ Về bản trước lần khôi phục</button>';
+        }
+      }
+      if (!st.item && st.tab === 'ls') nut += '<button data-k="item" data-i="' + idx + '">📜 Các phiên bản</button>';
+      if (!st.item && st.tab === 'xoa') nut += '<button data-k="item2" data-i="' + idx + '">📜 Lịch sử mục này</button>';
+      nut += '<button data-k="json" data-i="' + idx + '">Chi tiết</button>';
+      h += '<div class="ls-row"><div class="ls-top"><span class="ls-badge" style="color:' + a[1] + ';background:' + a[2] + '">' + a[0] + '</span>'
+        + '<span class="ls-kind">' + esc(KIND_LB[r.kind] || r.kind) + '</span>'
+        + '<span class="ls-time">' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + '</span></div>'
+        + '<div class="ls-sum">' + esc(x.tt.t) + (x.tt.s ? '<div class="ls-sub">' + esc(x.tt.s) + '</div>' : '') + '</div>'
+        + diff + '<div class="ls-act">' + nut + '</div><div class="ls-js"></div></div>';
+    });
+    if (st.rows.length >= st.limit) h += '<button class="ls-more">Tải thêm</button>';
+    body.innerHTML = h;
+    body.onclick = ev => {
+      if (ev.target.closest('.ls-more')) { st.limit += 150; tai(); return; }
+      const b = ev.target.closest('button[data-k]'); if (!b) return;
+      const x = list[+b.dataset.i]; if (!x) return;
+      const k = b.dataset.k;
+      if (k === 'cu') khoiPhuc(x.r, x.r.data_cu || x.r.data_moi);
+      else if (k === 'item') { st.item = x.r.item_id; st.limit = 150; tai(); }
+      else if (k === 'item2') { st.tab = 'ls'; st.item = x.r.item_id; st.limit = 150; tai(); }
+      else if (k === 'json') {
+        const box = b.closest('.ls-row').querySelector('.ls-js');
+        if (box.innerHTML) { box.innerHTML = ''; return; }
+        const d = x.r.hanh_dong === 'sua' ? {truoc: x.r.data_cu, sau: x.r.data_moi} : (x.r.data_cu || x.r.data_moi);
+        box.innerHTML = '<pre>' + esc(JSON.stringify(d, null, 2)) + '</pre><div class="ls-sub" style="margin-top:4px">Mã: ' + esc(x.r.item_id) + (x.r.ban ? ' · bản app ' + esc(x.r.ban) : '') + '</div>';
+      }
+    };
+  }
+
+  function lsOpen(){
+    lsClose();
+    const p = document.createElement('div'); p.id = 'lsPanel';
+    p.innerHTML = '<div class="ls-box" role="dialog" aria-modal="true" aria-label="Lịch sử thao tác">'
+      + '<div class="ls-hd"><h3><span>🕘 Lịch sử thao tác</span><button class="ls-x" aria-label="Đóng">✕</button></h3>'
+      + '<div class="ls-tabs"><button data-tab="xoa">🗑 Đã xoá</button><button data-tab="ls">📜 Lịch sử</button></div>'
+      + '<div class="ls-flt"><select class="ls-kindsel">'
+      + '<option value="bookings">Booking</option><option value="expenses">Chi phí</option><option value="contacts">KH liên hệ</option>'
+      + '<option value="maintenance">Bảo dưỡng</option><option value="assets">Tài sản</option><option value="cfg">Cấu hình / Kế hoạch</option><option value="*">Tất cả</option></select>'
+      + '<select class="ls-days"><option value="1">24 giờ qua</option><option value="7">7 ngày</option><option value="30">30 ngày</option><option value="90">90 ngày</option><option value="all">Tất cả</option></select>'
+      + '<input class="ls-q" type="search" placeholder="Tìm tên khách, xe, SĐT…"></div>'
+      + '<div class="ls-item-bar" style="display:none"><span></span><button class="ls-back">← Tất cả</button></div></div>'
+      + '<div class="ls-body"></div></div>';
+    document.body.appendChild(p);
+    p.querySelector('.ls-kindsel').value = st.kind;
+    p.querySelector('.ls-days').value = st.days;
+    p.querySelector('.ls-q').value = st.q;
+    p.addEventListener('click', e => { if (e.target === p || e.target.closest('.ls-x')) lsClose(); });
+    p.querySelectorAll('.ls-tabs button').forEach(b => b.onclick = () => { st.tab = b.dataset.tab; st.item = null; st.limit = 150; tai(); });
+    p.querySelector('.ls-kindsel').onchange = e => { st.kind = e.target.value; st.item = null; st.limit = 150; tai(); };
+    p.querySelector('.ls-days').onchange = e => { st.days = e.target.value; st.limit = 150; tai(); };
+    p.querySelector('.ls-q').oninput = e => { st.q = e.target.value; ve(); };
+    p.querySelector('.ls-back').onclick = () => { st.item = null; st.limit = 150; tai(); };
+    tai();
+  }
+  function lsClose(){ const p = document.getElementById('lsPanel'); if (p) p.remove(); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('lsPanel')) lsClose(); });
+  window.lsOpen = lsOpen;
 })();
 </script>
 </body>
