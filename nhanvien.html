@@ -618,6 +618,24 @@
   .hd-lang{display:inline-flex;background:#F2F4F7;border-radius:10px;padding:3px;gap:2px}
   .hd-lang button{border:none;background:transparent;border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px;color:#475569;cursor:pointer}
   .hd-lang button.on{background:#141414;color:#fff}
+  .hd-pay{background:#fff;border-radius:12px;padding:10px;color:#101828}
+  .hp-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+  .hp-top span{font-weight:800;font-size:13px;color:#475569;text-transform:uppercase;letter-spacing:.5px}
+  .hp-top b{font-size:22px;font-weight:800}
+  .hp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hp-btn{border:none;border-radius:11px;padding:11px 8px;font-weight:800;font-size:15px;background:#141414;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit}
+  .hp-btn small{font-size:11px;font-weight:600;opacity:.85}
+  .hp-btn.ck{background:#F47B20;color:#141414}
+  .hp-btn.sm{padding:8px 12px;font-size:13px}
+  .hp-other{margin-top:8px;font-size:13px}
+  .hp-other summary{cursor:pointer;color:#475569;font-weight:700}
+  .hp-orow{display:flex;gap:6px;margin-top:6px}
+  .hp-orow input{flex:1;min-width:0}
+  .hp-list{margin-top:8px;border-top:1px dashed #e4e7ec;padding-top:6px;font-size:13px}
+  .hp-list>div{display:flex;align-items:center;gap:8px;padding:3px 0}
+  .hp-list span{flex:1;color:#475569}
+  .hp-list i{width:26px}
+  .hp-x{width:26px;height:26px;border:none;border-radius:7px;background:#fee2e2;color:#b91c1c;font-weight:800;cursor:pointer}
   .hd-msg{color:#fff;font-size:12.5px;text-align:center;min-height:0}
   .hd-msg:empty{display:none}
   .hd-scroll{overflow:auto;border-radius:16px}
@@ -1444,7 +1462,7 @@ body.kh-linking,body.kh-linking *{cursor:crosshair!important;user-select:none;-w
 .lt-nowmoved{background:rgba(50,213,131,.14);color:#75E0A7;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700}
 .lt-nownote{background:rgba(253,176,34,.12);border:1px solid rgba(253,176,34,.45);color:#FEF0C7;border-radius:12px;padding:10px 12px;font-size:15.5px;font-weight:700;line-height:1.4;display:flex;flex-direction:column;gap:4px}
 .lt-nownote .lab{display:flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.6px;color:#FDB022}
-.lt-nowact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:2px}
+.lt-nowact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:2px}
 .lt-nowact .lt-nb2{font-size:14px;gap:5px;padding:0 6px;line-height:1.15;text-align:center}
 .lt-nowact .lt-hdb{background:#F47B20;border-color:#F47B20;color:#141414;gap:5px}
 .lt-rcbtns{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
@@ -2660,6 +2678,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <button type="button" class="hd-b lite" id="hdClose" aria-label="Đóng">✕</button>
       </span>
     </div>
+    <div class="hd-pay" id="hdPay" style="display:none"></div>
     <div class="hd-msg" id="hdMsg"></div>
     <div class="hd-scroll"><div id="hdCard"></div></div>
     <input type="file" id="hdQrFile" accept="image/*" style="display:none">
@@ -2981,7 +3000,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-09-khoiphucdt';
+const BAN_APP = '2026-11-09-hdpay';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5258,7 +5277,7 @@ function hdHtml(b){
     +'<div class="h4-sum">'
       +'<div class="h4-row strong"><span>'+hdL('Tổng cộng','Total')+'</span><b>'+n0(tot)+'</b></div>'
       +(payLs?'<div class="h4-sub">'+hdL('Đã thanh toán','Payments received')+'</div>'+payLs:'')
-      +'<div class="h4-due'+(due>0?'':' ok')+'"><span>'+(due>0?hdL('CÒN PHẢI THANH TOÁN','BALANCE DUE'):hdL('ĐÃ THANH TOÁN ĐỦ','PAID IN FULL'))+'</span><b>'+n0(due)+' VND</b></div>'
+      +'<div class="h4-due'+(due>0?'':' ok')+'"><span>'+(due>0?hdL('CÒN PHẢI THANH TOÁN','BALANCE DUE'):hdL('ĐÃ THANH TOÁN ĐỦ','PAID IN FULL'))+'</span>'+(due>0?'<b>'+n0(due)+' VND</b>':'<b>✓</b>')+'</div>'
     +'</div>'
     +(due>0&&(dyn||DB.hdQr)
       ? '<div class="h4-pay"><img src="'+qr+'" alt="QR" onerror="this.remove()"><div>'
@@ -5271,11 +5290,48 @@ function hdHtml(b){
     +'<div class="h4-foot">'+hdL('Cảm ơn quý khách đã sử dụng dịch vụ của GOODBIKE.','Thank you for choosing GOODBIKE.')+'<br>'+HD_SHOP.web+'</div>'
     +'</div>';
 }
-async function openHoaDon(id){
+/* Mở từ Lịch trình (app mũ đỏ): ctx = {kind:'giao'|'thu'} → hiện thêm khung THU TIỀN ngay trên hoá đơn
+   (gộp nút Thanh toán + Hoá đơn làm một, bản 2026-11-08-hdpay). Thu hồi sớm → hoá đơn tính tới hôm nay như ltNeedOf. */
+let hdCtx=null;
+function hdBkView(b){
+  if(!(hdCtx&&hdCtx.kind==='thu')) return b;
+  const td=todayStr(); if(!(b.depart>td)) return b;
+  const c=JSON.parse(JSON.stringify(b)); c.depart=td; if(c.prices) Object.keys(c.prices).forEach(ds=>{ if(ds>td) delete c.prices[ds]; });
+  return c;
+}
+function hdDue(b){ const v=hdBkView(b); return Math.max(totalOf(v)+svcTotalOf(v)-ltPaidOf(b)-((b.payments&&b.payments.length)?0:(+b.prepaid||0)),0); }
+function hdPayPanel(b){
+  const el=document.getElementById('hdPay'); if(!el) return;
+  if(!hdCtx){ el.style.display='none'; el.innerHTML=''; return; }
+  const due=hdDue(b), td=todayStr();
+  const list=(b.payments||[]).filter(p=>+p.amount);
+  el.style.display='';
+  el.innerHTML='<div class="hp-top"><span>'+(due?'Còn phải thu':'Đã thu đủ')+'</span><b>'+(due?moneyVN(due):'✓')+'</b></div>'
+    +(due?'<div class="hp-row"><button type="button" class="hp-btn" data-hp="TM">💵 Tiền mặt<small>Thu '+moneyVN(due)+'</small></button><button type="button" class="hp-btn ck" data-hp="CK">🏦 Chuyển khoản<small>Khách đã quét QR · '+moneyVN(due)+'</small></button></div>'
+      +'<details class="hp-other"><summary>Thu số tiền khác</summary><div class="hp-orow"><input id="hp_amt" inputmode="numeric" placeholder="Số tiền" autocomplete="off"><select id="hp_mth"><option value="TM">Tiền mặt</option><option value="CK">Chuyển khoản</option></select><button type="button" class="hp-btn sm" data-hp="amt">Ghi nhận</button></div></details>':'')
+    +(list.length?'<div class="hp-list">'+list.map((p,i)=>'<div><span>'+(p.date?fmtDM(p.date):'')+(p.time?' '+p.time:'')+' · '+(p.method==='CK'?'Chuyển khoản':(p.method==='TM'?'Tiền mặt':escNote(p.method||'')))+'</span><b>'+moneyVN(p.amount)+'</b>'
+      +(p.date===td?'<button type="button" class="hp-x" data-hpdel="'+i+'" aria-label="Xoá lệnh">✕</button>':'<i></i>')+'</div>').join('')+'</div>':'');
+  el.querySelectorAll('[data-hp]').forEach(x=>x.onclick=()=>{
+    let amt, mth=x.dataset.hp;
+    if(mth==='amt'){ amt=+String(document.getElementById('hp_amt').value).replace(/[^0-9]/g,''); mth=document.getElementById('hp_mth').value; if(amt>0&&amt<1000) amt*=1000; }
+    else amt=hdDue(b);
+    if(!amt){ document.getElementById('hdMsg').textContent='Nhập số tiền cần thu.'; return; }
+    ltAddPay(b,amt,mth); save(); try{ renderAll(); }catch(e){}
+    openHoaDon(b.id,hdCtx).then(()=>{ document.getElementById('hdMsg').textContent='✅ Đã ghi nhận '+moneyVN(amt)+(mth==='CK'?' chuyển khoản':' tiền mặt')+'.'; });
+  });
+  el.querySelectorAll('[data-hpdel]').forEach(x=>x.onclick=()=>{
+    const p=list[+x.dataset.hpdel]; if(!p||!confirm('Xoá lệnh thu '+moneyVN(p.amount)+'?')) return;
+    b.payments.splice(b.payments.indexOf(p),1); b.prepaid=ltPaidOf(b); save(); try{ renderAll(); }catch(e){}
+    openHoaDon(b.id,hdCtx);
+  });
+}
+async function openHoaDon(id,ctx){
+  hdCtx=ctx||null;
   const b=(DB.bookings||[]).find(x=>x.id===id); if(!b) return;
   if(typeof qrcode==='undefined'){ try{ await loadScriptOnce(HD_LIB_QR); }catch(e){ console.warn('qr lib',e); } }
   hdBkId=id; hdFontOnce();
-  document.getElementById('hdCard').innerHTML=hdHtml(b);
+  document.getElementById('hdCard').innerHTML=hdHtml(hdBkView(b));
+  hdPayPanel(b);
   document.querySelectorAll('#hdLangSeg button').forEach(x=>x.classList.toggle('on',x.dataset.l===hdLang));
   document.getElementById('hdMsg').textContent='';
   document.getElementById('hdQrBtn').style.display=((typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode))?'none':'';
@@ -5306,8 +5362,8 @@ document.getElementById('hdCopy').onclick=function(){ hdRun(this,async()=>{
   const c=await hdCanvas(), bl=await hdBlob(c);
   await navigator.clipboard.write([new ClipboardItem({'image/png':bl})]);
   document.getElementById('hdMsg').textContent='Đã sao chép ảnh — dán (Ctrl+V) vào Zalo / WhatsApp / Messenger.'; }); };
-document.querySelectorAll('#hdLangSeg button').forEach(x=>x.onclick=()=>{ hdLang=x.dataset.l; try{ localStorage.setItem('gb_hdLang',hdLang); }catch(e){} if(hdBkId) openHoaDon(hdBkId); });
-document.getElementById('hdClose').onclick=()=>document.getElementById('hdOverlay').classList.remove('open');
+document.querySelectorAll('#hdLangSeg button').forEach(x=>x.onclick=()=>{ hdLang=x.dataset.l; try{ localStorage.setItem('gb_hdLang',hdLang); }catch(e){} if(hdBkId) openHoaDon(hdBkId,hdCtx); });
+document.getElementById('hdClose').onclick=()=>{ document.getElementById('hdOverlay').classList.remove('open'); hdCtx=null; };
 document.getElementById('hdQrBtn').onclick=()=>document.getElementById('hdQrFile').click();
 document.getElementById('hdQrFile').onchange=function(){
   const f=this.files&&this.files[0]; this.value=''; if(!f) return;
@@ -9499,7 +9555,7 @@ const ltKPill = k => '<span class="lt-kp k-' + k.kc + '">' + LT_KIC[k.kc] + ltEs
 const ltCallBtn = (k, cls) => k.phone ? '<a class="' + cls + '" href="tel:' + ltEsc(k.phone) + '" aria-label="Gọi ' + ltEsc(k.gname || 'khách') + '">' + LT_PHONE + '<span>Gọi</span></a>'
   : '<span class="' + cls + ' off" title="Booking chưa có số điện thoại">' + LT_PHONE + '<span>Không SĐT</span></span>';
 // Nút HOÁ ĐƠN (8/11): mở hoá đơn của booking để khách xem + quét QR thanh toán ngay trên máy nhân viên
-const ltHdBtn = (k, cls) => k.payX ? '<button class="' + cls + '" onclick="event.stopPropagation();openHoaDon(\'' + k.payX.bk + '\')" aria-label="Hoá đơn">🧾<span>Hoá đơn</span></button>' : '';
+const ltHdBtn = (k, cls) => k.payX ? '<button class="' + cls + '" onclick="event.stopPropagation();openHoaDon(\'' + k.payX.bk + '\',{kind:\'' + (k.payX.kind === 'thu' ? 'thu' : 'giao') + '\'})" aria-label="Hoá đơn và thanh toán">🧾<span>Thanh toán</span></button>' : '';
 const ltShipHtml = k => (k.ship > 0 ? '<div class="lt-ship">🚚 Tiền ship ' + (k.c.kind === 'thu' ? 'chiều về' : (k.grp ? '' : 'chiều đi')) + ': ' + fmtVND(k.ship) + 'đ</div>' : '')
   + (k.svc ? '<div class="lt-svc">🛎 Dịch vụ thêm: ' + ltEsc(k.svc) + '</div>' : '');
 const ltGSteps = k => k.grp ? '<div class="lt-gsteps">' + k.mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (ltBien(x.xe) ? ' (' + ltEsc(ltBien(x.xe)) + ')' : '') + (k.c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span class="ok">xong</span>' : '') + '</div>').join('') + '</div>' : '';
@@ -9518,7 +9574,7 @@ function ltCurCard(id, lk){
     + ltAlertHtml(ltAlerts(c))
     + ltGSteps(k)
     + (k.notes.length ? '<div class="lt-nownote"><div class="lab">' + LT_NOTE_IC + 'GHI CHÚ</div>' + k.notes.map(n => '<div>' + ltEsc(n) + '</div>').join('') + '</div>' : '')
-    + '<div class="lt-nowact">' + ltCallBtn(k, 'lt-nb2') + '<button class="lt-nb2" data-lt="pay" data-v="' + id + '"' + (k.payX ? '' : ' disabled') + '>Thanh toán</button>' + ltHdBtn(k, 'lt-nb2 lt-hdb') + '</div>'
+    + '<div class="lt-nowact">' + ltCallBtn(k, 'lt-nb2') + (k.payX ? ltHdBtn(k, 'lt-nb2 lt-hdb') : '<button class="lt-nb2" disabled>Thanh toán</button>') + '</div>'
     + '<button class="lt-nowfin k-' + k.kc + '" data-lt="finish" data-v="' + id + '">' + k.finLab + '</button>'
     + (k.sh ? '<button class="lt-nowskip" data-lt="skip" data-v="' + id + '">Khách chưa tới · tạm bỏ qua</button>' : '')
     + '</div>';
