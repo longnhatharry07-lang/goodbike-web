@@ -671,9 +671,15 @@
   .hd-due.paid b{color:#F47B20;font-size:16px;letter-spacing:1.5px}
   .hd-dep{margin:8px 18px 0;border:1.5px dashed #6E6A66;border-radius:10px;padding:7px 11px;font-size:11.5px;display:flex;justify-content:space-between;gap:8px}
   .hd-qr{display:flex;gap:12px;align-items:center;margin:10px 18px 0;background:#fff;border-radius:12px;padding:10px}
-  .hd-qr img{width:120px;height:120px;object-fit:contain;flex:none;border-radius:6px}
+  .hd-qr img{width:136px;height:136px;object-fit:contain;flex:none;border-radius:6px}
   .hd-qr .q{font-size:11.5px;color:#6E6A66}
   .hd-qr .q b{display:block;color:#141414;font-size:13.5px;font-weight:800;margin-bottom:3px}
+  .hd-qr .q .bk{color:#141414;font-weight:700;font-size:12px;line-height:1.35;margin-bottom:4px}
+  .hd-qr .q .bk small{font-size:10px;font-weight:600;color:#6E6A66}
+  .hd-qr .q .nd{background:#F6F1EA;border-radius:7px;padding:4px 7px;font-weight:800;color:#141414;font-size:11.5px;word-break:break-word;margin-bottom:2px}
+  .hd-qr .q .nd span{display:block;font-weight:600;color:#6E6A66;font-size:10px}
+  .hd-qr .q .ok{font-size:10.5px;color:#15803d;font-weight:700;margin-top:5px}
+  .hd-qr img{image-rendering:pixelated}
   .hd-qr .q .amt{display:inline-block;margin-top:6px;background:#141414;color:#F47B20;border-radius:7px;padding:3px 9px;font-weight:800;font-size:14px}
   .hd-tags{display:flex;flex-wrap:wrap;gap:5px;padding:12px 18px 0}
   .hd-tags span{background:#141414;color:#F47B20;font-weight:800;font-size:9.5px;letter-spacing:1.3px;padding:4px 8px;border-radius:4px}
@@ -681,6 +687,79 @@
   .hd-foot .thx{color:#F47B20;font-weight:800;font-size:13px;letter-spacing:.5px;margin-bottom:4px}
   .hd-foot b{color:#fff}
   .hd-bottom{height:5px;background:#F47B20}
+  /* ===== Bản nghiêm túc hd4 ===== */
+  .hd4{background:#fff;color:#111;border-radius:6px;font-size:11.5px;line-height:1.4;padding:18px 18px 12px;border:1px solid #d9d9d9}
+  .h4-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-bottom:10px;border-bottom:2px solid #111}
+  .h4-co{display:flex;gap:8px;align-items:center}
+  .h4-co .h4-logo{width:40px;height:38px;background:#F47B20;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+  .hd4 .h4-logo img{width:30px !important;height:28px !important;max-width:none;object-fit:contain;display:block;margin:0}
+  .h4-co b em{font-style:normal;background:#F47B20;color:#141414;padding:0 4px;margin-right:2px;border-radius:2px}
+  .h4-co b{display:block;font-size:14px;font-weight:800;letter-spacing:1px}
+  .h4-co span,.h4-doc span{display:block;font-size:10px;color:#555;font-weight:500}
+  .h4-doc{text-align:right}
+  .h4-doc b{display:block;font-size:17px;font-weight:800;letter-spacing:2px;margin-bottom:2px}
+  .h4-info{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;padding:8px 0;border-bottom:1px solid #d9d9d9}
+  .h4-kv{display:flex;justify-content:space-between;gap:6px;padding:2px 0;min-width:0}
+  .h4-kv span{color:#555;white-space:nowrap}
+  .h4-kv b{font-weight:700;text-align:right;min-width:0;word-break:break-word}
+  .hd4 table.h4-tb{width:100%;border-collapse:collapse;margin:8px 0 0;border:none;background:none}
+  .hd4 .h4-tb td{padding:5px 0 5px 6px;border:none;border-bottom:1px solid #ececec;text-align:right;background:none;font-size:11.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .hd4 .h4-tb td.l{text-align:left;padding-left:0;white-space:normal;font-weight:600}
+  .hd4 .h4-tb td.l small{display:block;font-size:9.5px;color:#666;font-weight:500}
+  .hd4 .h4-tb thead td{font-size:9.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #111;padding-top:0}
+  .h4-sum{margin-top:6px}
+  .h4-row{display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-variant-numeric:tabular-nums}
+  .h4-row span{color:#333}
+  .h4-row b{font-weight:600}
+  .h4-row.strong span,.h4-row.strong b{font-weight:800;color:#111;font-size:12.5px}
+  .h4-sub{font-size:9.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:6px}
+  .h4-due{display:flex;justify-content:space-between;align-items:center;margin-top:8px;border:1.5px solid #111;padding:7px 10px}
+  .h4-due span{font-weight:800;font-size:11px;letter-spacing:.8px}
+  .h4-due b{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+  .h4-pay{display:flex;gap:12px;align-items:center;margin-top:10px;padding:10px;border:1.5px solid #F47B20;border-radius:6px;background:#FFF7F0}
+  .h4-pay img{background:#fff;padding:3px;border-radius:4px}
+  .h4-pay>div>b{color:#C2560A}
+  .h4-pay img{width:104px;height:104px;flex:none;image-rendering:pixelated}
+  .h4-pay>div{flex:1;min-width:0}
+  .h4-pay>div>b{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+  .h4-pay .h4-kv{font-size:10.5px;padding:1px 0}
+  .h4-pay small{display:block;font-size:9.5px;color:#555;margin-top:4px;line-height:1.35}
+  .h4-foot{text-align:center;font-size:9.5px;color:#666;margin-top:10px;padding-top:8px;border-top:1px solid #d9d9d9}
+  /* ===== Bản gọn hd3 ===== */
+  .hd3{font-size:12px}
+  .h3-head{background:#141414;color:#fff;padding:11px 14px;display:flex;align-items:center;gap:9px;border-bottom:4px solid #F47B20}
+  .hd3 .hd-helm{width:36px;height:34px;border-radius:8px}
+  .hd3 .hd-helm img{width:27px}
+  .hd3 .hd-word .gd{font-size:14px;padding:0 5px;letter-spacing:1.6px}
+  .hd3 .hd-word .bk{font-size:9.5px;letter-spacing:1.8px}
+  .hd3 .hd-ttl b{font-size:15px;letter-spacing:1.2px}
+  .hd3 .hd-ttl span{font-size:10.5px;letter-spacing:.3px;color:#e9e3db;font-weight:700}
+  .h3-info{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px 0}
+  .h3-info>div{background:#fff;border-radius:9px;padding:6px 9px;min-width:0}
+  .h3-info span{display:block;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6E6A66}
+  .h3-info span .hd-dot{width:7px;height:7px;margin-right:4px;vertical-align:0}
+  .h3-info b{display:block;font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .h3-info small{display:block;font-size:11px;font-weight:600;color:#6E6A66}
+  .h3-list{margin:6px 12px 0;background:#fff;border-radius:9px;padding:4px 10px}
+  .h3-ln{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px dashed #ece6dd}
+  .h3-ln:last-child{border-bottom:none}
+  .h3-ln span{font-weight:700;min-width:0}
+  .h3-ln span i{font-style:normal;font-weight:600;color:#6E6A66;font-size:11px}
+  .h3-ln b{font-weight:800;white-space:nowrap}
+  .h3-ln.tot{border-top:1.5px solid #141414;border-bottom:1.5px solid #141414;margin:2px 0;padding:5px 0}
+  .h3-ln.tot span,.h3-ln.tot b{font-size:14px;font-weight:800}
+  .h3-ln.pay span,.h3-ln.pay b{color:#15803d;font-weight:700}
+  .h3-due{margin:8px 12px 0;background:#F47B20;border-radius:11px;padding:9px;display:flex;gap:10px;align-items:center}
+  .h3-due img{width:108px;height:108px;background:#fff;border-radius:7px;padding:3px;flex:none;image-rendering:pixelated}
+  .h3-due .q{min-width:0;flex:1;color:#141414}
+  .h3-due .q span{display:block;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  .h3-due .q b{display:block;font-size:22px;font-weight:800;line-height:1.15}
+  .h3-due .q small{display:block;font-size:10.5px;font-weight:700;margin-top:2px;line-height:1.3}
+  .h3-due .q em{display:block;font-style:normal;font-size:10.5px;font-weight:600;margin-top:2px}
+  .h3-due .q em.nd{background:rgba(255,255,255,.55);border-radius:5px;padding:2px 6px;font-weight:800;word-break:break-word;margin-top:4px}
+  .h3-due.paid{background:#141414;justify-content:center;padding:11px}
+  .h3-due.paid b{color:#F47B20;font-size:15px;letter-spacing:1.4px;font-weight:800}
+  .h3-foot{text-align:center;font-size:10.5px;color:#6E6A66;padding:8px 12px 10px;font-weight:600}
   .hd2 .hd-sec{padding-top:12px}
   .hd-kv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px dashed #e4ddd3}
   .hd-kv:last-child{border-bottom:none}
@@ -3011,7 +3090,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-07-hoadon2';
+const BAN_APP = '2026-11-08-hoadongon';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5179,6 +5258,48 @@ document.getElementById('dtgSave').onclick=()=>{
 /* ====== HOÁ ĐƠN BOOKING (bản 2026-11-07-hoadon) — song ngữ Việt/Anh, chụp ảnh gửi khách ======
    Mở từ nút "🧾 Hoá đơn" trong booking (tự Lưu trước). Ảnh QR chuyển khoản: DB.hdQr (cfg, ảnh nén) hoặc file HD_QR_FILE. */
 const HD_QR_FILE='qr-chuyen-khoan.png';
+/* ===== QR VIETQR ĐỘNG (bản 2026-11-07-qrck) =====
+   DB.hdBank = {bin, acc, name?} — đọc 1 lần từ ảnh QR ngân hàng của chủ (nút QR trên hoá đơn, giải mã bằng jsQR).
+   Mỗi hoá đơn còn nợ tự tạo QR chuẩn VietQR (EMVCo) chứa SỐ TIỀN + NỘI DUNG CK → khách quét là có sẵn, chỉ bấm xác nhận.
+   Nội dung: GOODBIKE + tên xe + tên khách + SĐT (không dấu, viết hoa, tối đa 60 ký tự). */
+const HD_LIB_QR='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';
+const HD_LIB_JSQR='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+const HD_BANKS={'970436':'Vietcombank','970415':'VietinBank','970418':'BIDV','970405':'Agribank','970422':'MB Bank','970407':'Techcombank','970416':'ACB','970432':'VPBank','970423':'TPBank','970403':'Sacombank','970437':'HDBank','970441':'VIB','970443':'SHB','970431':'Eximbank','970426':'MSB','970448':'OCB','970454':'Viet Capital Bank','970429':'SCB','970440':'SeABank','970449':'LPBank','970427':'VietABank','970428':'Nam A Bank','970412':'PVcomBank','970425':'ABBANK','970438':'BaoViet Bank','970409':'Bac A Bank','970430':'PG Bank','970400':'Saigonbank','970419':'NCB','970452':'KienlongBank','963388':'Timo','971005':'Viettel Money','971011':'VNPT Money'};
+function hdKhongDau(t){ return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toUpperCase().replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function hdNoiDung(b){
+  const g=splitGuest(b.guest||''), xe=hdKhongDau(b.xe), ph=String(g.phone||'').replace(/[^\d]/g,'');
+  let nm=hdKhongDau(g.name), out=['GOODBIKE',xe,nm,ph].filter(Boolean).join(' ');
+  if(out.length>60){ nm=nm.slice(0,Math.max(0,nm.length-(out.length-60))).trim(); out=['GOODBIKE',xe,nm,ph].filter(Boolean).join(' '); }
+  return out.slice(0,60);
+}
+// TLV EMVCo
+const hdTlv=(id,v)=>id+String(v.length).padStart(2,'0')+v;
+function hdCrc16(str){ let c=0xFFFF; for(let i=0;i<str.length;i++){ c^=str.charCodeAt(i)<<8; for(let k=0;k<8;k++) c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF; } return c.toString(16).toUpperCase().padStart(4,'0'); }
+// QR ngân hàng của GOODBIKE (anh Harry gửi 7/11/2026): Techcombank, tài khoản hộ kinh doanh — dùng khi chưa cài DB.hdBank
+const HD_BANK_MAC_DINH={bin:'970407',acc:'MS00T08228403886049',
+  raw:'00020101021138630010A000000727013300069704070119MS00T082284038860490208QRIBFTTA53037045802VN8315T08228403886049840063040A03',
+  name:'HO KINH DOANH GOODBIKE RENTAL',accShow:'1907 0587 4900 12'};
+function hdBankNow(){ const b=DB.hdBank; return (b&&b.bin&&b.acc)?b:HD_BANK_MAC_DINH; }
+function hdVietQr(bk,amount,content){
+  if(bk.raw){   // giữ nguyên mọi trường của mã gốc (kể cả 83/84 của tài khoản hộ kinh doanh), chỉ thêm số tiền + nội dung
+    const t=hdTlvParse(bk.raw); delete t['63']; t['01']='12';
+    if(amount>0) t['54']=String(Math.round(amount)); else delete t['54'];
+    const sub=t['62']?hdTlvParse(t['62']):{}; if(content) sub['08']=content; else delete sub['08'];
+    const subS=Object.keys(sub).sort().map(k=>hdTlv(k,sub[k])).join(''); if(subS) t['62']=subS; else delete t['62'];
+    let p=Object.keys(t).sort().map(k=>hdTlv(k,t[k])).join('')+'6304';
+    return p+hdCrc16(p);
+  }
+  const acct=hdTlv('00','A000000727')+hdTlv('01',hdTlv('00',bk.bin)+hdTlv('01',bk.acc))+hdTlv('02','QRIBFTTA');
+  let p=hdTlv('00','01')+hdTlv('01','12')+hdTlv('38',acct)+hdTlv('53','704')+(amount>0?hdTlv('54',String(Math.round(amount))):'')+hdTlv('58','VN')+(content?hdTlv('62',hdTlv('08',content)):'')+'6304';
+  return p+hdCrc16(p);
+}
+function hdTlvParse(s){ const o={}; let i=0; while(i+4<=s.length){ const id=s.substr(i,2), n=parseInt(s.substr(i+2,2),10); if(isNaN(n)) break; o[id]=s.substr(i+4,n); i+=4+n; } return o; }
+function hdDocVietQr(txt){   // → {bin, acc, name} hoặc null
+  try{ const t=hdTlvParse(String(txt||'')); const a=t['38']&&hdTlvParse(t['38']); const b=a&&a['01']&&hdTlvParse(a['01']);
+    if(b&&b['00']&&b['01']) return {bin:b['00'],acc:b['01'],name:t['59']?String(t['59']).trim():'',raw:String(txt)}; }catch(e){}
+  return null;
+}
+function hdQrImg(text){ const q=qrcode(0,'M'); q.addData(text); q.make(); return q.createDataURL(6,2); }
 const HD_SHOP={hotline:'+84 385 308 342', web:'goodbikevietnamrental.com',
   cs:['192 P. Kim Mã, Ngọc Hà, Hà Nội','64 P. Phạm Huy Thông, Giảng Võ, Hà Nội']};
 let hdBkId=null;
@@ -5213,39 +5334,48 @@ function hdHtml(b){
   const pays=(b.payments&&b.payments.length)?b.payments.filter(p=>+p.amount):((+b.prepaid||0)>0?[{date:b.arrive,amount:+b.prepaid,method:b.pay||'TM'}]:[]);
   const paid=pays.reduce((a,p)=>a+(+p.amount||0),0), due=Math.max(tot-paid,0), nd=nightsOf(b).length;
   const dT=planDtime(b)||b.dtime||'08:00', rT=planRtime(b)||b.rtime||'12:00';
-  const logo=window.GB_LOGO||'', qr=DB.hdQr||HD_QR_FILE;
-  const rows=hdRentLines(b).map(l=>'<tr><td><div class="it">'+hdL('Thuê xe','Rental')+'</div><div class="s">'
-      +(l.n>1?fmtDM(l.from)+' → '+fmtDM(l.to):fmtDMY(l.from))+' · '+l.n+' × '+hdM(l.p)+'</div></td><td class="r">'+hdM(l.n*l.p)+'</td></tr>').join('')
-    + svc.map(x=>'<tr><td><div class="it">'+esc(hdSvcName(x.n))+'</div><div class="s">'+hdL('Dịch vụ thêm','Extra service')+'</div></td><td class="r">'+hdM(+x.p||0)+'</td></tr>').join('');
-  const payRows=pays.map(p=>'<tr><td><div class="it">'+hdPayLb(p.method)+'</div><div class="s">'+(p.date?fmtDMY(p.date):'')+(p.time?' '+p.time:'')+'</div></td><td class="r">'+hdM(+p.amount)+'</td></tr>').join('');
-  return '<div class="hd hd2" id="hdNode">'
-    +'<div class="hd-head">'+(logo?'<span class="hd-helm"><img src="'+logo+'" alt=""></span>':'')
-      +'<div class="hd-word"><span class="gd">GOOD</span><span class="bk">BIKE <em>RENTAL</em></span></div>'
-      +'<div class="hd-ttl"><b>'+hdL('HOÁ ĐƠN','INVOICE')+'</b><span>'+hdL('THUÊ XE MÁY','MOTORBIKE RENTAL')+'</span></div></div>'
-    +'<div class="hd-stripe"></div>'
-    +'<div class="hd-sec"><div class="hd-box">'
-      +((g.name||g.phone)?'<div class="hd-kv"><span class="hd-lb">'+hdL('Khách hàng','Customer')+'</span><span class="hd-cus"><b>'+esc(g.name||'—')+'</b>'+(g.phone?'<small>'+esc(g.phone)+'</small>':'')+'</span></div>':'')
-      +'<div class="hd-kv"><span class="hd-lb">'+hdL('Loại xe','Bike')+'</span><b class="hd-typ">'+esc(typ)+'</b></div>'
-      +'<div class="hd-kv"><span class="hd-lb"><span class="hd-dot" style="background:#16a34a"></span>'+hdL('Nhận xe','Pick\u2011up')+'</span><b>'+dT+' · '+fmtDMY(b.arrive)+'</b></div>'
-      +'<div class="hd-kv"><span class="hd-lb"><span class="hd-dot" style="background:#dc2626"></span>'+hdL('Trả xe','Return')+'</span><b>'+rT+' · '+fmtDMY(b.depart)+'</b></div>'
-    +'</div></div>'
-    +'<div class="hd-sec"><div class="hd-box"><div class="hd-lb">'+hdL('Chi tiết','Details')+' · '+nd+' '+hdL('ngày','day'+(nd>1?'s':''))+'</div>'
-      +'<table class="hd-items">'+(rows||'<tr><td class="s">—</td><td></td></tr>')+'</table>'
-      +'<div class="hd-sum tot"><span>'+hdL('Tổng cộng','Total')+'</span><b>'+hdM(tot)+'</b></div>'
-    +'</div></div>'
-    +'<div class="hd-sec"><div class="hd-box"><div class="hd-lb">'+hdL('Đã thanh toán','Payments')+'</div>'
-      +(payRows?'<table class="hd-items">'+payRows+'</table>':'<div class="s" style="color:#6E6A66;padding:4px 0">'+hdL('Chưa thanh toán','No payment yet')+'</div>')
-      +(pays.length>1?'<div class="hd-sum tot thin"><span>'+hdL('Tổng đã trả','Total paid')+'</span><b>'+hdM(paid)+'</b></div>':'')
-    +'</div></div>'
-    +(due>0?'<div class="hd-due"><span class="l">'+hdL('Còn phải thanh toán','Balance due')+'</span><b>'+hdM(due)+'</b></div>'
-           :'<div class="hd-due paid"><b>✓ '+hdL('ĐÃ THANH TOÁN ĐỦ','PAID IN FULL')+'</b></div>')
-    +(due>0?'<div class="hd-qr" id="hdQrBox"><img src="'+qr+'" alt="QR" crossorigin="anonymous" onerror="var b=document.getElementById(\'hdQrBox\');if(b)b.remove()">'
-         +'<div class="q"><b>'+hdL('Quét mã để chuyển khoản','Scan to pay by bank transfer')+'</b><span class="amt">'+hdM(due)+'</span></div></div>':'')
-    +'<div class="hd-foot2">'+hdL('Cảm ơn quý khách! Chúc chuyến đi vui vẻ.','Thank you & ride safe!')+'<br><b>'+HD_SHOP.hotline+'</b> · Zalo · WhatsApp</div>'
-    +'<div class="hd-bottom"></div></div>';
+  const logo=window.GB_LOGO||'', bk=DB.hdQr&&!DB.hdBank?null:hdBankNow(), nd2=hdNoiDung(b);
+  let qr=DB.hdQr||HD_QR_FILE, dyn=false;
+  if(bk && typeof qrcode!=='undefined'){ try{ qr=hdQrImg(hdVietQr(bk,due,nd2)); dyn=true; }catch(e){ console.warn('vietqr',e); } }
+  // BẢN NGHIÊM TÚC (8/11): nền trắng, chữ đen, kẻ mảnh, bảng cột như hoá đơn chuẩn; cam chỉ ở logo
+  const n0=v=>fmtVND(+v||0), dmy=ds=>{ const [y,m,d]=String(ds||'').split('-'); return d?(d+'/'+m+'/'+y):''; };
+  const dm=ds=>{ const [y,m,d]=String(ds||'').split('-'); return d?(d+'/'+m):''; };
+  const now=new Date(), issued=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear();
+  const tr=(a,q,u,t,c)=>'<tr'+(c?' class="'+c+'"':'')+'><td class="l">'+a+'</td><td>'+q+'</td><td>'+u+'</td><td>'+t+'</td></tr>';
+  const items=hdRentLines(b).map(l=>tr(hdL('Thuê xe','Motorbike rental')+'<small>'+dm(l.from)+(l.n>1?' – '+dm(l.to):'')+'</small>',l.n,n0(l.p),n0(l.n*l.p))).join('')
+    + svc.map(x=>tr(esc(hdSvcName(x.n)),1,n0(x.p),n0(x.p))).join('');
+  const kv=(l,v)=>'<div class="h4-kv"><span>'+l+'</span><b>'+v+'</b></div>';
+  const payLs=pays.map(p=>'<div class="h4-row"><span>'+hdPayLb(p.method)+' · '+(p.date?dm(p.date):'')+(p.time?' '+p.time:'')+'</span><b>'+n0(p.amount)+'</b></div>').join('');
+  return '<div class="hd hd4" id="hdNode">'
+    +'<div class="h4-top">'
+      +'<div class="h4-co">'+(logo?'<span class="h4-logo"><img src="'+logo+'" alt=""></span>':'')+'<div><b><em>GOOD</em>BIKE RENTAL</b><span>'+hdL('Cho thuê xe máy · Hà Nội','Motorbike rental · Hanoi')+'</span><span>Hotline/Zalo: '+HD_SHOP.hotline+'</span></div></div>'
+      +'<div class="h4-doc"><b>'+hdL('HOÁ ĐƠN','INVOICE')+'</b><span>'+hdL('Số','No.')+': '+hdNb(esc(hdNo(b)))+'</span><span>'+hdL('Ngày','Date')+': '+issued+'</span></div>'
+    +'</div>'
+    +'<div class="h4-info">'
+      +kv(hdL('Khách hàng','Customer'),esc(g.name||'—'))+kv(hdL('Điện thoại','Phone'),esc(g.phone||'—'))
+      +kv(hdL('Loại xe','Bike'),esc(typ))+kv(hdL('Số ngày','Days'),nd)
+      +kv(hdL('Nhận xe','Pick‑up'),dT+' '+dmy(b.arrive))+kv(hdL('Trả xe','Return'),rT+' '+dmy(b.depart))
+    +'</div>'
+    +'<table class="h4-tb"><thead>'+tr(hdL('Nội dung','Description'),hdL('SL','Qty'),hdL('Đơn giá','Unit'),hdL('Thành tiền','Amount'))+'</thead><tbody>'+items+'</tbody></table>'
+    +'<div class="h4-sum">'
+      +'<div class="h4-row strong"><span>'+hdL('Tổng cộng','Total')+'</span><b>'+n0(tot)+'</b></div>'
+      +(payLs?'<div class="h4-sub">'+hdL('Đã thanh toán','Payments received')+'</div>'+payLs:'')
+      +'<div class="h4-due'+(due>0?'':' ok')+'"><span>'+(due>0?hdL('CÒN PHẢI THANH TOÁN','BALANCE DUE'):hdL('ĐÃ THANH TOÁN ĐỦ','PAID IN FULL'))+'</span><b>'+n0(due)+' VND</b></div>'
+    +'</div>'
+    +(due>0&&(dyn||DB.hdQr)
+      ? '<div class="h4-pay"><img src="'+qr+'" alt="QR" onerror="this.remove()"><div>'
+          +'<b>'+hdL('Thông tin chuyển khoản','Bank transfer')+'</b>'
+          +(bk?kv(hdL('Ngân hàng','Bank'),esc(HD_BANKS[bk.bin]||''))+kv(hdL('Số TK','Account'),esc(bk.accShow||bk.acc))+(bk.name?kv(hdL('Chủ TK','Name'),esc(bk.name)):''):'')
+          +kv(hdL('Số tiền','Amount'),n0(due)+' VND')+kv(hdL('Nội dung','Reference'),esc(nd2))
+          +(dyn?'<small>'+hdL('Quét mã QR bằng ứng dụng ngân hàng — số tiền và nội dung đã điền sẵn.','Scan with your banking app — amount and reference are pre‑filled.')+'</small>':'')
+        +'</div></div>'
+      : '')
+    +'<div class="h4-foot">'+hdL('Cảm ơn quý khách đã sử dụng dịch vụ của GOODBIKE.','Thank you for choosing GOODBIKE.')+'<br>'+HD_SHOP.web+'</div>'
+    +'</div>';
 }
-function openHoaDon(id){
+async function openHoaDon(id){
   const b=(DB.bookings||[]).find(x=>x.id===id); if(!b) return;
+  if(typeof qrcode==='undefined'){ try{ await loadScriptOnce(HD_LIB_QR); }catch(e){ console.warn('qr lib',e); } }
   hdBkId=id; hdFontOnce();
   document.getElementById('hdCard').innerHTML=hdHtml(b);
   document.querySelectorAll('#hdLangSeg button').forEach(x=>x.classList.toggle('on',x.dataset.l===hdLang));
@@ -5283,12 +5413,27 @@ document.getElementById('hdClose').onclick=()=>document.getElementById('hdOverla
 document.getElementById('hdQrBtn').onclick=()=>document.getElementById('hdQrFile').click();
 document.getElementById('hdQrFile').onchange=function(){
   const f=this.files&&this.files[0]; this.value=''; if(!f) return;
-  const rd=new FileReader(); rd.onload=()=>{ const im=new Image(); im.onload=()=>{
-    const k=Math.min(1,480/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+  const msg=document.getElementById('hdMsg');
+  const rd=new FileReader(); rd.onload=()=>{ const im=new Image(); im.onload=async()=>{
+    const k=Math.min(1,1200/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
     const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.drawImage(im,0,0,c.width,c.height);
-    DB.hdQr=c.toDataURL('image/png'); try{ save(); }catch(e){}
-    if(hdBkId) openHoaDon(hdBkId);
-    document.getElementById('hdMsg').textContent='Đã đổi mã QR — mọi hoá đơn từ giờ dùng mã này.'; }; im.src=rd.result; };
+    let bk=null;
+    try{ if(typeof jsQR==='undefined') await loadScriptOnce(HD_LIB_JSQR);
+      const d=x.getImageData(0,0,c.width,c.height), r=jsQR(d.data,c.width,c.height,{inversionAttempts:'attemptBoth'});
+      bk=r&&hdDocVietQr(r.data); }catch(e){ console.warn('jsQR',e); }
+    if(bk){
+      if(!confirm('Đã đọc được tài khoản từ ảnh QR:\n\n'+(HD_BANKS[bk.bin]||('Ngân hàng BIN '+bk.bin))+'\nSố TK: '+bk.acc+(bk.name?'\nChủ TK: '+bk.name:'')+'\n\nDùng tài khoản này để tạo QR có sẵn số tiền + nội dung trên mọi hoá đơn?')) return;
+      DB.hdBank=bk; delete DB.hdQr; try{ save(); }catch(e){}
+      if(hdBkId) await openHoaDon(hdBkId);
+      msg.textContent='✅ Đã cài tài khoản '+(HD_BANKS[bk.bin]||bk.bin)+' · '+bk.acc+'. Khách quét QR trên hoá đơn là có sẵn số tiền + nội dung.';
+    }else{
+      // không đọc được VietQR → dùng ảnh QR cố định (khách phải tự gõ nội dung)
+      const k2=Math.min(1,480/Math.max(c.width,c.height)), c2=document.createElement('canvas'); c2.width=Math.round(c.width*k2); c2.height=Math.round(c.height*k2);
+      c2.getContext('2d').drawImage(c,0,0,c2.width,c2.height);
+      DB.hdQr=c2.toDataURL('image/png'); delete DB.hdBank; try{ save(); }catch(e){}
+      if(hdBkId) await openHoaDon(hdBkId);
+      msg.textContent='⚠️ Không đọc được mã VietQR trong ảnh — đang dùng ảnh QR cố định (khách phải tự nhập số tiền & nội dung). Thử chọn ảnh QR rõ hơn, chỉ chứa mã QR.';
+    } }; im.src=rd.result; };
   rd.readAsDataURL(f);
 };
 document.getElementById('bkHoaDon').onclick=()=>{
