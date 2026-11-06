@@ -615,6 +615,9 @@
   .hd-b{border:1px solid #D0D5DD;background:#fff;color:#101828;border-radius:9px;padding:7px 11px;font-weight:700;font-size:13px;cursor:pointer}
   .hd-b.dark{background:#141414;color:#fff;border-color:#141414}
   .hd-b.lite{background:#F2F4F7;color:#101828}
+  .hd-lang{display:inline-flex;background:#F2F4F7;border-radius:10px;padding:3px;gap:2px}
+  .hd-lang button{border:none;background:transparent;border-radius:8px;padding:6px 10px;font-weight:700;font-size:13px;color:#475569;cursor:pointer}
+  .hd-lang button.on{background:#141414;color:#fff}
   .hd-msg{color:#fff;font-size:12.5px;text-align:center;min-height:0}
   .hd-msg:empty{display:none}
   .hd-scroll{overflow:auto;border-radius:16px}
@@ -678,6 +681,19 @@
   .hd-foot .thx{color:#F47B20;font-weight:800;font-size:13px;letter-spacing:.5px;margin-bottom:4px}
   .hd-foot b{color:#fff}
   .hd-bottom{height:5px;background:#F47B20}
+  .hd2 .hd-sec{padding-top:12px}
+  .hd-kv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px dashed #e4ddd3}
+  .hd-kv:last-child{border-bottom:none}
+  .hd-kv .hd-lb{margin:0}
+  .hd-kv b{font-weight:800;font-size:14px;text-align:right}
+  .hd-kv b.hd-typ{font-size:17px}
+  .hd-cus{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+  .hd-cus b{font-size:15px}
+  .hd-cus small{font-size:12px;font-weight:600;color:#6E6A66;margin-top:1px}
+  .hd-sum.tot.thin{border-top-width:1px;font-size:13px}
+  .hd-sum.tot.thin b{font-size:15px}
+  .hd-foot2{margin-top:14px;background:#141414;color:#e9e3db;padding:12px 18px;font-size:11.5px;line-height:1.6;text-align:center}
+  .hd-foot2 b{color:#F47B20;font-size:13px}
   /* Dịch vụ thêm (form booking) */
   .svc-block .pay-block-h{background:linear-gradient(90deg,#f5f3ff,#ede9fe);color:#5b21b6}
   #bk_svclist{padding:6px 14px 2px}
@@ -2665,7 +2681,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 <div class="overlay" id="hdOverlay">
   <div class="hd-shell">
     <div class="hd-bar">
-      <b>🧾 Hoá đơn</b>
+      <span class="hd-lang" id="hdLangSeg"><button type="button" data-l="vi">🇻🇳 Tiếng Việt</button><button type="button" data-l="en">🇬🇧 English</button></span>
       <span class="hd-acts">
         <button type="button" id="hdShare" class="hd-b dark">📤 Gửi khách</button>
         <button type="button" id="hdSaveImg" class="hd-b">⬇ Lưu ảnh</button>
@@ -2995,7 +3011,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-07-hoadon';
+const BAN_APP = '2026-11-07-hoadon2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5172,7 +5188,12 @@ function hdFontOnce(){
   l.href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap&subset=vietnamese';
   document.head.appendChild(l);
 }
-const hdL=(vi,en)=>vi+' <i>/ '+en+'</i>';
+// Ngôn ngữ hoá đơn: 'vi' hoặc 'en' (chọn ở thanh trên hoá đơn, nhớ theo máy)
+let hdLang='vi'; try{ if(localStorage.getItem('gb_hdLang')==='en') hdLang='en'; }catch(e){}
+const hdL=(vi,en)=>hdLang==='en'?en:vi;
+// tên dịch vụ hay dùng → tiếng Anh (tên tự gõ khác thì giữ nguyên)
+const HD_SVC_EN={'áo mưa':'Raincoat','thêm mũ bảo hiểm':'Extra helmet','mũ bảo hiểm':'Helmet','giá đỡ điện thoại':'Phone holder','giao xe ngoài giờ':'After-hours delivery','đổ đầy xăng':'Full tank of fuel','sạc pin':'Battery charging','dịch vụ':'Service'};
+const hdSvcName=n=>{ n=String(n||'Dịch vụ'); return hdLang==='en'?(HD_SVC_EN[n.trim().toLowerCase()]||n):n; };
 const hdM=n=>fmtVND(n)+'đ';
 const hdNb=t=>String(t).replace(/-/g,'\u2011');   // gạch nối không ngắt dòng → ảnh chụp không hở chữ
 function hdNo(b){ return 'GB-'+String(b.arrive||'').slice(2).replace(/-/g,'')+'-'+String(b.xe||'').toUpperCase(); }
@@ -5183,56 +5204,51 @@ function hdRentLines(b){
     if(l && l.p===p && addDays(l.to,1)===ds){ l.to=ds; l.n++; } else out.push({from:ds,to:ds,n:1,p}); });
   return out;
 }
+function hdPayLb(m){ return m==='TM'?hdL('Tiền mặt','Cash'):(m==='CONGNO'||m==='RECV'?hdL('Công nợ','On account'):hdL('Chuyển khoản','Transfer')); }
+// Hoá đơn GỌN (theo góp ý 7/11): loại xe, ngày nhận/trả, giá, dịch vụ thêm, từng lệnh thanh toán, còn phải trả
 function hdHtml(b){
-  const g=splitGuest(b.guest||''), esc=escNote, vi=(DB.vehicleInfo&&DB.vehicleInfo[b.xe])||{};
-  const typ=vehTyp(b.xe)||'', bien=String(vi.bien||'').trim();
-  const rent=totalOf(b), svc=svcList(b), svcT=svcTotalOf(b), tot=rent+svcT;
-  const paid=(b.payments&&b.payments.length)?b.payments.reduce((a,p)=>a+(+p.amount||0),0):(+b.prepaid||0);
-  const due=Math.max(tot-paid,0), nd=nightsOf(b).length;
-  const recv=isRecvBk(b)||b.debt==='payable';
+  const esc=escNote, typ=vehTyp(b.xe)||'Xe máy';
+  const g=splitGuest(b.guest||'');
+  const svc=svcList(b), tot=totalOf(b)+svcTotalOf(b);
+  const pays=(b.payments&&b.payments.length)?b.payments.filter(p=>+p.amount):((+b.prepaid||0)>0?[{date:b.arrive,amount:+b.prepaid,method:b.pay||'TM'}]:[]);
+  const paid=pays.reduce((a,p)=>a+(+p.amount||0),0), due=Math.max(tot-paid,0), nd=nightsOf(b).length;
   const dT=planDtime(b)||b.dtime||'08:00', rT=planRtime(b)||b.rtime||'12:00';
-  const logo=window.GB_LOGO||'';
-  const qr=DB.hdQr||HD_QR_FILE;
-  const now=new Date(), issued=fmtDMY(todayStr())+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  const rows=hdRentLines(b).map(l=>'<tr><td><div class="it">'+hdL('Thuê xe','Bike rental')+'</div><div class="s">'
-      +(l.n>1?fmtDM(l.from)+' → '+fmtDM(l.to):fmtDMY(l.from))+' · '+l.n+' '+hdL('ngày','day'+(l.n>1?'s':''))+' × '+hdM(l.p)+'</div></td><td class="r">'+hdM(l.n*l.p)+'</td></tr>').join('')
-    + svc.map(x=>'<tr><td><div class="it">'+esc(x.n||'Dịch vụ')+'</div><div class="s">'+hdL('Dịch vụ thêm','Extra service')+'</div></td><td class="r">'+hdM(+x.p||0)+'</td></tr>').join('');
-  const dep=b.deposit&&(+b.deposit.amount||0)>0?b.deposit:null;
-  return '<div class="hd" id="hdNode">'
+  const logo=window.GB_LOGO||'', qr=DB.hdQr||HD_QR_FILE;
+  const rows=hdRentLines(b).map(l=>'<tr><td><div class="it">'+hdL('Thuê xe','Rental')+'</div><div class="s">'
+      +(l.n>1?fmtDM(l.from)+' → '+fmtDM(l.to):fmtDMY(l.from))+' · '+l.n+' × '+hdM(l.p)+'</div></td><td class="r">'+hdM(l.n*l.p)+'</td></tr>').join('')
+    + svc.map(x=>'<tr><td><div class="it">'+esc(hdSvcName(x.n))+'</div><div class="s">'+hdL('Dịch vụ thêm','Extra service')+'</div></td><td class="r">'+hdM(+x.p||0)+'</td></tr>').join('');
+  const payRows=pays.map(p=>'<tr><td><div class="it">'+hdPayLb(p.method)+'</div><div class="s">'+(p.date?fmtDMY(p.date):'')+(p.time?' '+p.time:'')+'</div></td><td class="r">'+hdM(+p.amount)+'</td></tr>').join('');
+  return '<div class="hd hd2" id="hdNode">'
     +'<div class="hd-head">'+(logo?'<span class="hd-helm"><img src="'+logo+'" alt=""></span>':'')
       +'<div class="hd-word"><span class="gd">GOOD</span><span class="bk">BIKE <em>RENTAL</em></span></div>'
-      +'<div class="hd-ttl"><b>HOÁ ĐƠN</b><span>INVOICE</span></div></div>'
+      +'<div class="hd-ttl"><b>'+hdL('HOÁ ĐƠN','INVOICE')+'</b><span>'+hdL('THUÊ XE MÁY','MOTORBIKE RENTAL')+'</span></div></div>'
     +'<div class="hd-stripe"></div>'
-    +'<div class="hd-meta"><span>'+hdL('Số','No.')+': <b>'+hdNb(esc(hdNo(b)))+'</b></span><span>'+hdL('Ngày lập','Issued')+': <b>'+issued+'</b></span></div>'
-    +'<div class="hd-sec"><div class="hd-box hd-cust"><div><div class="hd-lb">'+hdL('Khách hàng','Customer')+'</div>'
-      +'<div class="nm">'+(g.name?esc(g.name):'—')+'</div>'+(g.phone?'<div class="ph">'+esc(g.phone)+'</div>':'')
-      +(recv&&b.src?'<div class="ph">'+hdL('Đơn vị','Company')+': '+esc(b.src)+'</div>':'')+'</div>'
-      +'<div class="hd-xe"><div class="hd-lb" style="text-align:right">'+hdL('Xe','Bike')+'</div><b>'+esc(b.xe)+'</b><div>'+esc(typ)+(bien?' · '+hdNb(esc(bien)):'')+'</div></div></div></div>'
-    +'<div class="hd-sec hd-trip">'
-      +'<div class="hd-box"><div class="hd-lb"><span class="hd-dot" style="background:#16a34a"></span>'+hdL('Nhận xe','Pick\u2011up')+'</div><div class="t">'+dT+' · '+fmtDMY(b.arrive)+'</div>'+(b.daddr?'<div class="a">'+esc(b.daddr)+'</div>':'')+'</div>'
-      +'<div class="hd-box"><div class="hd-lb"><span class="hd-dot" style="background:#dc2626"></span>'+hdL('Trả xe','Return')+'</div><div class="t">'+rT+' · '+fmtDMY(b.depart)+'</div>'+(b.raddr?'<div class="a">'+esc(b.raddr)+'</div>':'')+'</div>'
-    +'</div>'
+    +'<div class="hd-sec"><div class="hd-box">'
+      +((g.name||g.phone)?'<div class="hd-kv"><span class="hd-lb">'+hdL('Khách hàng','Customer')+'</span><span class="hd-cus"><b>'+esc(g.name||'—')+'</b>'+(g.phone?'<small>'+esc(g.phone)+'</small>':'')+'</span></div>':'')
+      +'<div class="hd-kv"><span class="hd-lb">'+hdL('Loại xe','Bike')+'</span><b class="hd-typ">'+esc(typ)+'</b></div>'
+      +'<div class="hd-kv"><span class="hd-lb"><span class="hd-dot" style="background:#16a34a"></span>'+hdL('Nhận xe','Pick\u2011up')+'</span><b>'+dT+' · '+fmtDMY(b.arrive)+'</b></div>'
+      +'<div class="hd-kv"><span class="hd-lb"><span class="hd-dot" style="background:#dc2626"></span>'+hdL('Trả xe','Return')+'</span><b>'+rT+' · '+fmtDMY(b.depart)+'</b></div>'
+    +'</div></div>'
     +'<div class="hd-sec"><div class="hd-box"><div class="hd-lb">'+hdL('Chi tiết','Details')+' · '+nd+' '+hdL('ngày','day'+(nd>1?'s':''))+'</div>'
       +'<table class="hd-items">'+(rows||'<tr><td class="s">—</td><td></td></tr>')+'</table>'
       +'<div class="hd-sum tot"><span>'+hdL('Tổng cộng','Total')+'</span><b>'+hdM(tot)+'</b></div>'
-      +'<div class="hd-sum"><span>'+hdL('Đã thanh toán','Paid')+'</span><b>'+hdM(paid)+'</b></div>'
     +'</div></div>'
-    +(due>0?'<div class="hd-due"><span class="l">Còn phải trả<i>Balance due</i></span><b>'+hdM(due)+'</b></div>'
-           :'<div class="hd-due paid"><b>✓ ĐÃ THANH TOÁN ĐỦ</b><span style="font-size:11px;font-weight:600">PAID IN FULL</span></div>')
-    +(dep?'<div class="hd-dep"><span>'+hdL('Tiền cọc','Deposit')+' ('+(dep.method==='CK'?'CK / Transfer':'TM / Cash')+')</span><b>'+hdM(+dep.amount)+'</b></div>'
-         +'<div style="padding:3px 18px 0;font-size:10px;color:#6E6A66">'+hdL('Hoàn lại khi trả xe','Refunded when the bike is returned')+'</div>':'')
+    +'<div class="hd-sec"><div class="hd-box"><div class="hd-lb">'+hdL('Đã thanh toán','Payments')+'</div>'
+      +(payRows?'<table class="hd-items">'+payRows+'</table>':'<div class="s" style="color:#6E6A66;padding:4px 0">'+hdL('Chưa thanh toán','No payment yet')+'</div>')
+      +(pays.length>1?'<div class="hd-sum tot thin"><span>'+hdL('Tổng đã trả','Total paid')+'</span><b>'+hdM(paid)+'</b></div>':'')
+    +'</div></div>'
+    +(due>0?'<div class="hd-due"><span class="l">'+hdL('Còn phải thanh toán','Balance due')+'</span><b>'+hdM(due)+'</b></div>'
+           :'<div class="hd-due paid"><b>✓ '+hdL('ĐÃ THANH TOÁN ĐỦ','PAID IN FULL')+'</b></div>')
     +(due>0?'<div class="hd-qr" id="hdQrBox"><img src="'+qr+'" alt="QR" crossorigin="anonymous" onerror="var b=document.getElementById(\'hdQrBox\');if(b)b.remove()">'
-         +'<div class="q"><b>Quét mã để chuyển khoản</b>Scan to pay by bank transfer<br>'+hdL('Nội dung','Note')+': <b style="display:inline;font-size:12px">'+hdNb(esc(hdNo(b)))+'</b><br><span class="amt">'+hdM(due)+'</span></div></div>':'')
-    +'<div class="hd-tags"><span>GIAO XE TẬN NƠI</span><span>MỞ 24/7</span><span>RIDE HANOI THE GOOD WAY</span></div>'
-    +'<div class="hd-foot"><div class="thx">Cảm ơn quý khách! · Thank you & ride safe!</div>'
-      +'Hotline · Zalo · WhatsApp: <b>'+HD_SHOP.hotline+'</b><br>'
-      +HD_SHOP.cs.map((c,i)=>'CS'+(i+1)+': '+c).join('<br>')+'<br>'+HD_SHOP.web+'</div>'
+         +'<div class="q"><b>'+hdL('Quét mã để chuyển khoản','Scan to pay by bank transfer')+'</b><span class="amt">'+hdM(due)+'</span></div></div>':'')
+    +'<div class="hd-foot2">'+hdL('Cảm ơn quý khách! Chúc chuyến đi vui vẻ.','Thank you & ride safe!')+'<br><b>'+HD_SHOP.hotline+'</b> · Zalo · WhatsApp</div>'
     +'<div class="hd-bottom"></div></div>';
 }
 function openHoaDon(id){
   const b=(DB.bookings||[]).find(x=>x.id===id); if(!b) return;
   hdBkId=id; hdFontOnce();
   document.getElementById('hdCard').innerHTML=hdHtml(b);
+  document.querySelectorAll('#hdLangSeg button').forEach(x=>x.classList.toggle('on',x.dataset.l===hdLang));
   document.getElementById('hdMsg').textContent='';
   document.getElementById('hdQrBtn').style.display=((typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode))?'none':'';
   document.getElementById('hdOverlay').classList.add('open');
@@ -5244,7 +5260,7 @@ async function hdCanvas(){
   return await html2canvas(node,{scale:3,backgroundColor:null,useCORS:true});
 }
 const hdBlob=c=>new Promise(r=>c.toBlob(r,'image/png'));
-function hdFileName(){ const b=(DB.bookings||[]).find(x=>x.id===hdBkId)||{}; return 'hoa-don-'+hdNo(b)+'.png'; }
+function hdFileName(){ const b=(DB.bookings||[]).find(x=>x.id===hdBkId)||{}; return (hdLang==='en'?'invoice-':'hoa-don-')+hdNo(b)+'.png'; }
 async function hdRun(btn,fn){
   const msg=document.getElementById('hdMsg'), old=btn.textContent; btn.disabled=true; btn.textContent='Đang tạo ảnh…';
   try{ await fn(); }catch(e){ console.warn('hoadon',e); msg.textContent='Không tạo được ảnh ('+((e&&e.message)||e)+'). Có thể chụp màn hình hoá đơn này để gửi.'; }
@@ -5262,6 +5278,7 @@ document.getElementById('hdCopy').onclick=function(){ hdRun(this,async()=>{
   const c=await hdCanvas(), bl=await hdBlob(c);
   await navigator.clipboard.write([new ClipboardItem({'image/png':bl})]);
   document.getElementById('hdMsg').textContent='Đã sao chép ảnh — dán (Ctrl+V) vào Zalo / WhatsApp / Messenger.'; }); };
+document.querySelectorAll('#hdLangSeg button').forEach(x=>x.onclick=()=>{ hdLang=x.dataset.l; try{ localStorage.setItem('gb_hdLang',hdLang); }catch(e){} if(hdBkId) openHoaDon(hdBkId); });
 document.getElementById('hdClose').onclick=()=>document.getElementById('hdOverlay').classList.remove('open');
 document.getElementById('hdQrBtn').onclick=()=>document.getElementById('hdQrFile').click();
 document.getElementById('hdQrFile').onchange=function(){
