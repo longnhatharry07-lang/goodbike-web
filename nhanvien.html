@@ -129,6 +129,32 @@
   .veh.sp .vehinfo-ic{color:#9333ea}
   .veh.dump{background:#e5e7eb;color:#4b5563;border-right-color:#6b7280;font-style:normal}
   .veh.dump .typ{color:#6b7280}
+  .tl-row.tl-addrow{background:#fafbfc}
+  .veh.vehadd{cursor:pointer;color:#1d4ed8;font-weight:800;background:#eef4ff;border-right-color:#93c5fd;justify-content:center;align-items:center;flex-direction:column;gap:0;line-height:1.1;text-align:center}
+  .veh.vehadd b{font-size:18px;line-height:1}
+  .veh.vehadd span{font-size:12px;white-space:nowrap}
+  .veh.vehadd:hover{background:#dbe8ff}
+  #khTl .tl-addrow{display:none}
+  body.viewmode .tl-addrow,body.nvmode .tl-addrow{display:none !important}
+  .xm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+  .xm-grid .full{grid-column:1/-1}
+  .xm-chk{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.4;margin-top:4px;cursor:pointer}
+  .xm-chk input{width:18px;height:18px;margin-top:1px;flex:none}
+  .xm-note{font-size:12.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px;margin-top:10px;line-height:1.5}
+  .xm-err{color:#b91c1c;font-size:12.5px;font-weight:700;min-height:16px;margin-top:6px}
+  .veh-id-row{display:flex;gap:8px;align-items:center}
+  .veh-id-row input{flex:1;font-weight:800;text-transform:uppercase}
+  @media (max-width:560px){ .xm-grid{grid-template-columns:1fr} }
+  .xm-grid>*,.veh-grid>*{min-width:0}
+  .xm-grid input:not([type=checkbox]),.xm-grid select,.veh-grid input,#vi_web,#vi_id{width:100%;box-sizing:border-box;min-width:0}
+  .veh-color-row input{flex:1;min-width:0;width:auto}
+  label.xm-chk{display:flex !important;flex-wrap:nowrap;align-items:flex-start;gap:8px;font-weight:500;color:#101828}
+  label.xm-chk input[type=checkbox]{width:18px !important;height:18px;flex:0 0 18px;margin:1px 0 0}
+  label.xm-chk span{flex:1;min-width:0}
+  #vehOverlay .actions button,#xeMoiOverlay .actions button{border-radius:9px;padding:9px 16px;font-weight:700;cursor:pointer}
+  #vehOverlay .actions .ghost,#xeMoiOverlay .actions .ghost{background:#F2F4F7;color:#101828;border:1px solid #D0D5DD}
+  #vehOverlay .actions .primary,#xeMoiOverlay .actions .primary{background:#101828;color:#fff;border:1px solid #101828}
+  #vehOverlay .actions .btn-del{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
   .tl-row.dump-row{background:repeating-linear-gradient(135deg,#f3f4f6 0 8px,#fafafa 8px 16px)}
   .tl-row.dump-first{border-top:3px solid #6b7280}
   #timeline .bar{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -580,6 +606,35 @@
   .addpay-btn{background:#16a34a;color:#fff;font-weight:700;padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-size:13px}
   .addpay-btn:hover{filter:brightness(1.05)}
   .paylist-wrap{padding:8px 14px;max-height:190px;overflow:auto}
+  /* Dịch vụ thêm (form booking) */
+  .svc-block .pay-block-h{background:linear-gradient(90deg,#f5f3ff,#ede9fe);color:#5b21b6}
+  #bk_svclist{padding:6px 14px 2px}
+  .svcline{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed #eef2f7}
+  .svcline input{min-width:0}
+  .svcline .svc-p{text-align:right;font-weight:700}
+  .svcline .del{background:#fee2e2;color:#dc2626;padding:4px 8px;font-weight:700;border:none;border-radius:7px;cursor:pointer}
+  .svc-hint{font-size:11.5px;color:#64748b;padding:6px 14px 10px;line-height:1.45}
+  .paystat .svc-split{display:block;font-size:10.5px;font-weight:600;color:#6d28d9;margin-top:2px;line-height:1.3}
+  .paystat .svc-split:empty{display:none}
+  /* Tab Dịch vụ thêm */
+  .dv-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;font-weight:800;font-size:14px;border-bottom:1px solid var(--line);background:#faf5ff;color:#5b21b6;flex-wrap:wrap}
+  .dv-sum{font-weight:700;font-size:13px;color:#6d28d9}
+  .dv-names{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px}
+  .dv-names .w{border:1px solid #e9d5ff;background:#fff;border-radius:10px;padding:8px 12px;min-width:140px;font-size:13px;font-weight:700;color:#3b0764}
+  .dv-names .w b{display:block;font-size:16px;color:#6d28d9;margin-top:2px}
+  .dv-names .w span{font-size:11.5px;font-weight:500}
+  .dv-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .dv-tbl th{background:#f8fafc;font-size:12px;color:#475569;padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  .dv-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top}
+  .dv-tbl .l{text-align:left}
+  .dv-tbl tr.dvrow{cursor:pointer}
+  .dv-tbl tr.dvrow:hover td{background:#faf5ff}
+  .dv-tbl .dv-day td{background:#f8fafc;font-weight:800;color:#334155;text-align:left;font-size:12.5px}
+  .dv-it{display:block;white-space:nowrap}
+  .dv-pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .dv-pill.ok{background:#dcfce7;color:#15803d}
+  .dv-pill.no{background:#fee2e2;color:#b91c1c}
+  .lt-svc{margin:6px 0 0;font-size:13px;font-weight:700;color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:5px 9px;display:inline-block}
   /* Chi tiết khách hàng */
   .cust-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
   .trip-row{display:flex;align-items:stretch;gap:10px;margin-bottom:14px}
@@ -1629,6 +1684,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
   <button class="tab" data-t="coc">Tiền cọc</button>
   <button class="tab" data-t="ship">Tiền ship</button>
+  <button class="tab" data-t="dichvu">Dịch vụ thêm</button>
   <button class="tab" data-t="baoduong">Bảo dưỡng</button>
   <button class="tab admin-toggle" id="accToggle">🔒 Kế toán</button>
   <span class="tab-group" id="accGroupLabel" style="display:none">📊 Kế toán</span>
@@ -1725,6 +1781,35 @@ body.gb-shell #tabs .tab.gb-more{display:none}
     <div class="card" style="padding:0">
       <div class="sh-h" id="shHList"></div>
       <div id="shList"></div>
+    </div>
+  </section>
+
+  <!-- DỊCH VỤ THÊM -->
+  <section class="view" id="view-dichvu" style="display:none">
+    <div class="card">
+      <div class="row">
+        <h2 style="margin:0">Dịch vụ thêm</h2>
+        <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button class="coc-btn" id="dvPrev">◀</button>
+          <span class="muted">Từ</span><input type="date" id="dvFrom">
+          <span class="muted">đến</span><input type="date" id="dvTo">
+          <button class="coc-btn" id="dvNext">▶</button>
+          <button class="coc-btn" id="dvToday">Hôm nay</button>
+          <button class="coc-btn" id="dvWeek">7 ngày qua</button>
+          <button class="coc-btn" id="dvMonth">Tháng này</button>
+          <button class="coc-btn" id="dvLastMonth">Tháng trước</button>
+        </div>
+      </div>
+      <div class="kpis" id="dvKpis" style="margin-top:12px"></div>
+      <div class="muted" style="margin-top:8px">Tiền dịch vụ thêm (mũ, áo mưa, giao ngoài giờ…) nhập ở tab <b>Chi tiết thanh toán</b> của booking. Đã cộng vào tiền khách phải trả nhưng <b>không</b> tính vào bảng Tổng doanh thu. Tính theo ngày nhận xe. Bấm 1 dòng để mở booking.</div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="dv-h"><span>Theo dịch vụ</span><span class="dv-sum" id="dvNamesSum"></span></div>
+      <div class="dv-names" id="dvNames"></div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="dv-h" id="dvHList"></div>
+      <div class="tbl-wrap"><table class="dv-tbl" id="dvTable"></table></div>
     </div>
   </section>
 
@@ -2295,8 +2380,15 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </div>
         <div id="f_dayPrices" class="dayprice-wrap"></div>
       </div>
+      <div class="pay-block svc-block">
+        <div class="pay-block-h">🛎 Dịch vụ thêm
+          <button class="addpay-btn" id="bk_addsvc" type="button">➕ Thêm dịch vụ</button></div>
+        <div id="bk_svclist"></div>
+        <div class="svc-hint">Tiền dịch vụ cộng vào tổng tiền khách trả, <b>không</b> tính vào bảng Tổng doanh thu — xem riêng ở mục <b>Dịch vụ thêm</b>.</div>
+        <datalist id="svcNameList"></datalist>
+      </div>
       <div class="pay-summary">
-        <div class="paystat s-blue"><span class="lbl">TỔNG TIỀN</span><b id="f_total">0 đ</b></div>
+        <div class="paystat s-blue"><span class="lbl">TỔNG TIỀN</span><b id="f_total">0 đ</b><small class="svc-split" id="f_totalSplit"></small></div>
         <div class="paystat s-green"><span class="lbl">ĐÃ THU</span><b id="f_paid">0 đ</b></div>
         <div class="paystat s-red"><span class="lbl">CÒN LẠI</span><b id="f_remain">0 đ</b></div>
       </div>
@@ -2443,17 +2535,51 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <div class="modal" style="width:min(440px,100%)">
     <button class="modal-x" data-close="vehOverlay" title="Đóng">✕</button>
     <h3 id="vehTitle">Thông tin xe</h3>
+    <div class="field" id="vi_idBox" style="margin-bottom:10px"><label>Tên xe <span class="muted" style="font-weight:400">(đổi tên → mọi booking, bảo dưỡng của xe này đổi theo)</span></label>
+      <div class="veh-id-row"><input type="text" id="vi_id" maxlength="12" autocomplete="off" spellcheck="false" data-lpignore="true"></div></div>
     <div class="veh-grid">
-      <div class="field"><label>Loại xe</label><input type="text" id="vi_typ" placeholder="VD: Vision"></div>
+      <div class="field"><label>Loại xe</label><input type="text" id="vi_typ" placeholder="VD: Vision" list="xmTypList"></div>
       <div class="field"><label>Đời xe</label><input type="text" id="vi_doi" placeholder="VD: 2022"></div>
       <div class="field"><label>Biển số xe</label><input type="text" id="vi_bien" placeholder="VD: 29-AB1 234.56"></div>
       <div class="field"><label>Màu sắc</label>
         <div class="veh-color-row"><span class="veh-color-dot" id="vi_dot"></span><input type="text" id="vi_mau" placeholder="VD: Đỏ đô / #b91c1c"></div>
       </div>
     </div>
+    <div id="vi_moreBox">
+      <div class="field" style="margin-top:10px"><label>Mẫu trên web bán hàng</label><select id="vi_web"></select></div>
+      <label class="xm-chk"><input type="checkbox" id="vi_sp"><span>Xe dòng đặc biệt (tô tím ở mọi nơi)</span></label>
+    </div>
+    <div class="xm-err" id="vi_err"></div>
     <div class="actions">
+      <button class="btn-del" id="vehDelete" style="display:none;margin-right:auto" title="Xoá xe này khỏi đội xe (chỉ xe tự thêm, chưa có booking)">🗑 Xoá xe</button>
       <button class="ghost" id="vehCancel">Hủy</button>
       <button class="primary" id="vehSave">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Thêm xe mới -->
+<div class="overlay" id="xeMoiOverlay">
+  <div class="modal" style="width:min(500px,100%)">
+    <button class="modal-x" data-close="xeMoiOverlay" title="Đóng">✕</button>
+    <h3>＋ Thêm xe mới</h3>
+    <div class="xm-grid">
+      <div class="field"><label>Tên xe (mã xe)</label><input type="text" id="xm_id" maxlength="12" placeholder="VD: A16" autocomplete="off" spellcheck="false" data-lpignore="true" style="font-weight:800;text-transform:uppercase"></div>
+      <div class="field"><label>Loại xe</label><input type="text" id="xm_typ" list="xmTypList" placeholder="VD: Vision" autocomplete="off"></div>
+      <div class="field full"><label>Mẫu trên web bán hàng</label><select id="xm_web"></select></div>
+      <div class="field"><label>Hiện trên sơ đồ ngay sau xe</label><select id="xm_after"></select></div>
+      <div class="field"><label>Ngày bắt đầu khai thác</label><input type="date" id="xm_tu"></div>
+      <div class="full">
+        <label class="xm-chk"><input type="checkbox" id="xm_cs" checked><span>Tính vào mẫu số công suất từ ngày bắt đầu khai thác <span class="muted">(bỏ tick nếu là xe ngoài đội)</span></span></label>
+        <label class="xm-chk"><input type="checkbox" id="xm_sp"><span>Xe dòng đặc biệt (tô tím ở mọi nơi)</span></label>
+      </div>
+    </div>
+    <datalist id="xmTypList"></datalist>
+    <div class="xm-note">Xe mới có đủ mọi chức năng như các xe khác: sơ đồ xe, chọn xe khi tạo booking, xe trống, bảng doanh thu, công suất, bảo dưỡng, kế hoạch giao nhận. Chọn mẫu web bán hàng thì số xe trống trên web tự tính thêm xe này.</div>
+    <div class="xm-err" id="xm_err"></div>
+    <div class="actions">
+      <button class="ghost" id="xmCancel">Hủy</button>
+      <button class="primary" id="xmSave">＋ Thêm xe</button>
     </div>
   </div>
 </div>
@@ -2562,7 +2688,10 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============ CONFIG ============ */
-const VEHICLES = [
+/* VEHICLES_GOC = danh sách xe gốc (khi chưa từng thêm/đổi tên xe trong app).
+   Từ bản 2026-11-06-xemoi: thêm xe / đổi tên xe làm ngay trong app → lưu ở DB.fleet (cfg, đồng bộ mọi máy)
+   và VEHICLES / XE_THAT được nạp lại tại chỗ bằng apFleet(). Xem claude/them-doi-ten-xe.md. */
+const VEHICLES_GOC = [
   {id:'A1',typ:'Vision'},{id:'A2',typ:'Vision'},{id:'A3',typ:'Vision'},
   {id:'A4',typ:'Vision'},{id:'A5',typ:'Vision'},{id:'A6',typ:'Vision'},{id:'A7',typ:'Vision'},{id:'A8',typ:'Vision'},{id:'A9',typ:'Vision'},
   {id:'A10',typ:'Vision'},{id:'A11',typ:'Vision'},{id:'A12',typ:'Vision'},{id:'A15',typ:'Vision'},
@@ -2577,9 +2706,27 @@ const VEHICLES = [
   // KHÔNG tính vào số lượng xe, xe trống, công suất; KHÔNG bán trên web (không có trong WEB_GROUPS).
   {id:'DUMP1',typ:'Dump',dump:true},{id:'DUMP2',typ:'Dump',dump:true},{id:'DUMP3',typ:'Dump',dump:true}
 ];
+const VEHICLES = VEHICLES_GOC.map(v=>Object.assign({},v));   // mảng ĐỘNG — nạp lại tại chỗ từ DB.fleet
 function isSpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.sp);}
 function isDumpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.dump);}
 const XE_THAT = VEHICLES.filter(v=>!v.dump);   // chỉ xe thật — dùng cho mọi phép đếm số xe
+/* ===== ĐỘI XE ĐỘNG (thêm xe / đổi tên xe ngay trong app) =====
+   DB.fleet = [{id, typ, sp?, over?, dump?, web?:bike_id web bán hàng, tu?:'YYYY-MM-DD' ngày thêm, cs?:true tính công suất}]
+   Chưa có DB.fleet → dùng VEHICLES_GOC. Có rồi → VEHICLES/XE_THAT và WEB_GROUPS[].xe lấy theo DB.fleet. */
+function fleetHopLe(f){ return Array.isArray(f) && f.length>0 && f.every(v=>v && typeof v.id==='string' && v.id.trim()); }
+let _fleetSig='';
+function apFleet(){
+  const src=fleetHopLe(DB.fleet)?DB.fleet:VEHICLES_GOC, sig=JSON.stringify(src);
+  if(sig!==_fleetSig){
+    _fleetSig=sig;
+    const list=src.map(v=>{ const o={id:String(v.id).trim(),typ:v.typ||''};
+      ['sp','over','dump','cs'].forEach(k=>{ if(v[k]) o[k]=true; });
+      if(v.web) o.web=v.web; if(v.tu) o.tu=v.tu; return o; });
+    VEHICLES.splice(0,VEHICLES.length,...list);
+    XE_THAT.splice(0,XE_THAT.length,...VEHICLES.filter(v=>!v.dump));
+  }
+  try{ webGroupsTuFleet(); }catch(e){}   // WEB_GROUPS khai báo phía dưới — lần đầu có thể chưa sẵn
+}
 const FLEET_CAPACITY = 15; // (không còn dùng để tính công suất — xem FLEET_MOC / capacityOn)
 let DAYW = 212;           // độ rộng 1 ô ngày trên sơ đồ (px) — phải khớp CSS --dayw
 const SOURCES = {
@@ -2673,6 +2820,7 @@ function normalizeDB(){
   }
   // Tách GIỜ DỰ KIẾN (lúc tạo đặt xe) khỏi giờ thực tế. dplan/rplan = dự kiến; dtime/rtime = thực tế (cập nhật khi giao/thu hồi).
   (DB.bookings||[]).forEach(b=>{ if(b.dplan==null)b.dplan=b.dtime||''; if(b.rplan==null)b.rplan=b.rtime||''; });
+  apFleet();                                    // đội xe động (DB.fleet)
 }
 normalizeDB();
 let curMonth = ymNow();           // 'YYYY-MM'
@@ -2725,7 +2873,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-05-chatluong2';
+const BAN_APP = '2026-11-06-xemoi';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3271,7 +3419,12 @@ function debtGroupOf(src){
 function commissionOn(b,ds){return (b&&b.debt==='payable'&&b.commissions&&b.commissions[ds]!=null)?b.commissions[ds]:0;}
 function commissionTotal(b){return (b&&b.debt==='payable')?nightsOf(b).reduce((a,ds)=>a+commissionOn(b,ds),0):0;}
 function netOn(b,ds){return priceOn(b,ds)-commissionOn(b,ds);}   // DOANH THU THẬT/ngày = giá khách trả − hoa hồng
-function grossTotalOf(b){return totalOf(b);}   // số tiền KHÁCH trả = tổng giá (hoa hồng đã nằm trong giá)
+/* ===== DỊCH VỤ THÊM (bản 2026-11-06-xemoi): booking.services = [{n:'tên dịch vụ', p:giá}]
+   Cộng vào BILL khách phải trả (grossTotalOf, còn lại, thu đủ mới thu hồi) nhưng KHÔNG nằm trong totalOf
+   → bảng Tổng doanh thu, công suất, lãi… không tính. Thống kê riêng ở tab "Dịch vụ thêm". */
+function svcList(b){ return (b&&Array.isArray(b.services))?b.services.filter(x=>x&&((+x.p||0)>0||String(x.n||'').trim())):[]; }
+function svcTotalOf(b){ return svcList(b).reduce((a,x)=>a+(+x.p||0),0); }
+function grossTotalOf(b){return totalOf(b)+svcTotalOf(b);}   // số tiền KHÁCH trả = tiền thuê (hoa hồng đã nằm trong giá) + dịch vụ thêm
 function vehTyp(xe){ return (DB.vehicleInfo&&DB.vehicleInfo[xe]&&DB.vehicleInfo[xe].typ) || ((typeof VEHICLES!=='undefined'&&VEHICLES.find(v=>v.id===xe)||{}).typ) || xe; }
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function departDT(b){return new Date(b.depart+'T'+(b.rtime||'12:00')+':00');}
@@ -3323,6 +3476,7 @@ function switchTab(t){
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
   if(t==='ship'){ shipFrom=todayStr(); shipTo=todayStr(); renderShip(); }
+  if(t==='dichvu'){ try{ renderDichVu(); }catch(e){ console.warn('renderDichVu',e); } }
   if(t==='baoduong'){ try{ renderBaoDuong(true); }catch(e){ console.warn('renderBaoDuong',e); } }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
   if(t==='lichtrinh'){ try{ renderLichTrinh(); }catch(e){ console.warn('renderLichTrinh',e); } }
@@ -3764,7 +3918,7 @@ function renderAll(){
   normalizeDB();                     // đảm bảo DB đủ trường (kể cả sau khi kéo dữ liệu cloud cũ)
   const label=monthLabel(curMonth);
   document.querySelectorAll('.revMonthLabel').forEach(e=>e.textContent=label);
-  renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}try{renderShip();}catch(e){console.warn('renderShip',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
+  renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}try{renderShip();}catch(e){console.warn('renderShip',e);}try{renderDichVu();}catch(e){console.warn('renderDichVu',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
   try{ renderBaoDuong(); }catch(e){ console.warn('renderBaoDuong',e); }
   try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
@@ -3819,6 +3973,8 @@ function renderTimeline(){
   const nowLX = (win.map[_t]!=null) ? (win.map[_t]*DAYW + ((new Date().getHours()*60+new Date().getMinutes())/1440)*DAYW) : null;
   // rows
   let rows='';
+  const _addRow='<div class="tl-row tl-addrow"><div class="veh vehadd" id="tlAddXe" role="button" tabindex="0" title="Thêm xe mới vào đội xe"><b>＋</b><span>Thêm xe</span></div><div class="lane"></div></div>';
+  const _lastReal=XE_THAT[XE_THAT.length-1];
   VEHICLES.forEach(v=>{
     const _dFirst = v.dump && v===VEHICLES.find(x=>x.dump);
     rows+=`<div class="tl-row${v.dump?' dump-row':''}${_dFirst?' dump-first':''}" data-xe="${v.id}"><div class="veh vehclick${v.sp?' sp':''}${v.dump?' dump':''}" data-veh="${v.id}" title="${v.dump?'Dòng DUMP — chỉ để tạm chứa booking khi luân chuyển xe (không tính số xe, không bán trên web)':'Bấm để xem/sửa thông tin xe '+v.id}">${v.id}<span class="typ">${vehTyp(v.id)}</span><span class="vehinfo-ic">ⓘ</span></div><div class="lane">`;
@@ -3846,12 +4002,14 @@ function renderTimeline(){
     });
     if(nowLX!=null) rows+=`<div class="nowline" style="left:${nowLX}px"></div>`;  // đường hiện tại — NẰM SAU thanh booking (z-index thấp hơn)
     rows+='</div></div>';
+    if(v===_lastReal) rows+=_addRow;   // nút ＋ Thêm xe: ngay sau xe thật cuối cùng, trên các dòng DUMP
   });
   tl.innerHTML=mrow+head+rows;
   tl.querySelectorAll('.gridcell').forEach(c=>c.onclick=()=>openBooking(null,{xe:c.dataset.xe,ds:c.dataset.ds}));
   tl.querySelectorAll('.bar').forEach(bar=>bar.onclick=ev=>{ev.stopPropagation();if(tlDrag.justEnded)return;openBooking(bar.dataset.id);});
   tlWireDrag(tl);
   tl.querySelectorAll('.vehclick').forEach(el=>el.onclick=()=>openVehInfo(el.dataset.veh));
+  { const ad=document.getElementById('tlAddXe'); if(ad){ ad.onclick=()=>openXeMoi(); ad.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openXeMoi(); } }; } }
   renderTlStats();
 }
 /* ============ GIỮ CHUỘT KÉO THANH BOOKING SANG XE KHÁC ============
@@ -3864,7 +4022,7 @@ function tlWireDrag(tl){
   const wrap=tl.closest('.tl-wrap');
   const rowAt=(x,y)=>{ const g=tlDrag.st&&tlDrag.st.ghost; if(g) g.style.display='none';
     const el=document.elementFromPoint(x,y); if(g) g.style.display='';
-    const r=el&&el.closest&&el.closest('#'+tl.id+' .tl-row'); return r||null; };
+    const r=el&&el.closest&&el.closest('#'+tl.id+' .tl-row[data-xe]'); return r||null; };
   const clearHi=()=>tl.querySelectorAll('.tl-row.drop-ok,.tl-row.drop-bad').forEach(r=>r.classList.remove('drop-ok','drop-bad'));
   function begin(st){
     const b=DB.bookings.find(x=>x.id===st.id); if(!b){tlDrag.st=null;return;}
@@ -4192,6 +4350,8 @@ const FLEET_MOC = [
 function capacityOn(ds){
   let so=FLEET_MOC[0].so;
   for(let i=0;i<FLEET_MOC.length;i++){ if(ds>=FLEET_MOC[i].tu) so=FLEET_MOC[i].so; }
+  // xe tự thêm trong app (DB.fleet, cờ cs) → cộng 1 xe từ ngày bắt đầu khai thác
+  VEHICLES.forEach(v=>{ if(v.cs && v.tu && !v.dump && ds>=v.tu) so++; });
   return so;
 }
 function renderRevenue(){
@@ -4815,6 +4975,52 @@ document.getElementById('cocNext').onclick=()=>{const n=Math.round((new Date(coc
 document.getElementById('cocToday').onclick=()=>cocSet(todayStr(),todayStr());
 document.getElementById('cocTomorrow').onclick=()=>{const d=addDays(todayStr(),1);cocSet(d,d);};
 document.getElementById('cocWeek').onclick=()=>cocSet(todayStr(),addDays(todayStr(),6));
+/* ====== DỊCH VỤ THÊM: thống kê riêng (không nằm trong bảng Tổng doanh thu) ====== */
+let dvFrom=null, dvTo=null;
+function dvMonthRange(ym){ return [ym+'-01', ym+'-'+String(daysInMonth(ym)).padStart(2,'0')]; }
+function renderDichVu(){
+  if(!dvFrom){ const r=dvMonthRange(ymNow()); dvFrom=r[0]; dvTo=r[1]; }
+  const F=dvFrom, T=dvTo<dvFrom?dvFrom:dvTo, money=n=>fmtVND(n)+'đ', esc=escNote;
+  document.getElementById('dvFrom').value=F; document.getElementById('dvTo').value=T;
+  const bks=(DB.bookings||[]).filter(b=>svcList(b).length && b.arrive>=F && b.arrive<=T)
+    .sort((a,b)=>(a.arrive+(planDtime(a)||a.dtime||'')).localeCompare(b.arrive+(planDtime(b)||b.dtime||''))||String(a.xe).localeCompare(String(b.xe)));
+  const tot=bks.reduce((a,b)=>a+svcTotalOf(b),0);
+  const unpaid=bks.filter(b=>remainOf(b)>0), unpaidAmt=unpaid.reduce((a,b)=>a+Math.min(svcTotalOf(b),remainOf(b)),0);
+  const nItems=bks.reduce((a,b)=>a+svcList(b).length,0);
+  document.getElementById('dvKpis').innerHTML=`
+    ${kpi('Tổng tiền dịch vụ',money(tot)+' <small class="muted">· '+nItems+' lượt</small>')}
+    ${kpi('Số booking có dịch vụ',bks.length+'')}
+    ${kpi('Trung bình / booking',money(bks.length?Math.round(tot/bks.length):0))}
+    ${kpi('Booking chưa thu đủ',money(unpaidAmt)+' <small class="muted">· '+unpaid.length+' booking</small>',unpaid.length?'neg':'')}`;
+  // theo tên dịch vụ
+  const by={}; bks.forEach(b=>svcList(b).forEach(x=>{ const n=String(x.n||'Dịch vụ').trim()||'Dịch vụ'; const k=n.toLowerCase(); const o=by[k]||(by[k]={n,c:0,s:0}); o.c++; o.s+=(+x.p||0); }));
+  const names=Object.values(by).sort((a,b)=>b.s-a.s||b.c-a.c);
+  document.getElementById('dvNames').innerHTML=names.length?names.map(o=>`<div class="w">${esc(o.n)}<b>${money(o.s)}</b><span class="muted">${o.c} lượt</span></div>`).join('')
+    :'<div class="muted">Chưa có dịch vụ thêm trong khoảng này.</div>';
+  document.getElementById('dvNamesSum').textContent=names.length+' loại dịch vụ';
+  document.getElementById('dvHList').innerHTML=`<span>Booking có dịch vụ thêm · ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}</span><span class="dv-sum">${bks.length} booking · ${money(tot)}</span>`;
+  const th=`<tr><th class="l">Ngày nhận</th><th class="l">Xe</th><th class="l">Khách</th><th class="l">Dịch vụ</th><th>Tiền dịch vụ</th><th>Tổng bill</th><th class="l">Thu tiền</th></tr>`;
+  let last='', rb='';
+  bks.forEach(b=>{
+    if(b.arrive!==last){ last=b.arrive; rb+=`<tr class="dv-day"><td colspan="7">${dow(b.arrive)}, ${fmtDMY(b.arrive)}</td></tr>`; }
+    const g=splitGuest(b.guest||''), rem=remainOf(b);
+    rb+=`<tr class="dvrow" data-id="${b.id}"><td class="l">${fmtDM(b.arrive)} → ${fmtDM(b.depart)}</td><td class="l"><b class="${isSpXe(b.xe)?'sp':''}">${esc(b.xe)}</b></td><td class="l">${g.name?esc(g.name):'<span class="muted">—</span>'}${g.phone?`<br><small class="muted">${esc(g.phone)}</small>`:''}</td>`
+      +`<td class="l">${svcList(b).map(x=>`<span class="dv-it">${esc(x.n||'Dịch vụ')} · <b>${money(+x.p||0)}</b></span>`).join('')}</td>`
+      +`<td><b>${money(svcTotalOf(b))}</b></td><td>${money(grossTotalOf(b))}</td>`
+      +`<td class="l">${rem>0?`<span class="dv-pill no">Còn nợ ${money(rem)}</span>`:'<span class="dv-pill ok">Đã thu đủ</span>'}</td></tr>`;
+  });
+  document.getElementById('dvTable').innerHTML=th+(rb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có booking nào có dịch vụ thêm trong khoảng này.</td></tr>');
+  document.querySelectorAll('#dvTable .dvrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id));
+}
+function dvSet(f,t){dvFrom=f;dvTo=t<f?f:t;renderDichVu();}
+document.getElementById('dvFrom').onchange=e=>{if(e.target.value)dvSet(e.target.value,dvTo<e.target.value?e.target.value:dvTo);};
+document.getElementById('dvTo').onchange=e=>{if(e.target.value)dvSet(dvFrom>e.target.value?e.target.value:dvFrom,e.target.value);};
+document.getElementById('dvPrev').onclick=()=>{const n=Math.round((new Date(dvTo)-new Date(dvFrom))/864e5)+1;dvSet(addDays(dvFrom,-n),addDays(dvTo,-n));};
+document.getElementById('dvNext').onclick=()=>{const n=Math.round((new Date(dvTo)-new Date(dvFrom))/864e5)+1;dvSet(addDays(dvFrom,n),addDays(dvTo,n));};
+document.getElementById('dvToday').onclick=()=>dvSet(todayStr(),todayStr());
+document.getElementById('dvWeek').onclick=()=>dvSet(addDays(todayStr(),-6),todayStr());
+document.getElementById('dvMonth').onclick=()=>{const r=dvMonthRange(ymNow());dvSet(r[0],r[1]);};
+document.getElementById('dvLastMonth').onclick=()=>{const r=dvMonthRange(prevMonthYM(ymNow()));dvSet(r[0],r[1]);};
 /* ====== TIỀN SHIP: thống kê theo chuyến + theo nhân viên ====== */
 let shipFrom=todayStr(), shipTo=todayStr();
 const SHIP_NV_MAC_DINH=['Lâm','Tuấn Anh','Tùng'];
@@ -5027,7 +5233,7 @@ document.getElementById('schActDone').onclick=()=>{
   const b=DB.bookings.find(x=>x.id===schActId);if(!b)return;
   // BẮT BUỘC thanh toán đủ mới được THU HỒI xe (giao xe thì không cần)
   if(schActKind!=='Giao'){
-    const _tot=totalOf(b), _paid=saPayments.reduce((a,p)=>a+(+p.amount||0),0);
+    const _tot=grossTotalOf(b), _paid=saPayments.reduce((a,p)=>a+(+p.amount||0),0);
     if(_paid < _tot){ alert('Chưa thu đủ tiền — còn lại '+fmtVND(_tot-_paid)+'đ.\nPhải thanh toán hết mới được hoàn thành THU HỒI xe.'); return; }
   }
   const _snap=snapshotBk(b);                 // chụp trạng thái TRƯỚC khi đổi để còn Hoàn tác
@@ -5184,7 +5390,7 @@ function renderDebtRecon(){
     +`<th>${payable?'Phải trả (hoa hồng)':'Phải thu'}</th></tr>`;
   let tDays=0,tDebt=0,tGross=0;
   let body=rows.map(b=>{
-    const nd=nightsOf(b).length, debtAmt=payable?commissionTotal(b):totalOf(b), gross=grossTotalOf(b);
+    const nd=nightsOf(b).length, debtAmt=payable?commissionTotal(b):totalOf(b), gross=totalOf(b);
     tDays+=nd; tDebt+=debtAmt; tGross+=gross;
     const guest=(b.guest||'').trim()||'—';
     const da=(b.daddr||'').trim(), ra=(b.raddr||'').trim();
@@ -5362,6 +5568,7 @@ function openBooking(id,prefill,schedKind){
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     setDeposit(b.deposit); setShip(b.ship); dgReset();
+    bkSvcs=svcList(b).map(x=>({n:x.n||'',p:+x.p||0}));
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
     if(grp){ document.getElementById('f_debtCo').value=b.src; }
     renderDayPrices(b.prices||null, b.commissions||null);
@@ -5374,6 +5581,7 @@ function openBooking(id,prefill,schedKind){
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     setDeposit(null); setShip(null); dgReset();
+    bkSvcs=[];
     onSrcChange();
     renderDayPrices(null);
     del.style.display='none';
@@ -5382,7 +5590,7 @@ function openBooking(id,prefill,schedKind){
   refreshGuestList(); wireGuestInputs(); showGuestHint(null);   // gợi nhớ khách quen theo tên/SĐT
   renderXeOptions(selXe);   // dựng dropdown chỉ gồm xe còn trống theo khoảng ngày
   renderStatusBadge();      // badge trạng thái (không sửa tay; tự đổi khi giao/trả)
-  renderBkPayments();recalcPay();
+  renderBkPayments();renderBkSvcs();recalcPay();
   // mở tab theo ngữ cảnh: từ Lịch giao trả → tab Thanh toán; thường → tab Khách hàng
   activateMtab(schedKind?'bkSec2':'bkSec1');
   const sd=document.getElementById('bkSchDone');
@@ -5490,7 +5698,37 @@ function renderDayPrices(prices, commissions){ // 1 ô / NGÀY thuê GỒM cả 
 }
 function readDayPrices(){const o={};document.querySelectorAll('#f_dayPrices .dp').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
 function readDayComm(){const o={};document.querySelectorAll('#f_dayPrices .dpc').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
-function formTotal(){return [...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);}   // khách trả = giá (ô Doanh thu); hoa hồng đã nằm trong giá
+function formTotal(){return [...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);}
+function formBill(){return formTotal()+bkSvcs.reduce((a,x)=>a+(+x.p||0),0);}   // bill khách trả = tiền thuê + dịch vụ thêm
+/* ----- Dịch vụ thêm trong form booking ----- */
+let bkSvcs=[];
+const SVC_GOI_Y=['Thêm mũ bảo hiểm','Áo mưa','Giá đỡ điện thoại','Giao xe ngoài giờ','Đổ đầy xăng','Sạc pin'];
+function svcNames(){
+  const m={}; (DB.bookings||[]).forEach(b=>svcList(b).forEach(x=>{ const n=String(x.n||'').trim(); if(n) m[n]=(m[n]||0)+1; }));
+  const l=Object.keys(m).sort((a,b)=>m[b]-m[a]); SVC_GOI_Y.forEach(n=>{ if(!l.includes(n)) l.push(n); }); return l;
+}
+function renderBkSvcs(){
+  const el=document.getElementById('bk_svclist');
+  document.getElementById('svcNameList').innerHTML=svcNames().map(n=>'<option value="'+escNote(n)+'">').join('');
+  if(!bkSvcs.length){ el.innerHTML='<div class="muted" style="padding:6px">Chưa có dịch vụ. Bấm <b>➕ Thêm dịch vụ</b> — VD thêm mũ, áo mưa, giao ngoài giờ…</div>'; return; }
+  el.innerHTML=bkSvcs.map((x,i)=>'<div class="svcline"><input type="text" class="svc-n" data-i="'+i+'" list="svcNameList" maxlength="80" placeholder="Tên dịch vụ" value="'+escNote(x.n||'')+'" autocomplete="off" data-lpignore="true">'
+    +'<input type="text" inputmode="numeric" class="svc-p" data-i="'+i+'" placeholder="Giá tiền" value="'+moneyVN(x.p)+'" autocomplete="off">'
+    +'<button type="button" class="del" data-i="'+i+'" title="Xoá dịch vụ" aria-label="Xoá dịch vụ">✕</button></div>').join('');
+  el.querySelectorAll('.svc-n').forEach(inp=>inp.addEventListener('input',()=>{ bkSvcs[+inp.dataset.i].n=inp.value; }));
+  el.querySelectorAll('.svc-p').forEach(inp=>{
+    inp.addEventListener('input',()=>{ const n=parseInt(inp.value.replace(/[^\d]/g,''))||0; bkSvcs[+inp.dataset.i].p=n; inp.value=n?n.toLocaleString('en-US')+'đ':''; recalcPay(); });
+  });
+  el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{ bkSvcs.splice(+b.dataset.i,1); renderBkSvcs(); recalcPay(); });
+}
+function readSvcs(){
+  const l=bkSvcs.map(x=>({n:String(x.n||'').trim().replace(/\s+/g,' '),p:Math.max(0,Math.round(+x.p||0))})).filter(x=>x.n||x.p);
+  l.forEach(x=>{ if(!x.n) x.n='Dịch vụ'; });
+  return l.length?l:undefined;
+}
+document.getElementById('bk_addsvc').onclick=()=>{
+  bkSvcs.push({n:'',p:0}); renderBkSvcs(); recalcPay();
+  const ins=document.querySelectorAll('#bk_svclist .svc-n'); if(ins.length) ins[ins.length-1].focus();
+};   // khách trả = giá (ô Doanh thu); hoa hồng đã nằm trong giá
 function setDeposit(d){ d=d||{}; const a=+d.amount||0;
   document.getElementById('f_depAmt').value=a?a.toLocaleString('en-US')+'đ':'';
   document.getElementById('f_depMethod').value=d.method==='CK'?'CK':'TM';
@@ -5546,8 +5784,9 @@ function renderBkPayments(){
   el.querySelectorAll('.pedit').forEach(b=>b.onclick=()=>{bkPayments[+b.dataset.edit]._locked=false;renderBkPayments();recalcPay();});
   el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{bkPayments.splice(+b.dataset.i,1);renderBkPayments();recalcPay();});
 }
-function recalcPay(){ // tổng từ giá ngày (gồm hoa hồng nếu phải trả); đã thu = tổng các lệnh; còn lại = chênh
-  const total=formTotal();
+function recalcPay(){ // tổng = giá ngày (gồm hoa hồng nếu phải trả) + dịch vụ thêm; đã thu = tổng các lệnh; còn lại = chênh
+  const rent=formTotal(), svc=bkSvcs.reduce((a,x)=>a+(+x.p||0),0), total=rent+svc;
+  const sp=document.getElementById('f_totalSplit'); if(sp) sp.textContent=svc?('Thuê xe '+fmtVND(rent)+'đ + dịch vụ '+fmtVND(svc)+'đ'):'';
   const paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
   document.getElementById('f_total').textContent=fmtVND(total)+'đ';
   document.getElementById('f_paid').textContent=fmtVND(paid)+'đ';
@@ -5564,7 +5803,7 @@ function recalcPay(){ // tổng từ giá ngày (gồm hoa hồng nếu phải t
 ['f_dtime','f_rtime'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',()=>renderXeOptions(f('xe')));});
 ['f_guest','f_phone'].forEach(id=>document.getElementById(id).addEventListener('input',updateBkCall));
 document.getElementById('bk_addpay').onclick=()=>{
-  const total=formTotal();
+  const total=formBill();
   const paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
   bkPayments.push({date:todayStr(),time:nowHHMM(),amount:Math.max(total-paid,0),method:isFormRecv()?'CONGNO':'TM',desc:''});
   renderBkPayments();recalcPay();
@@ -5573,7 +5812,7 @@ document.querySelectorAll('.mtab').forEach(t=>t.onclick=()=>activateMtab(t.datas
 document.getElementById('bkSchDone').onclick=()=>{ // từ Lịch giao trả: set check-in/out + GIỜ THỰC TẾ rồi lưu
   // BẮT BUỘC thanh toán đủ mới được THU HỒI xe (giao xe thì không cần)
   if(bkSchKind && bkSchKind!=='Giao'){
-    const _tot=formTotal();
+    const _tot=formBill();
     const _paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
     if(_paid < _tot){ activateMtab('bkSec2'); alert('Chưa thu đủ tiền — còn lại '+fmtVND(_tot-_paid)+'đ.\nPhải thanh toán hết mới được hoàn thành THU HỒI xe.'); return; }
   }
@@ -5614,7 +5853,7 @@ document.getElementById('bkSave').onclick=()=>{
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
   rememberPlace(f('daddr'),f('dkm')); rememberPlace(f('raddr'),f('rkm'));   // tự nhớ địa điểm + km cho lần sau
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote'),deposit:readDeposit(),ship:readShip(editingBk?((DB.bookings.find(x=>x.id===editingBk)||{}).ship):null)};
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote'),deposit:readDeposit(),services:readSvcs(),ship:readShip(editingBk?((DB.bookings.find(x=>x.id===editingBk)||{}).ship):null)};
   if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
     // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
@@ -5708,6 +5947,7 @@ document.getElementById('swapSave').onclick=()=>{
     payments:newPay,prepaid:newPay.reduce((a,p)=>a+(+p.amount||0),0),
     pay:[...new Set(newPay.map(p=>p.method))].sort((x,y)=>PAY_PRIO[y]-PAY_PRIO[x])[0]||'',
     guest:b.guest,daddr:b.daddr||'',raddr:b.raddr||'',_swapFromXe:b.xe};
+  if(opt==='2' && svcList(b).length){ newB.services=JSON.parse(JSON.stringify(b.services)); delete b.services; }   // dịch vụ thêm đi theo tiền
   DB.bookings.push(newB);
   b._swapNewId=newB.id; b._swapToXe=newXe;               // liên kết + đánh dấu 3 mũi tên ⇶ để hoàn tác/hiển thị
   swapOv.classList.remove('open'); renderAll();
@@ -6373,7 +6613,7 @@ function paCustDirectory(){
     const r=map[key]||(map[key]={name:nm||'—', phone:ph, count:0, days:0, spend:0, last:'', srcs:new Set()});
     if(nm&&(r.name==='—'||!r.name))r.name=nm;
     if(ph&&!r.phone)r.phone=ph;
-    r.count++; r.days+=nightsOf(b).length; r.spend+=totalOf(b);
+    r.count++; r.days+=nightsOf(b).length; r.spend+=grossTotalOf(b);
     if((b.arrive||'')>r.last)r.last=b.arrive||'';
     if(b.src)r.srcs.add(b.src);
   });
@@ -6503,20 +6743,158 @@ function vf(k,v){const el=document.getElementById('vi_'+k);if(v!==undefined)el.v
 function updateVehDot(){ const dot=document.getElementById('vi_dot'); if(dot) dot.style.background=(vf('mau')||'').trim()||'transparent'; }
 function openVehInfo(id){
   editingVeh=id;
-  const base=(VEHICLES.find(v=>v.id===id)||{}).typ||'';
+  const v=VEHICLES.find(x=>x.id===id)||{};
+  const base=v.typ||'';
   const vi=(DB.vehicleInfo&&DB.vehicleInfo[id])||{};
+  const ro=(typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode);
   document.getElementById('vehTitle').textContent='Thông tin xe '+id;
   vf('typ',vi.typ||base); vf('doi',vi.doi||''); vf('bien',vi.bien||''); vf('mau',vi.mau||'');
+  document.getElementById('vi_id').value=id;
+  document.getElementById('vi_idBox').style.display=ro?'none':'';
+  document.getElementById('vi_moreBox').style.display=(ro||v.dump)?'none':'';
+  xmFillWeb(document.getElementById('vi_web'), xeWebOf(id));
+  document.getElementById('vi_sp').checked=!!v.sp;
+  document.getElementById('vi_err').textContent='';
+  const nBk=(DB.bookings||[]).filter(b=>b.xe===id).length;
+  const del=document.getElementById('vehDelete');
+  del.style.display=(!ro && v.tu && !nBk)?'':'none';   // chỉ xoá được xe tự thêm trong app và chưa có booking nào
+  xmFillTyp();
   updateVehDot();
   vehOv.classList.add('open');
 }
 document.getElementById('vi_mau').addEventListener('input',updateVehDot);
 document.getElementById('vehCancel').onclick=()=>vehOv.classList.remove('open');
 document.getElementById('vehSave').onclick=()=>{
+  const old=editingVeh, err=document.getElementById('vi_err');
+  const v=VEHICLES.find(x=>x.id===old)||{};
+  const ro=(typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode);
+  const neu=ro?old:xeNormId(document.getElementById('vi_id').value);
+  if(neu!==old){
+    const e=xeIdLoi(neu,old); if(e){ err.textContent=e; return; }
+    const nBk=(DB.bookings||[]).filter(b=>b.xe===old).length;
+    if(!confirm('Đổi tên xe '+old+' → '+neu+'?\n\n'+nBk+' booking (cả cũ lẫn mới), thông tin xe, bảo dưỡng và liên kết web bán hàng của xe này sẽ chuyển sang tên '+neu+'.')) return;
+  }
   if(!DB.vehicleInfo)DB.vehicleInfo={};
-  DB.vehicleInfo[editingVeh]={typ:vf('typ'),doi:vf('doi'),bien:vf('bien'),mau:vf('mau')};
+  DB.vehicleInfo[old]={typ:vf('typ'),doi:vf('doi'),bien:vf('bien'),mau:vf('mau')};
+  if(!ro && !v.dump){
+    const web=document.getElementById('vi_web').value||'', sp=document.getElementById('vi_sp').checked;
+    if(web!==xeWebOf(old) || sp!==!!v.sp){
+      const fl=fleetBase(), it=fl.find(x=>x.id===old);
+      if(it){ if(web) it.web=web; else delete it.web; if(sp) it.sp=true; else delete it.sp; DB.fleet=fl; apFleet(); }
+    }
+  }
+  if(neu!==old) doiTenXe(old,neu);
   vehOv.classList.remove('open'); renderAll();
 };
+document.getElementById('vehDelete').onclick=()=>{
+  const id=editingVeh, v=VEHICLES.find(x=>x.id===id);
+  if(!v||!v.tu) return;
+  if((DB.bookings||[]).some(b=>b.xe===id)){ alert('Xe '+id+' đã có booking nên không xoá được. Muốn dùng tên khác thì đổi tên xe.'); return; }
+  if(!confirm('Xoá xe '+id+' khỏi đội xe?\n\nChỉ nên xoá khi lỡ thêm nhầm. Xe này chưa có booking nào.')) return;
+  DB.fleet=fleetBase().filter(x=>x.id!==id);
+  if(DB.vehicleInfo) delete DB.vehicleInfo[id];
+  apFleet(); vehOv.classList.remove('open'); renderAll();
+};
+
+/* ============ THÊM XE MỚI / ĐỔI TÊN XE (bản 2026-11-06-xemoi) ============ */
+function xeNormId(s){ return String(s||'').trim().toUpperCase().replace(/\s+/g,''); }
+function xeIdLoi(id,old){
+  if(!id) return 'Nhập tên xe.';
+  if(!/^[A-Z0-9][A-Z0-9_.-]{0,11}$/.test(id)) return 'Tên xe chỉ gồm chữ không dấu, số, dấu - _ . (tối đa 12 ký tự), không có khoảng trắng.';
+  if(VEHICLES.some(v=>v.id!==old && v.id.toUpperCase()===id)) return 'Đã có xe tên '+id+'.';
+  if((DB.bookings||[]).some(b=>b.xe===id && b.xe!==old)) return 'Còn booking cũ đang mang tên '+id+' — chọn tên khác.';
+  return '';
+}
+function xeWebOf(id){ const v=VEHICLES.find(x=>x.id===id); if(v&&v.web) return v.web; if(fleetHopLe(DB.fleet)) return ''; const g=WEB_GROUPS.find(g=>g.xe.includes(id)); return g?g.id:''; }
+// bản sao danh sách xe hiện tại, kèm mẫu web của từng xe → dùng để ghi DB.fleet
+function fleetBase(){ return VEHICLES.map(v=>{ const o=Object.assign({},v); const w=xeWebOf(v.id); if(w&&!v.dump) o.web=w; else delete o.web; return o; }); }
+// WEB_GROUPS[].xe lấy theo DB.fleet (khi đã có) — Apps Script cũng đọc cfg:fleet theo cùng cách
+function webGroupsTuFleet(){
+  if(!fleetHopLe(DB.fleet)) return;
+  WEB_GROUPS.forEach(g=>{ g.xe=VEHICLES.filter(v=>!v.dump && v.web===g.id).map(v=>v.id); });
+}
+function xmFillWeb(sel,cur){
+  sel.innerHTML='<option value="">— Không bán trên web —</option>'+WEB_GROUPS.map(g=>'<option value="'+g.id+'"'+(g.id===cur?' selected':'')+'>'+escNote(g.ten)+' ('+g.xe.length+' xe)</option>').join('');
+  sel.value=cur||'';
+}
+function xmFillTyp(){
+  const ts=[...new Set(VEHICLES.filter(v=>!v.dump).map(v=>vehTyp(v.id)).filter(Boolean))];
+  document.getElementById('xmTypList').innerHTML=ts.map(t=>'<option value="'+escNote(t)+'">').join('');
+}
+function xmGoiYTen(typ,web){
+  // gợi ý tên kế tiếp theo tiền tố của xe cùng mẫu web / cùng loại (A15 → A16)
+  const same=VEHICLES.filter(v=>!v.dump && ((web&&xeWebOf(v.id)===web)||(!web&&typ&&vehTyp(v.id)===typ)));
+  const pool=same.length?same:XE_THAT;
+  const last=pool[pool.length-1]; if(!last) return '';
+  const m=last.id.match(/^(.*?)(\d+)$/); if(!m) return '';
+  const pre=m[1]; let n=Math.max(...VEHICLES.map(v=>{const k=v.id.match(/^(.*?)(\d+)$/);return k&&k[1]===pre?+k[2]:0;}))+1;
+  return pre+n;
+}
+function xmSync(fromWeb){
+  const web=document.getElementById('xm_web').value, typEl=document.getElementById('xm_typ');
+  if(fromWeb && web){ const s=VEHICLES.find(v=>!v.dump&&xeWebOf(v.id)===web); if(s){ typEl.value=vehTyp(s.id); document.getElementById('xm_sp').checked=!!s.sp; } }
+  const typ=typEl.value.trim();
+  // vị trí: sau xe cuối cùng cùng mẫu web, không có thì cùng loại, không có thì cuối xe thật
+  const pool=XE_THAT.filter(v=>web?xeWebOf(v.id)===web:(typ&&vehTyp(v.id)===typ));
+  const after=(pool[pool.length-1]||XE_THAT[XE_THAT.length-1]||{}).id||'';
+  document.getElementById('xm_after').value=after;
+  const idEl=document.getElementById('xm_id');
+  if(!idEl.value.trim() || idEl.dataset.auto==='1'){ const g=xmGoiYTen(typ,web); if(g){ idEl.value=g; idEl.dataset.auto='1'; } }
+}
+function openXeMoi(){
+  if((typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode)) return;
+  apFleet(); xmFillTyp();
+  const idEl=document.getElementById('xm_id'); idEl.value=''; idEl.dataset.auto='';
+  document.getElementById('xm_typ').value='';
+  xmFillWeb(document.getElementById('xm_web'),'');
+  document.getElementById('xm_after').innerHTML=XE_THAT.map(v=>'<option value="'+v.id+'">'+v.id+' ('+escNote(vehTyp(v.id))+')</option>').join('');
+  document.getElementById('xm_after').value=(XE_THAT[XE_THAT.length-1]||{}).id||'';
+  document.getElementById('xm_tu').value=todayStr();
+  document.getElementById('xm_cs').checked=true; document.getElementById('xm_sp').checked=false;
+  document.getElementById('xm_err').textContent='';
+  document.getElementById('xeMoiOverlay').classList.add('open');
+  setTimeout(()=>idEl.focus(),50);
+}
+document.getElementById('xm_web').onchange=()=>xmSync(true);
+document.getElementById('xm_typ').addEventListener('change',()=>xmSync(false));
+document.getElementById('xm_id').addEventListener('input',function(){ this.dataset.auto=''; });
+document.getElementById('xmCancel').onclick=()=>document.getElementById('xeMoiOverlay').classList.remove('open');
+document.getElementById('xmSave').onclick=()=>{
+  const err=document.getElementById('xm_err');
+  const id=xeNormId(document.getElementById('xm_id').value), typ=document.getElementById('xm_typ').value.trim().replace(/\s+/g,' ');
+  const e=xeIdLoi(id,null); if(e){ err.textContent=e; return; }
+  if(!typ){ err.textContent='Nhập loại xe (VD: Vision, Xe số, Xe điện…).'; return; }
+  const tu=document.getElementById('xm_tu').value||todayStr();
+  const web=document.getElementById('xm_web').value, after=document.getElementById('xm_after').value;
+  const it={id,typ,tu}; if(web) it.web=web; if(document.getElementById('xm_cs').checked) it.cs=true; if(document.getElementById('xm_sp').checked) it.sp=true;
+  const fl=fleetBase();
+  let pos=fl.findIndex(v=>v.id===after); if(pos<0) pos=fl.filter(v=>!v.dump).length-1;
+  fl.splice(pos+1,0,it);
+  DB.fleet=fl; apFleet();
+  document.getElementById('xeMoiOverlay').classList.remove('open');
+  renderAll();
+  alert('✅ Đã thêm xe '+id+' ('+typ+').'+(web?'\nWeb bán hàng sẽ tính thêm xe này vào mẫu '+(webGroupOf(web)||{}).ten+'.':'')+(it.cs?'\nMẫu số công suất +1 từ '+fmtDMY(tu)+'.':''));
+};
+// Đổi tên xe: chuyển mọi dữ liệu đang mang tên cũ sang tên mới
+function doiTenXe(old,neu){
+  const fl=fleetBase(), it=fl.find(v=>v.id===old); if(!it) return;
+  it.id=neu; DB.fleet=fl;
+  (DB.bookings||[]).forEach(b=>{
+    if(b.xe===old) b.xe=neu;
+    if(b._swapToXe===old) b._swapToXe=neu;
+    if(b._swapFromXe===old) b._swapFromXe=neu;
+  });
+  if(DB.vehicleInfo&&DB.vehicleInfo[old]){ DB.vehicleInfo[neu]=DB.vehicleInfo[old]; delete DB.vehicleInfo[old]; }
+  // bảo dưỡng: id mỗi dòng có tên xe ('mt_YYYY-MM_XE') → tạo dòng mới, bỏ dòng cũ
+  if(Array.isArray(DB.maintenance)){
+    DB.maintenance=DB.maintenance.map(m=>{ if(!m||m.xe!==old) return m; const n=Object.assign({},m,{xe:neu}); if(m.month) n.id='mt_'+m.month+'_'+neu; return n; });
+  }
+  // kế hoạch giao nhận: đơn phát sinh có ghi tên xe
+  Object.keys(DB).filter(k=>/^lt_\d{4}-\d{2}-\d{2}$/.test(k)).forEach(k=>{ const P=DB[k]; if(P&&Array.isArray(P.extra)) P.extra.forEach(x=>{ if(x&&x.xe===old) x.xe=neu; }); });
+  apFleet();
+  // đổi tên làm phát sinh nhiều lệnh "xoá" dòng bảo dưỡng cũ — đây là chủ ý nên không hỏi cầu dao xoá
+  dangDonRac=true; try{ save(); }finally{ dangDonRac=false; }
+}
 
 /* ============ ADMIN LOCK (Kế toán & Vận hành — mở riêng) ============ */
 document.getElementById('accToggle').onclick=()=>{accUnlocked?switchTab('revenue'):openAdmin('acc');};
@@ -7709,6 +8087,7 @@ const WEB_GROUPS=[
   {id:'ea8f3efa-8d9f-4571-8243-ea6b33c0195e', ten:'Yamaha NVX 125',                      xe:['B1']},
   {id:'611bf66e-4ec3-4495-8135-17c274375eb5', ten:'Honda Future 125',                    xe:['OVER1']}
 ];
+try{ webGroupsTuFleet(); }catch(e){}   // xe thêm/đổi tên trong app (DB.fleet) → nhóm web theo DB.fleet
 const WEB_SRC='Web';          // nguồn khách gán cho mọi đơn đặt từ web bán hàng
 const WEB_DAYS=90;            // đẩy tình trạng xe cho bao nhiêu ngày tới
 const WEB_EVERY=120000;       // tự đồng bộ mỗi 2 phút
@@ -8741,7 +9120,8 @@ function ltCardInfo(id){
   const kLab = grp ? c.label : (c.kind === 'thu' ? 'Thu hồi' : (c.kind === 'ps' ? 'Giao phát sinh' : 'Giao xe'));
   const wLab = sh ? (c.kind === 'thu' ? 'NHẬN XE TẠI' : 'GIAO XE TẠI') : (grp ? 'ĐỊA ĐIỂM' : (c.kind === 'thu' ? 'ĐI LẤY XE VỀ TỪ' : 'MANG XE ĐẾN'));
   const ship = mem.reduce((s, x) => { const bb = bkOf(x); return s + (bb ? shipAmt(bb, x.kind === 'thu' ? 'r' : 'd') : 0); }, 0);
-  return { c, grp, mem, sh, phone, gname, payX, late, plates, finLab, where, sub, notes: ltNotesOf(c), tmId, kc, kLab, wLab, ship };
+  const svc = [...new Set(mem.filter(x => x.kind !== 'thu').map(x => { const bb = bkOf(x); return bb ? svcList(bb).map(s => s.n).filter(Boolean).join(', ') : ''; }).filter(Boolean))].join(' · ');   // dịch vụ thêm → nhắc nhân viên khi giao
+  return { c, grp, mem, sh, phone, gname, payX, late, plates, finLab, where, sub, notes: ltNotesOf(c), tmId, kc, kLab, wLab, ship, svc };
 }
 const LT_KIC = {
   giao: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
@@ -8750,7 +9130,8 @@ const LT_KIC = {
 const ltKPill = k => '<span class="lt-kp k-' + k.kc + '">' + LT_KIC[k.kc] + ltEsc(k.kLab) + '</span>';
 const ltCallBtn = (k, cls) => k.phone ? '<a class="' + cls + '" href="tel:' + ltEsc(k.phone) + '" aria-label="Gọi ' + ltEsc(k.gname || 'khách') + '">' + LT_PHONE + '<span>Gọi</span></a>'
   : '<span class="' + cls + ' off" title="Booking chưa có số điện thoại">' + LT_PHONE + '<span>Không SĐT</span></span>';
-const ltShipHtml = k => k.ship > 0 ? '<div class="lt-ship">🚚 Tiền ship ' + (k.c.kind === 'thu' ? 'chiều về' : (k.grp ? '' : 'chiều đi')) + ': ' + fmtVND(k.ship) + 'đ</div>' : '';
+const ltShipHtml = k => (k.ship > 0 ? '<div class="lt-ship">🚚 Tiền ship ' + (k.c.kind === 'thu' ? 'chiều về' : (k.grp ? '' : 'chiều đi')) + ': ' + fmtVND(k.ship) + 'đ</div>' : '')
+  + (k.svc ? '<div class="lt-svc">🛎 Dịch vụ thêm: ' + ltEsc(k.svc) + '</div>' : '');
 const ltGSteps = k => k.grp ? '<div class="lt-gsteps">' + k.mem.map(x => '<div><b>' + ltFmt(ltT(x)) + '</b> ' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + (ltBien(x.xe) ? ' (' + ltEsc(ltBien(x.xe)) + ')' : '') + (k.c.same ? '' : ' · ' + ltEsc(x.addr)) + (ltDone(x.id) != null ? ' · <span class="ok">xong</span>' : '') + '</div>').join('') + '</div>' : '';
 // thẻ đơn đang làm (nền đen)
 function ltCurCard(id, lk){
@@ -9080,9 +9461,9 @@ function ltPaidOf(b){ return (b.payments || []).reduce((a, p) => a + (+p.amount 
 function ltNeedOf(b, kind){
   // thu hồi sớm hơn ngày hẹn → tiền tính tới hôm nay (giống hộp thu hồi cũ)
   if (kind !== 'thu') return grossTotalOf(b);
-  const td = todayStr(); if (!(b.depart > td)) return totalOf(b);
+  const td = todayStr(); if (!(b.depart > td)) return grossTotalOf(b);
   const c = JSON.parse(JSON.stringify(b)); c.depart = td; if (c.prices) Object.keys(c.prices).forEach(ds => { if (ds > td) delete c.prices[ds]; });
-  return totalOf(c);
+  return totalOf(c) + svcTotalOf(b);
 }
 function ltAddPay(b, amount, method){
   amount = Math.round(+amount || 0); if (!amount) return;
@@ -9922,7 +10303,7 @@ function renderChatLuong(){
     inventoryList:'Kiểm kê','funds.khauhao':'Quỹ khấu hao','funds.lairong':'Quỹ lợi nhuận','funds.tiennha':'Quỹ tiền nhà',contacts:'KH liên hệ',cfg:'Cấu hình'};
   const ACT = {them:['Thêm','#027A48','#ECFDF3'],sua:['Sửa','#175CD3','#EFF8FF'],xoa:['Xoá','#B42318','#FEF3F2'],khoiphuc:['Khôi phục','#6941C6','#F4F3FF']};
   const FLB = {xe:'Xe',guest:'Khách',arrive:'Ngày giao',depart:'Ngày trả',dtime:'Giờ giao',rtime:'Giờ trả',dplan:'Giờ giao dự kiến',rplan:'Giờ trả dự kiến',
-    daddr:'Nơi giao',raddr:'Nơi trả',status:'Trạng thái',src:'Nguồn',prices:'Giá',price:'Giá',payments:'Thanh toán',prepaid:'Đã trả',pay:'Hình thức TT',
+    daddr:'Nơi giao',raddr:'Nơi trả',status:'Trạng thái',src:'Nguồn',prices:'Giá',price:'Giá',payments:'Thanh toán',prepaid:'Đã trả',pay:'Hình thức TT',services:'Dịch vụ thêm',
     note:'Ghi chú',deposit:'Cọc',ship:'Ship',resaddr:'Nơi ở',debt:'Công nợ',commissions:'Hoa hồng',dkm:'Km giao',rkm:'Km trả',date:'Ngày',amt:'Số tiền',type:'Loại',cat:'Hạng mục',name:'Tên'};
 
   const css = document.createElement('style');
