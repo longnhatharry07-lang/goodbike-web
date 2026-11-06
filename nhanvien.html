@@ -1955,7 +1955,6 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <div class="chot-rev"><span id="chotRevSt"></span><button class="chot-main" id="chotBtn">Chốt tháng</button></div>
       </div>
       <div class="kpis" id="revKpis"></div>
-      <div class="muted" style="font-size:12px;margin-top:6px">Từ 1/11/2026: booking chỉ vào bảng khi khách <b>đã nhận xe</b> (bấm Hoàn thành giao). Booking “Sắp nhận” chưa tính vì khách có thể huỷ/đổi.</div>
       <div class="dtg-goal">
         <div><label>🎯 Mục tiêu doanh thu <span class="revMonthLabel"></span></label><input type="text" inputmode="numeric" id="dtgTarget" placeholder="VD: 60.000.000" autocomplete="off"></div>
         <button class="primary" id="dtgSave" style="background:#141414;color:#fff;border-radius:9px;padding:9px 14px;font-weight:700">Công bố</button>
@@ -2982,7 +2981,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-08-tinhgian';
+const BAN_APP = '2026-11-09-khoiphucdt';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3538,7 +3537,10 @@ function netOn(b,ds){return priceOn(b,ds)-commissionOn(b,ds);}   // DOANH THU TH
 function svcList(b){ return (b&&Array.isArray(b.services))?b.services.filter(x=>x&&((+x.p||0)>0||String(x.n||'').trim())):[]; }
 function svcTotalOf(b){ return svcList(b).reduce((a,x)=>a+(+x.p||0),0); }
 function grossTotalOf(b){return totalOf(b)+svcTotalOf(b);}
-/* ===== DOANH THU CHỈ TÍNH KHI KHÁCH ĐÃ NHẬN XE (bản 2026-11-07-hoadon) =====
+/* ===== DOANH THU "ĐÃ GIAO XE" — CHỈ DÙNG CHO THANH MỤC TIÊU APP MŨ ĐỎ (dtThang) =====
+   9/11/2026: anh Harry yêu cầu KHÔI PHỤC app chính (bảng Tổng doanh thu, doanh thu hôm nay, lãi, phân tích,
+   chốt tháng) về như cũ — tính MỌI booking kể cả "Sắp nhận". Quy tắc dưới chỉ còn áp cho mục tiêu doanh thu nhân viên.
+   (nội dung cũ:) =====
    Booking nhận từ DT_TU trở đi: còn "Sắp nhận" (khách có thể huỷ/đổi) thì CHƯA vào bảng Tổng doanh thu,
    doanh thu hôm nay, lãi tháng, phân tích tài chính, chốt tháng. Bấm "Hoàn thành giao" → vào ngay. Tháng cũ giữ nguyên. */
 const DT_TU='2026-11-01';
@@ -4242,7 +4244,7 @@ function renderTlStats(){
   const el=document.getElementById('tlStats'); if(!el)return;
   const T=todayStr();
   let rev=0;
-  dtBks().forEach(b=>{ if(nightsOf(b).includes(T)) rev+=priceOn(b,T); });   // doanh thu hôm nay theo DAY_PRICE
+  DB.bookings.forEach(b=>{ if(nightsOf(b).includes(T)) rev+=priceOn(b,T); });   // doanh thu hôm nay theo DAY_PRICE
   const rented=rentedSet(T);
   const tot=XE_THAT.length, thue=rented.size, trong=Math.max(tot-thue,0), pct=tot?Math.round(thue/tot*100):0;
   el.innerHTML=`
@@ -4404,7 +4406,7 @@ function buildMatrices(){
   const ndays=daysInMonth(curMonth);
   const top={},bottom={}; VEHICLES.forEach(v=>{top[v.id]={};bottom[v.id]={};});
   const extra={};
-  dtBks().forEach(b=>{
+  DB.bookings.forEach(b=>{
     if(top[b.xe]===undefined)return;
     const nights=nightsOf(b);
     // BẢNG TRÊN: doanh thu ĐẦY ĐỦ theo DAY_PRICE (cộng dồn nếu 1 xe nhiều booking/ngày)
@@ -4831,13 +4833,13 @@ function costGroup(type){return type==='bienphi'?'bien':type==='honhop'?'honhop'
 const GROUP_LABEL={bien:'biến phí',dinh:'định phí',honhop:'chi phí hỗn hợp'};
 function revBySource(month){
   const m={};
-  dtBks().forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)!==month)return;m[b.src||'Khác']=(m[b.src||'Khác']||0)+netOn(b,ds);}));
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)!==month)return;m[b.src||'Khác']=(m[b.src||'Khác']||0)+netOn(b,ds);}));
   return m;
 }
 // Gom nhóm doanh thu: nguồn thường (gộp Walk in/Zalo, Meta) + 2 nhóm công nợ kèm chi tiết công ty
 function revByGroup(month){
   const recvCo={}, payCo={}, simple={};
-  dtBks().forEach(b=>nightsOf(b).forEach(ds=>{
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{
     if(ds.slice(0,7)!==month)return;
     const v=netOn(b,ds), s=b.src||'Khác', g=debtGroupOf(s);
     if(g==='receivable')recvCo[s]=(recvCo[s]||0)+v;
@@ -4902,7 +4904,7 @@ function renderProfit(){
   document.getElementById('costTable').innerHTML=cth+cbody;
   /* ---- Doanh thu & lãi theo từng tháng ---- */
   const months={};
-  dtBks().forEach(b=>nightsOf(b).forEach(ds=>{const ym=ds.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0,khauhao:0}).rev+=priceOn(b,ds);}));
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{const ym=ds.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0,khauhao:0}).rev+=priceOn(b,ds);}));
   DB.expenses.forEach(e=>{const ym=e.date.slice(0,7);(months[ym]=months[ym]||{rev:0,bien:0,dinh:0,honhop:0,dautu:0,khauhao:0})[costGroup(e.type)]+=e.amt;});
   const yms=Object.keys(months).sort();
   let th=`<tr><th class="l">Tháng</th><th>Doanh thu</th><th>Biến phí</th><th>Định phí</th><th>Chi hỗn hợp</th><th>Lãi ròng</th><th>Biên LN</th></tr>`;
@@ -4911,7 +4913,7 @@ function renderProfit(){
   document.getElementById('profitTable').innerHTML=th+body;
 }
 function monthNet(month){
-  let rev=0;dtBks().forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)===month)rev+=priceOn(b,ds);}));
+  let rev=0;DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{if(ds.slice(0,7)===month)rev+=priceOn(b,ds);}));
   const g={bien:0,dinh:0,honhop:0};
   DB.expenses.filter(e=>e.date.slice(0,7)===month).forEach(e=>{const grp=costGroup(e.type);if(grp==='bien'||grp==='dinh'||grp==='honhop')g[grp]+=e.amt;});
   return rev-g.bien-g.dinh-g.honhop;
@@ -5140,7 +5142,7 @@ function renderDtgGoal(){
   const t=document.getElementById('dtgTarget'); if(!t) return;
   const g=dtGoalOf(curMonth), cur=dtThang(curMonth), ae=document.activeElement;
   if(ae!==t) t.value=g?Number(g.t).toLocaleString('en-US'):'';
-  document.getElementById('dtgSt').innerHTML=g?('Đã có <b>'+fmtVND(cur)+'đ</b> / '+fmtVND(g.t)+'đ · <b>'+Math.floor(cur/g.t*100)+'%</b>. Nhân viên thấy thanh tiến độ ở đầu Lịch trình (app mũ đỏ).')
+  document.getElementById('dtgSt').innerHTML=g?('Đã giao xe: <b>'+fmtVND(cur)+'đ</b> / '+fmtVND(g.t)+'đ · <b>'+Math.floor(cur/g.t*100)+'%</b>. Nhân viên thấy thanh tiến độ ở đầu Lịch trình (app mũ đỏ).')
     :'Chưa công bố mục tiêu tháng này. Doanh thu hiện tại: <b>'+fmtVND(cur)+'đ</b>.';
 }
 document.getElementById('dtgTarget').addEventListener('input',function(){ const n=parseInt(this.value.replace(/[^\d]/g,''))||0; this.value=n?n.toLocaleString('en-US'):''; });
@@ -6511,7 +6513,7 @@ function chotPhan(b){
 function tienThang(X){
   const d1=X+'-01', dE=ymEnd(X), P=ymPrev(X), N=ymNext(X), pE=ymEnd(P);
   const r={X,rev:0,congno:0,lc:0,thuNay:0,treo:0,thuSau:0,treoPrev:0,treoPrevThu:0,treoList:[]};
-  dtBks().forEach(b=>{
+  DB.bookings.forEach(b=>{
     const ns=nightsOf(b), mo=ds=>ds.slice(0,7);
     if(!ns.some(ds=>{const m=mo(ds);return m===X||m===N||m===P;})) return;
     let cX=0,cP=0; ns.forEach(ds=>{ if(mo(ds)===X) cX+=priceOn(b,ds); else if(mo(ds)===P) cP+=priceOn(b,ds); });
@@ -6654,7 +6656,7 @@ function paDDiff(a,b){return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a
 // Thống kê 1 khoảng ngày [from,to]
 function periodStats(from,to){
   let rev=0, days=0; const cust=new Set();
-  dtBks().forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ rev+=netOn(b,ds); n++; } }); if(n>0){ days+=n; cust.add(b.id); } });
+  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ rev+=netOn(b,ds); n++; } }); if(n>0){ days+=n; cust.add(b.id); } });
   let cost=0;
   DB.expenses.forEach(e=>{ if(e.date>=from&&e.date<=to){ const g=costGroup(e.type); if(g==='bien'||g==='dinh'||g==='honhop')cost+=e.amt; } });
   const numDays=paDDiff(from,to)+1;
@@ -6898,7 +6900,7 @@ function paWeekBrowser(){
 /* ===== Bảng đối chiếu chi tiết 2 kỳ (doanh thu theo nguồn + chi phí theo hạng mục) ===== */
 function paRevBySrc(from,to){
   const m={};
-  dtBks().forEach(b=>nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ const k=b.src||'Khác'; m[k]=(m[k]||0)+netOn(b,ds); } }));
+  DB.bookings.forEach(b=>nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){ const k=b.src||'Khác'; m[k]=(m[k]||0)+netOn(b,ds); } }));
   return m;
 }
 function paCostByCat(from,to){
@@ -6965,7 +6967,7 @@ function paRenderConcl(){
 /* ============ PHÂN TÍCH KHÁCH HÀNG ============ */
 function paCustStats(from,to){
   let bks=0, days=0, rev=0;
-  dtBks().forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){n++; rev+=netOn(b,ds);} }); if(n>0){bks++; days+=n;} });
+  DB.bookings.forEach(b=>{ let n=0; nightsOf(b).forEach(ds=>{ if(ds>=from&&ds<=to){n++; rev+=netOn(b,ds);} }); if(n>0){bks++; days+=n;} });
   return {bookings:bks, days, avgDays:bks?days/bks:0, reach:bks*2, rev, avgRev:bks?rev/bks:0};
 }
 function paCustDirectory(){
