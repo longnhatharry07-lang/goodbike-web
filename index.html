@@ -136,6 +136,7 @@
   .veh.vehadd:hover{background:#dbe8ff}
   #khTl .tl-addrow{display:none}
   body.viewmode .tl-addrow,body.nvmode .tl-addrow{display:none !important}
+  body.viewmode #svmCard,body.nvmode #svmCard{display:none !important}
   .xm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
   .xm-grid .full{grid-column:1/-1}
   .xm-chk{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.4;margin-top:4px;cursor:pointer}
@@ -606,7 +607,7 @@
   .addpay-btn{background:#16a34a;color:#fff;font-weight:700;padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-size:13px}
   .addpay-btn:hover{filter:brightness(1.05)}
   .paylist-wrap{padding:8px 14px;max-height:190px;overflow:auto}
-  /* ===== HOÁ ĐƠN (nhận diện GOODBIKE v2: cam #F47B20, đen #141414, ngà #F6F1EA, Montserrat) ===== */
+  /* ===== HOÁ ĐƠN (nhận diện GOODBIKE v2: cam #F47B20, đen #141414, ngà #F6F1EA, Be Vietnam Pro — đổi 9/11/2026 theo yêu cầu) ===== */
   .btn-hd{background:#F47B20;color:#141414;font-weight:800;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;font-size:13.5px}
   #hdOverlay{align-items:flex-start;overflow:auto}
   .hd-shell{width:min(460px,100%);margin:16px auto;display:flex;flex-direction:column;gap:8px}
@@ -639,7 +640,7 @@
   .hd-msg{color:#fff;font-size:12.5px;text-align:center;min-height:0}
   .hd-msg:empty{display:none}
   .hd-scroll{overflow:auto;border-radius:16px}
-  .hd{width:420px;max-width:100%;margin:0 auto;background:#F6F1EA;color:#141414;font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;border-radius:16px;overflow:hidden;position:relative;font-size:12.5px;line-height:1.4;letter-spacing:.1px}   /* letter-spacing≠0: html2canvas vẽ từng chữ theo đúng vị trí → không hở chữ quanh / : - */
+  .hd{width:420px;max-width:100%;margin:0 auto;background:#F6F1EA;color:#141414;font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;border-radius:16px;overflow:hidden;position:relative;font-size:12.5px;line-height:1.4;letter-spacing:.1px}   /* letter-spacing≠0: html2canvas vẽ từng chữ theo đúng vị trí → không hở chữ quanh / : - */
   .hd *{box-sizing:border-box}
   /* ===== Bản nghiêm túc hd4 ===== */
   .hd4{background:#fff;color:#111;border-radius:6px;font-size:11.5px;line-height:1.4;padding:18px 18px 12px;border:1px solid #d9d9d9}
@@ -678,15 +679,72 @@
   .h4-pay>div>b{display:block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
   .h4-pay .h4-kv{font-size:10.5px;padding:1px 0}
   .h4-pay small{display:block;font-size:9.5px;color:#555;margin-top:4px;line-height:1.35}
+  /* Be Vietnam Pro rộng hơn → giữ chữ chính trên 1 dòng ở màn hình điện thoại */
+  .h4-co b{white-space:nowrap;font-size:13px;letter-spacing:.6px}
+  .h4-doc b{white-space:nowrap;font-size:16px;letter-spacing:1.5px}
+  .h4-doc span{white-space:nowrap}
+  .h4-info{column-gap:10px}
+  .h4-info .h4-kv{font-size:11px}
+  .h4-info .h4-kv b{white-space:nowrap}
   .h4-foot{text-align:center;font-size:9.5px;color:#666;margin-top:10px;padding-top:8px;border-top:1px solid #d9d9d9}
   /* Dịch vụ thêm (form booking) */
-  .svc-block .pay-block-h{background:linear-gradient(90deg,#f5f3ff,#ede9fe);color:#5b21b6}
-  #bk_svclist{padding:6px 14px 2px}
-  .svcline{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed #eef2f7}
-  .svcline input{min-width:0}
-  .svcline .svc-p{text-align:right;font-weight:700}
-  .svcline .del{background:#fee2e2;color:#dc2626;padding:4px 8px;font-weight:700;border:none;border-radius:7px;cursor:pointer}
-  .svc-hint{font-size:11.5px;color:#64748b;padding:6px 14px 10px;line-height:1.45}
+  /* Dịch vụ thêm (form booking) — kiểu nghiêm túc trắng đen (bản 2026-11-09-dichvu) */
+  .svc-block{border:1px solid #d9d9d9;box-shadow:none}
+  /* Font chuyên nghiệp cho phần dịch vụ + hoá đơn (anh Harry chọn Be Vietnam Pro, 9/11/2026) */
+  .svc-block,.svc-block input,.svc-block button,#view-dichvu,#view-dichvu input,#view-dichvu button,.hd-pay,.hd-pay input,.hd-pay button,.hd-pay select{font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  .sv-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 14px 8px;border-bottom:2px solid #111}
+  .sv-h span{font-weight:800;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:#111}
+  .sv-h small{font-size:11px;color:#666}
+  .sv-cat{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 4px}
+  .sv-cat button{border:1px solid #c9c9c9;background:#fff;color:#111;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;gap:6px;align-items:baseline}
+  .sv-cat button span{font-weight:500;color:#666;font-size:12px;font-variant-numeric:tabular-nums}
+  .sv-cat button.on{border-color:#111;background:#111;color:#fff}
+  .sv-cat button.on span{color:#d6d6d6}
+  .sv-cat button.other{border-style:dashed;color:#444}
+  .sv-cat .sv-empty{font-size:12px;color:#666;padding:2px 0}
+  #bk_svclist{padding:4px 14px 10px}
+  table.sv-tb{width:100%;border-collapse:collapse;font-size:13px;border:none;background:none}
+  .sv-tb td{padding:7px 4px;border:none;border-bottom:1px solid #ececec;text-align:right;background:none;vertical-align:middle;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .sv-tb td.l{text-align:left;white-space:normal;padding-left:0;font-weight:600;color:#111}
+  .sv-tb td.l small{display:block;font-size:11px;color:#666;font-weight:500}
+  .sv-tb thead td{font-size:10.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #111;padding-top:2px}
+  .sv-tb tfoot td{border-bottom:none;font-weight:800;color:#111;padding-top:8px}
+  .sv-tb input{min-width:0;width:100%;box-sizing:border-box;font-size:13px;padding:5px 7px;border:1px solid #c9c9c9;border-radius:5px}
+  .sv-tb input.sv-u{text-align:right;width:92px}
+  .sv-step{display:inline-flex;align-items:center;border:1px solid #c9c9c9;border-radius:6px;overflow:hidden}
+  .sv-step button{border:none;background:#f4f4f4;width:26px;height:26px;font-weight:800;font-size:15px;cursor:pointer;color:#111;padding:0;line-height:26px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+  .sv-step b{min-width:24px;text-align:center;font-size:13px}
+  .sv-x{border:none;background:none;color:#999;font-size:15px;cursor:pointer;padding:2px 4px}
+  .sv-x:hover{color:#b91c1c}
+  .sv-h2{display:flex;align-items:center;gap:10px;padding:9px 12px}
+  .sv-h2 span{white-space:nowrap;font-weight:800;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;color:#111}
+  .sv-h2 b{margin-left:auto;font-size:13px;font-weight:700;color:#111;font-variant-numeric:tabular-nums}
+  .sv-h2 b:empty{display:none}
+  .sv-add{white-space:nowrap;border:1px solid #111;background:#fff;color:#111;border-radius:6px;padding:5px 10px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .sv-h2 b:empty+.sv-add{margin-left:auto}
+  .sv-add[aria-expanded="true"]{background:#111;color:#fff}
+  .sv-menu{margin:0 12px 8px;border:1px solid #d9d9d9;border-radius:6px;overflow:hidden}
+  .sv-menu button{display:flex;width:100%;justify-content:space-between;gap:10px;border:none;border-bottom:1px solid #eee;background:#fff;padding:9px 11px;font-size:13.5px;font-weight:600;color:#111;cursor:pointer;font-family:inherit;text-align:left}
+  .sv-menu button:last-child{border-bottom:none}
+  .sv-menu button:hover{background:#f6f6f6}
+  .sv-menu button span{font-weight:500;color:#555;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .sv-menu button.other{color:#555;font-weight:600}
+  .sv-menu .sv-empty{display:block;padding:9px 11px;font-size:12px;color:#666}
+  .sv-ln{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #eee;font-size:13px}
+  .sv-ln .nm{flex:1;min-width:0;font-weight:600;color:#111}
+  .sv-ln .nm small{color:#666;font-weight:500;margin-left:4px}
+  .sv-ln .am{font-weight:700;font-variant-numeric:tabular-nums;min-width:74px;text-align:right}
+  .sv-ln input{min-width:0;font-size:13px;padding:5px 7px;border:1px solid #c9c9c9;border-radius:5px;box-sizing:border-box}
+  .sv-ln input.sv-n{flex:1}
+  .sv-ln input.sv-u{width:96px;text-align:right}
+  #bk_svclist{padding:0 12px 4px}
+  /* Danh mục dịch vụ (tab Dịch vụ thêm) */
+  .svm-tb td{padding:6px 6px}
+  .svm-tb input[type=text]{border:1px solid #c9c9c9;border-radius:5px;padding:6px 8px;font-size:13px;width:100%;box-sizing:border-box}
+  .svm-act{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 14px;flex-wrap:wrap}
+  .svm-act button{border-radius:7px;padding:8px 14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .svm-add{border:1px dashed #888;background:#fff;color:#111}
+  .svm-save{border:1px solid #111;background:#111;color:#fff}
   .paystat .svc-split{display:block;font-size:10.5px;font-weight:600;color:#6d28d9;margin-top:2px;line-height:1.3}
   .paystat .svc-split:empty{display:none}
   /* Tab Dịch vụ thêm */
@@ -1904,6 +1962,11 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="kpis" id="dvKpis" style="margin-top:12px"></div>
       <div class="muted" style="margin-top:8px">Tiền dịch vụ thêm (mũ, áo mưa, giao ngoài giờ…) nhập ở tab <b>Chi tiết thanh toán</b> của booking. Đã cộng vào tiền khách phải trả nhưng <b>không</b> tính vào bảng Tổng doanh thu. Tính theo ngày nhận xe. Bấm 1 dòng để mở booking.</div>
     </div>
+    <div class="card" style="padding:0" id="svmCard">
+      <div class="sv-h"><span>Danh mục dịch vụ cố định</span><small>Giá ở đây tự điền khi chọn dịch vụ trong booking</small></div>
+      <div style="padding:4px 14px 0"><table class="sv-tb svm-tb"><thead><tr><td class="l">Tên dịch vụ</td><td>Giá</td><td style="text-align:center">Tính theo ngày</td><td></td></tr></thead><tbody id="svmBody"></tbody></table></div>
+      <div class="svm-act"><button type="button" class="svm-add" id="svmAdd">＋ Thêm dịch vụ</button><span class="muted" id="svmMsg" style="font-size:12px"></span><button type="button" class="svm-save" id="svmSave">Lưu danh mục</button></div>
+    </div>
     <div class="card" style="padding:0">
       <div class="dv-h"><span>Theo dịch vụ</span><span class="dv-sum" id="dvNamesSum"></span></div>
       <div class="dv-names" id="dvNames"></div>
@@ -2487,10 +2550,9 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <div id="f_dayPrices" class="dayprice-wrap"></div>
       </div>
       <div class="pay-block svc-block">
-        <div class="pay-block-h">🛎 Dịch vụ thêm
-          <button class="addpay-btn" id="bk_addsvc" type="button">➕ Thêm dịch vụ</button></div>
+        <div class="sv-h2"><span>Dịch vụ thêm</span><b id="sv_sum"></b><button type="button" class="sv-add" id="bk_svcopen" aria-expanded="false">＋ Dịch vụ</button></div>
+        <div class="sv-menu" id="bk_svccat" style="display:none"></div>
         <div id="bk_svclist"></div>
-        <div class="svc-hint">Tiền dịch vụ cộng vào tổng tiền khách trả, <b>không</b> tính vào bảng Tổng doanh thu — xem riêng ở mục <b>Dịch vụ thêm</b>.</div>
         <datalist id="svcNameList"></datalist>
       </div>
       <div class="pay-summary">
@@ -3000,7 +3062,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-09-hdpay';
+const BAN_APP = '2026-11-09-dichvu2';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5223,14 +5285,14 @@ let hdBkId=null;
 function hdFontOnce(){
   if(document.getElementById('hdFont')) return;
   const l=document.createElement('link'); l.id='hdFont'; l.rel='stylesheet';
-  l.href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap&subset=vietnamese';
+  l.href='https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap';
   document.head.appendChild(l);
 }
 // Ngôn ngữ hoá đơn: 'vi' hoặc 'en' (chọn ở thanh trên hoá đơn, nhớ theo máy)
 let hdLang='vi'; try{ if(localStorage.getItem('gb_hdLang')==='en') hdLang='en'; }catch(e){}
 const hdL=(vi,en)=>hdLang==='en'?en:vi;
 // tên dịch vụ hay dùng → tiếng Anh (tên tự gõ khác thì giữ nguyên)
-const HD_SVC_EN={'áo mưa':'Raincoat','thêm mũ bảo hiểm':'Extra helmet','mũ bảo hiểm':'Helmet','giá đỡ điện thoại':'Phone holder','giao xe ngoài giờ':'After-hours delivery','đổ đầy xăng':'Full tank of fuel','sạc pin':'Battery charging','dịch vụ':'Service'};
+const HD_SVC_EN={'đổi pin':'Battery swap','đón sân bay (xe 4 chỗ)':'Airport pick-up (4-seat car)','tiễn sân bay (xe 4 chỗ)':'Airport drop-off (4-seat car)','tour ninh bình 1 ngày':'Ninh Binh day tour','tour hạ long 1 ngày':'Ha Long Bay day tour','áo mưa':'Raincoat','thêm mũ bảo hiểm':'Extra helmet','mũ bảo hiểm':'Helmet','giá đỡ điện thoại':'Phone holder','giao xe ngoài giờ':'After-hours delivery','đổ đầy xăng':'Full tank of fuel','sạc pin':'Battery charging','dịch vụ':'Service'};
 const hdSvcName=n=>{ n=String(n||'Dịch vụ'); return hdLang==='en'?(HD_SVC_EN[n.trim().toLowerCase()]||n):n; };
 const hdM=n=>fmtVND(n)+'đ';
 const hdNb=t=>String(t).replace(/-/g,'\u2011');   // gạch nối không ngắt dòng → ảnh chụp không hở chữ
@@ -5260,7 +5322,7 @@ function hdHtml(b){
   const now=new Date(), issued=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear();
   const tr=(a,q,u,t,c)=>'<tr'+(c?' class="'+c+'"':'')+'><td class="l">'+a+'</td><td>'+q+'</td><td>'+u+'</td><td>'+t+'</td></tr>';
   const items=hdRentLines(b).map(l=>tr(hdL('Thuê xe','Motorbike rental')+'<small>'+dm(l.from)+(l.n>1?' – '+dm(l.to):'')+'</small>',l.n,n0(l.p),n0(l.n*l.p))).join('')
-    + svc.map(x=>tr(esc(hdSvcName(x.n)),1,n0(x.p),n0(x.p))).join('');
+    + svc.map(x=>{ const q=Math.max(1,+x.q||1), u=(x.u!=null?+x.u:+x.p), sl=x.d?q*nd:q; return tr(esc(hdSvcName(x.n))+(x.d?'<small>'+hdL('theo ngày','per day')+'</small>':''),sl,n0(u),n0(x.p)); }).join('');
   const kv=(l,v)=>'<div class="h4-kv"><span>'+l+'</span><b>'+v+'</b></div>';
   const payLs=pays.map(p=>'<div class="h4-row"><span>'+hdPayLb(p.method)+' · '+(p.date?dm(p.date):'')+(p.time?' '+p.time:'')+'</span><b>'+n0(p.amount)+'</b></div>').join('');
   return '<div class="hd hd4" id="hdNode">'
@@ -5396,10 +5458,38 @@ document.getElementById('bkHoaDon').onclick=()=>{
   if(document.getElementById('bkOverlay').classList.contains('open')) return;           // lưu không được (thiếu thông tin) → ở lại form
   openHoaDon(id);
 };
+/* ====== DANH MỤC DỊCH VỤ CỐ ĐỊNH (tab Dịch vụ thêm) ====== */
+let svmDraft=null;
+function svmRender(){
+  const body=document.getElementById('svmBody'); if(!body) return;
+  if(!svmDraft) svmDraft=svcCat().map(x=>({id:x.id,n:x.n,u:+x.u||0,d:!!x.d}));
+  body.innerHTML=svmDraft.length?svmDraft.map((x,i)=>'<tr><td class="l"><input type="text" data-k="n" data-i="'+i+'" value="'+escNote(x.n)+'" maxlength="60" placeholder="VD: Áo mưa"></td>'
+      +'<td><input type="text" inputmode="numeric" class="sv-u" data-k="u" data-i="'+i+'" value="'+(x.u?fmtVND(x.u):'')+'" placeholder="Giá"></td>'
+      +'<td style="text-align:center"><input type="checkbox" data-k="d" data-i="'+i+'"'+(x.d?' checked':'')+'></td>'
+      +'<td><button type="button" class="sv-x" data-svmdel="'+i+'" aria-label="Xoá dòng">✕</button></td></tr>').join('')
+    :'<tr><td class="l" colspan="4" style="color:#666;font-weight:500">Chưa có dịch vụ nào. Bấm “＋ Thêm dịch vụ”.</td></tr>';
+  body.querySelectorAll('[data-k]').forEach(inp=>{
+    const ev=inp.type==='checkbox'?'change':'input';
+    inp.addEventListener(ev,()=>{ const x=svmDraft[+inp.dataset.i], k=inp.dataset.k;
+      if(k==='d') x.d=inp.checked; else if(k==='u'){ const n=parseInt(inp.value.replace(/[^\d]/g,''))||0; x.u=n; inp.value=n?fmtVND(n):''; } else x.n=inp.value;
+      document.getElementById('svmMsg').textContent='Có thay đổi chưa lưu'; });
+  });
+  body.querySelectorAll('[data-svmdel]').forEach(b=>b.onclick=()=>{ svmDraft.splice(+b.dataset.svmdel,1); svmRender(); document.getElementById('svmMsg').textContent='Có thay đổi chưa lưu'; });
+}
+document.getElementById('svmAdd').onclick=()=>{ if(!svmDraft) svmRender(); svmDraft.push({id:'sv'+Date.now().toString(36),n:'',u:0,d:false}); svmRender();
+  const ins=document.querySelectorAll('#svmBody input[data-k="n"]'); if(ins.length) ins[ins.length-1].focus(); };
+document.getElementById('svmSave').onclick=()=>{
+  const l=(svmDraft||[]).map(x=>({id:x.id||('sv'+Math.random().toString(36).slice(2,8)),n:String(x.n||'').trim().replace(/\s+/g,' '),u:Math.max(0,Math.round(+x.u||0)),d:!!x.d})).filter(x=>x.n);
+  if((svmDraft||[]).some(x=>String(x.n||'').trim()&&!(+x.u>0)) && !confirm('Có dịch vụ chưa nhập giá (giá 0đ). Vẫn lưu?')) return;
+  DB.svcCatalog=l; save(); svmDraft=null; svmRender();
+  document.getElementById('svmMsg').textContent='✅ Đã lưu '+l.length+' dịch vụ — áp dụng ngay cho mọi máy.';
+};
 /* ====== DỊCH VỤ THÊM: thống kê riêng (không nằm trong bảng Tổng doanh thu) ====== */
 let dvFrom=null, dvTo=null;
 function dvMonthRange(ym){ return [ym+'-01', ym+'-'+String(daysInMonth(ym)).padStart(2,'0')]; }
 function renderDichVu(){
+  try{ hdFontOnce(); }catch(e){}
+  if(!(svmDraft&&document.getElementById('svmMsg').textContent==='Có thay đổi chưa lưu')){ svmDraft=null; svmRender(); }
   if(!dvFrom){ const r=dvMonthRange(ymNow()); dvFrom=r[0]; dvTo=r[1]; }
   const F=dvFrom, T=dvTo<dvFrom?dvFrom:dvTo, money=n=>fmtVND(n)+'đ', esc=escNote;
   document.getElementById('dvFrom').value=F; document.getElementById('dvTo').value=T;
@@ -5414,7 +5504,7 @@ function renderDichVu(){
     ${kpi('Trung bình / booking',money(bks.length?Math.round(tot/bks.length):0))}
     ${kpi('Booking chưa thu đủ',money(unpaidAmt)+' <small class="muted">· '+unpaid.length+' booking</small>',unpaid.length?'neg':'')}`;
   // theo tên dịch vụ
-  const by={}; bks.forEach(b=>svcList(b).forEach(x=>{ const n=String(x.n||'Dịch vụ').trim()||'Dịch vụ'; const k=n.toLowerCase(); const o=by[k]||(by[k]={n,c:0,s:0}); o.c++; o.s+=(+x.p||0); }));
+  const by={}; bks.forEach(b=>svcList(b).forEach(x=>{ const n=String(x.n||'Dịch vụ').trim()||'Dịch vụ'; const k=n.toLowerCase(); const o=by[k]||(by[k]={n,c:0,s:0}); o.c+=Math.max(1,+x.q||1); o.s+=(+x.p||0); }));
   const names=Object.values(by).sort((a,b)=>b.s-a.s||b.c-a.c);
   document.getElementById('dvNames').innerHTML=names.length?names.map(o=>`<div class="w">${esc(o.n)}<b>${money(o.s)}</b><span class="muted">${o.c} lượt</span></div>`).join('')
     :'<div class="muted">Chưa có dịch vụ thêm trong khoảng này.</div>';
@@ -5989,7 +6079,7 @@ function openBooking(id,prefill,schedKind){
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     setDeposit(b.deposit); setShip(b.ship); dgReset();
-    bkSvcs=svcList(b).map(x=>({n:x.n||'',p:+x.p||0}));
+    bkSvcs=svcList(b).map(svcFromSaved); svcMenuOpen=false;
     onSrcChange();                                  // hiện/ẩn ô công ty công nợ + render giá ngày đúng kiểu (phải trả = 2 ô)
     if(grp){ document.getElementById('f_debtCo').value=b.src; }
     renderDayPrices(b.prices||null, b.commissions||null);
@@ -6003,7 +6093,7 @@ function openBooking(id,prefill,schedKind){
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     setDeposit(null); setShip(null); dgReset();
-    bkSvcs=[];
+    bkSvcs=[]; svcMenuOpen=false;
     onSrcChange();
     renderDayPrices(null);
     del.style.display='none';
@@ -6122,7 +6212,7 @@ function renderDayPrices(prices, commissions){ // 1 ô / NGÀY thuê GỒM cả 
 function readDayPrices(){const o={};document.querySelectorAll('#f_dayPrices .dp').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
 function readDayComm(){const o={};document.querySelectorAll('#f_dayPrices .dpc').forEach(i=>{const v=+i.value||0;if(v>0)o[i.dataset.d]=v;});return o;}
 function formTotal(){return [...document.querySelectorAll('#f_dayPrices .dp')].reduce((a,i)=>a+(+i.value||0),0);}
-function formBill(){return formTotal()+bkSvcs.reduce((a,x)=>a+(+x.p||0),0);}   // bill khách trả = tiền thuê + dịch vụ thêm
+function formBill(){svcSync();return formTotal()+bkSvcs.reduce((a,x)=>a+(+x.p||0),0);}   // bill khách trả = tiền thuê + dịch vụ thêm
 /* ----- Dịch vụ thêm trong form booking ----- */
 let bkSvcs=[];
 const SVC_GOI_Y=['Thêm mũ bảo hiểm','Áo mưa','Giá đỡ điện thoại','Giao xe ngoài giờ','Đổ đầy xăng','Sạc pin'];
@@ -6130,28 +6220,65 @@ function svcNames(){
   const m={}; (DB.bookings||[]).forEach(b=>svcList(b).forEach(x=>{ const n=String(x.n||'').trim(); if(n) m[n]=(m[n]||0)+1; }));
   const l=Object.keys(m).sort((a,b)=>m[b]-m[a]); SVC_GOI_Y.forEach(n=>{ if(!l.includes(n)) l.push(n); }); return l;
 }
+/* ===== DỊCH VỤ THÊM: danh mục CỐ ĐỊNH + giá cố định (bản 2026-11-09-dichvu) =====
+   DB.svcCatalog = [{id, n:tên, u:đơn giá, d:true nếu tính theo ngày}] (cfg) — chủ sửa ở tab "Dịch vụ thêm".
+   Dòng trong booking: {id?, n, u, q, d?, p} — p = u × q (× số ngày nếu d). Dòng cũ chỉ có {n,p} vẫn đọc được.
+   Vẫn có "Dịch vụ khác" tự gõ tên + giá (anh Harry cho phép). */
+const SVC_CAT_MAC_DINH=[   // danh mục anh Harry gửi 9/11/2026
+  {id:'doipin',n:'Đổi pin',u:10000},
+  {id:'donsb',n:'Đón sân bay (xe 4 chỗ)',u:300000},
+  {id:'tiensb',n:'Tiễn sân bay (xe 4 chỗ)',u:250000},
+  {id:'tournb',n:'Tour Ninh Bình 1 ngày',u:999000},
+  {id:'tourhl',n:'Tour Hạ Long 1 ngày',u:1599000}
+];
+function svcCat(){ return Array.isArray(DB.svcCatalog)?DB.svcCatalog.filter(x=>x&&String(x.n||'').trim()):SVC_CAT_MAC_DINH; }
+function svcFormDays(){ return document.querySelectorAll('#f_dayPrices .dp').length||1; }
+function svcLineAmt(x,nd){ const q=Math.max(1,Math.round(+x.q||1)), u=Math.max(0,Math.round(+x.u||0)); return u*q*(x.d?Math.max(1,nd||1):1); }
+function svcSync(){ const nd=svcFormDays(); bkSvcs.forEach(x=>{ x.p=svcLineAmt(x,nd); }); }
+function svcFromSaved(x){ return {id:x.id||'', n:x.n||'', u:(x.u!=null?+x.u:+x.p||0), q:+x.q||1, d:!!x.d, p:+x.p||0}; }
+let svcMenuOpen=false;
 function renderBkSvcs(){
-  const el=document.getElementById('bk_svclist');
+  try{ hdFontOnce(); }catch(e){}
+  const cat=svcCat(), menu=document.getElementById('bk_svccat'), el=document.getElementById('bk_svclist'), btn=document.getElementById('bk_svcopen');
   document.getElementById('svcNameList').innerHTML=svcNames().map(n=>'<option value="'+escNote(n)+'">').join('');
-  if(!bkSvcs.length){ el.innerHTML='<div class="muted" style="padding:6px">Chưa có dịch vụ. Bấm <b>➕ Thêm dịch vụ</b> — VD thêm mũ, áo mưa, giao ngoài giờ…</div>'; return; }
-  el.innerHTML=bkSvcs.map((x,i)=>'<div class="svcline"><input type="text" class="svc-n" data-i="'+i+'" list="svcNameList" maxlength="80" placeholder="Tên dịch vụ" value="'+escNote(x.n||'')+'" autocomplete="off" data-lpignore="true">'
-    +'<input type="text" inputmode="numeric" class="svc-p" data-i="'+i+'" placeholder="Giá tiền" value="'+moneyVN(x.p)+'" autocomplete="off">'
-    +'<button type="button" class="del" data-i="'+i+'" title="Xoá dịch vụ" aria-label="Xoá dịch vụ">✕</button></div>').join('');
-  el.querySelectorAll('.svc-n').forEach(inp=>inp.addEventListener('input',()=>{ bkSvcs[+inp.dataset.i].n=inp.value; }));
-  el.querySelectorAll('.svc-p').forEach(inp=>{
-    inp.addEventListener('input',()=>{ const n=parseInt(inp.value.replace(/[^\d]/g,''))||0; bkSvcs[+inp.dataset.i].p=n; inp.value=n?n.toLocaleString('en-US')+'đ':''; recalcPay(); });
+  svcSync();
+  const tot=bkSvcs.reduce((a,x)=>a+(+x.p||0),0);
+  document.getElementById('sv_sum').textContent=bkSvcs.length?fmtVND(tot)+'đ':'';
+  btn.setAttribute('aria-expanded',svcMenuOpen?'true':'false'); btn.textContent=svcMenuOpen?'Đóng':'＋ Dịch vụ';
+  menu.style.display=svcMenuOpen?'':'none';
+  menu.innerHTML=(cat.length?cat.map(c=>'<button type="button" data-cat="'+escNote(c.id)+'">'+escNote(c.n)+'<span>'+fmtVND(c.u)+(c.d?'/ngày':'')+'</span></button>').join('')
+      :'<span class="sv-empty">Chưa có danh mục — thêm ở tab Dịch vụ thêm.</span>')
+    +'<button type="button" class="other" data-cat="__khac">Dịch vụ khác…<span>tự nhập giá</span></button>';
+  menu.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.cat; svcMenuOpen=false;
+    if(id==='__khac'){ bkSvcs.push({id:'',n:'',u:0,q:1,d:false,p:0,_edit:true}); renderBkSvcs(); recalcPay();
+      const ins=document.querySelectorAll('#bk_svclist .sv-n'); if(ins.length) ins[ins.length-1].focus(); return; }
+    const c=cat.find(z=>z.id===id); if(!c) return;
+    const ex=bkSvcs.find(x=>x.id===id); if(ex) ex.q=(+ex.q||1)+1; else bkSvcs.push({id:c.id,n:c.n,u:+c.u||0,q:1,d:!!c.d,p:0});
+    renderBkSvcs(); recalcPay();
   });
-  el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{ bkSvcs.splice(+b.dataset.i,1); renderBkSvcs(); recalcPay(); });
+  const nd=svcFormDays();
+  el.innerHTML=bkSvcs.map((x,i)=>{ const fix=!x._edit, q=+x.q||1;
+    return '<div class="sv-ln">'
+      +(fix?'<span class="nm">'+escNote(x.n||'Dịch vụ')+'<small>'+(q>1||x.d?fmtVND(x.u)+(x.d?'/ngày':'')+' × '+q+(x.d?' × '+nd+' ngày':''):'')+'</small></span>'
+           :'<input type="text" class="sv-n" data-i="'+i+'" list="svcNameList" maxlength="80" placeholder="Tên dịch vụ" value="'+escNote(x.n||'')+'" autocomplete="off" data-lpignore="true"><input type="text" inputmode="numeric" class="sv-u" data-i="'+i+'" placeholder="Giá" value="'+(x.u?fmtVND(x.u):'')+'" autocomplete="off">')
+      +(x._edit?'':'<span class="sv-step"><button type="button" data-q="-1" data-i="'+i+'" aria-label="Bớt">−</button><b>'+q+'</b><button type="button" data-q="1" data-i="'+i+'" aria-label="Thêm">+</button></span>')
+      +'<span class="am sv-amt" data-i="'+i+'">'+fmtVND(x.p)+'</span>'
+      +'<button type="button" class="sv-x" data-del="'+i+'" title="Bỏ dịch vụ" aria-label="Bỏ dịch vụ">✕</button></div>'; }).join('');
+  el.querySelectorAll('.sv-n').forEach(inp=>inp.addEventListener('input',()=>{ bkSvcs[+inp.dataset.i].n=inp.value; }));
+  el.querySelectorAll('.sv-u').forEach(inp=>inp.addEventListener('input',()=>{
+    const x=bkSvcs[+inp.dataset.i], n=parseInt(inp.value.replace(/[^\d]/g,''))||0; x.u=n; inp.value=n?fmtVND(n):'';
+    recalcPay(); }));
+  el.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ const x=bkSvcs[+b.dataset.i]; x.q=Math.max(1,(+x.q||1)+(+b.dataset.q)); renderBkSvcs(); recalcPay(); });
+  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ bkSvcs.splice(+b.dataset.del,1); renderBkSvcs(); recalcPay(); });
 }
+document.getElementById('bk_svcopen').onclick=()=>{ svcMenuOpen=!svcMenuOpen; renderBkSvcs(); };
 function readSvcs(){
-  const l=bkSvcs.map(x=>({n:String(x.n||'').trim().replace(/\s+/g,' '),p:Math.max(0,Math.round(+x.p||0))})).filter(x=>x.n||x.p);
-  l.forEach(x=>{ if(!x.n) x.n='Dịch vụ'; });
+  svcSync();
+  const l=bkSvcs.map(x=>{ const o={n:String(x.n||'').trim().replace(/\s+/g,' ')||'Dịch vụ', u:Math.max(0,Math.round(+x.u||0)), q:Math.max(1,Math.round(+x.q||1)), p:Math.max(0,Math.round(+x.p||0))};
+      if(x.id) o.id=x.id; if(x.d) o.d=true; return o; }).filter(x=>x.p>0||x.id||x.n!=='Dịch vụ');
   return l.length?l:undefined;
 }
-document.getElementById('bk_addsvc').onclick=()=>{
-  bkSvcs.push({n:'',p:0}); renderBkSvcs(); recalcPay();
-  const ins=document.querySelectorAll('#bk_svclist .svc-n'); if(ins.length) ins[ins.length-1].focus();
-};   // khách trả = giá (ô Doanh thu); hoa hồng đã nằm trong giá
 function setDeposit(d){ d=d||{}; const a=+d.amount||0;
   document.getElementById('f_depAmt').value=a?a.toLocaleString('en-US')+'đ':'';
   document.getElementById('f_depMethod').value=d.method==='CK'?'CK':'TM';
@@ -6208,7 +6335,8 @@ function renderBkPayments(){
   el.querySelectorAll('.del').forEach(b=>b.onclick=()=>{bkPayments.splice(+b.dataset.i,1);renderBkPayments();recalcPay();});
 }
 function recalcPay(){ // tổng = giá ngày (gồm hoa hồng nếu phải trả) + dịch vụ thêm; đã thu = tổng các lệnh; còn lại = chênh
-  const rent=formTotal(), svc=bkSvcs.reduce((a,x)=>a+(+x.p||0),0), total=rent+svc;
+  svcSync(); const rent=formTotal(), svc=bkSvcs.reduce((a,x)=>a+(+x.p||0),0), total=rent+svc;
+  { const t=document.getElementById('sv_sum'); if(t) t.textContent=bkSvcs.length?fmtVND(svc)+'đ':''; document.querySelectorAll('#bk_svclist .sv-amt').forEach(a=>{ const x=bkSvcs[+a.dataset.i]; if(x) a.textContent=fmtVND(x.p); }); }
   const sp=document.getElementById('f_totalSplit'); if(sp) sp.textContent=svc?('Thuê xe '+fmtVND(rent)+'đ + dịch vụ '+fmtVND(svc)+'đ'):'';
   const paid=bkPayments.reduce((a,p)=>a+(+p.amount||0),0);
   document.getElementById('f_total').textContent=fmtVND(total)+'đ';
@@ -6219,7 +6347,7 @@ function recalcPay(){ // tổng = giá ngày (gồm hoa hồng nếu phải tr�
   const cur=readDayPrices(), curC=readDayComm();        // giá + hoa hồng đang hiển thị
   const incl=dayListIncl(f('arrive'),f('depart'));      // CHỈ các ngày trong khoảng nhận→trả mới
   const kept={},keptC={}; incl.forEach(d=>{ if(cur[d]!=null) kept[d]=cur[d]; if(curC[d]!=null) keptC[d]=curC[d]; }); // giữ giá ngày còn trong khoảng, BỎ ngày ngoài khoảng
-  renderDayPrices(kept,keptC); recalcPay();
+  renderDayPrices(kept,keptC); renderBkSvcs(); recalcPay();
   renderXeOptions(f('xe'));   // đổi ngày → lọc lại xe còn trống
 }));
 // đổi GIỜ giao/thu hồi → lọc lại xe trống (xe vừa trả sẽ trống cho booking nhận sau giờ trả)
