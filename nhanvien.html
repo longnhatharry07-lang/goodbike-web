@@ -1838,6 +1838,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
   <button class="tab active" data-t="timeline">Sơ đồ xe</button>
   <button class="tab" data-t="kehoach">Kế hoạch giao nhận</button>
   <button class="tab" data-t="lichtrinh">Lịch trình</button>
+  <button class="tab" data-t="hopdong">Hợp đồng</button>
   <button class="tab" data-t="chatluong">Chất lượng vận hành</button>
   <button class="tab" data-t="thuchi">Thu tiền</button>
   <button class="tab" data-t="contacts">Thống kê KH liên hệ</button>
@@ -1940,6 +1941,32 @@ body.gb-shell #tabs .tab.gb-more{display:none}
     <div class="card" style="padding:0">
       <div class="sh-h" id="shHList"></div>
       <div id="shList"></div>
+    </div>
+  </section>
+
+  <!-- HỢP ĐỒNG THUÊ XE (bản 2026-11-09-hopdong) -->
+  <section class="view" id="view-hopdong" style="display:none">
+    <div class="card hdg-head">
+      <div class="row" style="flex-wrap:wrap;gap:10px">
+        <h2 style="margin:0">Hợp đồng thuê xe</h2>
+        <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button class="coc-btn" id="hgPrev">◀</button>
+          <span class="muted">Ngày giao xe</span><input type="date" id="hgDate">
+          <button class="coc-btn" id="hgNext">▶</button>
+          <button class="coc-btn" id="hgToday">Hôm nay</button>
+          <button class="coc-btn" id="hgTomorrow">Ngày mai</button>
+        </div>
+      </div>
+      <div class="hg-kpis" id="hgKpis"></div>
+    </div>
+    <div class="card" style="padding:0">
+      <div class="hg-bar">
+        <label class="hg-all"><input type="checkbox" id="hgAll"> Chọn tất cả</label>
+        <span class="hg-sp"></span>
+        <label class="hg-copies">Số bản / hợp đồng <select id="hgCopies"><option value="1">1</option><option value="2">2</option></select></label>
+        <button type="button" class="hg-print" id="hgPrintSel">🖨 Kiểm tra &amp; in (0)</button>
+      </div>
+      <div id="hgList"></div>
     </div>
   </section>
 
@@ -2480,8 +2507,12 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         <div class="field"><label>Nguồn khách</label>
           <div style="display:flex;gap:6px"><select id="f_src" style="flex:1;min-width:0"></select><button type="button" class="ct-plus" id="f_srcAdd" title="Thêm nguồn khách mới (chọn màu)">＋</button></div></div>
       </div>
-      <div class="field" style="margin-top:8px"><label>Địa chỉ thường trú <span class="muted" style="font-weight:400">(không bắt buộc)</span></label>
+      <div class="cust-row2">
+      <div class="field"><label>Địa chỉ thường trú <span class="muted" style="font-weight:400">(không bắt buộc)</span></label>
         <input type="text" id="f_resaddr" list="addrList" placeholder="VD: 12 Nguyễn Trãi, P. Bến Thành, Q.1, TP.HCM" autocomplete="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+      <div class="field"><label>Số CCCD / Hộ chiếu <span class="muted" style="font-weight:400">(in hợp đồng)</span></label>
+        <input type="text" id="f_cccd" placeholder="VD: 001203012345" maxlength="30" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"></div>
+      </div>
       <datalist id="addrList"></datalist>
       <datalist id="guestList"></datalist>
       <datalist id="phoneList"></datalist>
@@ -2578,6 +2609,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
     <div class="bk-actions">
       <button class="btn-del" id="bkDelete" style="display:none" title="Xóa booking" aria-label="Xóa booking">🗑</button>
       <button class="btn-hd" id="bkHoaDon" style="display:none" title="Lưu rồi mở hoá đơn để chụp gửi khách">🧾 Hoá đơn</button>
+      <button class="btn-hdg" id="bkHopDong" style="display:none" title="Lưu rồi mở hợp đồng thuê xe để kiểm tra và in">📄 Hợp đồng</button>
       <span class="act-spacer"></span>
       <button class="btn-call" id="bkCall" style="display:none" title="Gọi khách" aria-label="Gọi khách">📞</button>
       <button class="btn-undo" id="bkUndo" style="display:none" title="Hoàn tác giao/thu hồi gần nhất">↩ Hoàn tác</button>
@@ -2713,6 +2745,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
       <div class="field"><label>Màu sắc</label>
         <div class="veh-color-row"><span class="veh-color-dot" id="vi_dot"></span><input type="text" id="vi_mau" placeholder="VD: Đỏ đô / #b91c1c"></div>
       </div>
+      <div class="field" style="grid-column:1/-1"><label>Giá trị xe trên hợp đồng <span class="muted" style="font-weight:400">(để trống = xe số 20 triệu, xe khác 40 triệu)</span></label><input type="text" inputmode="numeric" id="vi_gt" placeholder="Mặc định theo loại xe"></div>
     </div>
     <div id="vi_moreBox">
       <div class="field" style="margin-top:10px"><label>Mẫu trên web bán hàng</label><select id="vi_web"></select></div>
@@ -3062,7 +3095,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP = '2026-11-09-dichvu2';
+const BAN_APP='2026-11-09-hopdong';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3678,6 +3711,7 @@ function switchTab(t){
   // Mở tab "Thu tiền" → tự lọc về giao dịch thu HÔM NAY (muốn xem rộng hơn thì tự điền khoảng ngày)
   if(t==='coc'){ cocFrom=todayStr(); cocTo=todayStr(); renderCoc(); }
   if(t==='ship'){ shipFrom=todayStr(); shipTo=todayStr(); renderShip(); }
+  if(t==='hopdong'){ try{ hgOpenTab(); }catch(e){ console.warn('hopdong',e); } }
   if(t==='dichvu'){ try{ renderDichVu(); }catch(e){ console.warn('renderDichVu',e); } }
   if(t==='baoduong'){ try{ renderBaoDuong(true); }catch(e){ console.warn('renderBaoDuong',e); } }
   if(t==='kehoach'){ try{ renderKeHoach(); }catch(e){ console.warn('renderKeHoach',e); } }
@@ -4123,6 +4157,7 @@ function renderAll(){
   renderLegend();renderTimeline();renderSchedule();try{renderCoc();}catch(e){console.warn('renderCoc',e);}try{renderShip();}catch(e){console.warn('renderShip',e);}try{renderDichVu();}catch(e){console.warn('renderDichVu',e);}try{renderDtgGoal();}catch(e){console.warn('renderDtgGoal',e);}renderRevenue();renderThuChi();renderDebtRecon();renderChi();renderProfit();renderFunds();renderAssets();renderPhanTich();
   try{ renderContacts(); }catch(e){ console.warn('renderContacts',e); }
   try{ renderBaoDuong(); }catch(e){ console.warn('renderBaoDuong',e); }
+  try{ const v=document.getElementById('view-hopdong'), ae=document.activeElement; if(v&&v.style.display!=='none'&&typeof renderHopDong==='function'&&!(ae&&ae.classList&&ae.classList.contains('hg-cccd'))) renderHopDong(); }catch(e){ console.warn('renderHopDong',e); }
   try{ if(typeof renderKeHoach==='function'){ renderKeHoach(); renderLichTrinh(); } }catch(e){ console.warn('renderLichTrinh',e); }
   try{ const v=document.getElementById('view-chatluong'); if(v && v.style.display!=='none' && typeof renderChatLuong==='function') renderChatLuong(); }catch(e){ console.warn('renderChatLuong',e); }
   save();
@@ -5254,20 +5289,13 @@ function hdNoiDung(b){
 // TLV EMVCo
 const hdTlv=(id,v)=>id+String(v.length).padStart(2,'0')+v;
 function hdCrc16(str){ let c=0xFFFF; for(let i=0;i<str.length;i++){ c^=str.charCodeAt(i)<<8; for(let k=0;k<8;k++) c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF; } return c.toString(16).toUpperCase().padStart(4,'0'); }
-// QR ngân hàng của GOODBIKE (anh Harry gửi 7/11/2026): Techcombank, tài khoản hộ kinh doanh — dùng khi chưa cài DB.hdBank
-const HD_BANK_MAC_DINH={bin:'970407',acc:'MS00T08228403886049',
-  raw:'00020101021138630010A000000727013300069704070119MS00T082284038860490208QRIBFTTA53037045802VN8315T08228403886049840063040A03',
-  name:'HO KINH DOANH GOODBIKE RENTAL',accShow:'1907 0587 4900 12'};
-function hdBankNow(){ const b=DB.hdBank; return (b&&b.bin&&b.acc)?b:HD_BANK_MAC_DINH; }
+// QR ngân hàng của GOODBIKE: Techcombank, tài khoản hộ kinh doanh 19070587490012.
+// 8/11/2026: QR gốc trỏ tới mã tài khoản ảo MS00T08228403886049 → Techcombank tự chèn "MS00T…,HO KINH DOANH GOODBIKE RENTAL,"
+// vào đầu lời nhắn. Từ bản 2026-11-09-hopdong tạo QR chuẩn VietQR trỏ THẲNG số tài khoản thật, không qua mã ảo.
+const HD_BANK_MAC_DINH={bin:'970407',acc:'19070587490012',name:'HO KINH DOANH GOODBIKE RENTAL',accShow:'1907 0587 4900 12'};
+const hdLaMaAo=b=>/^MS/i.test(String(b&&b.acc||''));   // mã tài khoản ảo Techcombank (MS00T…) → không dùng
+function hdBankNow(){ const b=DB.hdBank; return (b&&b.bin&&b.acc&&!(b.bin==='970407'&&hdLaMaAo(b)))?b:HD_BANK_MAC_DINH; }
 function hdVietQr(bk,amount,content){
-  if(bk.raw){   // giữ nguyên mọi trường của mã gốc (kể cả 83/84 của tài khoản hộ kinh doanh), chỉ thêm số tiền + nội dung
-    const t=hdTlvParse(bk.raw); delete t['63']; t['01']='12';
-    if(amount>0) t['54']=String(Math.round(amount)); else delete t['54'];
-    const sub=t['62']?hdTlvParse(t['62']):{}; if(content) sub['08']=content; else delete sub['08'];
-    const subS=Object.keys(sub).sort().map(k=>hdTlv(k,sub[k])).join(''); if(subS) t['62']=subS; else delete t['62'];
-    let p=Object.keys(t).sort().map(k=>hdTlv(k,t[k])).join('')+'6304';
-    return p+hdCrc16(p);
-  }
   const acct=hdTlv('00','A000000727')+hdTlv('01',hdTlv('00',bk.bin)+hdTlv('01',bk.acc))+hdTlv('02','QRIBFTTA');
   let p=hdTlv('00','01')+hdTlv('01','12')+hdTlv('38',acct)+hdTlv('53','704')+(amount>0?hdTlv('54',String(Math.round(amount))):'')+hdTlv('58','VN')+(content?hdTlv('62',hdTlv('08',content)):'')+'6304';
   return p+hdCrc16(p);
@@ -6003,6 +6031,14 @@ function resaddrByPhone(ph){
   });
   return best?best.resaddr:'';
 }
+function cccdByPhone(ph){   // CCCD đã lưu của khách (theo SĐT) — booking gần nhất có CCCD
+  const p=String(ph||'').replace(/\D/g,''); if(p.length<6) return '';
+  let best=null;
+  (DB.bookings||[]).forEach(b=>{ if(!b||!b.cccd) return;
+    if((splitGuest(b.guest||'').phone||'').replace(/\D/g,'')!==p) return;
+    if(!best || String(b.created||b.arrive||'')>String(best.created||best.arrive||'')) best=b; });
+  return best?best.cccd:'';
+}
 function findCustByPhone(ph){ ph=(ph||'').replace(/\s/g,''); if(ph.length<6)return null;
   return paCustDirectory().find(c=>c.phone&&c.phone.replace(/\s/g,'')===ph)||null; }
 function findCustByName(nm){ nm=(nm||'').trim().toLowerCase(); if(!nm)return null;
@@ -6024,6 +6060,7 @@ function wireGuestInputs(){
   const byPhone=()=>{ const c=findCustByPhone(ph.value);
     if(c){ if(c.name&&c.name!=='—'&&!g.value.trim())g.value=c.name;
       if(ra&&!ra.value.trim()){ const ad=resaddrByPhone(ph.value); if(ad)ra.value=ad; }    // khách quen → điền sẵn địa chỉ thường trú đã lưu
+      { const cc=document.getElementById('f_cccd'); if(cc&&!cc.value.trim()){ const v=cccdByPhone(ph.value); if(v) cc.value=v; } }   // khách quen → điền sẵn CCCD
       showGuestHint(c,'phone'); }
     else showGuestHint(null); };
   const byName=()=>{ if(findCustByPhone(ph.value))return;      // đã khớp SĐT thì ưu tiên SĐT
@@ -6075,7 +6112,7 @@ function openBooking(id,prefill,schedKind){
     document.getElementById('bkTitle').textContent='Chi tiết booking — '+b.xe;
     const grp = b.debt || debtGroupOf(b.src);     // booking cũ chưa có cờ debt → suy ra từ tên công ty
     const srcDisplay = grp==='receivable'?DEBT_RECV:(grp==='payable'?DEBT_PAY:b.src);
-    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}f('resaddr',b.resaddr||'');
+    f('arrive',b.arrive);f('depart',b.depart);f('dtime',planDtime(b)||'08:00');f('rtime',planRtime(b));f('src',srcDisplay);f('daddr',b.daddr||'');f('raddr',b.raddr||'');f('dkm',b.dkm||'');f('rkm',b.rkm||'');f('status',b.status||'sapnhan');f('bknote',b.note||'');{const sg=splitGuest(b.guest);f('guest',sg.name);f('phone',sg.phone);}f('resaddr',b.resaddr||'');f('cccd',b.cccd||'');
     selXe=b.xe;
     bkPayments=(b.payments||[]).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||'',_locked:true}));
     setDeposit(b.deposit); setShip(b.ship); dgReset();
@@ -6085,11 +6122,12 @@ function openBooking(id,prefill,schedKind){
     renderDayPrices(b.prices||null, b.commissions||null);
     del.style.display='';
     document.getElementById('bkHoaDon').style.display='';
+    document.getElementById('bkHopDong').style.display='';
   }else{
     document.getElementById('bkTitle').textContent='Thêm booking';
     // mặc định: nếu bấm từ ô sơ đồ xe (prefill.ds) → đúng ngày đó; nếu bấm "+ Thêm booking" → HÔM NAY
     const ds = (prefill&&prefill.ds) ? prefill.ds : todayStr();
-    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime',(prefill&&prefill.dtime)||'08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('bknote','');
+    f('src','Walk in');f('arrive',ds);f('depart',addDays(ds,1));f('dtime',(prefill&&prefill.dtime)||'08:00');f('rtime','12:00');f('daddr','');f('raddr','');f('dkm','');f('rkm','');f('status','sapnhan');f('guest','');f('phone','');f('resaddr','');f('cccd','');f('bknote','');
     selXe = prefill?prefill.xe:undefined;   // chưa ép xe — chờ lọc theo xe trống
     bkPayments=[];
     setDeposit(null); setShip(null); dgReset();
@@ -6098,6 +6136,7 @@ function openBooking(id,prefill,schedKind){
     renderDayPrices(null);
     del.style.display='none';
     document.getElementById('bkHoaDon').style.display='none';
+    document.getElementById('bkHopDong').style.display='none';
   }
   refreshPlaceList(); wirePlaceInputs();   // gợi ý địa điểm đã lưu + tự điền km
   refreshGuestList(); wireGuestInputs(); showGuestHint(null);   // gợi nhớ khách quen theo tên/SĐT
@@ -6404,7 +6443,7 @@ document.getElementById('bkSave').onclick=()=>{
   const pays=bkPayments.filter(p=>(+p.amount||0)!==0).map(p=>({date:p.date,time:p.time,amount:p.amount,method:p.method,desc:p.desc||''}));
   const ms=[...new Set(pays.map(p=>p.method))].sort((a,b)=>PAY_PRIO[b]-PAY_PRIO[a]);
   rememberPlace(f('daddr'),f('dkm')); rememberPlace(f('raddr'),f('rkm'));   // tự nhớ địa điểm + km cho lần sau
-  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),note:f('bknote'),deposit:readDeposit(),services:readSvcs(),ship:readShip(editingBk?((DB.bookings.find(x=>x.id===editingBk)||{}).ship):null)};
+  const rec={xe:f('xe'),src:srcStore,debt,arrive:f('arrive'),depart:f('depart'),dtime:f('dtime'),rtime:f('rtime'),dplan:f('dtime'),rplan:f('rtime'),daddr:f('daddr'),raddr:f('raddr'),dkm:(parseFloat(f('dkm'))||0),rkm:(parseFloat(f('rkm'))||0),status:f('status'),price:(Object.values(_pr)[0]||0),prices:_pr,commissions:(debt==='payable'?_co:undefined),payments:pays,prepaid:pays.reduce((a,p)=>a+(+p.amount||0),0),pay:ms[0]||'',guest:joinGuest(f('guest'),f('phone')),resaddr:(f('resaddr')||'').trim(),cccd:(f('cccd')||'').trim()||undefined,note:f('bknote'),deposit:readDeposit(),services:readSvcs(),ship:readShip(editingBk?((DB.bookings.find(x=>x.id===editingBk)||{}).ship):null)};
   if(editingBk){const ex=DB.bookings.find(x=>x.id===editingBk);rec.created=ex.created||ex.arrive;
     // giữ giờ thực tế đã ghi nếu booking đã giao/thu hồi (không để form ghi đè bằng giờ dự kiến)
     if(ex.status==='danhan'||ex.status==='datra')rec.dtime=ex.dtime;
@@ -7299,7 +7338,7 @@ function openVehInfo(id){
   const vi=(DB.vehicleInfo&&DB.vehicleInfo[id])||{};
   const ro=(typeof viewMode!=='undefined'&&viewMode)||(typeof nvMode!=='undefined'&&nvMode);
   document.getElementById('vehTitle').textContent='Thông tin xe '+id;
-  vf('typ',vi.typ||base); vf('doi',vi.doi||''); vf('bien',vi.bien||''); vf('mau',vi.mau||'');
+  vf('typ',vi.typ||base); vf('doi',vi.doi||''); vf('bien',vi.bien||''); vf('mau',vi.mau||''); vf('gt',vi.gt?Number(vi.gt).toLocaleString('vi-VN'):'');
   document.getElementById('vi_id').value=id;
   document.getElementById('vi_idBox').style.display=ro?'none':'';
   document.getElementById('vi_moreBox').style.display=(ro||v.dump)?'none':'';
@@ -7314,6 +7353,7 @@ function openVehInfo(id){
   vehOv.classList.add('open');
 }
 document.getElementById('vi_mau').addEventListener('input',updateVehDot);
+document.getElementById('vi_gt').addEventListener('input',function(){const n=parseInt(this.value.replace(/[^\d]/g,''))||0;this.value=n?n.toLocaleString('vi-VN'):'';});
 document.getElementById('vehCancel').onclick=()=>vehOv.classList.remove('open');
 document.getElementById('vehSave').onclick=()=>{
   const old=editingVeh, err=document.getElementById('vi_err');
@@ -7326,7 +7366,7 @@ document.getElementById('vehSave').onclick=()=>{
     if(!confirm('Đổi tên xe '+old+' → '+neu+'?\n\n'+nBk+' booking (cả cũ lẫn mới), thông tin xe, bảo dưỡng và liên kết web bán hàng của xe này sẽ chuyển sang tên '+neu+'.')) return;
   }
   if(!DB.vehicleInfo)DB.vehicleInfo={};
-  DB.vehicleInfo[old]={typ:vf('typ'),doi:vf('doi'),bien:vf('bien'),mau:vf('mau')};
+  DB.vehicleInfo[old]={typ:vf('typ'),doi:vf('doi'),bien:vf('bien'),mau:vf('mau')}; { const gt=parseInt(String(vf('gt')).replace(/[^\d]/g,''))||0; if(gt) DB.vehicleInfo[old].gt=gt; }
   if(!ro && !v.dump){
     const web=document.getElementById('vi_web').value||'', sp=document.getElementById('vi_sp').checked;
     if(web!==xeWebOf(old) || sp!==!!v.sp){
@@ -10593,6 +10633,329 @@ function renderChatLuong(){
 })();
 </script>
 
+<style>
+/* ===== HỢP ĐỒNG THUÊ XE (bản 2026-11-09-hopdong) ===== */
+.cust-row2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:10px;margin-top:8px}
+@media(max-width:640px){.cust-row2{grid-template-columns:1fr}}
+.btn-hdg{background:#fff;color:#101828;font-weight:800;border:1.5px solid #101828;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:13.5px}
+.hg-kpis{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hg-kpi{border:1px solid #EAECF0;border-radius:10px;padding:8px 12px;min-width:120px;background:#fff}
+.hg-kpi span{display:block;font-size:12px;color:#667085}
+.hg-kpi b{font-size:20px;color:#101828}
+.hg-kpi.warn b{color:#B42318}
+.hg-kpi.ok b{color:#027A48}
+.hg-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid #EAECF0}
+.hg-bar .hg-sp{flex:1}
+.hg-all,.hg-copies{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#344054;cursor:pointer}
+.hg-print{background:#101828;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+.hg-print:disabled{opacity:.4;cursor:default}
+.hg-row{display:grid;grid-template-columns:28px 64px minmax(0,1.1fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid #F2F4F7;font-size:13.5px}
+.hg-row.hg-head{font-size:12px;font-weight:700;color:#667085;background:#F9FAFB;padding-top:8px;padding-bottom:8px}
+.hg-row .t{font-weight:800;color:#101828}
+.hg-row .x b{display:block;color:#101828}
+.hg-row .x small,.hg-row .k small{display:block;color:#667085;font-size:12px}
+.hg-row .k b{display:block;color:#101828}
+.hg-row input.hg-cccd{width:100%;padding:6px 8px;border:1px solid #D0D5DD;border-radius:8px;font-size:13px;font-family:inherit}
+.hg-row input.hg-cccd.miss{border-color:#FDA29B;background:#FFFBFA}
+.hg-row input.hg-cccd.saved{border-color:#12B76A}
+.hg-st{display:flex;flex-direction:column;align-items:flex-start;gap:3px;font-size:12px}
+.hg-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;white-space:nowrap}
+.hg-tag.ok{background:#ECFDF3;color:#027A48}
+.hg-tag.no{background:#F2F4F7;color:#475467}
+.hg-tag.warn{background:#FEF3F2;color:#B42318}
+.hg-tag.sw{background:#F4F3FF;color:#5925DC}
+.hg-open{background:#fff;border:1px solid #D0D5DD;border-radius:8px;padding:7px 10px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.hg-empty{padding:28px 14px;text-align:center;color:#667085}
+@media(max-width:860px){
+  .hg-row.hg-head{display:none}
+  .hg-row{grid-template-columns:28px minmax(0,1fr) auto;grid-template-areas:"c t o" "c x x" "c k k" "c i i" "c s s";row-gap:6px}
+  .hg-row>.c{grid-area:c;align-self:start;padding-top:2px}.hg-row>.t{grid-area:t}.hg-row>.x{grid-area:x}.hg-row>.k{grid-area:k}
+  .hg-row>.i{grid-area:i}.hg-row>.hg-st{grid-area:s;flex-direction:row;flex-wrap:wrap}.hg-row>.o{grid-area:o}
+}
+/* Trình xem/sửa hợp đồng */
+#hdgOverlay{position:fixed;inset:0;z-index:300;background:#667085;display:none;flex-direction:column}
+#hdgOverlay.open{display:flex}
+.hdg-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#101828;color:#fff}
+.hdg-top h3{margin:0;font-size:15px;flex:1;min-width:150px}
+.hdg-top button{border:0;border-radius:8px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;background:rgba(255,255,255,.12);color:#fff}
+.hdg-top button.pr{background:#F47B20;color:#141414}
+.hdg-top .hdg-msg{width:100%;font-size:12.5px;color:#D0D5DD}
+.hdg-top .hdg-msg:empty{display:none}
+.hdg-scroll{flex:1;overflow:auto;padding:18px 10px 40px;-webkit-overflow-scrolling:touch}
+.hdg-doc{background:#fff;width:210mm;max-width:100%;margin:0 auto 18px;padding:16mm 18mm;box-sizing:border-box;box-shadow:0 4px 18px rgba(0,0,0,.25);
+  font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.38;color:#000;outline:none}
+@media(max-width:640px){.hdg-doc{padding:8mm 6mm;font-size:11pt}}
+.hdg-doc:focus{box-shadow:0 0 0 3px #F47B20,0 4px 18px rgba(0,0,0,.25)}
+.hdg-doc p{margin:0 0 2pt}
+.hdg-doc .c{text-align:center}
+.hdg-doc .qh{font-weight:700;font-size:12pt}
+.hdg-doc .dl{font-weight:700}
+.hdg-doc .rule{width:90px;border-top:1px solid #000;margin:3pt auto 10pt}
+.hdg-doc .tt{font-weight:700;font-size:15pt;margin:4pt 0 2pt}
+.hdg-doc .date{text-align:right;font-style:italic;margin:0 30pt 10pt 0}
+.hdg-doc .sec{font-weight:700;font-size:12.5pt;margin:8pt 0 3pt}
+.hdg-doc .art{font-weight:700;font-size:12.5pt;margin:8pt 0 2pt 12pt}
+.hdg-doc ol{margin:0 0 2pt;padding-left:38pt}
+.hdg-doc ol ol{padding-left:22pt}
+.hdg-doc li{margin:0 0 1pt}
+.hdg-doc .ind{padding-left:56pt}
+.hdg-doc .ind2{padding-left:12pt}
+.hdg-doc ul.dot{margin:0 0 2pt;padding-left:38pt}
+.hdg-f{background:#FFF4E5;border-bottom:1px dotted #F47B20;padding:0 2px;font-weight:700}
+.hdg-f.empty{font-weight:400;color:#000;background:#FEF3F2}
+.hdg-sign{display:grid;grid-template-columns:1fr 1fr;text-align:center;margin-top:16pt;min-height:110pt}
+.hdg-sign b{display:block}
+.hdg-sign span{display:block}
+#hdgPrintArea{display:none}
+@media print{
+  @page{size:A4;margin:12mm 16mm}
+  html,body{background:#fff!important}
+  body.hdg-printing{padding:0!important;margin:0!important}
+  body.hdg-printing>*:not(#hdgPrintArea){display:none!important}
+  body.hdg-printing #hdgPrintArea{display:block!important}
+  #hdgPrintArea .hdg-doc{width:auto;max-width:none;margin:0;padding:0;box-shadow:none;font-size:12pt}
+  #hdgPrintArea .hdg-doc+.hdg-doc{break-before:page;page-break-before:always}
+  #hdgPrintArea .hdg-f{background:none!important;border:0!important;padding:0}
+  #hdgPrintArea .hdg-sign{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+<script>
+/* ===== HỢP ĐỒNG THUÊ XE (bản 2026-11-09-hopdong) =====
+   Tab "Hợp đồng": danh sách booking GIAO XE trong 1 ngày (mặc định NGÀY MAI → tối hôm trước in sẵn).
+   Ô CCCD sửa ngay trong danh sách (lưu b.cccd). Chọn nhiều → "Kiểm tra & in" → trình xem A4 sửa trực tiếp → In.
+   Mỗi booking: b.cccd, b.hdgIn = 'YYYY-MM-DD HH:MM' lần in gần nhất, b.hdgOv = {khoá: giá trị đã sửa tay trên hợp đồng}.
+   Mẫu theo Google Doc "HỢP ĐỒNG KHÁCH LẺ" của anh Harry (8/11/2026). */
+(function(){
+  const BEN_A={dd:'Đào Long Nhật',cccd:'036203015047',cv:'Chủ Cửa hàng',dc:'Số 4 Ngõ 192 Kim Mã, Phường Ngọc Hà, Thành Phố Hà Nội',dt:'0877.312.148',em:'goodbikehanoi@gmail.com'};
+  const DOTS='………………………………';
+  const ro=()=>(typeof viewMode!=='undefined'&&viewMode);
+  const vnd=n=>Number(Math.round(+n||0)).toLocaleString('vi-VN');
+  const dmy=ds=>{ const [y,m,d]=String(ds||'').split('-'); return d?(d+'/'+m+'/'+y):''; };
+  const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const bkById=id=>(DB.bookings||[]).find(x=>x.id===id);
+  const nowStamp=()=>{ const d=new Date(); return todayStr()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+  let hgDate=null, hgSel=new Set(), hdgIds=[];
+
+  /* ---------- Giá trị tự điền từ booking ---------- */
+  function hdgAuto(b){
+    const g=splitGuest(b.guest||''), vi=(DB.vehicleInfo&&DB.vehicleInfo[b.xe])||{};
+    const typ=vehTyp(b.xe)||'', mau=String(vi.mau||'').trim();
+    const [y,m,d]=String(b.arrive||'').split('-');
+    const ns=nightsOf(b), nd=ns.length, rent=totalOf(b), svc=svcList(b), svT=svcTotalOf(b);
+    const ps=[...new Set(ns.map(ds=>priceOn(b,ds)))];
+    let gia=ps.length===1&&nd>0 ? vnd(ps[0])+' VND/ngày × '+nd+' ngày = '+vnd(rent)+' VND' : (rent?vnd(rent)+' VND ('+nd+' ngày)':'');
+    if(svT>0) gia+=' · Dịch vụ thêm ('+svc.map(x=>x.n).join(', ')+'): '+vnd(svT)+' VND · Tổng cộng: '+vnd(rent+svT)+' VND';
+    const dep=b.deposit||{}; let coc='';
+    if(+dep.amount>0) coc=vnd(dep.amount)+' VND ('+(dep.method==='CK'?'chuyển khoản':'tiền mặt')+')'+(dep.note?' – '+dep.note:'');
+    else if(dep.note) coc=dep.note;
+    return {
+      ngay:d||'', thang:m||'', nam:y||'',
+      ten:g.name||'', cccd:b.cccd||'', lh:g.phone||'',
+      loai:[typ,vi.doi?('đời '+vi.doi):''].filter(Boolean).join(' '),
+      mau:/^(#|rgb|hsl)/i.test(mau)?'':mau, bien:String(vi.bien||'').trim(),
+      gt:vnd(hdgGiaTriXe(b.xe))+' VND',
+      tu:dmy(b.arrive), tug:planDtime(b)||b.dtime||'', den:dmy(b.depart), deng:planRtime(b)||b.rtime||'', songay:nd?String(nd):'',
+      gia, coc
+    };
+  }
+  const hdgVals=b=>Object.assign(hdgAuto(b), b.hdgOv||{});
+  // Giá trị tài sản (anh Harry 8/11): xe số 20 triệu, các xe khác (tay ga, điện…) 40 triệu. Ô "Giá trị xe" ở Thông tin xe ghi đè nếu có.
+  function hdgGiaTriXe(xe){
+    const vi=(DB.vehicleInfo&&DB.vehicleInfo[xe])||{}; if(+vi.gt>0) return +vi.gt;
+    const base=((VEHICLES.find(v=>v.id===xe)||{}).typ)||'';
+    return (/số/i.test(base)||/số/i.test(vi.typ||''))?20000000:40000000;
+  }
+  window.hdgGiaTriXe=hdgGiaTriXe;
+
+  /* ---------- Nội dung hợp đồng (theo mẫu) ---------- */
+  function hdgHtml(b){
+    const v=hdgVals(b);
+    const F=(k,w)=>{ const t=v[k]; return '<span class="hdg-f'+(t?'':' empty')+'" data-k="'+k+'">'+(t?esc(t):(w||DOTS))+'</span>'; };
+    return '<div class="hdg-doc" data-id="'+esc(b.id)+'"'+(ro()?'':' contenteditable="true" spellcheck="false"')+'>'
+      +'<p class="c qh">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>'
+      +'<p class="c dl">Độc lập – Tự do – Hạnh phúc</p><div class="rule"></div>'
+      +'<p class="c tt">HỢP ĐỒNG THUÊ XE MÁY</p>'
+      +'<p class="date">Hà Nội, Ngày '+F('ngay','……')+' Tháng '+F('thang','……')+' Năm '+F('nam','2026')+'</p>'
+      +'<p class="sec">A. BÊN CHO THUÊ - BÊN A - Hộ Kinh Doanh GOODBIKE RENTAL (GBR)</p>'
+      +'<ol><li>Đại diện: '+esc(BEN_A.dd)+'</li><li>CCCD: '+esc(BEN_A.cccd)+'</li><li>Chức vụ: '+esc(BEN_A.cv)+'</li><li>Địa chỉ: '+esc(BEN_A.dc)+'</li><li>Điện thoại: '+esc(BEN_A.dt)+'</li><li>Email: '+esc(BEN_A.em)+'</li></ol>'
+      +'<p class="sec">B. BÊN THUÊ (BÊN B)</p>'
+      +'<ol><li>Họ và tên khách hàng : '+F('ten')+'</li><li>Số CCCD : '+F('cccd')+'</li><li>Thông tin liên hệ : '+F('lh')+'</li></ol>'
+      +'<p>Hai bên đã thoả thuận và thống nhất ký kết Hợp đồng cho thuê xe máy với những điều khoản cụ thể sau :</p>'
+      +'<p class="art">Điều 1 : Nội Dung Hợp Đồng</p>'
+      +'<p class="ind2">Bên A cho Bên B thuê xe máy :</p>'
+      +'<ol><li>Loại xe : '+F('loai')+'<div>Màu sắc : '+F('mau')+'</div><div>Biển Số : '+F('bien')+'</div></li>'
+      +'<li>Giá trị của tài sản cho thuê<div>Xe Máy : '+F('gt')+'</div><div>Phụ Kiện :</div>'
+      +'<ol><li>Mũ Bảo Hiểm : 200.000 VND/2 chiếc</li><li>Áo Mưa : 150.000 VND/ 1 chiếc</li></ol></li></ol>'
+      +'<p class="art">Điều 2 : Thời Gian Và Giá Thuê</p>'
+      +'<ol><li>Thời gian thuê: Từ ngày '+F('tu')+' (lúc '+F('tug','………')+') Đến ngày '+F('den')+' (lúc '+F('deng','………')+') - Số ngày thuê : '+F('songay','……')+' Ngày</li>'
+      +'<li>Giá Thuê : '+F('gia')+'</li><li>Tiền Cọc (nếu có) : '+F('coc')+'</li></ol>'
+      +'<p class="art">Điều 3 :</p>'
+      +'<ol><li>Hợp đồng có hiệu lực giá trị tương đương với thời gian thuê xe.</li>'
+      +'<li>Nếu một trong hai Bên, bên nào muốn chấm dứt hợp đồng trước thời hạn thì phải thông báo cho Bên kia ít nhất trước 1 ngày trước thời hạn hợp đồng.</li></ol>'
+      +'<p class="art">Điều 4 : Trách Nhiệm Và Quyền Hạn Các Bên</p>'
+      +'<ol><li>Trách nhiệm và quyền hạn bên A<ol>'
+        +'<li>Chịu trách nhiệm về pháp lý và nguồn gốc và quyền sở hữu xe.</li>'
+        +'<li>Đơn phương đình chỉ thực hiện hợp đồng và yêu cầu bồi thường thiệt hại nếu bên B có hành vi vi phạm hợp đồng hoặc phá hoại tài sản.</li>'
+        +'<li>Bên A không hoàn trả tiền cọc và số tiền thuê xe còn lại nếu bên B vi phạm các điều khoản trong hợp đồng.</li></ol></li>'
+      +'<li>Trách nhiệm và quyền hạn bên B<ol>'
+        +'<li>Sử dụng phương tiện xe đúng mục đích cam kết và tuân thủ luật giao thông cũng như luật pháp Việt Nam, chịu toàn bộ trách nhiệm pháp lí nếu như phát sinh hành vi vi phạm pháp luật trong quá trình thuê xe của bên B.</li>'
+        +'<li>Chỉ sử dụng xe với mục đích di chuyển, KHÔNG sử dụng xe để : chạy các app dịch vụ (bee, grab,..), chở đồ nặng (trên 12kg), tham gia các hoạt động đua xe, tụ tập vi phạm pháp luật, các hành vi cầm đồ (hoặc các hình thức thế chấp tài sản để vay mượn), cho bên thứ 3 thuê/mượn</li>'
+        +'<li>Nếu bên B bắt đầu thuê sau 15:00 thì thời gian đáo hạn 1 ngày thuê xe (tính tròn 1 ngày thuê xe) là 15:00 hàng ngày, nếu quá thời hạn trả xe khách hàng phải trả thêm phụ phí.</li>'
+        +'<li>Trong thời gian sử dụng xe Bên B có trách nhiệm giữ liên lạc với bên A, Bên A hoàn toàn có quyền đơn phương thu hồi xe nếu như không thể liên lạc được với bên B trong vòng 3 tiếng hoặc có các dấu hiệu vi phạm những điều khoản sử dụng xe có trong hợp đồng này.</li>'
+        +'<li>Bên B chỉ được sử dụng xe trong phạm vi bán kính 40km tính từ địa chỉ : 192 Kim Mã, Giảng Võ, Hà Nội (nội thành), nếu sử dụng xe vượt ngoài phạm vi kể trên, Bên B phải có trách nhiệm thông báo với bên A để trả thêm phụ phí.</li>'
+        +'<li>Bên B có nghĩa vụ hoàn trả nguyên trạng, không thay tháo bộ phận xe và các phụ kiện, nếu làm mất, hư hại hoặc có dấu hiệu can thiệp vào tất cả các bộ phận xe quý khách vui lòng thanh toán tiền bồi thường theo giá trị tài sản đã thống nhất.</li>'
+        +'<li>Trường hợp xảy ra tai nạn, phát sinh chi phí sửa chữa hoặc xảy ra vấn đề xước sát bộ phận xe trong quá trình sử dụng, Bên B có trách nhiệm báo với Bên A, không được can thiệp, thay tháo bất cứ bộ phận nào trên xe nếu chưa được sự đồng ý của Bên A.</li></ol></li></ol>'
+      +'<p class="art">Điều 5 : Điều khoản chung</p>'
+      +'<ul class="dot"><li>Hai Bên cam kết thực hiện nghiêm túc và đầy đủ các nội dung đã thỏa thuận.</li>'
+      +'<li>Trong trường hợp phát sinh tranh chấp, hai Bên ưu tiên giải quyết thông qua thương lượng, hòa giải. Nếu không đạt được thỏa thuận, tranh chấp sẽ được giải quyết tại Tòa án có thẩm quyền tại Việt Nam theo quy định pháp luật.</li></ul>'
+      +'<div class="hdg-sign"><div><b>ĐẠI DIỆN BÊN A</b><span>(ký và ghi rõ họ tên)</span></div><div><b>ĐẠI DIỆN BÊN B</b><span>(ký và ghi rõ họ tên)</span></div></div>'
+      +'</div>';
+  }
+
+  /* ---------- Trình xem / sửa / in ---------- */
+  function ensureOverlay(){
+    if(document.getElementById('hdgOverlay')) return;
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="hdgOverlay"><div class="hdg-top"><h3 id="hdgTitle">Hợp đồng</h3>'
+      +'<button type="button" id="hdgReset" title="Bỏ các chỗ đã sửa tay, điền lại theo booking">↺ Điền lại từ booking</button>'
+      +'<button type="button" class="pr" id="hdgPrint">🖨 In</button>'
+      +'<button type="button" id="hdgClose">✕ Đóng</button><div class="hdg-msg" id="hdgMsg"></div></div>'
+      +'<div class="hdg-scroll" id="hdgScroll"></div></div><div id="hdgPrintArea"></div>');
+    document.getElementById('hdgClose').onclick=()=>{ hdgCollect(); document.getElementById('hdgOverlay').classList.remove('open'); try{ renderHopDong(); }catch(e){} };
+    document.getElementById('hdgPrint').onclick=hdgPrint;
+    document.getElementById('hdgReset').onclick=()=>{
+      if(!confirm('Bỏ mọi chỗ đã sửa tay trên '+(hdgIds.length>1?hdgIds.length+' hợp đồng này':'hợp đồng này')+' và điền lại theo booking?')) return;
+      hdgIds.forEach(id=>{ const b=bkById(id); if(b&&b.hdgOv){ delete b.hdgOv; } }); if(!ro()) save(); hdgRender();
+    };
+    window.addEventListener('afterprint',()=>{ document.body.classList.remove('hdg-printing'); document.getElementById('hdgPrintArea').innerHTML=''; });
+  }
+  function hdgRender(){
+    const bs=hdgIds.map(bkById).filter(Boolean);
+    document.getElementById('hdgScroll').innerHTML=bs.map(hdgHtml).join('');
+    document.getElementById('hdgTitle').textContent=bs.length>1?('Hợp đồng · '+bs.length+' booking giao '+dmy(bs[0].arrive)):('Hợp đồng · '+(bs[0]?bs[0].xe+' · '+(splitGuest(bs[0].guest||'').name||''):''));
+    const thieu=bs.filter(b=>!hdgVals(b).cccd).length;
+    document.getElementById('hdgMsg').textContent=(ro()?'Chế độ chỉ xem: in được nhưng không lưu chỗ sửa. ':'Bấm thẳng vào hợp đồng để sửa (ô tô cam là thông tin lấy từ booking, chỗ sửa ở ô cam được lưu lại). ')
+      +(thieu?'⚠ '+thieu+' hợp đồng chưa có CCCD.':'');
+  }
+  // đọc lại các ô (data-k) đã sửa tay → lưu b.hdgOv (chỉ phần khác giá trị tự điền); CCCD sửa ở đây → ghi về booking
+  function hdgCollect(){
+    if(ro()) return false;
+    let changed=false;
+    document.querySelectorAll('#hdgScroll .hdg-doc').forEach(doc=>{
+      const b=bkById(doc.dataset.id); if(!b) return;
+      const auto=hdgAuto(b), ov={};
+      doc.querySelectorAll('.hdg-f[data-k]').forEach(sp=>{
+        const k=sp.dataset.k, val=sp.textContent.replace(/…+/g,' ').replace(/\s+/g,' ').trim();
+        if(k==='cccd'){ if(val!==(b.cccd||'')){ if(val) b.cccd=val; else delete b.cccd; changed=true; } return; }
+        if(val!==(auto[k]||'')) ov[k]=val;
+      });
+      const old=JSON.stringify(b.hdgOv||{}), neu=JSON.stringify(ov);
+      if(old!==neu){ if(Object.keys(ov).length) b.hdgOv=ov; else delete b.hdgOv; changed=true; }
+    });
+    if(changed) save();
+    return changed;
+  }
+  function hdgPrint(){
+    hdgCollect();
+    const n=+(document.getElementById('hgCopies')||{}).value||1;
+    const pa=document.getElementById('hdgPrintArea');
+    let html='';
+    document.querySelectorAll('#hdgScroll .hdg-doc').forEach(doc=>{
+      const c=doc.cloneNode(true); c.removeAttribute('contenteditable');
+      for(let i=0;i<n;i++) html+=c.outerHTML;
+    });
+    pa.innerHTML=html;
+    if(!ro()){ const st=nowStamp(); hdgIds.forEach(id=>{ const b=bkById(id); if(b) b.hdgIn=st; }); save(); }
+    document.body.classList.add('hdg-printing');
+    setTimeout(()=>{ try{ window.print(); }finally{ setTimeout(()=>{ document.body.classList.remove('hdg-printing'); },500); } },60);
+  }
+  window.openHopDong=function(ids){
+    ids=(Array.isArray(ids)?ids:[ids]).filter(id=>bkById(id));
+    if(!ids.length) return;
+    ensureOverlay(); hdgIds=ids; hdgRender();
+    document.getElementById('hdgScroll').scrollTop=0;
+    document.getElementById('hdgOverlay').classList.add('open');
+  };
+
+  /* ---------- Tab Hợp đồng ---------- */
+  function hgList(ds){
+    return (DB.bookings||[]).filter(b=>b&&b.arrive===ds&&!isDumpXe(b.xe))
+      .sort((a,b)=>String(planDtime(a)||'').localeCompare(String(planDtime(b)||''))||String(a.xe).localeCompare(String(b.xe)));
+  }
+  window.hgOpenTab=function(){
+    if(!hgDate){ hgDate=addDays(todayStr(),1); hgSel=new Set(hgList(hgDate).map(b=>b.id)); }
+    renderHopDong();
+  };
+  function setDate(ds){ hgDate=ds; hgSel=new Set(hgList(ds).map(b=>b.id)); renderHopDong(); }
+  window.renderHopDong=function(){
+    const el=document.getElementById('hgList'); if(!el) return;
+    if(!hgDate) hgDate=addDays(todayStr(),1);
+    document.getElementById('hgDate').value=hgDate;
+    const list=hgList(hgDate);
+    [...hgSel].forEach(id=>{ if(!list.some(b=>b.id===id)) hgSel.delete(id); });
+    const miss=list.filter(b=>!hdgVals(b).cccd).length, done=list.filter(b=>b.hdgIn).length;
+    const tm=hgDate===addDays(todayStr(),1)?' (ngày mai)':(hgDate===todayStr()?' (hôm nay)':'');
+    document.getElementById('hgKpis').innerHTML=
+      '<div class="hg-kpi"><span>Giao xe '+dow(hgDate)+' '+dmy(hgDate)+tm+'</span><b>'+list.length+'</b></div>'
+      +'<div class="hg-kpi '+(miss?'warn':'ok')+'"><span>Thiếu CCCD</span><b>'+miss+'</b></div>'
+      +'<div class="hg-kpi '+(done===list.length&&list.length?'ok':'')+'"><span>Đã in</span><b>'+done+' / '+list.length+'</b></div>';
+    if(!list.length){ el.innerHTML='<div class="hg-empty">Không có booking giao xe ngày '+dmy(hgDate)+'.</div>'; }
+    else el.innerHTML='<div class="hg-row hg-head"><span></span><span>Giờ giao</span><span>Xe</span><span>Khách</span><span>Số CCCD</span><span>Trạng thái</span><span></span></div>'
+      +list.map(b=>{
+        const g=splitGuest(b.guest||''), vi=(DB.vehicleInfo&&DB.vehicleInfo[b.xe])||{}, v=hdgVals(b);
+        const warns=[]; if(!vi.bien) warns.push('thiếu biển số');
+        return '<div class="hg-row" data-id="'+esc(b.id)+'">'
+          +'<span class="c"><input type="checkbox" class="hg-ck"'+(hgSel.has(b.id)?' checked':'')+'></span>'
+          +'<span class="t">'+esc(planDtime(b)||'—')+'</span>'
+          +'<span class="x"><b>'+esc(b.xe)+' · '+esc(vehTyp(b.xe)||'')+'</b><small>'+esc(vi.bien||'Chưa có biển số')+'</small></span>'
+          +'<span class="k"><b>'+esc(g.name||'—')+'</b><small>'+esc(g.phone||'')+(b.daddr?' · '+esc(b.daddr):'')+'</small></span>'
+          +'<span class="i"><input type="text" class="hg-cccd'+(v.cccd?'':' miss')+'" value="'+esc(b.cccd||'')+'" placeholder="Nhập số CCCD" maxlength="30"'+(ro()?' disabled':'')+' autocomplete="off" spellcheck="false" data-lpignore="true"></span>'
+          +'<span class="hg-st">'+(b.hdgIn?'<span class="hg-tag ok">✓ Đã in '+esc(b.hdgIn.slice(11))+' '+esc(dmy(b.hdgIn.slice(0,10)).slice(0,5))+'</span>':'<span class="hg-tag no">Chưa in</span>')
+            +(b._swapFromXe?'<span class="hg-tag sw">⇶ Đổi từ xe '+esc(b._swapFromXe)+'</span>':'')
+            +warns.map(w=>'<span class="hg-tag warn">'+w+'</span>').join('')+'</span>'
+          +'<span class="o"><button type="button" class="hg-open">Xem &amp; in</button></span>'
+          +'</div>';
+      }).join('');
+    const all=document.getElementById('hgAll'); all.checked=list.length>0&&list.every(b=>hgSel.has(b.id)); all.disabled=!list.length;
+    const pb=document.getElementById('hgPrintSel'); pb.textContent='🖨 Kiểm tra & in ('+hgSel.size+')'; pb.disabled=!hgSel.size;
+  };
+  function wire(){
+    const $=id=>document.getElementById(id); if(!$('hgList')) return;
+    $('hgPrev').onclick=()=>setDate(addDays(hgDate,-1));
+    $('hgNext').onclick=()=>setDate(addDays(hgDate,1));
+    $('hgToday').onclick=()=>setDate(todayStr());
+    $('hgTomorrow').onclick=()=>setDate(addDays(todayStr(),1));
+    $('hgDate').onchange=e=>{ if(e.target.value) setDate(e.target.value); };
+    $('hgAll').onchange=e=>{ const l=hgList(hgDate); hgSel=new Set(e.target.checked?l.map(b=>b.id):[]); renderHopDong(); };
+    try{ const c=localStorage.getItem('gb_hgCopies'); if(c) $('hgCopies').value=c; }catch(e){}
+    $('hgCopies').onchange=e=>{ try{ localStorage.setItem('gb_hgCopies',e.target.value); }catch(_){} };
+    $('hgPrintSel').onclick=()=>{ const ids=hgList(hgDate).filter(b=>hgSel.has(b.id)).map(b=>b.id); if(ids.length) openHopDong(ids); };
+    const L=$('hgList');
+    L.addEventListener('change',e=>{
+      const row=e.target.closest('.hg-row'); if(!row) return; const id=row.dataset.id;
+      if(e.target.classList.contains('hg-ck')){ if(e.target.checked) hgSel.add(id); else hgSel.delete(id); renderHopDong(); return; }
+      if(e.target.classList.contains('hg-cccd')&&!ro()){
+        const b=bkById(id); if(!b) return; const v=e.target.value.trim();
+        if(v===(b.cccd||'')) return;
+        if(v) b.cccd=v; else delete b.cccd;
+        save(); renderHopDong();
+        const inp=document.querySelector('.hg-row[data-id="'+CSS.escape(id)+'"] .hg-cccd'); if(inp) inp.classList.add('saved');
+      }
+    });
+    L.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.classList.contains('hg-cccd')) e.target.blur(); });
+    L.addEventListener('click',e=>{ const bt=e.target.closest('.hg-open'); if(!bt) return; openHopDong(bt.closest('.hg-row').dataset.id); });
+    const bkb=$('bkHopDong');
+    if(bkb) bkb.onclick=()=>{
+      const id=editingBk; if(!id) return;
+      if(!ro()) $('bkSave').click();
+      if($('bkOverlay').classList.contains('open')) return;      // lưu không được → ở lại form
+      openHopDong(id);
+    };
+  }
+  wire();
+})();
+</script>
+
 <script>
 /* ===== KHUNG MỚI: logo, nhóm điều hướng, biểu tượng tab, khung màu cho Chi tiết booking ===== */
 (function(){
@@ -10603,6 +10966,7 @@ function renderChatLuong(){
     timeline: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>',
     kehoach: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
     lichtrinh: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    hopdong: '<path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
     chatluong: '<path d="M3.5 18a9 9 0 1117 0"/><path d="M12 14l4-5"/>',
     thuchi: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
     contacts: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
@@ -10859,7 +11223,7 @@ function renderChatLuong(){
   const ACT = {them:['Thêm','#027A48','#ECFDF3'],sua:['Sửa','#175CD3','#EFF8FF'],xoa:['Xoá','#B42318','#FEF3F2'],khoiphuc:['Khôi phục','#6941C6','#F4F3FF']};
   const FLB = {xe:'Xe',guest:'Khách',arrive:'Ngày giao',depart:'Ngày trả',dtime:'Giờ giao',rtime:'Giờ trả',dplan:'Giờ giao dự kiến',rplan:'Giờ trả dự kiến',
     daddr:'Nơi giao',raddr:'Nơi trả',status:'Trạng thái',src:'Nguồn',prices:'Giá',price:'Giá',payments:'Thanh toán',prepaid:'Đã trả',pay:'Hình thức TT',services:'Dịch vụ thêm',
-    note:'Ghi chú',deposit:'Cọc',ship:'Ship',resaddr:'Nơi ở',debt:'Công nợ',commissions:'Hoa hồng',dkm:'Km giao',rkm:'Km trả',date:'Ngày',amt:'Số tiền',type:'Loại',cat:'Hạng mục',name:'Tên'};
+    note:'Ghi chú',deposit:'Cọc',ship:'Ship',resaddr:'Nơi ở',cccd:'CCCD',hdgIn:'In hợp đồng',hdgOv:'Sửa hợp đồng',debt:'Công nợ',commissions:'Hoa hồng',dkm:'Km giao',rkm:'Km trả',date:'Ngày',amt:'Số tiền',type:'Loại',cat:'Hạng mục',name:'Tên'};
 
   const css = document.createElement('style');
   css.textContent = `
