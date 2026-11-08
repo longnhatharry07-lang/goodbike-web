@@ -3095,7 +3095,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-09-hopdong';
+const BAN_APP='2026-11-10-qrcuahang';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -5292,10 +5292,25 @@ function hdCrc16(str){ let c=0xFFFF; for(let i=0;i<str.length;i++){ c^=str.charC
 // QR ngân hàng của GOODBIKE: Techcombank, tài khoản hộ kinh doanh 19070587490012.
 // 8/11/2026: QR gốc trỏ tới mã tài khoản ảo MS00T08228403886049 → Techcombank tự chèn "MS00T…,HO KINH DOANH GOODBIKE RENTAL,"
 // vào đầu lời nhắn. Từ bản 2026-11-09-hopdong tạo QR chuẩn VietQR trỏ THẲNG số tài khoản thật, không qua mã ảo.
-const HD_BANK_MAC_DINH={bin:'970407',acc:'19070587490012',name:'HO KINH DOANH GOODBIKE RENTAL',accShow:'1907 0587 4900 12'};
-const hdLaMaAo=b=>/^MS/i.test(String(b&&b.acc||''));   // mã tài khoản ảo Techcombank (MS00T…) → không dùng
-function hdBankNow(){ const b=DB.hdBank; return (b&&b.bin&&b.acc&&!(b.bin==='970407'&&hdLaMaAo(b)))?b:HD_BANK_MAC_DINH; }
+/* 9/11/2026: QUAY LẠI MÃ QR CỬA HÀNG (tài khoản ảo MS00T… của Techcombank).
+   Bản 2026-11-09-hopdong đổi sang chuyển thẳng STK 19070587490012 cho lời nhắn gọn hơn, nhưng anh Harry báo:
+   chuyển vào STK thẳng thì CHỈ báo về hộ kinh doanh, KHÔNG báo về cửa hàng (loa/app cửa hàng liên kết tài khoản).
+   Phải chuyển đúng mã QR cửa hàng (MS00T08228403886049, kèm tag 83/84 của mã gốc) thì cửa hàng mới nhận thông báo.
+   → giữ nguyên mọi trường của mã gốc anh gửi, chỉ thêm số tiền (54) + nội dung (62/08). Ngân hàng sẽ tự chèn
+   "MS00T…,HO KINH DOANH GOODBIKE RENTAL," vào đầu lời nhắn — chấp nhận được. */
+const HD_BANK_MAC_DINH={bin:'970407',acc:'MS00T08228403886049',
+  raw:'00020101021138630010A000000727013300069704070119MS00T082284038860490208QRIBFTTA53037045802VN8315T08228403886049840063040A03',
+  name:'HO KINH DOANH GOODBIKE RENTAL',accShow:'1907 0587 4900 12'};
+function hdBankNow(){ const b=DB.hdBank; return (b&&b.bin&&b.acc)?b:HD_BANK_MAC_DINH; }
 function hdVietQr(bk,amount,content){
+  if(bk.raw){   // mã QR cửa hàng: giữ nguyên mọi trường (kể cả 83/84), chỉ đổi 01→12 và thêm số tiền + nội dung
+    const t=hdTlvParse(bk.raw); delete t['63']; t['01']='12';
+    if(amount>0) t['54']=String(Math.round(amount)); else delete t['54'];
+    const sub=t['62']?hdTlvParse(t['62']):{}; if(content) sub['08']=content; else delete sub['08'];
+    const subS=Object.keys(sub).sort().map(k=>hdTlv(k,sub[k])).join(''); if(subS) t['62']=subS; else delete t['62'];
+    let p=Object.keys(t).sort().map(k=>hdTlv(k,t[k])).join('')+'6304';
+    return p+hdCrc16(p);
+  }
   const acct=hdTlv('00','A000000727')+hdTlv('01',hdTlv('00',bk.bin)+hdTlv('01',bk.acc))+hdTlv('02','QRIBFTTA');
   let p=hdTlv('00','01')+hdTlv('01','12')+hdTlv('38',acct)+hdTlv('53','704')+(amount>0?hdTlv('54',String(Math.round(amount))):'')+hdTlv('58','VN')+(content?hdTlv('62',hdTlv('08',content)):'')+'6304';
   return p+hdCrc16(p);
