@@ -1949,6 +1949,7 @@ body.gb-shell #tabs .tab.gb-more{display:none}
     <div class="card hdg-head">
       <div class="row" style="flex-wrap:wrap;gap:10px">
         <h2 style="margin:0">Hợp đồng thuê xe</h2>
+        <button type="button" class="hg-mau-btn" id="hgMau" title="Sửa mẫu hợp đồng gốc: thêm/bớt điều khoản, đổi chữ — áp dụng cho mọi hợp đồng">📝 Hợp đồng bản cứng<small id="hgMauTag"></small></button>
         <div class="right row" style="flex-wrap:wrap;gap:6px;justify-content:flex-end">
           <button class="coc-btn" id="hgPrev">◀</button>
           <span class="muted">Ngày giao xe</span><input type="date" id="hgDate">
@@ -3095,7 +3096,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-10-qrcuahang';
+const BAN_APP='2026-11-10-maugoc';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -10688,8 +10689,14 @@ function renderChatLuong(){
   .hg-row>.i{grid-area:i}.hg-row>.hg-st{grid-area:s;flex-direction:row;flex-wrap:wrap}.hg-row>.o{grid-area:o}
 }
 /* Trình xem/sửa hợp đồng */
-#hdgOverlay{position:fixed;inset:0;z-index:300;background:#667085;display:none;flex-direction:column}
-#hdgOverlay.open{display:flex}
+#hdgOverlay,#mauOverlay{position:fixed;inset:0;z-index:300;background:#667085;display:none;flex-direction:column}
+#hdgOverlay.open,#mauOverlay.open{display:flex}
+.mau-tools{display:flex;flex-wrap:wrap;gap:4px;width:100%;align-items:center}
+.mau-tools button,.mau-tools select{background:#fff!important;color:#101828!important;border:1px solid #D0D5DD;border-radius:6px;padding:5px 9px!important;font-size:13px;font-weight:600;cursor:pointer;min-width:32px}
+.mau-tools select{max-width:200px}
+.hdg-mau .hdg-f{background:#EFF8FF;border:1px solid #84CAFF;border-bottom:1px solid #84CAFF;border-radius:4px;color:#175CD3;font-weight:600;padding:0 4px;white-space:nowrap;cursor:default;user-select:all;-webkit-user-select:all}
+.hg-mau-btn{background:#fff;border:1.5px solid #101828;border-radius:10px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer}
+.hg-mau-btn small{font-weight:600;color:#B54708;margin-left:4px}
 .hdg-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#101828;color:#fff}
 .hdg-top h3{margin:0;font-size:15px;flex:1;min-width:150px}
 .hdg-top button{border:0;border-radius:8px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;background:rgba(255,255,255,.12);color:#fff}
@@ -10723,13 +10730,20 @@ function renderChatLuong(){
 .hdg-sign span{display:block}
 #hdgPrintArea{display:none}
 @media print{
-  @page{size:A4;margin:12mm 16mm}
+  /* lề trang = 0 → Chrome/Edge không in dòng đầu/cuối trang (tiêu đề web, link, ngày, số trang).
+     Lề thật tạo bằng bảng: thead/tfoot (khoảng trống 12mm) tự lặp lại ở mỗi trang, cột có đệm trái/phải 16mm. */
+  @page{size:A4;margin:0}
   html,body{background:#fff!important}
   body.hdg-printing{padding:0!important;margin:0!important}
   body.hdg-printing>*:not(#hdgPrintArea){display:none!important}
   body.hdg-printing #hdgPrintArea{display:block!important}
   #hdgPrintArea .hdg-doc{width:auto;max-width:none;margin:0;padding:0;box-shadow:none;font-size:12pt}
-  #hdgPrintArea .hdg-doc+.hdg-doc{break-before:page;page-break-before:always}
+  #hdgPrintArea .hdg-pt{width:100%;border-collapse:collapse;border:0}
+  #hdgPrintArea .hdg-pt{font-size:12pt}
+  #hdgPrintArea .hdg-pt td{padding:0 16mm;border:0;text-align:left;white-space:normal;vertical-align:top;background:none}
+  #hdgPrintArea .hdg-doc{text-align:left;white-space:normal}
+  #hdgPrintArea .hdg-pt .sp{height:12mm}
+  #hdgPrintArea .hdg-pt+.hdg-pt{break-before:page;page-break-before:always}
   #hdgPrintArea .hdg-f{background:none!important;border:0!important;padding:0}
   #hdgPrintArea .hdg-sign{break-inside:avoid;page-break-inside:avoid}
 }
@@ -10765,7 +10779,7 @@ function renderChatLuong(){
     else if(dep.note) coc=dep.note;
     return {
       ngay:d||'', thang:m||'', nam:y||'',
-      ten:g.name||'', cccd:b.cccd||'', lh:g.phone||'',
+      ten:g.name||'', cccd:b.cccd||'', lh:g.phone||'', dc:String(b.resaddr||'').trim(), xe:String(b.xe||''), daddr:String(b.daddr||'').trim(), raddr:String(b.raddr||'').trim(),
       loai:[typ,vi.doi?('đời '+vi.doi):''].filter(Boolean).join(' '),
       mau:/^(#|rgb|hsl)/i.test(mau)?'':mau, bien:String(vi.bien||'').trim(),
       gt:vnd(hdgGiaTriXe(b.xe))+' VND',
@@ -10783,10 +10797,10 @@ function renderChatLuong(){
   window.hdgGiaTriXe=hdgGiaTriXe;
 
   /* ---------- Nội dung hợp đồng (theo mẫu) ---------- */
-  function hdgHtml(b){
-    const v=hdgVals(b);
-    const F=(k,w)=>{ const t=v[k]; return '<span class="hdg-f'+(t?'':' empty')+'" data-k="'+k+'">'+(t?esc(t):(w||DOTS))+'</span>'; };
-    return '<div class="hdg-doc" data-id="'+esc(b.id)+'"'+(ro()?'':' contenteditable="true" spellcheck="false"')+'>'
+  function hdgMauGoc(){   // mẫu gốc theo Google Doc — ô tự điền là <span class="hdg-f" data-k=…>
+    const F=k=>hdgChip(k);
+
+    return ''
       +'<p class="c qh">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>'
       +'<p class="c dl">Độc lập – Tự do – Hạnh phúc</p><div class="rule"></div>'
       +'<p class="c tt">HỢP ĐỒNG THUÊ XE MÁY</p>'
@@ -10824,8 +10838,107 @@ function renderChatLuong(){
       +'<ul class="dot"><li>Hai Bên cam kết thực hiện nghiêm túc và đầy đủ các nội dung đã thỏa thuận.</li>'
       +'<li>Trong trường hợp phát sinh tranh chấp, hai Bên ưu tiên giải quyết thông qua thương lượng, hòa giải. Nếu không đạt được thỏa thuận, tranh chấp sẽ được giải quyết tại Tòa án có thẩm quyền tại Việt Nam theo quy định pháp luật.</li></ul>'
       +'<div class="hdg-sign"><div><b>ĐẠI DIỆN BÊN A</b><span>(ký và ghi rõ họ tên)</span></div><div><b>ĐẠI DIỆN BÊN B</b><span>(ký và ghi rõ họ tên)</span></div></div>'
-      +'</div>';
+      ;
   }
+
+  /* ---------- MẪU HỢP ĐỒNG GỐC (bản 2026-11-10-maugoc) ----------
+     DB.hdgMau = HTML mẫu do chủ sửa (cfg, đồng bộ mọi máy). Chưa có → hdgMauGoc(). Ô tự điền = <span class="hdg-f" data-k="khoá">. */
+  const HDG_KEYS={ngay:'Ngày',thang:'Tháng',nam:'Năm',ten:'Họ tên khách',cccd:'Số CCCD',lh:'SĐT khách',dc:'Địa chỉ thường trú',
+    xe:'Mã xe',loai:'Loại xe',mau:'Màu xe',bien:'Biển số',gt:'Giá trị xe',tu:'Ngày nhận xe',tug:'Giờ nhận',den:'Ngày trả xe',deng:'Giờ trả',
+    songay:'Số ngày thuê',gia:'Giá thuê',coc:'Tiền cọc',daddr:'Nơi giao xe',raddr:'Nơi trả xe'};
+  const HDG_SHORT={ngay:'……',thang:'……',nam:'2026',tug:'………',deng:'………',songay:'……'};
+  function hdgChip(k){ return '<span class="hdg-f" data-k="'+k+'" contenteditable="false">'+esc(HDG_KEYS[k]||k)+'</span>'; }
+  function hdgSanitize(html){
+    const t=document.createElement('template'); t.innerHTML=String(html||'');
+    t.content.querySelectorAll('script,style,iframe,object,embed,link,meta,form,input,button,textarea,select').forEach(x=>x.remove());
+    t.content.querySelectorAll('*').forEach(el=>{ [...el.attributes].forEach(at=>{ const n=at.name.toLowerCase();
+      if(n.startsWith('on')||(/^(href|src|xlink:href)$/.test(n)&&/^\s*javascript:/i.test(at.value))||n==='id') el.removeAttribute(at.name); }); });
+    return t.innerHTML;
+  }
+  const hdgMauNow=()=>(typeof DB.hdgMau==='string'&&DB.hdgMau.trim())?DB.hdgMau:hdgMauGoc();
+  function hdgHtml(b){
+    const v=hdgVals(b), t=document.createElement('template');
+    t.innerHTML=hdgSanitize(hdgMauNow());
+    t.content.querySelectorAll('.hdg-f[data-k]').forEach(sp=>{
+      const k=sp.dataset.k, val=v[k]; sp.removeAttribute('contenteditable');
+      if(!(k in HDG_KEYS)) return;
+      sp.textContent=val||HDG_SHORT[k]||DOTS; sp.classList.toggle('empty',!val);
+    });
+    const d=document.createElement('div'); d.appendChild(t.content);
+    return '<div class="hdg-doc" data-id="'+esc(b.id)+'"'+(ro()?'':' contenteditable="true" spellcheck="false"')+'>'+d.innerHTML+'</div>';
+  }
+  function mauOpen(){
+    ensureOverlay();
+    if(!document.getElementById('mauOverlay')){
+      const tb=(c,l,t)=>'<button type="button" data-c="'+c+'" title="'+t+'">'+l+'</button>';
+      document.body.insertAdjacentHTML('beforeend',
+        '<div id="mauOverlay"><div class="hdg-top"><h3>Mẫu hợp đồng gốc</h3>'
+        +'<button type="button" id="mauGoc" title="Bỏ mọi chỉnh sửa, quay về mẫu ban đầu">↺ Khôi phục mẫu ban đầu</button>'
+        +'<button type="button" class="pr" id="mauSave">💾 Lưu mẫu</button>'
+        +'<button type="button" id="mauClose">✕ Đóng</button>'
+        +'<div class="mau-tools">'
+          +tb('bold','<b>B</b>','Đậm')+tb('italic','<i>I</i>','Nghiêng')+tb('underline','<u>U</u>','Gạch chân')
+          +tb('insertOrderedList','1.','Danh sách số')+tb('insertUnorderedList','•','Danh sách chấm')
+          +tb('outdent','⇤','Lùi ra')+tb('indent','⇥','Thụt vào')
+          +tb('justifyLeft','Trái','Căn trái')+tb('justifyCenter','Giữa','Căn giữa')+tb('justifyRight','Phải','Căn phải')
+          +'<button type="button" id="mauDieu" title="Thêm điều khoản mới trước phần chữ ký">＋ Điều khoản</button>'
+          +'<select id="mauChip"><option value="">＋ Chèn ô tự điền…</option>'+Object.keys(HDG_KEYS).map(k=>'<option value="'+k+'">'+esc(HDG_KEYS[k])+'</option>').join('')+'</select>'
+        +'</div>'
+        +'<div class="hdg-msg" id="mauMsg"></div></div>'
+        +'<div class="hdg-scroll"><div class="hdg-doc hdg-mau" id="mauDoc" contenteditable="true" spellcheck="false"></div></div></div>');
+      const doc=document.getElementById('mauDoc'); let rng=null, dirty=false;
+      const keep=()=>{ const s=getSelection(); if(s.rangeCount&&doc.contains(s.anchorNode)) rng=s.getRangeAt(0).cloneRange(); };
+      document.addEventListener('selectionchange',keep);
+      const restore=()=>{ doc.focus(); if(rng){ const s=getSelection(); s.removeAllRanges(); s.addRange(rng); } };
+      doc.addEventListener('input',()=>{ dirty=true; });
+      doc.addEventListener('paste',e=>{ e.preventDefault(); const tx=(e.clipboardData||window.clipboardData).getData('text/plain'); document.execCommand('insertText',false,tx); });
+      document.querySelectorAll('#mauOverlay .mau-tools [data-c]').forEach(bt=>{ bt.onmousedown=e=>e.preventDefault(); bt.onclick=()=>{ restore(); document.execCommand(bt.dataset.c,false,null); dirty=true; }; });
+      document.getElementById('mauChip').onchange=function(){
+        const k=this.value; this.value=''; if(!k) return; restore();
+        const s=getSelection(); if(!s.rangeCount||!doc.contains(s.anchorNode)){ alert('Bấm vào chỗ muốn chèn trong mẫu trước.'); return; }
+        const r=s.getRangeAt(0); r.deleteContents();
+        const w=document.createElement('span'); w.innerHTML=hdgChip(k); const chip=w.firstChild, sp=document.createTextNode('\u00a0');
+        r.insertNode(sp); r.insertNode(chip);
+        const r2=document.createRange(); r2.setStartAfter(sp); r2.collapse(true); s.removeAllRanges(); s.addRange(r2); rng=r2.cloneRange(); dirty=true;
+      };
+      document.getElementById('mauDieu').onclick=()=>{
+        const n=doc.querySelectorAll('p.art').length+1, sign=doc.querySelector('.hdg-sign');
+        const w=document.createElement('div'); w.innerHTML='<p class="art">Điều '+n+' : Tiêu đề điều khoản</p><ol><li>Nội dung điều khoản</li></ol>';
+        const nodes=[...w.childNodes]; nodes.forEach(nd=>{ if(sign) sign.parentNode.insertBefore(nd,sign); else doc.appendChild(nd); });
+        dirty=true; const li=nodes[1].querySelector('li'); li.scrollIntoView({block:'center'});
+        const r=document.createRange(); r.selectNodeContents(nodes[0]); const s=getSelection(); s.removeAllRanges(); s.addRange(r); doc.focus();
+      };
+      document.getElementById('mauSave').onclick=()=>{
+        if(ro()) return;
+        const html=hdgSanitize(doc.innerHTML).trim();
+        if(html===hdgSanitize(hdgMauGoc()).trim()) delete DB.hdgMau; else DB.hdgMau=html;
+        save(); dirty=false;
+        document.getElementById('mauMsg').textContent='✅ Đã lưu mẫu. Mọi hợp đồng in từ giờ dùng mẫu này.';
+        try{ renderHopDong(); }catch(e){}
+      };
+      document.getElementById('mauGoc').onclick=()=>{
+        if(!confirm('Bỏ mọi chỉnh sửa và quay về mẫu hợp đồng ban đầu?\n\n(Bấm "Lưu mẫu" sau đó để áp dụng.)')) return;
+        doc.innerHTML=hdgMauGoc(); dirty=true;
+        document.getElementById('mauMsg').textContent='Đã đưa về mẫu ban đầu — bấm 💾 Lưu mẫu để áp dụng.';
+      };
+      document.getElementById('mauClose').onclick=()=>{
+        if(dirty&&!confirm('Mẫu có chỉnh sửa chưa lưu. Đóng và bỏ các chỉnh sửa này?')) return;
+        document.getElementById('mauOverlay').classList.remove('open');
+      };
+      mauOpen._reset=()=>{ dirty=false; rng=null; };
+    }
+    const doc=document.getElementById('mauDoc');
+    doc.innerHTML=hdgSanitize(hdgMauNow());
+    doc.querySelectorAll('.hdg-f[data-k]').forEach(sp=>{ sp.setAttribute('contenteditable','false'); sp.textContent=HDG_KEYS[sp.dataset.k]||sp.dataset.k; });
+    doc.setAttribute('contenteditable',ro()?'false':'true');
+    document.getElementById('mauSave').style.display=ro()?'none':'';
+    document.getElementById('mauMsg').textContent=(ro()?'Chế độ chỉ xem: không sửa được mẫu. ':'Sửa trực tiếp như văn bản Word. Ô xanh là ô tự điền thông tin booking (xoá được, chèn thêm ở ô "Chèn ô tự điền"). ')
+      +(DB.hdgMau?'Đang dùng mẫu đã chỉnh sửa.':'Đang dùng mẫu ban đầu.');
+    mauOpen._reset();
+    document.getElementById('mauOverlay').classList.add('open');
+    doc.parentNode.scrollTop=0;
+  }
+  window.hdgMauOpen=mauOpen;
 
   /* ---------- Trình xem / sửa / in ---------- */
   function ensureOverlay(){
@@ -10877,7 +10990,8 @@ function renderChatLuong(){
     let html='';
     document.querySelectorAll('#hdgScroll .hdg-doc').forEach(doc=>{
       const c=doc.cloneNode(true); c.removeAttribute('contenteditable');
-      for(let i=0;i<n;i++) html+=c.outerHTML;
+      const one='<table class="hdg-pt"><thead><tr><td><div class="sp"></div></td></tr></thead><tfoot><tr><td><div class="sp"></div></td></tr></tfoot><tbody><tr><td>'+c.outerHTML+'</td></tr></tbody></table>';
+      for(let i=0;i<n;i++) html+=one;
     });
     pa.innerHTML=html;
     if(!ro()){ const st=nowStamp(); hdgIds.forEach(id=>{ const b=bkById(id); if(b) b.hdgIn=st; }); save(); }
@@ -10906,6 +11020,7 @@ function renderChatLuong(){
     const el=document.getElementById('hgList'); if(!el) return;
     if(!hgDate) hgDate=addDays(todayStr(),1);
     document.getElementById('hgDate').value=hgDate;
+    { const tg=document.getElementById('hgMauTag'); if(tg) tg.textContent=DB.hdgMau?'· đã chỉnh':''; }
     const list=hgList(hgDate);
     [...hgSel].forEach(id=>{ if(!list.some(b=>b.id===id)) hgSel.delete(id); });
     const miss=list.filter(b=>!hdgVals(b).cccd).length, done=list.filter(b=>b.hdgIn).length;
@@ -10936,6 +11051,7 @@ function renderChatLuong(){
   };
   function wire(){
     const $=id=>document.getElementById(id); if(!$('hgList')) return;
+    $('hgMau').onclick=()=>mauOpen();
     $('hgPrev').onclick=()=>setDate(addDays(hgDate,-1));
     $('hgNext').onclick=()=>setDate(addDays(hgDate,1));
     $('hgToday').onclick=()=>setDate(todayStr());
