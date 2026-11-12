@@ -47,6 +47,35 @@
     color:#fff;background:#94a3b8;cursor:pointer;line-height:1.2;white-space:nowrap;
     box-shadow:0 1px 3px rgba(0,0,0,.18)}
   .syncdot:hover{filter:brightness(1.06)}
+  .cn-btn{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;margin-left:8px;border:0;cursor:pointer;
+    border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;font-family:inherit;color:#fff;background:#0f172a}
+  .cn-btn.cn-o2{background:#7c3aed}
+  .cn-btn .cn-v{opacity:.7;font-size:10px}
+  .cn-btn.cn-side{display:flex;margin:0 8px 12px;width:calc(100% - 16px);box-sizing:border-box;justify-content:flex-start;
+    background:#1D2939;color:#fff;border-radius:10px;padding:9px 12px;font-size:13.5px}
+  .cn-btn.cn-side.cn-o2{background:#5b21b6}
+  .cn-btn.cn-side .cn-v{margin-left:auto}
+  .cn-btn.cn-tlp{display:inline-flex;margin:6px 0 0;padding:4px 10px;font-size:12px;background:#F2F4F7;color:#101828;border:1px solid #E4E7EC}
+  .cn-btn.cn-tlp.cn-o2{background:#7c3aed;color:#fff;border-color:#7c3aed}
+  html.gb-dock body.gb-shell #tabs .cn-side{display:none!important}
+  @media(min-width:1000px){ body.gb-shell .cn-btn.cn-hdr{display:none} }
+  @media(max-width:999px){ body.gb-shell .cn-btn.cn-side{display:none} }
+  .cn-dot{width:8px;height:8px;border-radius:50%;background:#F58B41;display:inline-block;flex:none}
+  .cn-o2 .cn-dot{background:#c4b5fd}
+  .cn-menu{position:fixed;z-index:2147483000;background:#fff;border-radius:12px;box-shadow:0 16px 40px rgba(15,23,42,.25);
+    padding:8px;min-width:220px;max-width:calc(100vw - 16px);font-family:inherit}
+  .cn-menu-h{font-size:11.5px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px 6px}
+  .cn-menu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;text-align:left;
+    padding:10px;border-radius:8px;font-size:14.5px;font-weight:700;color:#0f172a;cursor:pointer;font-family:inherit}
+  .cn-menu button:hover{background:#F2F4F7}
+  .cn-menu button.on{background:#F2F4F7}
+  .cn-menu button small{font-weight:500;color:#64748b}
+  .cn-menu .cn-o1 .cn-dot{background:#F58B41}
+  .cn-menu .cn-o2 .cn-dot{background:#7c3aed}
+  .cn-menu-f{font-size:12px;color:#64748b;padding:6px 8px 2px;line-height:1.45}
+  body.cn-phu header{box-shadow:inset 0 4px 0 #7c3aed}
+  body.cn-phu .tab[data-t="websync"]{display:none!important}
+  @media(max-width:640px){.cn-btn{font-size:11.5px;padding:4px 9px;margin-left:6px}}
   .syncdot.ok{background:#16a34a}
   .syncdot.err{background:#dc2626}
   .syncdot.wait{background:#dc2626;animation:syncpulse 1s infinite}
@@ -2910,6 +2939,60 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ============ CHI NHÁNH (bản 2026-11-12-chinhanh) ============
+   Hai chi nhánh dùng CHUNG một web + một máy chủ, nhưng dữ liệu TÁCH HẲN.
+   · Kim Mã (chi nhánh 1): giữ nguyên mọi dòng cũ trong goodbike_items — không đổi gì.
+   · Chi nhánh 2: mọi dòng có id và kind bắt đầu bằng 'cn2:' (vd id 'cn2:b123', kind 'cn2:bookings').
+     Vì kind khác 'bookings' nên Apps Script web bán hàng và thông báo đẩy "đơn mới" KHÔNG đụng tới CN2.
+   · Trong app (DB) mọi thứ y hệt nhau — chỉ tầng đọc/ghi máy chủ thêm/bỏ tiền tố.
+   · Chọn chi nhánh: nút 📍 cạnh nút đồng bộ (nhớ theo máy, localStorage gb_chiNhanh), hoặc link ?cn=2 / ?cn=1. */
+const CHI_NHANH=[{so:'1',ten:'Kim Mã',p:''},{so:'2',ten:'Chi nhánh 2',p:'cn2:'}];
+const CN=(function(){
+  let s=null;
+  try{ const u=new URLSearchParams(location.search).get('cn'); if(u && CHI_NHANH.some(c=>c.so===u)){ s=u; localStorage.setItem('gb_chiNhanh',u); } }catch(e){}
+  if(!s){ try{ s=localStorage.getItem('gb_chiNhanh'); }catch(e){} }
+  return CHI_NHANH.find(c=>c.so===s)||CHI_NHANH[0];
+})();
+const CN_P=CN.p;                                         // '' = Kim Mã, 'cn2:' = Chi nhánh 2
+function cnBo(s){ s=String(s==null?'':s); return (CN_P && s.indexOf(CN_P)===0)?s.slice(CN_P.length):s; }
+/* lọc truy vấn theo chi nhánh: CN2 → chỉ dòng 'cn2:%'; Kim Mã → mọi dòng KHÔNG có tiền tố 'cnX:' */
+function cnLoc(q,col){ col=col||'kind'; return CN_P ? q.like(col,CN_P+'%') : q.not(col,'like','cn%:%'); }
+function cnChuyen(so){
+  if(so===CN.so) return;
+  try{ localStorage.setItem('gb_chiNhanh',so); }catch(e){}
+  const u=new URL(location.href); u.searchParams.delete('cn'); if(so!=='1') u.searchParams.set('cn',so);
+  location.replace(u.toString());
+}
+function cnMenu(ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  let m=document.getElementById('cnMenu'); if(m){ m.remove(); return; }
+  const b=(ev&&ev.currentTarget)||document.querySelector('.cn-btn'); if(!b) return;
+  m=document.createElement('div'); m.id='cnMenu'; m.className='cn-menu';
+  m.innerHTML='<div class="cn-menu-h">Chuyển chi nhánh</div>'+CHI_NHANH.map(c=>
+    '<button type="button" data-so="'+c.so+'" class="cn-o'+c.so+(c.so===CN.so?' on':'')+'"><span class="cn-dot"></span>'+c.ten+(c.so===CN.so?' <small>(đang xem)</small>':'')+'</button>').join('')
+    +'<div class="cn-menu-f">Dữ liệu mỗi chi nhánh tách riêng hoàn toàn. Máy này sẽ nhớ chi nhánh đã chọn.</div>';
+  document.body.appendChild(m);
+  const r=b.getBoundingClientRect();
+  let top=r.bottom+6; if(top+m.offsetHeight>window.innerHeight-8) top=Math.max(8,r.top-m.offsetHeight-6);
+  m.style.top=top+'px'; m.style.left=Math.max(8,Math.min(r.left,window.innerWidth-m.offsetWidth-8))+'px';
+  m.querySelectorAll('button[data-so]').forEach(x=>x.onclick=()=>cnChuyen(x.dataset.so));
+  setTimeout(()=>document.addEventListener('click',function dong(e){ if(!m.contains(e.target)){ m.remove(); document.removeEventListener('click',dong); } }),0);
+}
+/* Nút 📍 chi nhánh: thanh đầu (các tab khác), cột trái (máy tính), dưới tiêu đề Sơ đồ xe (mọi màn hình) */
+function cnGanNut(){
+  if(!document.body) return;
+  document.body.classList.add('cn'+CN.so);
+  if(CN_P) document.body.classList.add('cn-phu');
+  const nut=vt=>'<button type="button" class="cn-btn cn-'+vt+' cn-o'+CN.so+'" title="Đổi chi nhánh"><span class="cn-dot"></span><span class="cn-t">'+CN.ten+'</span><span class="cn-v">▾</span></button>';
+  const gan=(el,vt,cho)=>{ if(el && !document.querySelector('.cn-'+vt)){ el.insertAdjacentHTML(cho||'afterend',nut(vt)); } };
+  gan(document.getElementById('syncDot'),'hdr');
+  gan(document.querySelector('#tabs .nav-logo'),'side');
+  gan(document.getElementById('tlpDate'),'tlp');
+  document.querySelectorAll('.cn-btn').forEach(x=>x.onclick=cnMenu);
+  if(CN_P && document.title.indexOf(CN.ten)<0) document.title=CN.ten+' · '+document.title;
+}
+document.addEventListener('DOMContentLoaded',cnGanNut);
+cnGanNut();
 /* ============ CONFIG ============ */
 /* VEHICLES_GOC = danh sách xe gốc (khi chưa từng thêm/đổi tên xe trong app).
    Từ bản 2026-11-06-xemoi: thêm xe / đổi tên xe làm ngay trong app → lưu ở DB.fleet (cfg, đồng bộ mọi máy)
@@ -2929,7 +3012,7 @@ const VEHICLES_GOC = [
   // KHÔNG tính vào số lượng xe, xe trống, công suất; KHÔNG bán trên web (không có trong WEB_GROUPS).
   {id:'DUMP1',typ:'Dump',dump:true},{id:'DUMP2',typ:'Dump',dump:true},{id:'DUMP3',typ:'Dump',dump:true}
 ];
-const VEHICLES = VEHICLES_GOC.map(v=>Object.assign({},v));   // mảng ĐỘNG — nạp lại tại chỗ từ DB.fleet
+const VEHICLES = (CN_P?[]:VEHICLES_GOC).map(v=>Object.assign({},v));   // mảng ĐỘNG — nạp lại tại chỗ từ DB.fleet
 function isSpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.sp);}
 function isDumpXe(id){const v=VEHICLES.find(x=>x.id===id);return !!(v&&v.dump);}
 const XE_THAT = VEHICLES.filter(v=>!v.dump);   // chỉ xe thật — dùng cho mọi phép đếm số xe
@@ -2939,7 +3022,7 @@ const XE_THAT = VEHICLES.filter(v=>!v.dump);   // chỉ xe thật — dùng cho 
 function fleetHopLe(f){ return Array.isArray(f) && f.length>0 && f.every(v=>v && typeof v.id==='string' && v.id.trim()); }
 let _fleetSig='';
 function apFleet(){
-  const src=fleetHopLe(DB.fleet)?DB.fleet:VEHICLES_GOC, sig=JSON.stringify(src);
+  const src=fleetHopLe(DB.fleet)?DB.fleet:(CN_P?[]:VEHICLES_GOC), sig=JSON.stringify(src);
   if(sig!==_fleetSig){
     _fleetSig=sig;
     const list=src.map(v=>{ const o={id:String(v.id).trim(),typ:v.typ||''};
@@ -3096,7 +3179,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-10-maugoc';
+const BAN_APP='2026-11-12-chinhanh';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -3355,9 +3438,9 @@ async function gbGopKeHoach(rows){
   let doi=false;
   for(const r of rows){
     if(r.kind!=='cfg'||r.deleted||!/^cfg:lt_\d{4}-\d{2}-\d{2}$/.test(String(r.id))) continue;
-    const {data,error}=await sb.from(SB_TABLE).select('id,data,deleted').eq('id',String(r.id));
+    const {data,error}=await sb.from(SB_TABLE).select('id,data,deleted').eq('id',CN_P+String(r.id));
     if(error) throw error;
-    const sv=(data||[]).find(x=>String(x.id)===String(r.id));
+    const sv=(data||[]).find(x=>String(x.id)===CN_P+String(r.id));
     if(!sv||sv.deleted||!sv.data||!sv.data.v) continue;
     const k=String(r.id).slice(4), gop=gbMergeLt(banGoc&&banGoc[k],r.data&&r.data.v,sv.data.v);
     if(JSON.stringify(gop)!==JSON.stringify(r.data.v)){ r.data={v:gop}; DB[k]=JSON.parse(JSON.stringify(gop)); doi=true; }
@@ -3371,7 +3454,7 @@ async function ghiLenMayChu(rows){
     gopKH=await gbGopKeHoach(rows);
     for(let i=0;i<rows.length;i+=200){
       const lo=rows.slice(i,i+200).map(r=>({
-        id:String(r.id), kind:r.kind,
+        id:CN_P+String(r.id), kind:CN_P+r.kind,            // CN2: thêm tiền tố 'cn2:'
         data:r.data===undefined?null:r.data,
         deleted:!!r.deleted, ban:BAN_APP
       }));
@@ -3412,9 +3495,10 @@ async function keoVe(toanBo){
        ~2.700 dòng đã xoá (~845 KB, phần lớn là quỹ trùng đã dọn từ 8/2026) rồi bỏ đi. Dòng đã xoá vẫn nằm
        nguyên trên máy chủ (khôi phục được ở 🕘 Lịch sử → Đã xoá); lần kéo sau (toanBo=false) vẫn nhận lệnh xoá. */
     if(toanBo) q=q.eq('deleted',false);
+    q=cnLoc(q);                                     // chỉ dữ liệu của chi nhánh đang chọn
     const {data,error}=await q;
     if(error) throw error;
-    rows=rows.concat(data||[]);
+    rows=rows.concat((data||[]).map(r=>Object.assign({},r,{id:cnBo(r.id),kind:cnBo(r.kind)})));
     if(!data||data.length<1000) break;
     tu+=1000;
   }
@@ -3424,7 +3508,7 @@ async function keoVe(toanBo){
 
 async function taiLanDau(){
   const rows=await keoVe(true);
-  if(!rows.length) throw new Error('Máy chủ không trả về dữ liệu nào. Chưa mở web để tránh ghi đè bằng dữ liệu rỗng.');
+  if(!rows.length && !CN_P) throw new Error('Máy chủ không trả về dữ liệu nào. Chưa mở web để tránh ghi đè bằng dữ liệu rỗng.');
   sbApplyingRemote=true;
   Object.keys(DB).forEach(k=>{ delete DB[k]; });
   try{ normalizeDB(); }catch(e){}
@@ -3461,7 +3545,7 @@ async function dongBoNhanh(){
 
 /* ---------------- KHỞI ĐỘNG ---------------- */
 async function sbInit(){
-  manTai('Đang lấy dữ liệu từ máy chủ…\nMàn hình sẽ mở ngay khi tải xong.');
+  manTai('Đang lấy dữ liệu '+CN.ten+' từ máy chủ…\nMàn hình sẽ mở ngay khi tải xong.');
   if(!window.supabase||!window.supabase.createClient){
     manTai('Chưa tải được thư viện kết nối.\nKiểm tra mạng rồi thử lại.',true); return;
   }
@@ -4242,6 +4326,7 @@ function renderTimeline(){
     rows+='</div></div>';
     if(v===_lastReal) rows+=_addRow;   // nút ＋ Thêm xe: ngay sau xe thật cuối cùng, trên các dòng DUMP
   });
+  if(!_lastReal) rows=_addRow+rows;    // chi nhánh mới chưa có xe nào → vẫn có nút ＋ Thêm xe
   tl.innerHTML=mrow+head+rows;
   tl.querySelectorAll('.gridcell').forEach(c=>c.onclick=()=>openBooking(null,{xe:c.dataset.xe,ds:c.dataset.ds}));
   tl.querySelectorAll('.bar').forEach(bar=>bar.onclick=ev=>{ev.stopPropagation();if(tlDrag.justEnded)return;openBooking(bar.dataset.id);});
@@ -4586,6 +4671,8 @@ const FLEET_MOC = [
   {tu:'2026-11-01', so:30}    // 1/11/2026: thêm K3 (xe điện Evomax) -> mẫu số 30
 ];
 function capacityOn(ds){
+  /* Chi nhánh 2: không dùng mốc của Kim Mã — mẫu số = số xe thật có tick "tính công suất", tính từ ngày bắt đầu khai thác */
+  if(CN_P) return XE_THAT.filter(v=>v.cs && (!v.tu || ds>=v.tu)).length;
   let so=FLEET_MOC[0].so;
   for(let i=0;i<FLEET_MOC.length;i++){ if(ds>=FLEET_MOC[i].tu) so=FLEET_MOC[i].so; }
   // xe tự thêm trong app (DB.fleet, cờ cs) → cộng 1 xe từ ngày bắt đầu khai thác
@@ -8341,21 +8428,24 @@ function ctAskViewPass(){
    DB.nvPass  // cfg: mật khẩu chung của nhân viên; không có = tắt link
    Máy nhân viên nhớ mật khẩu (localStorage gb_nvPass) nên chỉ nhập 1 lần.
    Chủ đổi mật khẩu → máy nhân viên tự hỏi lại trong vòng 1 phút.        */
-function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'nhanvien.html'; }
+const NV_PASS_KEY='gb_nvPass'+(CN_P?'_cn'+CN.so:'');   // mỗi chi nhánh nhớ mật khẩu nhân viên riêng
+function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'nhanvien.html'+(CN_P?'?cn='+CN.so:''); }
 function nvMoKhoa(){
   const p=prompt('Máy của chủ cửa hàng? Nhập mật khẩu Kế toán để mở khoá máy này về app quản lý:');
   if(p==null) return;
   if(p!==(DB.password||'goodbike')){ alert('Sai mật khẩu Kế toán.'); return; }
-  try{ localStorage.removeItem('gb_nvDevice'); localStorage.removeItem('gb_nvPass'); localStorage.setItem('gb_owner','1'); }catch(e){}
+  try{ localStorage.removeItem('gb_nvDevice'); localStorage.removeItem(NV_PASS_KEY); localStorage.setItem('gb_owner','1'); }catch(e){}
   location.replace(location.pathname.replace(/[^/]*$/,'')+'index.html');
 }
 function nvAskPass(){
   const ok=String(DB.nvPass||'').trim();
-  let saved=''; try{ saved=localStorage.getItem('gb_nvPass')||''; }catch(e){}
+  let saved=''; try{ saved=localStorage.getItem(NV_PASS_KEY)||''; }catch(e){}
   if(ok && saved===ok){ nvApply(ok); return; }
   const box=(msg,input)=>manChan('gbNv',
     '<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.45);color:#101828">'
     +'<div style="font-weight:800;font-size:20px">GOODBIKE · Lịch trình</div>'
+    +'<div style="margin-top:6px;font-size:13.5px;color:#475569">Chi nhánh: <b>'+CN.ten+'</b> · '
+      +CHI_NHANH.filter(c=>c.so!==CN.so).map(c=>'<a href="#" data-cn="'+c.so+'" style="color:#2563eb;font-weight:700">đổi sang '+c.ten+'</a>').join(' · ')+'</div>'
     +'<div style="color:#475569;font-size:14px;margin-top:8px;line-height:1.5">'+msg+'</div>'
     +(input?'<input id="gbNvPass" type="password" autocomplete="current-password" placeholder="Mật khẩu nhân viên" '
       +'style="width:100%;box-sizing:border-box;margin-top:16px;height:50px;padding:0 14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-align:center">'
@@ -8363,12 +8453,13 @@ function nvAskPass(){
       +'<button id="gbNvOk" style="margin-top:4px;width:100%;height:52px;background:#101828;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer">Vào lịch trình</button>':'')
     +'<button id="gbNvOwner" style="margin-top:14px;background:none;border:0;color:#5B6472;font-size:13px;text-decoration:underline;cursor:pointer">Máy của chủ cửa hàng? Mở khoá</button>'
     +'</div>');
-  const own=()=>{ const b=document.getElementById('gbNvOwner'); if(b) b.onclick=nvMoKhoa; };
+  const own=()=>{ const b=document.getElementById('gbNvOwner'); if(b) b.onclick=nvMoKhoa;
+    document.querySelectorAll('#gbNv a[data-cn]').forEach(a=>a.onclick=e=>{ e.preventDefault(); cnChuyen(a.dataset.cn); }); };
   if(!ok){ box('Link nhân viên đang tắt. Nhờ chủ cửa hàng bật ở tab Kế hoạch giao nhận, nút “Link cho nhân viên”.',false); own(); return; }
   box('Nhập mật khẩu nhân viên. Máy này sẽ nhớ, lần sau không phải nhập lại.',true); own();
   const inp=document.getElementById('gbNvPass'), btn=document.getElementById('gbNvOk');
   const go=()=>{
-    if(inp.value.trim()===ok){ try{ localStorage.setItem('gb_nvPass',ok); }catch(e){} dongMan('gbNv'); nvApply(ok); }
+    if(inp.value.trim()===ok){ try{ localStorage.setItem(NV_PASS_KEY,ok); }catch(e){} dongMan('gbNv'); nvApply(ok); }
     else { inp.value=''; document.getElementById('gbNvErr').textContent='Sai mật khẩu. Hỏi lại chủ cửa hàng.'; inp.focus(); }
   };
   btn.onclick=go; inp.onkeydown=e=>{ if(e.key==='Enter') go(); };
@@ -8389,7 +8480,7 @@ function nvApply(key){
     const bk=document.getElementById('nvBack'); if(bk) bk.onclick=()=>{ location.href=location.pathname.replace(/[^/]*$/,'')+'index.html'; };
     document.getElementById('nvOut').onclick=()=>{
       if(!confirm('Đăng xuất? Lần sau phải nhập lại mật khẩu nhân viên.')) return;
-      try{ localStorage.removeItem('gb_nvPass'); }catch(e){}
+      try{ localStorage.removeItem(NV_PASS_KEY); }catch(e){}
       location.reload();
     };
   }
@@ -8398,7 +8489,7 @@ function nvApply(key){
   pushKhoiDong();
   window.scrollTo({top:0});
   // chủ đổi hoặc tắt mật khẩu → hỏi lại
-  setInterval(()=>{ if(String(DB.nvPass||'').trim()!==key){ try{ localStorage.removeItem('gb_nvPass'); }catch(e){} location.reload(); } },60000);
+  setInterval(()=>{ if(String(DB.nvPass||'').trim()!==key){ try{ localStorage.removeItem(NV_PASS_KEY); }catch(e){} location.reload(); } },60000);
 }
 // ===== Thông báo đẩy "đơn mới hôm nay" (app nhân viên) =====
 // Máy chủ gửi: Supabase Edge Function "thong-bao-don" (supabase-thong-bao-don.ts + supabase-thong-bao.sql)
@@ -11468,19 +11559,20 @@ function renderChatLuong(){
       let q;
       if (st.tab === 'xoa') {
         q = sb.from(SB_TABLE).select('id,kind,data,updated_at,ban').eq('deleted', true).order('updated_at', {ascending:false}).limit(st.limit);
-        if (st.kind !== '*') q = q.eq('kind', st.kind); else q = q.neq('kind', 'cfg');
-        if (st.item) q = q.eq('id', st.item);
+        if (st.kind !== '*') q = q.eq('kind', CN_P + st.kind); else q = cnLoc(q.neq('kind', CN_P + 'cfg'));
+        if (st.item) q = q.eq('id', CN_P + st.item);
         const s = sinceIso(); if (s) q = q.gte('updated_at', s);
         const {data, error} = await q; if (error) throw error;
-        st.rows = (data||[]).map(r => ({hid:'x'+r.id, at:r.updated_at, item_id:r.id, kind:r.kind, hanh_dong:'xoa', data_cu:r.data, data_moi:r.data, ban:r.ban}));
+        st.rows = (data||[]).map(r => ({hid:'x'+r.id, at:r.updated_at, item_id:cnBo(r.id), kind:cnBo(r.kind), hanh_dong:'xoa', data_cu:r.data, data_moi:r.data, ban:r.ban}));
       } else {
         q = sb.from(HIST).select('hid,at,item_id,kind,hanh_dong,data_cu,data_moi,ban').order('at', {ascending:false}).limit(st.limit);
-        if (st.item) q = q.eq('item_id', st.item);
-        else if (st.kind !== '*') q = q.eq('kind', st.kind);
+        if (st.item) q = q.eq('item_id', CN_P + st.item);
+        else if (st.kind !== '*') q = q.eq('kind', CN_P + st.kind);
+        else q = cnLoc(q);
         const s = sinceIso(); if (s && !st.item) q = q.gte('at', s);
         const {data, error} = await q;
         if (error) { if (/goodbike_history|does not exist|PGRST205|42P01|schema cache/i.test((error.message||'')+' '+(error.code||''))) { st.noTable = true; st.rows = []; } else throw error; }
-        else st.rows = data || [];
+        else st.rows = (data || []).map(r => Object.assign({}, r, {item_id: cnBo(r.item_id), kind: cnBo(r.kind)}));
       }
     }catch(e){ console.warn('lichSu', e); st.err = (e && e.message) || String(e); st.rows = []; }
     st.loading = false; ve();
