@@ -19,11 +19,12 @@
    Máy đã đăng nhập nhân viên bị KHOÁ vào app nhân viên: mở index.html (hay link ?nv=1 cũ) đều chuyển sang nhanvien.html.
    Chỉ mật khẩu Kế toán mới mở khoá được máy đó. */
 (function(){
-  if(/nhanvien\.html$/i.test(location.pathname) || /[?&]xem=/.test(location.search)) return;
+  if(/nhanvien2?\.html$/i.test(location.pathname) || /[?&]xem=/.test(location.search)) return;
   var khoa=false; try{ khoa=localStorage.getItem('gb_nvDevice')==='1' && localStorage.getItem('gb_owner')!=='1'; }catch(e){}
   if(khoa || /[?&]nv=/.test(location.search)){
     document.documentElement.style.display='none';
-    location.replace(location.pathname.replace(/[^/]*$/,'')+'nhanvien.html');
+    var app='nhanvien.html'; try{ if(localStorage.getItem('gb_nvApp')==='nhanvien2.html') app='nhanvien2.html'; }catch(e){}   // máy nhân viên CN2 → app mũ xanh
+    location.replace(location.pathname.replace(/[^/]*$/,'')+app);
   }
 })();
 </script>
@@ -51,6 +52,10 @@
     border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:800;font-family:inherit;color:#fff;background:#0f172a}
   .cn-btn.cn-o2{background:#7c3aed}
   .cn-btn .cn-v{opacity:.7;font-size:10px}
+  .cn-btn.cn-khoa{cursor:default}
+  body.nvmode .cn-btn.cn-hdr{display:none!important}   /* app nhân viên: chi nhánh hiện trong nhãn "Nhân viên CN2" */
+  body.nvmode.cn-phu header{box-shadow:inset 0 4px 0 #00D0D4}
+  body.nvmode.cn-phu .nv-tag{background:#00D0D4;color:#fff}
   .cn-btn.cn-side{display:flex;margin:0 8px 12px;width:calc(100% - 16px);box-sizing:border-box;justify-content:flex-start;
     background:#1D2939;color:#fff;border-radius:10px;padding:9px 12px;font-size:13.5px}
   .cn-btn.cn-side.cn-o2{background:#5b21b6}
@@ -2947,8 +2952,12 @@ body.gb-shell #tabs .tab.gb-more{display:none}
    · Trong app (DB) mọi thứ y hệt nhau — chỉ tầng đọc/ghi máy chủ thêm/bỏ tiền tố.
    · Chọn chi nhánh: nút 📍 cạnh nút đồng bộ (nhớ theo máy, localStorage gb_chiNhanh), hoặc link ?cn=2 / ?cn=1. */
 const CHI_NHANH=[{so:'1',ten:'Kim Mã',p:''},{so:'2',ten:'Chi nhánh 2',p:'cn2:'}];
+/* App nhân viên gắn cứng chi nhánh: nhanvien.html (mũ đỏ) = Kim Mã, nhanvien2.html (mũ xanh) = Chi nhánh 2.
+   Không ghi vào localStorage → máy chủ mở app nhân viên xong quay về app quản lý vẫn giữ chi nhánh đang chọn. */
+const CN_KHOA=/nhanvien2\.html$/i.test(location.pathname)?'2':(/nhanvien\.html$/i.test(location.pathname)?'1':null);
 const CN=(function(){
-  let s=null;
+  let s=CN_KHOA;
+  if(s) return CHI_NHANH.find(c=>c.so===s);
   try{ const u=new URLSearchParams(location.search).get('cn'); if(u && CHI_NHANH.some(c=>c.so===u)){ s=u; localStorage.setItem('gb_chiNhanh',u); } }catch(e){}
   if(!s){ try{ s=localStorage.getItem('gb_chiNhanh'); }catch(e){} }
   return CHI_NHANH.find(c=>c.so===s)||CHI_NHANH[0];
@@ -2983,13 +2992,13 @@ function cnGanNut(){
   if(!document.body) return;
   document.body.classList.add('cn'+CN.so);
   if(CN_P) document.body.classList.add('cn-phu');
-  const nut=vt=>'<button type="button" class="cn-btn cn-'+vt+' cn-o'+CN.so+'" title="Đổi chi nhánh"><span class="cn-dot"></span><span class="cn-t">'+CN.ten+'</span><span class="cn-v">▾</span></button>';
+  const nut=vt=>'<button type="button" class="cn-btn cn-'+vt+' cn-o'+CN.so+(CN_KHOA?' cn-khoa':'')+'" title="'+(CN_KHOA?'App nhân viên của '+CN.ten:'Đổi chi nhánh')+'"><span class="cn-dot"></span><span class="cn-t">'+CN.ten+'</span>'+(CN_KHOA?'':'<span class="cn-v">▾</span>')+'</button>';
   const gan=(el,vt,cho)=>{ if(el && !document.querySelector('.cn-'+vt)){ el.insertAdjacentHTML(cho||'afterend',nut(vt)); } };
   gan(document.getElementById('syncDot'),'hdr');
   gan(document.querySelector('#tabs .nav-logo'),'side');
   gan(document.getElementById('tlpDate'),'tlp');
-  document.querySelectorAll('.cn-btn').forEach(x=>x.onclick=cnMenu);
-  if(CN_P && document.title.indexOf(CN.ten)<0) document.title=CN.ten+' · '+document.title;
+  if(!CN_KHOA) document.querySelectorAll('.cn-btn').forEach(x=>x.onclick=cnMenu);
+  if(CN_P && !CN_KHOA && document.title.indexOf(CN.ten)<0) document.title=CN.ten+' · '+document.title;
 }
 document.addEventListener('DOMContentLoaded',cnGanNut);
 cnGanNut();
@@ -3179,7 +3188,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-12-chinhanh';
+const BAN_APP='2026-11-12-cn2nv';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -7637,7 +7646,7 @@ const VIEW_ASK=/[?&]xem=/.test(location.search);   // link chỉ xem
 if(VIEW_ASK) document.body.classList.add('viewpending');   // che nội dung ngay, chưa nhập mật khẩu thì không thấy gì
 var ctLast=new Map();         // key dòng → dữ liệu dòng đang vẽ
 var nvMode=false;             // true = mở bằng link nhân viên (?nv=1) và đã nhập đúng mật khẩu
-const NV_ASK=/nhanvien\.html$/i.test(location.pathname)||/[?&]nv=/.test(location.search);
+const NV_ASK=/nhanvien2?\.html$/i.test(location.pathname)||/[?&]nv=/.test(location.search);
 if(NV_ASK) document.body.classList.add('nvpending');      // che hết cho tới khi nhập đúng mật khẩu nhân viên
 var ctPop=null;
 
@@ -8429,7 +8438,7 @@ function ctAskViewPass(){
    Máy nhân viên nhớ mật khẩu (localStorage gb_nvPass) nên chỉ nhập 1 lần.
    Chủ đổi mật khẩu → máy nhân viên tự hỏi lại trong vòng 1 phút.        */
 const NV_PASS_KEY='gb_nvPass'+(CN_P?'_cn'+CN.so:'');   // mỗi chi nhánh nhớ mật khẩu nhân viên riêng
-function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+'nhanvien.html'+(CN_P?'?cn='+CN.so:''); }
+function nvLink(){ return location.href.split('#')[0].split('?')[0].replace(/[^/]*$/,'')+(CN_P?'nhanvien2.html':'nhanvien.html'); }   // CN2 có app nhân viên riêng (mũ xanh)
 function nvMoKhoa(){
   const p=prompt('Máy của chủ cửa hàng? Nhập mật khẩu Kế toán để mở khoá máy này về app quản lý:');
   if(p==null) return;
@@ -8444,8 +8453,8 @@ function nvAskPass(){
   const box=(msg,input)=>manChan('gbNv',
     '<div style="background:#fff;border-radius:16px;max-width:400px;width:100%;padding:26px 22px;box-shadow:0 24px 60px rgba(0,0,0,.45);color:#101828">'
     +'<div style="font-weight:800;font-size:20px">GOODBIKE · Lịch trình</div>'
-    +'<div style="margin-top:6px;font-size:13.5px;color:#475569">Chi nhánh: <b>'+CN.ten+'</b> · '
-      +CHI_NHANH.filter(c=>c.so!==CN.so).map(c=>'<a href="#" data-cn="'+c.so+'" style="color:#2563eb;font-weight:700">đổi sang '+c.ten+'</a>').join(' · ')+'</div>'
+    +'<div style="margin-top:6px;font-size:13.5px;color:#475569">Chi nhánh: <b>'+CN.ten+'</b>'
+      +(CN_KHOA?'':' · '+CHI_NHANH.filter(c=>c.so!==CN.so).map(c=>'<a href="#" data-cn="'+c.so+'" style="color:#2563eb;font-weight:700">đổi sang '+c.ten+'</a>').join(' · '))+'</div>'
     +'<div style="color:#475569;font-size:14px;margin-top:8px;line-height:1.5">'+msg+'</div>'
     +(input?'<input id="gbNvPass" type="password" autocomplete="current-password" placeholder="Mật khẩu nhân viên" '
       +'style="width:100%;box-sizing:border-box;margin-top:16px;height:50px;padding:0 14px;border:1px solid #cbd5e1;border-radius:12px;font-size:16px;text-align:center">'
@@ -8468,13 +8477,13 @@ function nvAskPass(){
 function nvApply(key){
   nvMode=true;
   let chu=false; try{ chu=localStorage.getItem('gb_owner')==='1'; }catch(e){}
-  if(!chu){ try{ localStorage.setItem('gb_nvDevice','1'); }catch(e){} }   // khoá máy nhân viên; máy của chủ (đã từng nhập MK Kế toán) thì không
+  if(!chu){ try{ localStorage.setItem('gb_nvDevice','1'); localStorage.setItem('gb_nvApp',CN_P?'nhanvien2.html':'nhanvien.html'); }catch(e){} }   // khoá máy nhân viên; máy của chủ (đã từng nhập MK Kế toán) thì không
   document.body.classList.remove('nvpending');
   document.body.classList.add('nvmode');
   const hd=document.querySelector('header');
-  document.querySelectorAll('.hdr-logo').forEach(im=>{ im.src='apple-touch-icon-nv.png'; });   // logo mũ ĐỎ
+  document.querySelectorAll('.hdr-logo').forEach(im=>{ im.src=CN_P?'apple-touch-icon-nv2.png':'apple-touch-icon-nv.png'; });   // logo mũ ĐỎ (Kim Mã) / mũ XANH (CN2)
   if(hd && !document.getElementById('nvOut')){
-    const h1=hd.querySelector('h1'); if(h1 && !chu) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên</span>');
+    const h1=hd.querySelector('h1'); if(h1 && !chu) h1.insertAdjacentHTML('beforeend','<span class="nv-tag">Nhân viên'+(CN_P?' CN2':'')+'</span>');
     if(chu) hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvBack">Quản lý</button>');
     hd.insertAdjacentHTML('beforeend','<button type="button" class="nv-out" id="nvOut"'+(chu?' style="margin-left:0"':'')+'>Thoát</button>');
     const bk=document.getElementById('nvBack'); if(bk) bk.onclick=()=>{ location.href=location.pathname.replace(/[^/]*$/,'')+'index.html'; };
@@ -8512,6 +8521,7 @@ async function pushKiem(){   // xác định trạng thái hiện tại của m�
   return pushState;
 }
 function pushBtnHtml(){
+  if(CN_P) return '';   // CN2 chưa có thông báo đẩy
   const on = pushState === 'bat';
   return '<button class="lt-btn" data-lt="push" style="height:40px;padding:0 14px;flex-shrink:0;' + (on ? 'background:#ECFDF3;color:#067647;border-color:#A6DDBD' : 'background:#FEF3F2;color:#B42318;border-color:#FECDCA') + '">' + (on ? '🔔 Thông báo: Bật' : '🔕 Bật thông báo') + '</button>';
 }
@@ -8557,6 +8567,7 @@ async function pushThu(){
 }
 // mở app nhân viên: đã cho phép thì tự đăng ký lại (địa chỉ nhận có thể đổi) rồi vẽ lại nút
 function pushKhoiDong(){
+  if(CN_P) return;   // thông báo "đơn mới" hiện chỉ áp cho Kim Mã — CN2 chưa bật để khỏi nhận nhầm đơn
   pushKiem().then(async st => {
     if (st === 'tat' && 'Notification' in window && Notification.permission === 'granted') { try { await pushDangKy(await navigator.serviceWorker.ready); await pushKiem(); } catch (e) { console.warn(e); } }
     else if (st === 'bat') { try { await pushDangKy(await navigator.serviceWorker.ready); } catch (e) { console.warn(e); } }

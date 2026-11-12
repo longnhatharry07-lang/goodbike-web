@@ -1,0 +1,33 @@
+{
+  "name": "GOODBIKE CN2 — Lịch trình nhân viên",
+  "short_name": "GB CN2 Lịch trình",
+  "description": "Lịch trình giao và thu hồi xe cho nhân viên",
+  "start_url": "./nhanvien2.html",
+  "scope": "./nhanvien2.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#00D0D4",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "icon-nv2-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-nv2-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-nv2-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./nhanvien2.html"
+}
