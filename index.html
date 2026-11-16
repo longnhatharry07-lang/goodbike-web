@@ -3626,16 +3626,18 @@ function bmOpen(id,x,y,opt){
   let h='<div class="bm-hd"><div><b>'+escNote(b.xe)+'</b><span>'+escNote(g.name||g.phone||b.src||'')+'</span></div>'
     +'<small>'+fmtDM(b.arrive)+' '+escNote(planDtime(b)||'')+' → '+fmtDM(b.depart)+' '+escNote(planRtime(b)||'')+' · '+((STATUS[computeStatus(b)]||{}).label||'')+'</small></div>';
   const inBk=opt&&opt.inBk;
+  const ph=g.phone||phoneOf(b.note||'')||phoneOf(b.resaddr||'');
+  const callIt=ph?'<a class="bm-it" href="tel:'+escNote(String(ph).replace(/[^\d+]/g,''))+'">'+bmSvg('call')+'<span>Gọi khách</span><small>'+escNote(ph)+'</small></a>'
+    :it('call','call','Gọi khách','chưa có SĐT',true);
   if(!nv){
-    if(!inBk) h+=it('info','info','Thông tin booking')
-      +it('pay','pay','Thanh toán & hoá đơn',due?'còn '+fmtVND(due)+'đ':'đã đủ');
+    if(!inBk) h+=it('info','info','Chi tiết booking',due?'còn '+fmtVND(due)+'đ':'đã thu đủ');   // thanh toán & hoá đơn nằm trong chi tiết booking
+    if(!inBk) h+=callIt;   // 17/11: Gọi khách luôn có, ngay dưới Chi tiết booking
     if(dm.length>1) h+=it('doan','doan','Thông tin đoàn',dm.length+' xe');
     else if(!ro) h+=it('doanjoin','doan','Ghép đoàn…');
     if(!ro) h+=it('swap','swap','Đổi xe','',st==='datra');
   }
   if(!ro&&(st==='sapnhan'||st==='danhan')) h+='<div class="bm-sep"></div>'+(st==='sapnhan'?it('in','in','Giao xe','check-in'):it('out','out','Trả xe','check-out'));
-  if(nv) h+='<div class="bm-sep"></div>'+it('hd','hd',dm.length>1&&doanGop(b.doan)?'Hoá đơn đoàn':'Hoá đơn');   // app nhân viên không mở được booking → giữ mục hoá đơn
-  if(g.phone&&!inBk) h+=(nv?'':'<div class="bm-sep"></div>')+'<a class="bm-it" href="tel:'+escNote(String(g.phone).replace(/[^\d+]/g,''))+'">'+bmSvg('call')+'<span>Gọi khách</span><small>'+escNote(g.phone)+'</small></a>';
+  if(nv) h+='<div class="bm-sep"></div>'+callIt+it('hd','hd',dm.length>1&&doanGop(b.doan)?'Hoá đơn đoàn':'Hoá đơn');   // app nhân viên không mở được booking → giữ mục hoá đơn
   if(!nv&&!ro) h+='<div class="bm-sep"></div>'+it('huy','huy','Huỷ booking',st==='sapnhan'?'':'xe đã giao',st!=='sapnhan').replace('class="bm-it"','class="bm-it bm-red"');
   const m=document.createElement('div'); m.id='bmMenu'; m.className='bm'; m.setAttribute('role','menu'); m.innerHTML=h;
   const sheet=x==null||bmTouch();
@@ -3972,7 +3974,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-17-doan';
+const BAN_APP='2026-11-17-goi';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
