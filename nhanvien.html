@@ -3544,6 +3544,19 @@ function hdPayPanelDoan(m){
   });
 }
 
+/* ===== Ô GIỜ TRÊN ĐIỆN THOẠI (17/11): bàn phím số không có dấu ":" → tự chèn.
+   Gõ 0930 → 09:30 · 930 → 09:30 · 17 → 17: · 1745 → 17:45. Bấm vào ô là chọn hết để gõ đè; rời ô thì chuẩn hoá HH:MM. */
+const GB_TMASK=['qb_t','lt_time'];
+function gbTimeMask(el,del){
+  let d=String(el.value||'').replace(/\D/g,'');
+  if(d.length&&+d[0]>2) d='0'+d;                       // 9 → 09
+  if(d.length>=2&&+d.slice(0,2)>23) d='0'+d;            // 25 → 02:5
+  d=d.slice(0,4);
+  el.value=d.length>2?d.slice(0,2)+':'+d.slice(2):(d.length===2&&!del?d+':':d);
+}
+document.addEventListener('input',e=>{ const t=e.target; if(t&&GB_TMASK.indexOf(t.id)>=0) gbTimeMask(t,/^delete/.test(e.inputType||'')); },true);
+document.addEventListener('focusin',e=>{ const t=e.target; if(t&&GB_TMASK.indexOf(t.id)>=0) setTimeout(()=>{ try{ t.select(); }catch(_){} },0); });
+document.addEventListener('focusout',e=>{ const t=e.target; if(!(t&&GB_TMASK.indexOf(t.id)>=0)||!t.value) return; const m=ltParse(t.value); if(m!=null) t.value=ltFmt(m); });
 /* ---- ⚡ THÊM NHANH BOOKING (tab Lịch trình) ---- */
 let qbk={xes:new Set(),n:1};
 function qbkAct(a,b){
@@ -3556,7 +3569,7 @@ function qbkSheet(){
   const ds=runDate||todayStr();
   try{ refreshPlaceList(); }catch(e){}
   ltSheet('<h2>⚡ Thêm nhanh booking</h2><div class="lt-sub" style="margin-top:-8px">Giao '+ltDayLabel(ds)+' · tên khách, giá, ngày trả bổ sung sau</div>'
-    +'<div class="qb-2"><label class="lt-fld">Giờ giao<input id="qb_t" inputmode="numeric" placeholder="VD: 930" autocomplete="off"></label>'
+    +'<div class="qb-2"><label class="lt-fld">Giờ giao<input id="qb_t" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" placeholder="VD: 09:30" autocomplete="off"></label>'
     +'<label class="lt-fld">SĐT khách<input id="qb_p" inputmode="tel" placeholder="09…" autocomplete="off"></label></div>'
     +'<label class="lt-fld">Địa chỉ giao<input id="qb_a" list="placeList" placeholder="Bỏ trống = khách đến cửa hàng lấy" autocomplete="off"></label>'
     +'<div class="qb-nrow">Thuê tạm <button class="qb-nb" data-lt="qbkn" data-v="-1" aria-label="Bớt 1 ngày">−</button><b id="qb_n">'+qbk.n+' ngày</b><button class="qb-nb" data-lt="qbkn" data-v="1" aria-label="Thêm 1 ngày">+</button><small>chỉ để lọc xe trống, sửa sau</small></div>'
@@ -3974,7 +3987,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-17-goi';
+const BAN_APP='2026-11-17-gio';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -10885,7 +10898,7 @@ document.addEventListener('click', e => {
     const x = ltById(v), isExtra = !x.bk, run = ltCtx === 'run'; ltEditId = v;
     ltSheet('<h2>' + LT_TYPE[x.kind][0] + ' ' + ltEsc(x.xe) + '</h2><div class="lt-sub">' + ltEsc(x.addr) + '</div>'
       + (isExtra || run ? '' : '<div style="display:flex;justify-content:space-between;background:#F2F4F7;border-radius:12px;padding:12px 14px;font-size:15px"><span>Giờ trong booking</span><b>' + ltFmt(x.t) + '</b></div>')
-      + '<label class="lt-fld">' + (isExtra ? 'Giờ' : (run ? 'Giờ đi làm' : 'Giờ đi làm theo kế hoạch')) + '<input id="lt_time" inputmode="numeric" value="' + ltFmt(ltT(x)) + '" autocomplete="off"></label>' + ltBtns('savetime', 'Lưu giờ')
+      + '<label class="lt-fld">' + (isExtra ? 'Giờ' : (run ? 'Giờ đi làm' : 'Giờ đi làm theo kế hoạch')) + '<input id="lt_time" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" value="' + ltFmt(ltT(x)) + '" autocomplete="off"></label>' + ltBtns('savetime', 'Lưu giờ')
       + (!isExtra && !run && ltMoved(x) ? '<button class="lt-link" style="text-align:center" data-lt="resettime" data-v="' + v + '">Về giờ booking (' + ltFmt(x.t) + ')</button>' : '')
       + (x.bk ? '<button class="lt-link" style="text-align:center;color:#344054" data-lt="openbk" data-v="' + x.bk + '">Mở booking</button>' : '<button class="lt-link" style="text-align:center;color:#B42318" data-lt="delitem" data-v="' + v + '">Xoá đơn này</button>'));
     return;
@@ -10917,7 +10930,7 @@ document.addEventListener('click', e => {
     ltSheet('<h2>Chèn đơn vào vị trí ' + (i + 1) + '</h2>'
       + '<div class="lt-kseg" id="lt_kind"><button class="on" data-lt="kind" data-v="giao">Giao xe</button><button data-lt="kind" data-v="thu">Thu hồi</button><button data-lt="kind" data-v="ps">Phát sinh</button></div>'
       + '<label class="lt-fld">Xe<input id="lt_xe" placeholder="Ví dụ A3" autocomplete="off"></label>'
-      + '<label class="lt-fld">Giờ<input id="lt_time" inputmode="numeric" value="' + (b.dataset.t || (near ? ltFmt(ltT(near)) : '08:00')) + '" autocomplete="off"></label>'
+      + '<label class="lt-fld">Giờ<input id="lt_time" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" value="' + (b.dataset.t || (near ? ltFmt(ltT(near)) : '08:00')) + '" autocomplete="off"></label>'
       + '<label class="lt-fld">Địa chỉ<input id="lt_addr" placeholder="Số nhà, đường" autocomplete="off"></label>' + ltBtns('saveins', 'Chèn đơn'));
     return;
   }
