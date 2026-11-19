@@ -1510,10 +1510,18 @@ body.kh-linking,body.kh-linking *{cursor:crosshair!important;user-select:none;-w
 .lt-shopact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px}
 .lt-shopact .lt-btn{height:36px;font-size:13px;padding:0 8px;background:#fff}
 .lt-shopact .lt-btn:first-child{background:var(--lt-dark);color:#fff;border-color:var(--lt-dark)}
-.lt-skipdock{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:min(360px,calc(100vw - 24px))}
-.lt-skipbtn{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--lt-shop-line);background:var(--lt-shop-bg);color:var(--lt-shop);font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(16,24,40,.16);cursor:pointer}
-.lt-skippanel{background:#fff;border:1px solid var(--lt-line);border-radius:14px;box-shadow:0 12px 32px rgba(16,24,40,.2);padding:6px;width:100%;max-height:60vh;overflow:auto}
-.lt-skiprow{padding:10px;display:flex;flex-direction:column;gap:8px}
+/* 19/11: dải "Tạm bỏ qua" nằm trong luồng trang, ngay trên thanh tiến độ — không còn nổi đè lên nút X của các hộp */
+.lt-skipdock{background:var(--lt-shop-bg);border:1px solid var(--lt-shop-line);border-radius:14px;box-shadow:0 4px 14px rgba(16,24,40,.08);overflow:hidden}
+.lt-skipbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 12px;border:0;background:transparent;color:var(--lt-shop);text-align:left;cursor:pointer;font:inherit}
+.lt-skipic{width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid var(--lt-shop-line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lt-skiptx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.lt-skiptx b{font-size:14.5px;font-weight:800}
+.lt-skiptx span{font-size:12.5px;font-weight:600;color:#8A6D1A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt-skipn{min-width:26px;height:26px;padding:0 8px;border-radius:999px;background:var(--lt-shop);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lt-skipchev{flex-shrink:0;transition:transform .2s}
+.lt-skipbtn[aria-expanded="true"] .lt-skipchev{transform:rotate(180deg)}
+.lt-skippanel{background:#fff;border-top:1px solid var(--lt-shop-line);max-height:55vh;overflow:auto}
+.lt-skiprow{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .lt-skiprow+.lt-skiprow{border-top:1px solid var(--lt-line2)}
 .lt-skipact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .lt-skipact .lt-btn{height:38px;font-size:13px}
@@ -3987,7 +3995,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-17-gio';
+const BAN_APP='2026-11-19-boqua';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -10718,9 +10726,10 @@ function ltRunView(all){
   P.skipped = P.skipped || {};
   const skipped = ord.filter(id => P.skipped[id] && ltDone(id) == null);
   const queue = ord.filter(id => ltDone(id) == null && !P.skipped[id]), h = [], doneN = ord.filter(id => ltDone(id) != null).length;
-  // đơn tạm bỏ qua: treo ở góc trên, bấm để mở
+  // đơn tạm bỏ qua: dải nằm đầu danh sách (trong luồng), bấm để mở
   if (skipped.length) {
-    h.push('<div class="lt-skipdock"><button class="lt-skipbtn" data-lt="toggleskip" aria-expanded="' + ltShowSkip + '">' + LT_PAUSE + 'Tạm bỏ qua · ' + skipped.length + '</button>');
+    const skNames = skipped.map(id => ltById(id).xe).filter(Boolean).join(', ');
+    h.push('<div class="lt-skipdock"><button class="lt-skipbtn" data-lt="toggleskip" aria-expanded="' + ltShowSkip + '"><span class="lt-skipic">' + LT_PAUSE + '</span><span class="lt-skiptx"><b>Đơn tạm bỏ qua</b><span>' + (ltShowSkip ? 'Bấm để thu gọn' : ltEsc(skNames)) + '</span></span><span class="lt-skipn">' + skipped.length + '</span><svg class="lt-skipchev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>');
     if (ltShowSkip) {
       h.push('<div class="lt-skippanel">');
       skipped.forEach(id => { const x = ltById(id);
