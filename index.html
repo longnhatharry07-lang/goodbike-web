@@ -798,6 +798,33 @@
   .dv-tbl .l{text-align:left}
   .dv-tbl tr.dvrow{cursor:pointer}
   .dv-tbl tr.dvrow:hover td{background:#faf5ff}
+  /* Đơn dịch vụ riêng (không kèm thuê xe) — DB.svcOrders */
+  .so-h{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);background:#ecfeff;flex-wrap:wrap}
+  .so-h .t{font-weight:800;font-size:14px;color:#155e75;margin-right:auto}
+  .so-h .t small{display:block;font-weight:500;font-size:11.5px;color:#64748b;margin-top:2px}
+  .so-add{border:1px solid #0e7490;background:#0e7490;color:#fff;border-radius:8px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+  .so-add.tour{background:#fff;color:#0e7490}
+  .so-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 0;flex-wrap:wrap}
+  .so-bar .ct-seg button.on{background:#0e7490;color:#fff;font-weight:700}
+  .so-sum{font-size:12.5px;color:#475569;margin-left:auto}
+  .so-sum b{color:#0f172a}
+  .so-tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .so-tag.sb{background:#e0f2fe;color:#0369a1}
+  .so-tag.tour{background:#fef3c7;color:#92400e}
+  .so-st{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .so-st.moi{background:#fee4e2;color:#b42318}
+  .so-st.xn{background:#dbeafe;color:#1d4ed8}
+  .so-st.xong{background:#dcfce7;color:#15803d}
+  .so-st.huy{background:#f2f4f7;color:#98a2b3;text-decoration:line-through}
+  .dv-tbl tr.sorow{cursor:pointer}
+  .dv-tbl tr.sorow:hover td{background:#ecfeff}
+  .dv-tbl tr.sorow.huy td{color:#98a2b3}
+  .so-d{font-size:12px;color:#475569;line-height:1.45}
+  #soOverlay .ct-seg button.on{background:#0e7490;color:#fff;font-weight:700}
+  #soOverlay .ct-seg{flex-wrap:wrap;white-space:normal}
+  #soOverlay input,#soOverlay select,#soOverlay textarea{width:100%;box-sizing:border-box}
+  #soOverlay .so-auto{font-size:11.5px;color:#0e7490;margin-top:3px;min-height:14px}
+  body.viewmode .so-add,body.viewmode #so_save,body.viewmode #so_del{display:none !important}
   .dv-tbl .dv-day td{background:#f8fafc;font-weight:800;color:#334155;text-align:left;font-size:12.5px}
   .dv-it{display:block;white-space:nowrap}
   .dv-pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:700;white-space:nowrap}
@@ -2035,7 +2062,15 @@ body.gb-shell #tabs .tab.gb-more{display:none}
         </div>
       </div>
       <div class="kpis" id="dvKpis" style="margin-top:12px"></div>
-      <div class="muted" style="margin-top:8px">Tiền dịch vụ thêm (mũ, áo mưa, giao ngoài giờ…) nhập ở tab <b>Chi tiết thanh toán</b> của booking. Đã cộng vào tiền khách phải trả nhưng <b>không</b> tính vào bảng Tổng doanh thu. Tính theo ngày nhận xe. Bấm 1 dòng để mở booking.</div>
+      <div class="muted" style="margin-top:8px">Bảng <b>Đơn dịch vụ riêng</b> ngay dưới dành cho khách chỉ đặt đưa đón sân bay / tour. Các bảng dưới nữa là dịch vụ thêm <b>kèm booking xe</b>: tiền dịch vụ thêm (mũ, áo mưa, giao ngoài giờ…) nhập ở tab <b>Chi tiết thanh toán</b> của booking. Đã cộng vào tiền khách phải trả nhưng <b>không</b> tính vào bảng Tổng doanh thu. Tính theo ngày nhận xe. Bấm 1 dòng để mở booking.</div>
+    </div>
+    <div class="card" style="padding:0" id="soCard">
+      <div class="so-h"><div class="t">Đơn dịch vụ riêng<small>Khách chỉ đặt dịch vụ, không thuê xe máy · tính theo ngày làm dịch vụ</small></div>
+        <button type="button" class="so-add" id="soAddSb">＋ Đưa đón sân bay</button>
+        <button type="button" class="so-add tour" id="soAddTour">＋ Tour</button></div>
+      <div class="so-bar"><div class="ct-seg" id="soFlt"><button type="button" data-v="all" class="on">Tất cả</button><button type="button" data-v="sanbay">Sân bay</button><button type="button" data-v="tour">Tour</button></div>
+        <span class="so-sum" id="soSum"></span></div>
+      <div class="tbl-wrap" style="margin-top:8px"><table class="dv-tbl" id="soTable"></table></div>
     </div>
     <div class="card" style="padding:0" id="svmCard">
       <div class="sv-h"><span>Danh mục dịch vụ cố định</span><small>Giá ở đây tự điền khi chọn dịch vụ trong booking</small></div>
@@ -2633,6 +2668,40 @@ body.gb-shell #tabs .tab.gb-more{display:none}
 </div>
 
 <!-- Expense modal -->
+<!-- Đơn dịch vụ riêng (sân bay / tour) -->
+<div class="overlay" id="soOverlay">
+  <div class="modal">
+    <button class="modal-x" data-close="soOverlay" title="Đóng">✕</button>
+    <h2 id="soTitle" style="margin:0 0 12px;font-size:17px">Đơn dịch vụ</h2>
+    <div class="ct-form">
+      <div class="full"><label class="lb">Loại dịch vụ</label>
+        <div class="ct-seg" id="so_type"><button type="button" data-v="sanbay">✈️ Đưa đón sân bay</button><button type="button" data-v="tour">🏞 Tour du lịch</button></div></div>
+      <div class="full so-sb"><label class="lb">Chiều</label>
+        <div class="ct-seg" id="so_dir"><button type="button" data-v="don">Đón tại sân bay → về điểm khách</button><button type="button" data-v="tien">Tiễn từ điểm khách → sân bay</button></div></div>
+      <div class="full so-tour"><label class="lb">Tour</label><input id="so_tour" list="soTourList" autocomplete="off" placeholder="VD: Tour Ninh Bình 1 ngày"><datalist id="soTourList"></datalist></div>
+      <div><label class="lb">Ngày</label><input type="date" id="so_date"></div>
+      <div><label class="lb" id="so_timeLb">Giờ đón</label><input type="time" id="so_time"></div>
+      <div class="so-sb"><label class="lb">Số hiệu chuyến bay</label><input id="so_flight" placeholder="VD: VN123" autocomplete="off"></div>
+      <div class="so-sb"><label class="lb">Loại xe</label><input id="so_car" list="soCarList" autocomplete="off" placeholder="Xe 4 chỗ"><datalist id="soCarList"><option>Xe 4 chỗ</option><option>Xe 7 chỗ</option><option>Xe 16 chỗ</option></datalist></div>
+      <div class="full"><label class="lb" id="so_addrLb">Địa chỉ khách</label><input id="so_addr" list="addrList" autocomplete="off" placeholder="Khách sạn / địa chỉ"></div>
+      <div><label class="lb">Tên khách</label><input id="so_name" placeholder="VD: John Smith"></div>
+      <div><label class="lb">SĐT / WhatsApp</label><input id="so_phone" inputmode="tel" placeholder="+84 …"></div>
+      <div><label class="lb">Số khách</label><input type="number" id="so_pax" min="1" step="1" placeholder="1"></div>
+      <div><label class="lb">Nguồn</label><input id="so_src" list="soSrcList" autocomplete="off" placeholder="Web bán hàng"><datalist id="soSrcList"><option>Web bán hàng</option><option>Zalo / điện thoại</option><option>WhatsApp</option><option>Tại cửa hàng</option><option>Facebook</option></datalist></div>
+      <div><label class="lb">Giá (đ)</label><input type="text" inputmode="numeric" id="so_price" placeholder="0"><div class="so-auto" id="so_priceHint"></div></div>
+      <div><label class="lb">Đã thu (đ)</label><input type="text" inputmode="numeric" id="so_paid" placeholder="0"></div>
+      <div class="full"><label class="lb">Trạng thái</label>
+        <div class="ct-seg" id="so_status"><button type="button" data-v="moi">Mới</button><button type="button" data-v="xn">Đã xác nhận</button><button type="button" data-v="xong">Hoàn thành</button><button type="button" data-v="huy">Huỷ</button></div></div>
+      <div class="full"><label class="lb">Ghi chú</label><textarea id="so_note" rows="2" placeholder="VD: khách có 2 vali lớn, cần ghế trẻ em…"></textarea></div>
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button class="danger" id="so_del" style="margin-right:auto;display:none">Xoá đơn</button>
+      <button class="ghost" data-close="soOverlay" id="so_cancel">Hủy</button>
+      <button class="primary" id="so_save">Lưu</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="expOverlay">
   <div class="modal">
     <button class="modal-x" data-close="expOverlay" title="Đóng">✕</button>
@@ -3928,6 +3997,7 @@ function normalizeDB(){
   if(!DB.places)DB.places={};                   // {key:{name,km,n}} — thư viện địa điểm giao/trả đã lưu
   if(!DB.customSources)DB.customSources={};     // {tênNguồn:'#màu'} — nguồn khách tự thêm
   if(!DB.sourceColors||typeof DB.sourceColors!=='object')DB.sourceColors={};   // màu tự chọn cho nguồn có sẵn (Walk in, Zalo, Meta, iRest) & 2 nhóm công nợ (__recv, __pay)
+  if(!Array.isArray(DB.svcOrders))DB.svcOrders=[];  // Đơn dịch vụ riêng (tab Dịch vụ thêm)
   if(!Array.isArray(DB.contacts))DB.contacts=[];  // Thống kê KH liên hệ: khách thêm tay + phần chọn thêm cho dòng booking
   if(DB.viewPass!==undefined && !String(DB.viewPass).trim()) delete DB.viewPass;   // mật khẩu chế độ chỉ xem (link ?xem=1)
   if(typeof DB.adCostPerDay!=='number')DB.adCostPerDay=+DB.adCostPerDay||0;   // tiền quảng cáo/ngày (Thống kê KH liên hệ)
@@ -4001,7 +4071,7 @@ function snapDaily(){
    gốc của cảnh "đã trả xe lại quay về chưa trả". Không vá được bằng luật phân
    xử — chỉ chữa được bằng cách bỏ hẳn bản riêng và hàng chờ.                    */
 
-const BAN_APP='2026-11-21-shipbill';
+const BAN_APP='2026-11-25-donDV';
 const SB_URL   = 'https://ewkivaybedatwtfpqado.supabase.co';
 const SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3a2l2YXliZWRhdHd0ZnBxYWRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzgzMDgsImV4cCI6MjA5NzQxNDMwOH0.bzuoieSzFKesDHwrITBY8STpppkhF7xtwtY5BM0LarU';
 const SB_TABLE = 'goodbike_items';
@@ -4009,7 +4079,7 @@ const SB_TABLE = 'goodbike_items';
 /* Mảng mà mỗi phần tử là một mục có id riêng -> mỗi phần tử một dòng trên máy chủ */
 const ITEM_PATHS = ['bookings','expenses','assets','maintenance','assetMoves',
                     'inventoryList','funds.khauhao','funds.lairong','funds.tiennha',
-                    'contacts'];   // contacts = Thống kê khách hàng liên hệ (mỗi khách 1 dòng)
+                    'contacts','svcOrders'];   // svcOrders = Đơn dịch vụ riêng (sân bay/tour, không kèm xe) · contacts = Thống kê khách hàng liên hệ (mỗi khách 1 dòng)
 const ITEM_TOP = new Set(ITEM_PATHS.map(p=>p.split('.')[0]));
 /* Nhãn kỹ thuật của cơ chế cũ — không bao giờ đồng bộ, không bao giờ so sánh */
 const BO_QUA = new Set(['_tomb','_cfgRev','_rev','_dev']);
@@ -6493,7 +6563,123 @@ function renderDichVu(){
   });
   document.getElementById('dvTable').innerHTML=th+(rb||'<tr><td colspan="7" class="l muted" style="padding:14px">Không có booking nào có dịch vụ thêm trong khoảng này.</td></tr>');
   document.querySelectorAll('#dvTable .dvrow').forEach(r=>r.onclick=()=>openBooking(r.dataset.id));
+  try{ soRender(); }catch(e){ console.warn('soRender',e); }
 }
+/* ====== ĐƠN DỊCH VỤ RIÊNG (không kèm thuê xe) — 25/11/2026 ======
+   DB.svcOrders (ITEM_PATHS → mỗi đơn 1 dòng kind='svcOrders' trên máy chủ):
+   {id:'so_…', type:'sanbay'|'tour', dir:'don'|'tien' (sân bay), tour:'tên tour', date:'YYYY-MM-DD', time:'HH:MM',
+    flight, car, addr, name, phone, pax, src, price, paid, status:'moi'|'xn'|'xong'|'huy', note, webId?, created}
+   Không cộng vào bảng Tổng doanh thu (giống dịch vụ thêm). Trường sẽ bổ sung khi web bán hàng có form đặt dịch vụ. */
+const SO_ST={moi:'Mới',xn:'Đã xác nhận',xong:'Hoàn thành',huy:'Huỷ'};
+let soFlt='all', soEdit=null, soCur=null, soAutoP=0;
+function soList(){ return Array.isArray(DB.svcOrders)?DB.svcOrders:[]; }
+function soNum(v){ return parseInt(String(v||'').replace(/[^\d]/g,''))||0; }
+function soLabel(o){ return o.type==='tour'?(o.tour||'Tour'):(o.dir==='tien'?'Tiễn sân bay':'Đón sân bay'); }
+function soCatPrice(o){
+  const cat=(typeof svcCat==='function')?svcCat():[];
+  let it=null;
+  if(o.type==='tour'){ const t=String(o.tour||'').trim().toLowerCase(); if(t) it=cat.find(x=>String(x.n).trim().toLowerCase()===t); }
+  else { const re=o.dir==='tien'?/tiễn.*sân bay/i:/đón.*sân bay/i; it=cat.find(x=>re.test(x.n)); }
+  return it?{n:it.n,u:+it.u||0}:null;
+}
+function soRender(){
+  const tb=document.getElementById('soTable'); if(!tb) return;
+  const F=dvFrom, T=dvTo<dvFrom?dvFrom:dvTo, money=n=>fmtVND(n)+'đ', esc=escNote;
+  const all=soList().filter(o=>o&&o.date>=F&&o.date<=T);
+  const l=all.filter(o=>soFlt==='all'||o.type===soFlt).sort((a,b)=>(a.date+(a.time||'99')).localeCompare(b.date+(b.time||'99')));
+  const live=l.filter(o=>o.status!=='huy');
+  const tot=live.reduce((a,o)=>a+(+o.price||0),0), paid=live.reduce((a,o)=>a+Math.min(+o.paid||0,+o.price||0),0);
+  document.getElementById('soSum').innerHTML=`<b>${live.length}</b> đơn · <b>${money(tot)}</b> · đã thu ${money(paid)}`+(tot>paid?` · <span style="color:#b42318">còn ${money(tot-paid)}</span>`:'');
+  document.querySelectorAll('#soFlt button').forEach(b=>b.classList.toggle('on',b.dataset.v===soFlt));
+  const th=`<tr><th class="l">Giờ</th><th class="l">Dịch vụ</th><th class="l">Khách</th><th class="l">Chi tiết</th><th>Giá</th><th class="l">Thu tiền</th><th class="l">Trạng thái</th></tr>`;
+  let last='', rb='';
+  l.forEach(o=>{
+    if(o.date!==last){ last=o.date; rb+=`<tr class="dv-day"><td colspan="7">${dow(o.date)}, ${fmtDMY(o.date)}</td></tr>`; }
+    const pr=+o.price||0, pd=+o.paid||0, rem=pr-pd, st=SO_ST[o.status]?o.status:'moi';
+    const det=[];
+    if(o.type==='sanbay'){ if(o.flight) det.push('✈️ '+esc(o.flight)); if(o.car) det.push(esc(o.car)); }
+    if(o.pax) det.push(esc(o.pax)+' khách');
+    const addr=o.addr?`<br>📍 ${esc(o.addr)}`:'';
+    rb+=`<tr class="sorow${st==='huy'?' huy':''}" data-id="${esc(o.id)}"><td class="l"><b>${o.time?esc(o.time):'—'}</b></td>`
+      +`<td class="l"><span class="so-tag ${o.type==='tour'?'tour':'sb'}">${o.type==='tour'?'TOUR':'SÂN BAY'}</span><br><b>${esc(soLabel(o))}</b></td>`
+      +`<td class="l">${o.name?esc(o.name):'<span class="muted">—</span>'}${o.phone?`<br><small class="muted">${esc(o.phone)}</small>`:''}</td>`
+      +`<td class="l so-d">${det.join(' · ')||''}${addr}${o.note?`<br><i>${esc(o.note)}</i>`:''}</td>`
+      +`<td><b>${pr?money(pr):'—'}</b></td>`
+      +`<td class="l">${st==='huy'?'':(pr&&rem<=0?'<span class="dv-pill ok">Đã thu đủ</span>':pr?`<span class="dv-pill no">Còn ${money(rem)}</span>`:'<span class="muted">—</span>')}</td>`
+      +`<td class="l"><span class="so-st ${st}">${SO_ST[st]}</span></td></tr>`;
+  });
+  tb.innerHTML=th+(rb||`<tr><td colspan="7" class="l muted" style="padding:14px">Chưa có đơn dịch vụ riêng nào trong khoảng ${F===T?fmtDMY(F):fmtDM(F)+' → '+fmtDMY(T)}.</td></tr>`);
+  tb.querySelectorAll('.sorow').forEach(r=>r.onclick=()=>soOpen(r.dataset.id));
+}
+function soSeg(id,v){ document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+function soSegVal(id){ const b=document.querySelector('#'+id+' button.on'); return b?b.dataset.v:''; }
+function soApplyType(){
+  const t=soCur.type, sb=t==='sanbay';
+  document.querySelectorAll('#soOverlay .so-sb').forEach(e=>e.style.display=sb?'':'none');
+  document.querySelectorAll('#soOverlay .so-tour').forEach(e=>e.style.display=sb?'none':'');
+  soSeg('so_type',t); soSeg('so_dir',soCur.dir||'don');
+  document.getElementById('so_timeLb').textContent=sb?(soCur.dir==='tien'?'Giờ đón khách (đi sân bay)':'Giờ máy bay hạ cánh'):'Giờ đón khách';
+  document.getElementById('so_addrLb').textContent=sb?(soCur.dir==='tien'?'Đón khách tại':'Đưa khách về'):'Điểm đón khách';
+  document.getElementById('soTitle').textContent=(soEdit?'Sửa đơn · ':'Đơn mới · ')+(sb?'Đưa đón sân bay':'Tour du lịch');
+}
+function soAutoPrice(){
+  const c=soCatPrice(soCur), inp=document.getElementById('so_price'), cur=soNum(inp.value);
+  document.getElementById('so_priceHint').textContent=c?('Giá danh mục: '+fmtVND(c.u)+'đ'+(soCur.type==='tour'?' / khách':'')):'';
+  if(!c) return;
+  const pax=Math.max(1,soNum(document.getElementById('so_pax').value)||1);
+  const v=soCur.type==='tour'?c.u*pax:c.u;
+  if(!cur||cur===soAutoP){ inp.value=fmtVND(v); soAutoP=v; }
+}
+function soOpen(id,type){
+  const o=id?soList().find(x=>String(x.id)===String(id)):null;
+  if(id&&!o) return;
+  soEdit=o?o.id:null;
+  soCur=o?Object.assign({},o):{type:type||'sanbay',dir:'don',date:todayStr(),status:'moi',src:''};
+  const set=(k,v)=>document.getElementById('so_'+k).value=v==null?'':v;
+  ['tour','date','time','flight','car','addr','name','phone','pax','src','note'].forEach(k=>set(k,soCur[k]));
+  set('price',soCur.price?fmtVND(soCur.price):''); set('paid',soCur.paid?fmtVND(soCur.paid):'');
+  soAutoP=0;
+  const dl=document.getElementById('soTourList');
+  dl.innerHTML=((typeof svcCat==='function')?svcCat():[]).filter(x=>/tour/i.test(x.n)).map(x=>`<option value="${escNote(x.n)}">${fmtVND(+x.u||0)}đ</option>`).join('');
+  soSeg('so_status',SO_ST[soCur.status]?soCur.status:'moi');
+  document.getElementById('so_del').style.display=o?'':'none';
+  soApplyType(); soAutoPrice();
+  document.getElementById('soOverlay').classList.add('open');
+}
+document.getElementById('soAddSb').onclick=()=>soOpen(null,'sanbay');
+document.getElementById('soAddTour').onclick=()=>soOpen(null,'tour');
+document.querySelectorAll('#soFlt button').forEach(b=>b.onclick=()=>{ soFlt=b.dataset.v; soRender(); });
+document.querySelectorAll('#so_type button').forEach(b=>b.onclick=()=>{ soCur.type=b.dataset.v; soApplyType(); soAutoPrice(); });
+document.querySelectorAll('#so_dir button').forEach(b=>b.onclick=()=>{ soCur.dir=b.dataset.v; soApplyType(); soAutoPrice(); });
+document.querySelectorAll('#so_status button').forEach(b=>b.onclick=()=>soSeg('so_status',b.dataset.v));
+document.getElementById('so_tour').addEventListener('input',e=>{ soCur.tour=e.target.value; soAutoPrice(); });
+document.getElementById('so_pax').addEventListener('input',()=>soAutoPrice());
+['so_price','so_paid'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{ const n=soNum(e.target.value); e.target.value=n?fmtVND(n):''; }));
+document.getElementById('so_cancel').onclick=()=>document.getElementById('soOverlay').classList.remove('open');
+document.getElementById('so_save').onclick=()=>{
+  if(typeof viewMode!=='undefined'&&viewMode){ alert('Đang ở chế độ chỉ xem.'); return; }
+  const g=k=>String(document.getElementById('so_'+k).value||'').trim();
+  const o=Object.assign({},soCur,{
+    type:soSegVal('so_type')||soCur.type, date:g('date'), time:g('time'), addr:g('addr'), name:g('name'), phone:g('phone'),
+    pax:soNum(g('pax'))||'', src:g('src'), price:soNum(g('price')), paid:soNum(g('paid')), status:soSegVal('so_status')||'moi', note:g('note')});
+  if(o.type==='sanbay'){ o.dir=soSegVal('so_dir')||'don'; o.flight=g('flight'); o.car=g('car'); delete o.tour; }
+  else { o.tour=g('tour'); delete o.dir; delete o.flight; delete o.car; }
+  if(!o.date){ alert('Chưa chọn ngày.'); return; }
+  if(!o.name&&!o.phone){ alert('Nhập tên hoặc SĐT khách.'); return; }
+  if(o.type==='tour'&&!o.tour){ alert('Chưa nhập tên tour.'); return; }
+  if(o.paid>o.price&&o.price&&!confirm('Số đã thu lớn hơn giá. Vẫn lưu?')) return;
+  if(!Array.isArray(DB.svcOrders)) DB.svcOrders=[];
+  if(soEdit){ const i=DB.svcOrders.findIndex(x=>String(x.id)===String(soEdit)); if(i>=0) DB.svcOrders[i]=o; else DB.svcOrders.push(o); }
+  else { o.id='so_'+uid()+uid(); o.created=new Date().toISOString(); DB.svcOrders.push(o); }
+  save(); document.getElementById('soOverlay').classList.remove('open');
+  if(o.date<dvFrom||o.date>dvTo){ dvFrom=o.date<dvFrom?o.date:dvFrom; dvTo=o.date>dvTo?o.date:dvTo; }
+  renderDichVu();
+};
+document.getElementById('so_del').onclick=()=>{
+  if(!soEdit||!confirm('Xoá đơn dịch vụ này?\n(Khôi phục được trong Lịch sử thao tác → Đã xoá)')) return;
+  DB.svcOrders=soList().filter(x=>String(x.id)!==String(soEdit));
+  save(); document.getElementById('soOverlay').classList.remove('open'); renderDichVu();
+};
 function dvSet(f,t){dvFrom=f;dvTo=t<f?f:t;renderDichVu();}
 document.getElementById('dvFrom').onchange=e=>{if(e.target.value)dvSet(e.target.value,dvTo<e.target.value?e.target.value:dvTo);};
 document.getElementById('dvTo').onchange=e=>{if(e.target.value)dvSet(dvFrom>e.target.value?e.target.value:dvFrom,e.target.value);};
@@ -12316,7 +12502,7 @@ function renderChatLuong(){
   if (document.getElementById('lsFab')) return;
   const HIST = 'goodbike_history';
   const KIND_LB = {bookings:'Booking',expenses:'Chi phí',assets:'Tài sản',maintenance:'Bảo dưỡng',assetMoves:'Biến động TS',
-    inventoryList:'Kiểm kê','funds.khauhao':'Quỹ khấu hao','funds.lairong':'Quỹ lợi nhuận','funds.tiennha':'Quỹ tiền nhà',contacts:'KH liên hệ',cfg:'Cấu hình'};
+    inventoryList:'Kiểm kê','funds.khauhao':'Quỹ khấu hao','funds.lairong':'Quỹ lợi nhuận','funds.tiennha':'Quỹ tiền nhà',contacts:'KH liên hệ',svcOrders:'Đơn dịch vụ',cfg:'Cấu hình'};
   const ACT = {them:['Thêm','#027A48','#ECFDF3'],sua:['Sửa','#175CD3','#EFF8FF'],xoa:['Xoá','#B42318','#FEF3F2'],khoiphuc:['Khôi phục','#6941C6','#F4F3FF']};
   const FLB = {xe:'Xe',guest:'Khách',arrive:'Ngày giao',depart:'Ngày trả',dtime:'Giờ giao',rtime:'Giờ trả',dplan:'Giờ giao dự kiến',rplan:'Giờ trả dự kiến',
     daddr:'Nơi giao',raddr:'Nơi trả',status:'Trạng thái',src:'Nguồn',prices:'Giá',price:'Giá',payments:'Thanh toán',prepaid:'Đã trả',pay:'Hình thức TT',services:'Dịch vụ thêm',
@@ -12560,7 +12746,7 @@ function renderChatLuong(){
       + '<div class="ls-hd"><h3><span>🕘 Lịch sử thao tác</span><button class="ls-x" aria-label="Đóng">✕</button></h3>'
       + '<div class="ls-tabs"><button data-tab="xoa">🗑 Đã xoá</button><button data-tab="ls">📜 Lịch sử</button></div>'
       + '<div class="ls-flt"><select class="ls-kindsel">'
-      + '<option value="bookings">Booking</option><option value="expenses">Chi phí</option><option value="contacts">KH liên hệ</option>'
+      + '<option value="bookings">Booking</option><option value="expenses">Chi phí</option><option value="contacts">KH liên hệ</option><option value="svcOrders">Đơn dịch vụ</option>'
       + '<option value="maintenance">Bảo dưỡng</option><option value="assets">Tài sản</option><option value="cfg">Cấu hình / Kế hoạch</option><option value="*">Tất cả</option></select>'
       + '<select class="ls-days"><option value="1">24 giờ qua</option><option value="7">7 ngày</option><option value="30">30 ngày</option><option value="90">90 ngày</option><option value="all">Tất cả</option></select>'
       + '<input class="ls-q" type="search" placeholder="Tìm tên khách, xe, SĐT…"></div>'
